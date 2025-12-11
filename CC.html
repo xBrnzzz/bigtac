@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>BIGTAC - Menu Uploader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-200 p-10 font-mono">
+
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-3xl font-bold text-orange-500 mb-6">BIGTAC - Menu Uploader</h1>
+        
+        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl mb-8">
+            <p class="mb-4 text-slate-300">This tool will wipe existing categories/items if you want a clean slate (optional), or just append. <br><strong class="text-white">Clicking start adds the data below to Firestore.</strong></p>
+            <button onclick="startUpload()" id="btn" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-lg font-bold transition">
+                Start Menu Upload
+            </button>
+        </div>
+
+        <div id="logs" class="space-y-2 text-sm max-h-[60vh] overflow-y-auto bg-black p-4 rounded-lg border border-slate-700 font-mono">
+            <div class="text-slate-500">Ready to start...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, collection, addDoc } from './firebase-config.js';
+
+        // --- SAUCES DATA (Shared for Tacos) ---
+        const SAUCE_OPTIONS = [
+            { name: "Biggy", price: 0 }, { name: "Mayonnaise", price: 0 }, { name: "Pita", price: 0 }, 
+            { name: "Blanche", price: 0 }, { name: "Tartare", price: 0 }, { name: "Magic Onions", price: 0 }, 
+            { name: "Old School", price: 0 }, { name: "Brazil", price: 0 }, { name: "American", price: 0 }, 
+            { name: "Barbecue", price: 0 }, { name: "Ketchup", price: 0 }, { name: "Andalouse", price: 0 }, 
+            { name: "Buffalo-tasty", price: 0 }, { name: "Cocktail", price: 0 }, { name: "Hummer", price: 0 },
+            { name: "Algérienne", price: 0 }, { name: "Samouraï", price: 0 }, { name: "Marocaine", price: 0 }, 
+            { name: "Chilli thaï", price: 0 }, { name: "Pili pili", price: 0 }
+        ];
+
+        // --- MENU DATA ---
+        const DATA = {
+          menu: {
+            sections: [
+              {
+                name: "Tacos",
+                items: [
+                  { name: "Poulet", image: "assets/tacos.png", prices: { M: 22, L: 32, XL: 45 } },
+                  { name: "Viande Hachée", image: "assets/tacos.png", prices: { M: 22, L: 32, XL: 45 } },
+                  { name: "Nuggets", image: "assets/tacos.png", prices: { M: 25, L: 35, XL: 45 } },
+                  { name: "Cordon-bleu", image: "assets/tacos.png", prices: { L: 35, XL: 48 } },
+                  { name: "Mixte", image: "assets/tacos.png", prices: { M: 25, L: 35, XL: 48 }, desc: "2 viandes au choix" }
+                ],
+                supplements: [
+                    { name: "Frites", price: 5 },
+                    { name: "Sauce Extra", price: 2 }
+                ]
+              },
+              {
+                name: "Tacos Gratiné",
+                items: [
+                  { name: "Poulet Gratiné", image: "assets/tacos.png", prices: { M: 27, L: 39, XL: 55 } }, // Base + (5, 7, 10)
+                  { name: "Viande Hachée Gratiné", image: "assets/tacos.png", prices: { M: 27, L: 39, XL: 55 } },
+                  { name: "Nuggets Gratiné", image: "assets/tacos.png", prices: { M: 30, L: 42, XL: 55 } },
+                  { name: "Cordon-bleu Gratiné", image: "assets/tacos.png", prices: { L: 42, XL: 58 } },
+                  { name: "Mixte Gratiné", image: "assets/tacos.png", prices: { M: 30, L: 42, XL: 58 } }
+                ],
+                supplements: [
+                    { name: "Frites", price: 5 },
+                    { name: "Sauce Extra", price: 2 }
+                ]
+              },
+              {
+                name: "Tacos Special",
+                items: [
+                   { name: "Tacos Zinger Combo", price: 35, image: "assets/tacos.png" },
+                   { name: "Tacos Big-tac Royal", price: 40, image: "assets/tacos.png" },
+                   { name: "Tacos Crunchy XL", price: 49, image: "assets/tacos.png" },
+                   { name: "Tacos X'trême (4-6 pers)", price: 105, image: "assets/tacos.png" },
+                   { name: "Tacos X'trême Royal (6-8 pers)", price: 160, image: "assets/tacos.png" }
+                ],
+                supplements: [
+                    { name: "Frites", price: 5 },
+                    { name: "Sauce Extra", price: 2 }
+                ]
+              },
+              {
+                name: "Hunter Box",
+                items: [
+                    { name: "Mini Hunter Box", price: 30, image: "assets/box.png" },
+                    { name: "Hunter Box", price: 42, image: "assets/box.png" }
+                ]
+              },
+              {
+                name: "Poutine",
+                items: [
+                    { name: "Poulet", price: 25, image: "assets/poutine.png" },
+                    { name: "Viande Hachée", price: 25, image: "assets/poutine.png" },
+                    { name: "Charcuterie", price: 25, image: "assets/poutine.png" },
+                    { name: "Nuggets", price: 25, image: "assets/poutine.png" },
+                    { name: "Cordon Bleu", price: 30, image: "assets/poutine.png" },
+                    { name: "Mixte", price: 30, image: "assets/poutine.png" }
+                ]
+              },
+              {
+                name: "Panini",
+                items: [
+                    { name: "Poulet", price: 18, image: "assets/panini.png" },
+                    { name: "Viande Hachée", price: 18, image: "assets/panini.png" },
+                    { name: "Charcuterie", price: 20, image: "assets/panini.png" },
+                    { name: "Mixte", price: 20, image: "assets/panini.png" }
+                ]
+              },
+              {
+                name: "Witcher",
+                items: [
+                    { name: "Poulet", price: 14, image: "assets/burger.png" },
+                    { name: "Viande Hachée", price: 14, image: "assets/burger.png" },
+                    { name: "Mixte", price: 17, image: "assets/burger.png" },
+                    { name: "Tenders", price: 17, image: "assets/burger.png" }
+                ]
+              },
+              {
+                name: "Sandwich",
+                items: [
+                    { name: "Zinger + Frites", price: 35, image: "assets/sandwich.png" },
+                    { name: "Zinger Spicy + Frites", price: 35, image: "assets/sandwich.png" },
+                    { name: "Plat Chicken Royal", price: 39, image: "assets/assiette.png" }
+                ]
+              },
+              {
+                name: "Boissons & Desserts",
+                items: [
+                    { name: "Potatoes", price: 10, image: "assets/potatos.png" },
+                    { name: "Boisson", price: 5, image: "assets/soda25.png" },
+                    { name: "Eau Minérale", price: 5, image: "assets/eau.png" },
+                    { name: "Oulmès", price: 6, image: "assets/oulmes.png" },
+                    { name: "Tiramisu", price: 13, image: "assets/tiramisu.png" }
+                ]
+              }
+            ]
+          }
+        };
+
+        const log = (msg, type='info') => {
+            const el = document.getElementById('logs');
+            const color = type === 'success' ? 'text-green-400' : 'text-slate-400';
+            el.innerHTML += `<div class="${color}">${msg}</div>`;
+            el.scrollTop = el.scrollHeight;
+        };
+
+        window.startUpload = async () => {
+            const btn = document.getElementById('btn');
+            btn.disabled = true;
+            btn.innerText = "Uploading... Please Wait";
+            
+            try {
+                let catOrder = 1;
+                let itemOrder = 1;
+                
+                for (const section of DATA.menu.sections) {
+                    // 1. Upload Category
+                    log(`Processing Category: ${section.name}...`);
+                    await addDoc(collection(db, "categories"), {
+                        name: section.name,
+                        order: catOrder++,
+                        image: section.items[0]?.image || '', 
+                        createdAt: new Date()
+                    });
+
+                    // 2. Upload Items
+                    for (const item of section.items) {
+                        const itemData = {
+                            name: item.name,
+                            category: section.name,
+                            description: item.desc || '',
+                            imageUrl: item.image || '',
+                            isPopular: !!item.popular,
+                            isVisible: true,
+                            order: itemOrder++,
+                            supplements: section.supplements || [],
+                            mandatoryChoices: [],
+                            createdAt: new Date()
+                        };
+
+                        // Logic: Handle Sizes (Prices object)
+                        if (item.prices) {
+                            itemData.price = 0; // Base price is 0 if sizes exist
+                            const sizeOptions = [];
+                            for (const [size, price] of Object.entries(item.prices)) {
+                                if (price !== null) {
+                                    sizeOptions.push({ name: size, price: price });
+                                }
+                            }
+                            itemData.mandatoryChoices.push({
+                                title: "Taille",
+                                type: "radio",
+                                min: 1,
+                                max: 1,
+                                options: sizeOptions
+                            });
+                        } else {
+                            // Simple Price
+                            itemData.price = item.price || 0;
+                        }
+
+                        // Logic: Inject Sauces for Tacos categories
+                        if (section.name.includes("Tacos")) {
+                            itemData.mandatoryChoices.push({
+                                title: "Sauces (2 Max)",
+                                type: "checkbox",
+                                min: 0,
+                                max: 2,
+                                options: SAUCE_OPTIONS
+                            });
+                        }
+
+                        // Add to Firestore
+                        await addDoc(collection(db, "menuItems"), itemData);
+                        log(`-- Uploaded Item: ${item.name}`, 'success');
+                    }
+                }
+                
+                log("-----------------------------------");
+                log("🎉 UPLOAD COMPLETE! You can close this page.", 'success');
+                btn.innerText = "Upload Complete";
+
+            } catch (error) {
+                console.error(error);
+                log(`❌ ERROR: ${error.message}`, 'error');
+                btn.disabled = false;
+                btn.innerText = "Retry Upload";
+            }
+        };
+    </script>
+</body>
+</html>
