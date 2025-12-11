@@ -183,11 +183,24 @@
 
                         // Logic: Handle Sizes (Prices object)
                         if (item.prices) {
-                            itemData.price = 0; // Base price is 0 if sizes exist
+                            // Find Base Price: Prefer 'M', otherwise use lowest available price
+                            let basePrice = 0;
+                            const validPrices = Object.values(item.prices).filter(p => p !== null && p !== undefined);
+                            
+                            if (item.prices.M) {
+                                basePrice = item.prices.M;
+                            } else if (validPrices.length > 0) {
+                                basePrice = Math.min(...validPrices);
+                            }
+
+                            itemData.price = basePrice;
+                            
                             const sizeOptions = [];
                             for (const [size, price] of Object.entries(item.prices)) {
                                 if (price !== null) {
-                                    sizeOptions.push({ name: size, price: price });
+                                    // Calculate difference from base price
+                                    const diff = price - basePrice;
+                                    sizeOptions.push({ name: size, price: diff });
                                 }
                             }
                             itemData.mandatoryChoices.push({
