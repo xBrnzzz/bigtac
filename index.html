@@ -1587,15 +1587,46 @@
 
         // WHATSAPP MODE
         if (appConfig.whatsappMode) {
-            // ... (Keep your existing WhatsApp logic here) ...
             const phoneNumber = WHATSAPP_NUMBERS['default'];
-            let message = `*Nouvelle Commande - BIGTAC*\n\n`;
-            // ... build message ...
-            message += `👤 *Nom:* ${checkoutData.name}\n`;
-            message += `💰 *Total:* ${total.toFixed(2)} Dh`;
             
-            cart = []; localStorage.setItem('bigtacCart', '[]'); updateCartUI();
+            // 1. Build Header
+            let message = `*Nouvelle Commande - BIGTAC*\n\n`;
+            message += `👤 *Nom:* ${checkoutData.name}\n`;
+            message += `📞 *Tél:* ${checkoutData.phone}\n`;
+            message += `📦 *Mode:* ${type.toUpperCase()}\n`;
+            
+            // 2. Add Location/Address
+            if(type === 'livraison') {
+                message += `📍 *Adresse:* ${checkoutData.location}\n`;
+            } else {
+                message += `📍 *Lieu:* ${checkoutData.location}\n`;
+            }
+            
+            message += `\n*Articles:*\n`;
+            
+            // 3. List Every Item in Cart
+            cart.forEach(item => {
+                message += `- ${item.qty}x ${item.name}`;
+                
+                // Combine size options and supplements into one text
+                const opts = [...(item.selectedOptions || []), ...(item.supplements || [])]
+                    .map(o => o.name)
+                    .join(', ');
+                    
+                if(opts) message += ` (${opts})`;
+                message += `\n`;
+            });
+            
+            // 4. Add Total and Note
+            message += `\n💰 *Total:* ${total.toFixed(2)} Dh`;
+            if(checkoutData.note) message += `\n📝 *Note:* ${checkoutData.note}`;
+            
+            // 5. Clear Cart and Redirect
+            cart = []; 
+            localStorage.setItem('bigtacCart', '[]'); 
+            updateCartUI();
             closeModalAnimation('summaryModal');
+            
             window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
             
             if(btn) { btn.innerText = "Confirmer la Commande"; btn.disabled = false; }
