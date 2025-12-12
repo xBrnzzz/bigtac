@@ -1470,6 +1470,7 @@
         const supps = [];
         let finalPrice = currentItem.price;
 
+        // CHECK: Is this Wizard Mode (>1 step) or Simple Mode?
         if (wizardSteps.length > 1) {
             // --- WIZARD MODE (Existing Logic) ---
             Object.keys(wizardData).forEach(key => {
@@ -1487,38 +1488,47 @@
             finalPrice *= modalQty;
 
         } else {
-            // --- SIMPLE VIEW MODE (Fix Applied Here) ---
+            // --- SIMPLE VIEW MODE (Validation Fix) ---
             
             // 1. VALIDATION LOOP
+            let isValid = true;
+            
             for (let i = 0; i < wizardSteps.length; i++) {
                 const step = wizardSteps[i];
+                
+                // Only validate "Choices/Variantes" (Supplements are usually optional)
                 if (step.type === 'choice') {
                     const group = step.data;
-                    const checkedInputs = document.querySelectorAll(`input[name="simple_opt_${i}"]:checked`);
+                    const type = (group.type || 'radio').toLowerCase(); // Handle 'Radio' vs 'radio'
+                    const inputsName = `simple_opt_${i}`;
+                    const checkedInputs = document.querySelectorAll(`input[name="${inputsName}"]:checked`);
+                    
+                    console.log(`Validating Group: ${group.title} | Type: ${type} | Checked: ${checkedInputs.length}`);
 
-                    // Check if Radio group has a selection
-                    if ((group.type === 'radio' || group.type === 'select') && checkedInputs.length === 0) {
-                        // Shake animation or alert
-                        const container = document.querySelector(`input[name="simple_opt_${i}"]`).closest('div').parentElement;
-                        container.classList.add('bg-red-50', 'border-red-500');
-                        setTimeout(() => container.classList.remove('bg-red-50', 'border-red-500'), 1000);
-                        
+                    // RULE 1: Radio/Select MUST have 1 selection
+                    if ((type === 'radio' || type === 'select') && checkedInputs.length === 0) {
+                        isValid = false;
+                        highlightError(inputsName);
                         alert(`⚠️ Veuillez choisir une option pour : ${group.title}`);
-                        return; // STOP HERE
+                        break; // Stop loop
                     }
                     
-                    // Check Checkbox minimum requirements
-                    if (group.type === 'checkbox') {
+                    // RULE 2: Checkbox MUST meet Minimum requirement
+                    if (type === 'checkbox') {
                         const min = parseInt(group.min) || 0;
                         if (checkedInputs.length < min) {
+                             isValid = false;
+                             highlightError(inputsName);
                              alert(`⚠️ Veuillez sélectionner au moins ${min} option(s) pour : ${group.title}`);
-                             return; // STOP HERE
+                             break; // Stop loop
                         }
                     }
                 }
             }
 
-            // 2. DATA COLLECTION (If validation passes)
+            if (!isValid) return; // STOP FUNCTION IF INVALID
+
+            // 2. DATA COLLECTION (Only runs if valid)
             document.querySelectorAll('.option-input:checked').forEach(i => opts.push({name: i.value}));
             document.querySelectorAll('.supp-check:checked').forEach(i => supps.push({name: i.value, price: parseFloat(i.dataset.price)}));
             finalPrice = window.calcModalTotal() || (currentItem.price * modalQty);
@@ -1551,6 +1561,18 @@
         setTimeout(() => { t.classList.remove('opacity-0', 'translate-y-10'); }, 10);
         setTimeout(() => { t.classList.add('opacity-0', 'translate-y-10'); setTimeout(()=> t.classList.add('hidden'), 300); }, 3000);
     };
+
+    // Helper to show red error box
+    function highlightError(name) {
+        const firstInput = document.querySelector(`input[name="${name}"]`);
+        if(firstInput) {
+            // Find the parent container of the options
+            const container = firstInput.closest('div').parentElement.parentElement; 
+            container.classList.add('border-2', 'border-red-500', 'bg-red-50');
+            container.scrollIntoView({behavior: 'smooth', block: 'center'});
+            setTimeout(() => container.classList.remove('border-2', 'border-red-500', 'bg-red-50'), 2000);
+        }
+    }
 
     window.closeAddItemModal = () => { closeModalAnimation('addItemModal'); };
     window.updateModalQty = (d) => { 
