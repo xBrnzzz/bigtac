@@ -718,16 +718,79 @@
             return (await res.json()).secure_url;
         }
         window.saveItem = async () => {
-            const btn = document.getElementById('btn-save-item'); btn.innerText = "Enregistrement..."; btn.disabled = true;
+            const btn = document.getElementById('btn-save-item'); 
+            
+            // 1. VALIDATION: Check Category
+            const categoryVal = document.getElementById('input-category').value;
+            if (!categoryVal || categoryVal === "") {
+                alert(" Veuillez sélectionner une catégorie pour ce plat.");
+                // Highlight the select box red
+                document.getElementById('input-category').classList.add('border-red-500', 'bg-red-50');
+                setTimeout(() => document.getElementById('input-category').classList.remove('border-red-500', 'bg-red-50'), 2000);
+                return; // STOP execution
+            }
+
+            btn.innerText = "Enregistrement..."; 
+            btn.disabled = true;
+            
             try {
-                const id = document.getElementById('edit-item-id').value; const fileInput = document.getElementById('input-image-file');
-                let imageUrl = document.getElementById('input-image-url').value; if (fileInput.files.length > 0) imageUrl = await uploadToCloudinary(fileInput.files[0]);
-                const data = { name: document.getElementById('input-name').value, price: parseFloat(document.getElementById('input-price').value) || 0, description: document.getElementById('input-desc').value, category: document.getElementById('input-category').value, imageUrl: imageUrl, isPopular: document.getElementById('input-popular').checked, isVisible: document.getElementById('input-visible').checked, mandatoryChoices: [], supplements: [] };
-                document.querySelectorAll('.group-row').forEach(g => { const title = g.querySelector('.g-title').value; const type = g.querySelector('.g-type').value; const min = parseInt(g.querySelector('.g-min').value) || 0; const max = parseInt(g.querySelector('.g-max').value) || 0; const options = []; g.querySelectorAll('.option-row').forEach(r => { const name = r.querySelector('.opt-name').value; const price = parseFloat(r.querySelector('.opt-price').value) || 0; if(name) options.push({name, price}); }); if(title && options.length > 0) data.mandatoryChoices.push({title, type, options, min: min, max: max}); });
-                document.querySelectorAll('.supp-row').forEach(r => { const name = r.querySelector('.supp-name').value; const price = parseFloat(r.querySelector('.supp-price').value) || 0; if(name) data.supplements.push({name, price}); });
-                if(id) await updateDoc(doc(db, 'menuItems', id), data); else { data.order = items.length; data.createdAt = serverTimestamp(); await addDoc(collection(db, 'menuItems'), data); }
-                closeItemEditor(); loadItems();
-            } catch(e) { console.error(e); alert('Erreur sauvegarde: ' + e.message); } finally { btn.innerText = "Enregistrer"; btn.disabled = false; }
+                const id = document.getElementById('edit-item-id').value; 
+                const fileInput = document.getElementById('input-image-file');
+                let imageUrl = document.getElementById('input-image-url').value; 
+                
+                if (fileInput.files.length > 0) imageUrl = await uploadToCloudinary(fileInput.files[0]);
+                
+                const data = { 
+                    name: document.getElementById('input-name').value, 
+                    price: parseFloat(document.getElementById('input-price').value) || 0, 
+                    description: document.getElementById('input-desc').value, 
+                    category: categoryVal, // Used validated value
+                    imageUrl: imageUrl, 
+                    isPopular: document.getElementById('input-popular').checked, 
+                    isVisible: document.getElementById('input-visible').checked, 
+                    mandatoryChoices: [], 
+                    supplements: [] 
+                };
+                
+                // Collect Choices
+                document.querySelectorAll('.group-row').forEach(g => { 
+                    const title = g.querySelector('.g-title').value; 
+                    const type = g.querySelector('.g-type').value; 
+                    const min = parseInt(g.querySelector('.g-min').value) || 0; 
+                    const max = parseInt(g.querySelector('.g-max').value) || 0; 
+                    const options = []; 
+                    g.querySelectorAll('.option-row').forEach(r => { 
+                        const name = r.querySelector('.opt-name').value; 
+                        const price = parseFloat(r.querySelector('.opt-price').value) || 0; 
+                        if(name) options.push({name, price}); 
+                    }); 
+                    if(title && options.length > 0) data.mandatoryChoices.push({title, type, options, min, max}); 
+                });
+                
+                // Collect Supplements
+                document.querySelectorAll('.supp-row').forEach(r => { 
+                    const name = r.querySelector('.supp-name').value; 
+                    const price = parseFloat(r.querySelector('.supp-price').value) || 0; 
+                    if(name) data.supplements.push({name, price}); 
+                });
+                
+                if(id) await updateDoc(doc(db, 'menuItems', id), data); 
+                else { 
+                    data.order = items.length; 
+                    data.createdAt = serverTimestamp(); 
+                    await addDoc(collection(db, 'menuItems'), data); 
+                }
+                
+                closeItemEditor(); 
+                loadItems();
+                
+            } catch(e) { 
+                console.error(e); 
+                alert('Erreur sauvegarde: ' + e.message); 
+            } finally { 
+                btn.innerText = "Enregistrer"; 
+                btn.disabled = false; 
+            }
         };
         window.saveItemOrder = async () => { const list = document.getElementById('items-grid'); const ids = Array.from(list.children).map(c => c.getAttribute('data-id')).filter(Boolean); if(!ids.length) return; const btn = document.getElementById('btn-save-order'); const prevText = btn.innerHTML; btn.innerText = "..."; try { await Promise.all(ids.map((id, index) => updateDoc(doc(db, 'menuItems', id), { order: index }))); alert("Ordre du menu sauvegardé !"); } catch(e) { console.error(e); alert("Erreur."); } finally { btn.innerHTML = prevText; } };
         window.saveCategoryOrder = async () => { const list = document.getElementById('categories-list-manage'); const ids = Array.from(list.children).map(c => c.getAttribute('data-id')).filter(Boolean); try { await Promise.all(ids.map((id, index) => updateDoc(doc(db, 'categories', id), { order: index }))); alert("Ordre des catégories mis à jour !"); loadCategories(); } catch(e) { console.error(e); alert("Erreur."); } };
