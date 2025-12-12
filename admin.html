@@ -795,7 +795,86 @@
         window.saveItemOrder = async () => { const list = document.getElementById('items-grid'); const ids = Array.from(list.children).map(c => c.getAttribute('data-id')).filter(Boolean); if(!ids.length) return; const btn = document.getElementById('btn-save-order'); const prevText = btn.innerHTML; btn.innerText = "..."; try { await Promise.all(ids.map((id, index) => updateDoc(doc(db, 'menuItems', id), { order: index }))); alert("Ordre du menu sauvegardé !"); } catch(e) { console.error(e); alert("Erreur."); } finally { btn.innerHTML = prevText; } };
         window.saveCategoryOrder = async () => { const list = document.getElementById('categories-list-manage'); const ids = Array.from(list.children).map(c => c.getAttribute('data-id')).filter(Boolean); try { await Promise.all(ids.map((id, index) => updateDoc(doc(db, 'categories', id), { order: index }))); alert("Ordre des catégories mis à jour !"); loadCategories(); } catch(e) { console.error(e); alert("Erreur."); } };
         window.deleteItem = async (id) => { if(confirm("Supprimer définitivement ?")) { await deleteDoc(doc(db, 'menuItems', id)); loadItems(); } };
-        document.getElementById('category-form').addEventListener('submit', async e => { e.preventDefault(); const btn = document.getElementById('btn-save-cat'); btn.disabled = true; btn.innerText = "..."; try { const id = document.getElementById('cat-id').value; const name = document.getElementById('cat-name').value; const fileInput = document.getElementById('cat-image-file'); let imageUrl = null; if (fileInput.files.length > 0) imageUrl = await uploadToCloudinary(fileInput.files[0]); const data = { name }; if (imageUrl) data.image = imageUrl; if (!id) data.order = categories.length; if (id) await updateDoc(doc(db, 'categories', id), data); else await addDoc(collection(db, 'categories'), data); resetCategoryForm(); loadCategories(); } catch(e) { console.error(e); alert('Erreur'); } finally { btn.disabled = false; btn.innerText = "Enregistrer"; } });
+        // --- SMART CATEGORY SAVE (Fixes the Empty Menu Issue) ---
+    
+        // 1. Clean up any old event listeners so they don't clash
+        const catFormRef = document.getElementById('category-form');
+        catFormRef.replaceWith(catFormRef.cloneNode(true));
+
+        // 2. Add the new "Smart" Listener
+        document.getElementById('category-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-cat');
+            btn.disabled = true;
+            btn.innerText = "Sauvegarde...";
+            
+            try {
+                // Get the values from the form
+                const id = document.getElementById('cat-id').value;
+                const newName = document.getElementById('cat-name').value.trim(); // New Name (e.g., "Smash Burgers")
+                const fileInput = document.getElementById('cat-image-file');
+                
+                // Upload Image if selected
+                let imageUrl = null;
+                if (fileInput.files.length > 0) {
+                    imageUrl = await uploadToCloudinary(fileInput.files[0]);
+                }
+                
+                const data = { name: newName };
+                if (imageUrl) data.image = imageUrl;
+                
+                if (id) {
+                    // --- EDITING EXISTING CATEGORY ---
+                    
+                    // A. First, find out what the OLD name was
+                    const catRef = doc(db, 'categories', id);
+                    const snapshot = await getDoc(catRef);
+                    const oldName = snapshot.exists() ? snapshot.data().name : null;
+                    
+                    // B. Update the category to the NEW name
+                    await updateDoc(catRef, data);
+
+                    // C. CRITICAL STEP: Fix the Items
+                    // If the name actually changed (e.g., Burgers -> Smash Burgers)
+                    if (oldName && oldName !== newName) {
+                        
+                        // Find all items that still have the OLD name
+                        const q = query(collection(db, 'menuItems'), where('category', '==', oldName));
+                        const itemsSnap = await getDocs(q);
+                        
+                        // Create a "Batch" (a list of updates to do at once)
+                        const batch = writeBatch(db);
+                        itemsSnap.forEach(itemDoc => {
+                            // Update each item to the NEW name
+                            batch.update(itemDoc.ref, { category: newName });
+                        });
+                        
+                        // Run the batch update
+                        if (!itemsSnap.empty) {
+                            await batch.commit();
+                            console.log(`Success! Moved ${itemsSnap.size} items to ${newName}`);
+                        }
+                    }
+
+                } else {
+                    // --- CREATING NEW CATEGORY ---
+                    data.order = categories.length;
+                    await addDoc(collection(db, 'categories'), data);
+                }
+                
+                // Close modal and refresh the page to see changes
+                closeCategoryEditor();
+                await loadCategories(); 
+                await loadItems(); 
+                
+            } catch(e) {
+                console.error(e);
+                alert('Erreur: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Enregistrer";
+            }
+        });
         window.editCategory = (id) => { const c = categories.find(x => x.id === id); if(c) { document.getElementById('cat-id').value = c.id; document.getElementById('cat-name').value = c.name; document.getElementById('btn-save-cat').innerText = "Modifier"; window.scrollTo({top:0, behavior:'smooth'}); } };
         window.resetCategoryForm = () => { document.getElementById('category-form').reset(); document.getElementById('cat-id').value = ''; document.getElementById('btn-save-cat').innerText = "Enregistrer"; };
         window.deleteCategory = async (id) => { if(confirm("Supprimer ?")) { await deleteDoc(doc(db, 'categories', id)); loadCategories(); } };
