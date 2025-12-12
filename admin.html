@@ -386,7 +386,8 @@
     <!-- JS Logic Reused from original file, ensures everything works as before -->
     <script type="module">
         import { auth, db, signInWithEmailAndPassword, onAuthStateChanged, signOut, collection, addDoc, getDocs, deleteDoc, updateDoc, getDoc, doc, query, orderBy, onSnapshot, serverTimestamp, writeBatch, where, setDoc } from './firebase-config.js';
-        
+        window.auth = auth;
+        window.signOut = signOut;
         const CLOUDINARY_CLOUD_NAME = "dv0vnjnto"; 
         const CLOUDINARY_PRESET = "qaoutiassets"; 
 
