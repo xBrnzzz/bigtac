@@ -1460,6 +1460,7 @@
         let finalPrice = currentItem.price;
 
         if (wizardSteps.length > 1) {
+            // --- WIZARD MODE (Existing Logic) ---
             Object.keys(wizardData).forEach(key => {
                 const stepIdx = parseInt(key);
                 const step = wizardSteps[stepIdx];
@@ -1473,12 +1474,46 @@
             Object.values(wizardData).forEach(stepItems => stepItems.forEach(item => wizardAddons += item.price));
             finalPrice += wizardAddons;
             finalPrice *= modalQty;
+
         } else {
+            // --- SIMPLE VIEW MODE (Fix Applied Here) ---
+            
+            // 1. VALIDATION LOOP
+            for (let i = 0; i < wizardSteps.length; i++) {
+                const step = wizardSteps[i];
+                if (step.type === 'choice') {
+                    const group = step.data;
+                    const checkedInputs = document.querySelectorAll(`input[name="simple_opt_${i}"]:checked`);
+
+                    // Check if Radio group has a selection
+                    if ((group.type === 'radio' || group.type === 'select') && checkedInputs.length === 0) {
+                        // Shake animation or alert
+                        const container = document.querySelector(`input[name="simple_opt_${i}"]`).closest('div').parentElement;
+                        container.classList.add('bg-red-50', 'border-red-500');
+                        setTimeout(() => container.classList.remove('bg-red-50', 'border-red-500'), 1000);
+                        
+                        alert(`⚠️ Veuillez choisir une option pour : ${group.title}`);
+                        return; // STOP HERE
+                    }
+                    
+                    // Check Checkbox minimum requirements
+                    if (group.type === 'checkbox') {
+                        const min = parseInt(group.min) || 0;
+                        if (checkedInputs.length < min) {
+                             alert(`⚠️ Veuillez sélectionner au moins ${min} option(s) pour : ${group.title}`);
+                             return; // STOP HERE
+                        }
+                    }
+                }
+            }
+
+            // 2. DATA COLLECTION (If validation passes)
             document.querySelectorAll('.option-input:checked').forEach(i => opts.push({name: i.value}));
             document.querySelectorAll('.supp-check:checked').forEach(i => supps.push({name: i.value, price: parseFloat(i.dataset.price)}));
             finalPrice = window.calcModalTotal() || (currentItem.price * modalQty);
         }
 
+        // --- ADD TO CART (Common Logic) ---
         cart.push({
             cartId: Date.now(),
             id: currentItem.id,
