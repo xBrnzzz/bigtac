@@ -775,6 +775,7 @@
     let allItems = [];
     let allPromotions = [];
     let allCategories = [];
+    let categoryImages = {};
     let cart = JSON.parse(localStorage.getItem('bigtacCart') || '[]');
     let currentItem = null;
     let modalQty = 1;
@@ -946,6 +947,7 @@
             snap.forEach(doc => {
                 const d = doc.data();
                 allCategories.push(d.name);
+                categoryImages[d.name] = d.image;
                 if (d.image) {
                     html += `<button onclick="filterSection('${d.name}')" class="filter-btn filter-btn-image w-auto min-w-[120px] h-[46px] px-4 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" style="background-image: url('${d.image}')" data-cat="${d.name}"><span class="relative z-10 drop-shadow-md">${d.name}</span></button>`;
                 } else {
@@ -993,7 +995,7 @@
                 container.innerHTML = allPromotions.map(item => `
                     <div class="menu-card snap-center shrink-0 w-[280px] cursor-pointer" onclick="openItemModal('${item.id}', true)">
                         <div class="relative">
-                            <img src="${item.imageUrl}" alt="${item.name}" class="menu-card-image h-[180px]">
+                            <img src="${item.imageUrl || categoryImages[item.category] || 'assets/snack.png'}" alt="${item.name}" class="menu-card-image" loading="lazy">
                             <div class="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-md">-PROMO-</div>
                         </div>
                         <div class="menu-card-content">
@@ -1059,7 +1061,7 @@
         popContainer.innerHTML = populars.map(item => `
             <div class="menu-card snap-center shrink-0 w-[280px] cursor-pointer" onclick="openItemModal('${item.id}')">
                 <div class="relative h-[180px]">
-                    <img src="${item.imageUrl || 'assets/snack.png'}" alt="${item.name}" class="w-full h-full object-cover rounded-t-2xl">
+                    <img src="${item.imageUrl || categoryImages[item.category] || 'assets/snack.png'}" alt="${item.name}" class="w-full h-full object-cover rounded-t-2xl">
                     <div class="absolute top-3 left-3 bg-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-md">POPULAIRE</div>
                 </div>
                 <div class="p-4">
@@ -1107,7 +1109,7 @@
         document.getElementById('modalItemName').innerText = currentItem.name;
         document.getElementById('modalItemBasePrice').innerText = currentItem.price + " MAD";
         document.getElementById('modalItemDesc').innerText = currentItem.description || '';
-        document.getElementById('modalItemImage').src = currentItem.imageUrl || 'assets/snack.png';
+        document.getElementById('modalItemImage').src = currentItem.imageUrl || categoryImages[currentItem.category] || 'assets/snack.png';
         
         wizardSteps = [];
         if (currentItem.mandatoryChoices && currentItem.mandatoryChoices.length > 0) {
