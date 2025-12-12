@@ -713,6 +713,180 @@
         window.closePromoEditor = () => { document.getElementById('promo-editor').children[1].classList.add('translate-x-full'); setTimeout(() => document.getElementById('promo-editor').classList.add('hidden'), 300); };
         window.savePromo = async () => { const btn = document.getElementById('btn-save-promo'); btn.innerText = "Sauvegarde..."; btn.disabled = true; try { const id = document.getElementById('edit-promo-id').value; const fileInput = document.getElementById('promo-image-file'); let imageUrl = document.getElementById('promo-image-url').value; if (fileInput.files.length > 0) imageUrl = await uploadToCloudinary(fileInput.files[0]); const data = { name: document.getElementById('promo-name').value, price: parseFloat(document.getElementById('promo-price').value)||0, description: document.getElementById('promo-desc').value, imageUrl: imageUrl, isVisible: document.getElementById('promo-visible').checked }; if (id) await updateDoc(doc(db, 'promotions', id), data); else await addDoc(collection(db, 'promotions'), data); closePromoEditor(); loadPromotions(); } catch(e) { console.error(e); alert("Erreur."); } finally { btn.innerText = "Sauvegarder Promo"; btn.disabled = false; } };
         window.deletePromo = async (id) => { if(confirm("Supprimer ?")) { await deleteDoc(doc(db, 'promotions', id)); loadPromotions(); } };
+        // --- PROMOTION EDITOR LOGIC FIXES ---
+
+        // 1. Tab Switching for Promo Editor
+        window.switchPromoTab = (tab) => {
+            document.getElementById('promo-panel-choices').classList.add('hidden');
+            document.getElementById('promo-panel-supplements').classList.add('hidden');
+            
+            document.getElementById('promo-tab-choices').className = "flex-1 py-4 text-sm font-bold text-slate-500 hover:bg-slate-50 transition border-b-2 border-transparent";
+            document.getElementById('promo-tab-supplements').className = "flex-1 py-4 text-sm font-bold text-slate-500 hover:bg-slate-50 transition border-b-2 border-transparent";
+            
+            document.getElementById(`promo-panel-${tab}`).classList.remove('hidden');
+            document.getElementById(`promo-tab-${tab}`).className = "flex-1 py-4 text-sm font-bold text-brand-600 border-b-2 border-brand-500 bg-brand-50/50 transition";
+        };
+
+        // 2. Add Choice Group (Variants) for Promo
+        window.addPromoChoiceGroup = (data = null) => {
+            const div = document.createElement('div');
+            div.className = "bg-slate-50 p-4 rounded-xl border border-slate-200 relative group-row animate-fade-in";
+            div.innerHTML = `
+                <button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-red-400 hover:text-red-600 p-1"><i data-feather="x" class="w-4 h-4"></i></button>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                    <div class="sm:col-span-1">
+                        <label class="text-[10px] uppercase font-bold text-slate-400 mb-1 block">Titre</label>
+                        <input type="text" class="g-title w-full p-2 border border-slate-200 rounded-lg text-sm font-bold" value="${data?.title||''}" placeholder="Ex: Choix Boisson">
+                    </div>
+                    <div class="sm:col-span-1">
+                        <label class="text-[10px] uppercase font-bold text-slate-400 mb-1 block">Type</label>
+                        <select class="g-type w-full p-2 border border-slate-200 rounded-lg text-sm bg-white">
+                            <option value="radio" ${data?.type==='radio'?'selected':''}>Unique (Radio)</option>
+                            <option value="checkbox" ${data?.type==='checkbox'?'selected':''}>Multiple (Check)</option>
+                            <option value="select" ${data?.type==='select'?'selected':''}>Liste Déroulante</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-1 grid grid-cols-2 gap-2">
+                        <div><label class="text-[10px] uppercase font-bold text-slate-400 mb-1 block">Min</label><input type="number" class="g-min w-full p-2 border border-slate-200 rounded-lg text-sm text-center" value="${data?.min||0}" min="0"></div>
+                        <div><label class="text-[10px] uppercase font-bold text-slate-400 mb-1 block">Max</label><input type="number" class="g-max w-full p-2 border border-slate-200 rounded-lg text-sm text-center" value="${data?.max||0}" min="0"></div>
+                    </div>
+                </div>
+                <div class="g-options space-y-2 pl-3 border-l-2 border-slate-200"></div>
+                <button type="button" onclick="addPromoOptionRow(this)" class="mt-3 text-xs font-bold text-brand-600 hover:underline flex items-center gap-1">+ Choix</button>
+            `;
+            document.getElementById('promo-container-choices').appendChild(div);
+            
+            const addBtn = div.querySelector('button[onclick^="addPromoOptionRow"]');
+            if(data?.options && data.options.length > 0) {
+                data.options.forEach(opt => addPromoOptionRow(addBtn, opt));
+            } else {
+                addPromoOptionRow(addBtn);
+            }
+            feather.replace();
+        };
+
+        // 3. Add Option Row for Promo
+        window.addPromoOptionRow = (btn, optData = null) => {
+            const row = document.createElement('div');
+            row.className = "flex gap-2 items-center option-row";
+            row.innerHTML = `
+                <input type="text" class="opt-name flex-1 p-2 text-sm border border-slate-200 rounded-lg" placeholder="Nom (ex: Coca)" value="${optData?.name||''}">
+                <input type="number" class="opt-price w-24 p-2 text-sm border border-slate-200 rounded-lg" placeholder="Prix (+)" value="${optData?.price||''}">
+                <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-red-500"><i data-feather="minus-circle" class="w-4 h-4"></i></button>
+            `;
+            btn.previousElementSibling.appendChild(row);
+            feather.replace();
+        };
+
+        // 4. Add Supplement Row for Promo
+        window.addPromoSupplementRow = (data = null) => {
+            const div = document.createElement('div');
+            div.className = "flex gap-3 items-center bg-slate-50 p-2 rounded-lg border border-slate-200 supp-row animate-fade-in";
+            div.innerHTML = `
+                <input type="text" class="supp-name flex-1 p-2 text-sm border border-slate-200 rounded-lg" placeholder="Nom supplément" value="${data?.name||''}">
+                <input type="number" class="supp-price w-24 p-2 text-sm border border-slate-200 rounded-lg" placeholder="Prix" value="${data?.price||''}">
+                <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-red-500 p-1"><i data-feather="trash-2" class="w-4 h-4"></i></button>
+            `;
+            document.getElementById('promo-container-supplements').appendChild(div);
+            feather.replace();
+        };
+
+        // 5. OVERWRITE: Open Promo Editor (to load data)
+        window.openPromoEditor = (id = null) => {
+            document.getElementById('promo-editor').classList.remove('hidden');
+            setTimeout(() => document.getElementById('promo-editor').children[1].classList.remove('translate-x-full'), 10);
+            
+            document.getElementById('promo-editor-title').innerText = id ? "Modifier Promo" : "Nouvelle Promo";
+            document.getElementById('edit-promo-id').value = id || '';
+            document.getElementById('promo-form').reset();
+            document.getElementById('promo-image-preview').innerHTML = '<i data-feather="image" class="text-slate-300"></i>';
+            
+            // Clear containers
+            document.getElementById('promo-container-choices').innerHTML = '';
+            document.getElementById('promo-container-supplements').innerHTML = '';
+            
+            window.switchPromoTab('choices');
+
+            if(id) {
+                getDoc(doc(db, "promotions", id)).then(snap => {
+                    if (snap.exists()) {
+                        const d = snap.data();
+                        document.getElementById('promo-name').value = d.name;
+                        document.getElementById('promo-price').value = d.price;
+                        document.getElementById('promo-desc').value = d.description || '';
+                        document.getElementById('promo-visible').checked = d.isVisible !== false;
+                        document.getElementById('promo-image-url').value = d.imageUrl || '';
+                        if(d.imageUrl) document.getElementById('promo-image-preview').innerHTML = `<img src="${d.imageUrl}" class="w-full h-full object-cover">`;
+                        
+                        // Load Variants
+                        if(d.mandatoryChoices) d.mandatoryChoices.forEach(g => addPromoChoiceGroup(g));
+                        // Load Supplements
+                        if(d.supplements) d.supplements.forEach(s => addPromoSupplementRow(s));
+                    }
+                });
+            }
+        };
+
+        // 6. OVERWRITE: Save Promo (to save data)
+        window.savePromo = async () => {
+            const btn = document.getElementById('btn-save-promo');
+            btn.innerText = "Sauvegarde...";
+            btn.disabled = true;
+            
+            try {
+                const id = document.getElementById('edit-promo-id').value;
+                const fileInput = document.getElementById('promo-image-file');
+                let imageUrl = document.getElementById('promo-image-url').value;
+                
+                if (fileInput.files.length > 0) imageUrl = await uploadToCloudinary(fileInput.files[0]);
+                
+                const data = {
+                    name: document.getElementById('promo-name').value,
+                    price: parseFloat(document.getElementById('promo-price').value) || 0,
+                    description: document.getElementById('promo-desc').value,
+                    imageUrl: imageUrl,
+                    isVisible: document.getElementById('promo-visible').checked,
+                    mandatoryChoices: [],
+                    supplements: []
+                };
+
+                // Collect Choices
+                const choicesContainer = document.getElementById('promo-container-choices');
+                choicesContainer.querySelectorAll('.group-row').forEach(g => {
+                    const title = g.querySelector('.g-title').value;
+                    const type = g.querySelector('.g-type').value;
+                    const min = parseInt(g.querySelector('.g-min').value) || 0;
+                    const max = parseInt(g.querySelector('.g-max').value) || 0;
+                    const options = [];
+                    g.querySelectorAll('.option-row').forEach(r => {
+                        const name = r.querySelector('.opt-name').value;
+                        const price = parseFloat(r.querySelector('.opt-price').value) || 0;
+                        if(name) options.push({name, price});
+                    });
+                    if(title && options.length > 0) data.mandatoryChoices.push({title, type, options, min, max});
+                });
+
+                // Collect Supplements
+                const suppContainer = document.getElementById('promo-container-supplements');
+                suppContainer.querySelectorAll('.supp-row').forEach(r => {
+                    const name = r.querySelector('.supp-name').value;
+                    const price = parseFloat(r.querySelector('.supp-price').value) || 0;
+                    if(name) data.supplements.push({name, price});
+                });
+
+                if (id) await updateDoc(doc(db, 'promotions', id), data);
+                else await addDoc(collection(db, 'promotions'), data);
+                
+                closePromoEditor();
+                loadPromotions();
+            } catch(e) {
+                console.error(e);
+                alert("Erreur lors de la sauvegarde.");
+            } finally {
+                btn.innerText = "Sauvegarder Promo";
+                btn.disabled = false;
+            }
+        };
     </script>
 </body>
 </html>
