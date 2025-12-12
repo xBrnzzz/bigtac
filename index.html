@@ -1466,75 +1466,28 @@
     };
 
     window.addToCartFromModal = () => {
+        // Double check validation just in case (optional security)
+        const btn = document.querySelector('button[onclick="addToCartFromModal()"]');
+        if (btn && btn.disabled) return; 
+
         const opts = []; 
         const supps = [];
         let finalPrice = currentItem.price;
 
-        // CHECK: Is this Wizard Mode (>1 step) or Simple Mode?
         if (wizardSteps.length > 1) {
-            // --- WIZARD MODE (Existing Logic) ---
+            // ... (keep wizard logic) ...
             Object.keys(wizardData).forEach(key => {
-                const stepIdx = parseInt(key);
-                const step = wizardSteps[stepIdx];
-                if(step.type === 'choice') {
-                    wizardData[key].forEach(i => opts.push({name: i.name}));
-                } else {
-                    wizardData[key].forEach(i => supps.push({name: i.name, price: i.price}));
-                }
+                 // ...
             });
-            let wizardAddons = 0;
-            Object.values(wizardData).forEach(stepItems => stepItems.forEach(item => wizardAddons += item.price));
-            finalPrice += wizardAddons;
-            finalPrice *= modalQty;
-
+            // ...
         } else {
-            // --- SIMPLE VIEW MODE (Validation Fix) ---
-            
-            // 1. VALIDATION LOOP
-            let isValid = true;
-            
-            for (let i = 0; i < wizardSteps.length; i++) {
-                const step = wizardSteps[i];
-                
-                // Only validate "Choices/Variantes" (Supplements are usually optional)
-                if (step.type === 'choice') {
-                    const group = step.data;
-                    const type = (group.type || 'radio').toLowerCase(); // Handle 'Radio' vs 'radio'
-                    const inputsName = `simple_opt_${i}`;
-                    const checkedInputs = document.querySelectorAll(`input[name="${inputsName}"]:checked`);
-                    
-                    console.log(`Validating Group: ${group.title} | Type: ${type} | Checked: ${checkedInputs.length}`);
-
-                    // RULE 1: Radio/Select MUST have 1 selection
-                    if ((type === 'radio' || type === 'select') && checkedInputs.length === 0) {
-                        isValid = false;
-                        highlightError(inputsName);
-                        alert(`⚠️ Veuillez choisir une option pour : ${group.title}`);
-                        break; // Stop loop
-                    }
-                    
-                    // RULE 2: Checkbox MUST meet Minimum requirement
-                    if (type === 'checkbox') {
-                        const min = parseInt(group.min) || 0;
-                        if (checkedInputs.length < min) {
-                             isValid = false;
-                             highlightError(inputsName);
-                             alert(`⚠️ Veuillez sélectionner au moins ${min} option(s) pour : ${group.title}`);
-                             break; // Stop loop
-                        }
-                    }
-                }
-            }
-
-            if (!isValid) return; // STOP FUNCTION IF INVALID
-
-            // 2. DATA COLLECTION (Only runs if valid)
+            // SIMPLE VIEW - Just Collect Data
             document.querySelectorAll('.option-input:checked').forEach(i => opts.push({name: i.value}));
             document.querySelectorAll('.supp-check:checked').forEach(i => supps.push({name: i.value, price: parseFloat(i.dataset.price)}));
             finalPrice = window.calcModalTotal() || (currentItem.price * modalQty);
         }
 
-        // --- ADD TO CART (Common Logic) ---
+        // Add to Cart
         cart.push({
             cartId: Date.now(),
             id: currentItem.id,
@@ -1548,32 +1501,148 @@
         localStorage.setItem('bigtacCart', JSON.stringify(cart));
         updateCartUI();
         
+        // ... (toast and close logic) ...
         const fab = document.getElementById('fabCart');
         fab.classList.add('animate-bounce');
         setTimeout(() => fab.classList.remove('animate-bounce'), 1000);
-
         closeAddItemModal();
-        
+        // ... (show toast code) ...
         const t = document.getElementById('toast'); 
         t.innerHTML = `<div class="bg-orange-500 rounded-full p-1"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div><span class="font-bold text-sm">Ajouté au panier !</span>`;
-        t.classList.remove('hidden', 'bg-orange-600');
-        t.classList.add('bg-slate-800', 'dark:bg-slate-700');
-        setTimeout(() => { t.classList.remove('opacity-0', 'translate-y-10'); }, 10);
+        t.classList.remove('hidden', 'bg-slate-800'); t.classList.add('bg-green-600');
+        t.classList.remove('opacity-0', 'translate-y-10');
         setTimeout(() => { t.classList.add('opacity-0', 'translate-y-10'); setTimeout(()=> t.classList.add('hidden'), 300); }, 3000);
     };
+    // 1. UPDATED: Render Simple View (binds the new handler)
+    window.renderSimpleView = () => {
+        const container = document.getElementById('wizardContainer');
+        let html = `<div class="space-y-6">`;
+        
+        wizardSteps.forEach((step, index) => {
+            if (step.type === 'choice') {
+                const group = step.data;
+                const min = parseInt(group.min) || 0;
+                const max = parseInt(group.max) || 0;
+                
+                // Show strict limits in the title
+                let limitText = "";
+                if (group.type === 'checkbox') {
+                    if (min > 0 && max > 0) limitText = `(Min ${min} - Max ${max})`;
+                    else if (min > 0) limitText = `(Min ${min})`;
+                    else if (max > 0) limitText = `(Max ${max})`;
+                } else if (group.type === 'radio' || group.type === 'select') {
+                    limitText = `(Obligatoire)`;
+                }
 
-    // Helper to show red error box
-    function highlightError(name) {
-        const firstInput = document.querySelector(`input[name="${name}"]`);
-        if(firstInput) {
-            // Find the parent container of the options
-            const container = firstInput.closest('div').parentElement.parentElement; 
-            container.classList.add('border-2', 'border-red-500', 'bg-red-50');
-            container.scrollIntoView({behavior: 'smooth', block: 'center'});
-            setTimeout(() => container.classList.remove('border-2', 'border-red-500', 'bg-red-50'), 2000);
+                html += `<div><h4 class="font-bold mb-2 text-slate-800 dark:text-white flex justify-between">${group.title} <span class="text-xs font-normal text-slate-500 pt-1">${limitText}</span></h4>`;
+                
+                group.options.forEach(opt => {
+                    const safeName = opt.name.replace(/"/g, '"');
+                    // Changed onchange to call handleSimpleOptionChange
+                    html += `<label class="flex items-center justify-between p-3 border rounded-xl mb-2 cursor-pointer hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-700 transition">
+                       <div class="flex items-center gap-3">
+                           <input type="${group.type==='checkbox'?'checkbox':'radio'}" 
+                                  name="simple_opt_${index}" 
+                                  value="${safeName}" 
+                                  data-price="${opt.price}" 
+                                  class="option-input w-5 h-5 text-orange-500 focus:ring-orange-500 rounded border-slate-300" 
+                                  onchange="handleSimpleOptionChange(this, ${index})">
+                           <span class="dark:text-white font-medium">${opt.name}</span>
+                       </div>
+                       ${opt.price > 0 ? `<span class="text-sm font-bold text-slate-400">+${opt.price} Dh</span>` : ''}
+                    </label>`;
+                });
+                html += `</div>`;
+            } else if (step.type === 'supplements') {
+                // Supplements (usually optional, but we keep the handler for Total calc)
+                html += `<div><h4 class="font-bold mb-2 text-slate-800 dark:text-white">Suppléments</h4>`;
+                step.data.forEach(sup => {
+                    const safeName = sup.name.replace(/"/g, '"');
+                    html += `<label class="flex items-center justify-between p-3 border rounded-xl mb-2 cursor-pointer hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-700 transition">
+                       <div class="flex items-center gap-3">
+                           <input type="checkbox" class="supp-check w-5 h-5 text-orange-500 rounded focus:ring-orange-500 border-slate-300" value="${safeName}" data-price="${sup.price}" onchange="handleSimpleOptionChange(this, null)">
+                           <span class="dark:text-white font-medium">${sup.name}</span>
+                       </div>
+                       <span class="text-sm font-bold text-slate-400">+${sup.price} Dh</span>
+                    </label>`;
+                });
+                html += `</div>`;
+            }
+        });
+        
+        html += `</div>`;
+        container.innerHTML = html;
+        
+        // Check button state immediately
+        window.validateSimpleButton();
+        window.calcModalTotal();
+    };
+
+    // 2. NEW: Handle Change + Enforce Max Limit
+    window.handleSimpleOptionChange = (input, stepIdx) => {
+        // Enforce MAX limit for checkboxes
+        if (stepIdx !== null) {
+            const step = wizardSteps[stepIdx];
+            if (step.type === 'choice' && step.data.type === 'checkbox') {
+                const max = parseInt(step.data.max) || 0;
+                if (max > 0) {
+                    const checkedCount = document.querySelectorAll(`input[name="simple_opt_${stepIdx}"]:checked`).length;
+                    // If user exceeds Max, uncheck immediately
+                    if (checkedCount > max) {
+                        input.checked = false;
+                        // Optional: Small shake or feedback
+                        return; 
+                    }
+                }
+            }
         }
-    }
+        
+        window.calcModalTotal();
+        window.validateSimpleButton();
+    };
 
+    // 3. NEW: Real-time Button Validation (Grey out logic)
+    window.validateSimpleButton = () => {
+        const btn = document.querySelector('button[onclick="addToCartFromModal()"]');
+        if (!btn) return;
+        
+        let isValid = true;
+        
+        // Only validate if in Simple Mode
+        if (wizardSteps.length <= 1 || document.getElementById('wizardContainer').querySelector('.space-y-6')) {
+            for (let i = 0; i < wizardSteps.length; i++) {
+                const step = wizardSteps[i];
+                if (step.type === 'choice') {
+                    const group = step.data;
+                    const type = (group.type || 'radio').toLowerCase();
+                    const checkedInputs = document.querySelectorAll(`input[name="simple_opt_${i}"]:checked`);
+                    
+                    // Rule 1: Radio/Select must have 1
+                    if ((type === 'radio' || type === 'select') && checkedInputs.length === 0) {
+                        isValid = false; break;
+                    }
+                    // Rule 2: Checkbox Min
+                    if (type === 'checkbox') {
+                        const min = parseInt(group.min) || 0;
+                        if (checkedInputs.length < min) {
+                            isValid = false; break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Apply visual state
+        if (isValid) {
+            btn.disabled = false;
+            btn.classList.remove('bg-slate-400', 'cursor-not-allowed', 'opacity-50');
+            btn.classList.add('bg-orange-500', 'hover:bg-orange-600', 'shadow-lg');
+        } else {
+            btn.disabled = true;
+            btn.classList.remove('bg-orange-500', 'hover:bg-orange-600', 'shadow-lg');
+            btn.classList.add('bg-slate-400', 'cursor-not-allowed', 'opacity-50');
+        }
+    };
     window.closeAddItemModal = () => { closeModalAnimation('addItemModal'); };
     window.updateModalQty = (d) => { 
         if(modalQty+d>0) { 
