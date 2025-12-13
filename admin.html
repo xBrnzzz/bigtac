@@ -383,55 +383,12 @@
             <div class="flex-1 overflow-y-auto bg-slate-50 p-6">
                 <form id="category-form" class="space-y-6">
                     <input type="hidden" id="cat-id">
+                    
+    
                     <input type="hidden" id="cat-original-name"> 
     
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-                    ```
-
-                #### Step 2: Update `openCategoryEditor`
-                We need to fill this hidden input when the modal opens.
-                Replace your `window.openCategoryEditor` function with this:
-
-                ```javascript
-                    window.openCategoryEditor = (id = null) => {
-                        const modal = document.getElementById('category-editor-modal');
-                        const form = document.getElementById('category-form');
-                        const title = document.getElementById('cat-editor-title');
-                        const btn = document.getElementById('btn-save-cat');
-                        
-                        // Reset form
-                        form.reset();
-                        document.getElementById('cat-image-preview').innerHTML = '<i data-feather="image" class="w-6 h-6 text-slate-300"></i>';
-                        
-                        // Show modal
-                        modal.classList.remove('hidden');
-                        setTimeout(() => modal.lastElementChild.classList.remove('translate-x-full'), 10);
-                        
-                        if (id) {
-                            // Edit Mode
-                            const cat = categories.find(c => c.id === id);
-                            if (cat) {
-                                document.getElementById('cat-id').value = cat.id;
-                                document.getElementById('cat-name').value = cat.name;
-                                
-                                // 👇 CRITICAL: Save the original name here
-                                document.getElementById('cat-original-name').value = cat.name; 
-
-                                if (cat.image) {
-                                    document.getElementById('cat-image-preview').innerHTML = `<img src="${cat.image}" class="w-full h-full object-cover">`;
-                                }
-                                title.innerText = "Modifier Catégorie";
-                                btn.innerText = "Mettre à jour";
-                            }
-                        } else {
-                            // New Mode
-                            document.getElementById('cat-id').value = '';
-                            document.getElementById('cat-original-name').value = ''; // Clear it
-                            title.innerText = "Nouvelle Catégorie";
-                            btn.innerText = "Créer";
-                        }
-                        feather.replace();
-                    };
+                    
+                        ```
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase mb-1 block">Nom de la catégorie</label>
