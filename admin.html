@@ -383,7 +383,55 @@
             <div class="flex-1 overflow-y-auto bg-slate-50 p-6">
                 <form id="category-form" class="space-y-6">
                     <input type="hidden" id="cat-id">
-                    
+                    <input type="hidden" id="cat-original-name"> 
+    
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                    ```
+
+                #### Step 2: Update `openCategoryEditor`
+                We need to fill this hidden input when the modal opens.
+                Replace your `window.openCategoryEditor` function with this:
+
+                ```javascript
+                    window.openCategoryEditor = (id = null) => {
+                        const modal = document.getElementById('category-editor-modal');
+                        const form = document.getElementById('category-form');
+                        const title = document.getElementById('cat-editor-title');
+                        const btn = document.getElementById('btn-save-cat');
+                        
+                        // Reset form
+                        form.reset();
+                        document.getElementById('cat-image-preview').innerHTML = '<i data-feather="image" class="w-6 h-6 text-slate-300"></i>';
+                        
+                        // Show modal
+                        modal.classList.remove('hidden');
+                        setTimeout(() => modal.lastElementChild.classList.remove('translate-x-full'), 10);
+                        
+                        if (id) {
+                            // Edit Mode
+                            const cat = categories.find(c => c.id === id);
+                            if (cat) {
+                                document.getElementById('cat-id').value = cat.id;
+                                document.getElementById('cat-name').value = cat.name;
+                                
+                                // 👇 CRITICAL: Save the original name here
+                                document.getElementById('cat-original-name').value = cat.name; 
+
+                                if (cat.image) {
+                                    document.getElementById('cat-image-preview').innerHTML = `<img src="${cat.image}" class="w-full h-full object-cover">`;
+                                }
+                                title.innerText = "Modifier Catégorie";
+                                btn.innerText = "Mettre à jour";
+                            }
+                        } else {
+                            // New Mode
+                            document.getElementById('cat-id').value = '';
+                            document.getElementById('cat-original-name').value = ''; // Clear it
+                            title.innerText = "Nouvelle Catégorie";
+                            btn.innerText = "Créer";
+                        }
+                        feather.replace();
+                    };
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase mb-1 block">Nom de la catégorie</label>
@@ -795,86 +843,69 @@
         window.saveItemOrder = async () => { const list = document.getElementById('items-grid'); const ids = Array.from(list.children).map(c => c.getAttribute('data-id')).filter(Boolean); if(!ids.length) return; const btn = document.getElementById('btn-save-order'); const prevText = btn.innerHTML; btn.innerText = "..."; try { await Promise.all(ids.map((id, index) => updateDoc(doc(db, 'menuItems', id), { order: index }))); alert("Ordre du menu sauvegardé !"); } catch(e) { console.error(e); alert("Erreur."); } finally { btn.innerHTML = prevText; } };
         window.saveCategoryOrder = async () => { const list = document.getElementById('categories-list-manage'); const ids = Array.from(list.children).map(c => c.getAttribute('data-id')).filter(Boolean); try { await Promise.all(ids.map((id, index) => updateDoc(doc(db, 'categories', id), { order: index }))); alert("Ordre des catégories mis à jour !"); loadCategories(); } catch(e) { console.error(e); alert("Erreur."); } };
         window.deleteItem = async (id) => { if(confirm("Supprimer définitivement ?")) { await deleteDoc(doc(db, 'menuItems', id)); loadItems(); } };
-        // --- SMART CATEGORY SAVE (Fixes the Empty Menu Issue) ---
-    
-        // 1. Clean up any old event listeners so they don't clash
-        const catFormRef = document.getElementById('category-form');
-        catFormRef.replaceWith(catFormRef.cloneNode(true));
+        // --- FINAL FIX FOR CATEGORY RENAMING ---
+    const catFormRef = document.getElementById('category-form');
+    catFormRef.replaceWith(catFormRef.cloneNode(true)); // Clear old listeners
 
-        // 2. Add the new "Smart" Listener
-        document.getElementById('category-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-save-cat');
-            btn.disabled = true;
-            btn.innerText = "Sauvegarde...";
+    document.getElementById('category-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save-cat');
+        btn.disabled = true;
+        btn.innerText = "Sauvegarde...";
+        
+        try {
+            const id = document.getElementById('cat-id').value;
+            const newName = document.getElementById('cat-name').value.trim();
+            const oldName = document.getElementById('cat-original-name').value; // Get the safe old name
+            const fileInput = document.getElementById('cat-image-file');
             
-            try {
-                // Get the values from the form
-                const id = document.getElementById('cat-id').value;
-                const newName = document.getElementById('cat-name').value.trim(); // New Name (e.g., "Smash Burgers")
-                const fileInput = document.getElementById('cat-image-file');
-                
-                // Upload Image if selected
-                let imageUrl = null;
-                if (fileInput.files.length > 0) {
-                    imageUrl = await uploadToCloudinary(fileInput.files[0]);
-                }
-                
-                const data = { name: newName };
-                if (imageUrl) data.image = imageUrl;
-                
-                if (id) {
-                    // --- EDITING EXISTING CATEGORY ---
-                    
-                    // A. First, find out what the OLD name was
-                    const catRef = doc(db, 'categories', id);
-                    const snapshot = await getDoc(catRef);
-                    const oldName = snapshot.exists() ? snapshot.data().name : null;
-                    
-                    // B. Update the category to the NEW name
-                    await updateDoc(catRef, data);
-
-                    // C. CRITICAL STEP: Fix the Items
-                    // If the name actually changed (e.g., Burgers -> Smash Burgers)
-                    if (oldName && oldName !== newName) {
-                        
-                        // Find all items that still have the OLD name
-                        const q = query(collection(db, 'menuItems'), where('category', '==', oldName));
-                        const itemsSnap = await getDocs(q);
-                        
-                        // Create a "Batch" (a list of updates to do at once)
-                        const batch = writeBatch(db);
-                        itemsSnap.forEach(itemDoc => {
-                            // Update each item to the NEW name
-                            batch.update(itemDoc.ref, { category: newName });
-                        });
-                        
-                        // Run the batch update
-                        if (!itemsSnap.empty) {
-                            await batch.commit();
-                            console.log(`Success! Moved ${itemsSnap.size} items to ${newName}`);
-                        }
-                    }
-
-                } else {
-                    // --- CREATING NEW CATEGORY ---
-                    data.order = categories.length;
-                    await addDoc(collection(db, 'categories'), data);
-                }
-                
-                // Close modal and refresh the page to see changes
-                closeCategoryEditor();
-                await loadCategories(); 
-                await loadItems(); 
-                
-            } catch(e) {
-                console.error(e);
-                alert('Erreur: ' + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Enregistrer";
+            let imageUrl = null;
+            if (fileInput.files.length > 0) {
+                imageUrl = await uploadToCloudinary(fileInput.files[0]);
             }
-        });
+            
+            const data = { name: newName };
+            if (imageUrl) data.image = imageUrl;
+            
+            if (id) {
+                // 1. Update the Category
+                await updateDoc(doc(db, 'categories', id), data);
+
+                // 2. CHECK: Did the name change?
+                if (oldName && oldName !== newName) {
+                    console.log(`Renaming items from "${oldName}" to "${newName}"...`);
+                    
+                    // Find items with the OLD name
+                    const q = query(collection(db, 'menuItems'), where('category', '==', oldName));
+                    const itemsSnap = await getDocs(q);
+                    
+                    if (!itemsSnap.empty) {
+                        const batch = writeBatch(db);
+                        itemsSnap.forEach(doc => {
+                            batch.update(doc.ref, { category: newName });
+                        });
+                        await batch.commit();
+                        console.log(`✅ Fixed ${itemsSnap.size} items.`);
+                        alert(`Catégorie renommée ! ${itemsSnap.size} articles ont été mis à jour.`);
+                    }
+                }
+            } else {
+                data.order = categories.length;
+                await addDoc(collection(db, 'categories'), data);
+            }
+            
+            closeCategoryEditor();
+            await loadCategories(); 
+            await loadItems(); 
+            
+        } catch(e) {
+            console.error(e);
+            alert('Erreur: ' + e.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Enregistrer";
+        }
+    });
         window.editCategory = (id) => { const c = categories.find(x => x.id === id); if(c) { document.getElementById('cat-id').value = c.id; document.getElementById('cat-name').value = c.name; document.getElementById('btn-save-cat').innerText = "Modifier"; window.scrollTo({top:0, behavior:'smooth'}); } };
         window.resetCategoryForm = () => { document.getElementById('category-form').reset(); document.getElementById('cat-id').value = ''; document.getElementById('btn-save-cat').innerText = "Enregistrer"; };
         window.deleteCategory = async (id) => { if(confirm("Supprimer ?")) { await deleteDoc(doc(db, 'categories', id)); loadCategories(); } };
