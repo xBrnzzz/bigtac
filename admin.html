@@ -936,6 +936,13 @@
                     const driverBadge = o.deliveryGuyName ? `<span class="text-xs font-bold bg-purple-100 text-purple-700 px-2 py-1 rounded-full">📦 ${o.deliveryGuyName}</span>` : `<span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded-full">⏳ En attente livreur</span>`;
                     actions = `<div class="mt-3">${driverBadge}</div><button onclick="setStatus('${o.id}', 'delivered')" class="w-full mt-2 bg-green-500 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-green-600 shadow-sm transition flex items-center justify-center gap-2"><i data-feather="check" class="w-4 h-4"></i> MARQUER LIVRÉ</button>`;
                 }
+                else if (type === 'history') {
+                    // Show driver info and delivery fee for completed deliveries
+                    if (o.deliveryGuyName && o.type === 'livraison') {
+                        const deliveryFee = parseFloat(o.deliveryPrice || 0).toFixed(2);
+                        actions = `<div class="mt-3 flex items-center justify-between"><span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full">✓ ${o.deliveryGuyName}</span><span class="text-xs font-bold text-green-600">+${deliveryFee} Dh</span></div>`;
+                    }
+                }
                 let rawPhone = o.customer.phone || '';
                 let cleanPhone = rawPhone.replace(/\D/g, '');
                 if (cleanPhone.startsWith('0')) cleanPhone = '212' + cleanPhone.substring(1);
