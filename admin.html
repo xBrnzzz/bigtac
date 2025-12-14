@@ -1914,14 +1914,13 @@
 
                     const orderData = orderSnap.data();
 
-                    // Check if still available
-                    if (orderData.status !== 'ready' || orderData.deliveryGuyId) {
+                    // Check if still available (status is en_livraison but no driver assigned yet)
+                    if (orderData.status !== 'en_livraison' || orderData.deliveryGuyId) {
                         throw new Error('Cette course a déjà été prise par un autre livreur.');
                     }
 
-                    // Update order
+                    // Update order with driver info (status already en_livraison)
                     transaction.update(orderRef, {
-                        status: 'en_livraison',
                         deliveryGuyId: currentUser.uid,
                         deliveryGuyName: currentUser.name,
                         claimedAt: serverTimestamp()
