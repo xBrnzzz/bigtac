@@ -1663,24 +1663,29 @@
             tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400">Chargement...</td></tr>';
 
             try {
-                const q = query(collection(db, 'users'), where('role', '==', 'delivery'), orderBy('createdAt', 'desc'));
-                const snap = await getDocs(q);
+                // Simplified query - get all users, then filter by role
+                const snap = await getDocs(collection(db, 'users'));
+                const drivers = [];
 
-                if (snap.empty) {
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if (data.role === 'delivery') {
+                        drivers.push({ id: doc.id, ...data });
+                    }
+                });
+
+                if (drivers.length === 0) {
                     tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400 italic">Aucun livreur enregistré.</td></tr>';
                     return;
                 }
 
                 tableBody.innerHTML = '';
 
-                for (const driverDoc of snap.docs) {
-                    const driver = { id: driverDoc.id, ...driverDoc.data() };
-
-                    // Calculate earnings: Sum deliveryPrice of all delivered orders
+                for (const driver of drivers) {
+                    // Calculate earnings: Get all orders for this driver
                     const ordersQ = query(
                         collection(db, 'orders'),
-                        where('deliveryGuyId', '==', driver.uid),
-                        where('status', 'in', ['delivered', 'ready']) // Adjust based on your delivered status
+                        where('deliveryGuyId', '==', driver.uid)
                     );
                     const ordersSnap = await getDocs(ordersQ);
 
@@ -1696,24 +1701,24 @@
                     });
 
                     tableBody.innerHTML += `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-                        <td class="p-3 font-bold text-slate-800">${driver.name}</td>
-                        <td class="p-3 text-sm text-slate-600">${driver.email}</td>
-                        <td class="p-3 text-center font-bold text-slate-700">${deliveryCount}</td>
-                        <td class="p-3 text-right font-bold text-green-600">${totalEarnings.toFixed(2)} Dh</td>
-                        <td class="p-3 text-right">
-                            <button onclick="deleteDriver('${driver.uid}')" class="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition text-xs font-bold">
-                                Supprimer
-                            </button>
-                        </td>
-                    </tr>
-                `;
+                        <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                            <td class="p-3 font-bold text-slate-800">${driver.name}</td>
+                            <td class="p-3 text-sm text-slate-600">${driver.email}</td>
+                            <td class="p-3 text-center font-bold text-slate-700">${deliveryCount}</td>
+                            <td class="p-3 text-right font-bold text-green-600">${totalEarnings.toFixed(2)} Dh</td>
+                            <td class="p-3 text-right">
+                                <button onclick="deleteDriver('${driver.uid}')" class="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition text-xs font-bold">
+                                    Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                    `;
                 }
 
                 feather.replace();
             } catch (e) {
-                console.error(e);
-                tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-red-500">Erreur de chargement.</td></tr>';
+                console.error('Error loading drivers:', e);
+                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-red-500">Erreur: ${e.message}</td></tr>`;
             }
         }
 
@@ -1734,10 +1739,21 @@
         // ======================
 
         function initDriverApp() {
-            // Hide admin UI
-            document.querySelector('aside')?.classList.add('hidden');
-            document.getElementById('mobile-menu')?.classList.add('hidden');
-            document.querySelector('header.md\\:hidden')?.classList.add('hidden');
+            // Hide ALL admin UI elements
+            const sidebar = document.querySelector('aside');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileHeader = document.querySelector('header');
+            const viewsContainer = document.getElementById('views-container');
+
+            if (sidebar) sidebar.style.display = 'none';
+            if (mobileMenu) mobileMenu.style.display = 'none';
+            if (mobileHeader) mobileHeader.style.display = 'none';
+
+            // Hide all admin views
+            ['orders', 'menu', 'categories', 'promotions', 'drivers'].forEach(v => {
+                const viewEl = document.getElementById(`view-${v}`);
+                if (viewEl) viewEl.style.display = 'none';
+            });
 
             // Show driver UI
             document.getElementById('view-driver').classList.remove('hidden');
@@ -1774,11 +1790,11 @@
 
         // Listen to available delivery runs
         function listenToAvailableRuns() {
+            // Simplified query without orderBy to avoid index requirement
             const q = query(
                 collection(db, 'orders'),
                 where('status', '==', 'ready'),
-                where('type', '==', 'livraison'),
-                orderBy('createdAt', 'desc')
+                where('type', '==', 'livraison')
             );
 
             onSnapshot(q, (snap) => {
@@ -1789,12 +1805,29 @@
                 }
 
                 container.innerHTML = '';
+                const orders = [];
+
                 snap.forEach(orderDoc => {
                     const order = { id: orderDoc.id, ...orderDoc.data() };
-
                     // Skip if already assigned
-                    if (order.deliveryGuyId) return;
+                    if (!order.deliveryGuyId) {
+                        orders.push(order);
+                    }
+                });
 
+                // Sort by createdAt manually if needed
+                orders.sort((a, b) => {
+                    const timeA = a.createdAt?.seconds || 0;
+                    const timeB = b.createdAt?.seconds || 0;
+                    return timeB - timeA; // Most recent first
+                });
+
+                if (orders.length === 0) {
+                    container.innerHTML = '<p class="text-center text-slate-400 italic py-8">Aucune course disponible pour le moment.</p>';
+                    return;
+                }
+
+                orders.forEach(order => {
                     const deliveryFee = parseFloat(order.deliveryPrice || 0).toFixed(2);
                     const location = order.location || 'Non spécifié';
                     const paymentMethod = order.paymentMethod || 'Espèces';
@@ -1829,6 +1862,10 @@
                 });
 
                 feather.replace();
+            }, (error) => {
+                console.error('Error listening to available runs:', error);
+                const container = document.getElementById('available-runs-list');
+                container.innerHTML = `<p class="text-center text-red-500 italic py-8">Erreur: ${error.message}</p>`;
             });
         }
 
@@ -1873,11 +1910,11 @@
         function listenToMyDeliveries() {
             if (!currentUser) return;
 
+            // Simplified query without orderBy
             const q = query(
                 collection(db, 'orders'),
                 where('deliveryGuyId', '==', currentUser.uid),
-                where('status', '==', 'en_livraison'),
-                orderBy('claimedAt', 'desc')
+                where('status', '==', 'en_livraison')
             );
 
             onSnapshot(q, (snap) => {
@@ -1888,8 +1925,20 @@
                 }
 
                 container.innerHTML = '';
+
+                // Convert to array and sort manually
+                const orders = [];
                 snap.forEach(orderDoc => {
-                    const order = { id: orderDoc.id, ...orderDoc.data() };
+                    orders.push({ id: orderDoc.id, ...orderDoc.data() });
+                });
+
+                orders.sort((a, b) => {
+                    const timeA = a.claimedAt?.seconds || 0;
+                    const timeB = b.claimedAt?.seconds || 0;
+                    return timeB - timeA;
+                });
+
+                orders.forEach(order => {
 
                     const deliveryFee = parseFloat(order.deliveryPrice || 0).toFixed(2);
                     const totalPrice = parseFloat(order.total || 0).toFixed(2);
