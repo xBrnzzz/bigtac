@@ -731,6 +731,13 @@
         const CLOUDINARY_CLOUD_NAME = "dv0vnjnto";
         const CLOUDINARY_PRESET = "qaoutiassets";
 
+        // Helper function to extract delivery price from location string
+        function getDeliveryPrice(location) {
+            if (!location) return 0;
+            const match = location.match(/\((\d+)\s*Dh\)/i);
+            return match ? parseFloat(match[1]) : 0;
+        }
+
         feather.replace();
 
         let currentUser = null; // Global variable to store current user profile
@@ -939,8 +946,8 @@
                 else if (type === 'history') {
                     // Show driver info and delivery fee for completed deliveries
                     if (o.deliveryGuyName && o.type === 'livraison') {
-                        const deliveryFee = parseFloat(o.deliveryPrice || 0).toFixed(2);
-                        actions = `<div class="mt-3 flex items-center justify-between"><span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full">✓ ${o.deliveryGuyName}</span><span class="text-xs font-bold text-green-600">+${deliveryFee} Dh</span></div>`;
+                        const deliveryFee = getDeliveryPrice(o.location);
+                        actions = `<div class="mt-3 flex items-center justify-between"><span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full">✓ ${o.deliveryGuyName}</span><span class="text-xs font-bold text-green-600">+${deliveryFee.toFixed(2)} Dh</span></div>`;
                     }
                 }
                 let rawPhone = o.customer.phone || '';
@@ -1703,7 +1710,7 @@
                     ordersSnap.forEach(orderDoc => {
                         const order = orderDoc.data();
                         if (order.status === 'delivered' || order.status === 'ready') {
-                            totalEarnings += parseFloat(order.deliveryPrice || 0);
+                            totalEarnings += getDeliveryPrice(order.location);
                             deliveryCount++;
                         }
                     });
@@ -1836,7 +1843,7 @@
                 }
 
                 orders.forEach(order => {
-                    const deliveryFee = parseFloat(order.deliveryPrice || 0).toFixed(2);
+                    const deliveryFee = getDeliveryPrice(order.location);
                     const totalPrice = parseFloat(order.total || 0).toFixed(2);
                     const location = order.location || 'Non spécifié';
                     const paymentMethod = order.paymentMethod || 'Espèces';
@@ -1976,7 +1983,7 @@
 
                 orders.forEach(order => {
 
-                    const deliveryFee = parseFloat(order.deliveryPrice || 0).toFixed(2);
+                    const deliveryFee = getDeliveryPrice(order.location);
                     const totalPrice = parseFloat(order.total || 0).toFixed(2);
                     const location = order.location || 'Non spécifié';
 
