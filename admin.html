@@ -725,7 +725,7 @@
     </div>
     <!-- JS Logic Reused from original file, ensures everything works as before -->
     <script type="module">
-        import { auth, db, signInWithEmailAndPassword, onAuthStateChanged, signOut, collection, addDoc, getDocs, deleteDoc, updateDoc, getDoc, doc, query, orderBy, onSnapshot, serverTimestamp, writeBatch, where, setDoc } from './firebase-config.js';
+        import { auth, db, signInWithEmailAndPassword, onAuthStateChanged, signOut, collection, addDoc, getDocs, deleteDoc, updateDoc, getDoc, doc, query, orderBy, onSnapshot, serverTimestamp, writeBatch, where, setDoc, runTransaction } from './firebase-config.js';
         window.auth = auth;
         window.signOut = signOut;
         const CLOUDINARY_CLOUD_NAME = "dv0vnjnto";
@@ -930,7 +930,7 @@
                     actions = `<div class="flex gap-2 mt-4 pt-3 border-t border-slate-100"><button onclick="setStatus('${o.id}', 'confirmed')" class="flex-1 bg-green-500 text-white py-2 rounded-xl text-xs font-bold hover:bg-green-600 shadow-sm transition">ENVOYER EN CUISINE</button><button onclick="setStatus('${o.id}', 'rejected')" class="w-10 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 flex items-center justify-center"><i data-feather="x" class="w-4 h-4"></i></button></div>`;
                 }
                 else if (type === 'confirmed') {
-                    actions = `<button onclick="setStatus('${o.id}', 'en_livraison')" class="w-full mt-4 pt-2 bg-purple-500 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-purple-600 shadow-sm transition flex items-center justify-center gap-2"><i data-feather="truck" class="w-4 h-4"></i> PRÊT / LIVRAISON</button>`;
+                    actions = `<button onclick="setStatus('${o.id}', 'ready')" class="w-full mt-4 pt-2 bg-purple-500 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-purple-600 shadow-sm transition flex items-center justify-center gap-2"><i data-feather="check-circle" class="w-4 h-4"></i> PRÊT POUR LIVRAISON</button>`;
                 }
                 else if (type === 'delivery') {
                     actions = `<button onclick="setStatus('${o.id}', 'ready')" class="w-full mt-4 pt-2 bg-slate-800 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-slate-900 shadow-sm transition flex items-center justify-center gap-2"><i data-feather="check" class="w-4 h-4"></i> MARQUER LIVRÉ</button>`;
