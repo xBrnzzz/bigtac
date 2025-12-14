@@ -930,10 +930,11 @@
                     actions = `<div class="flex gap-2 mt-4 pt-3 border-t border-slate-100"><button onclick="setStatus('${o.id}', 'confirmed')" class="flex-1 bg-green-500 text-white py-2 rounded-xl text-xs font-bold hover:bg-green-600 shadow-sm transition">ENVOYER EN CUISINE</button><button onclick="setStatus('${o.id}', 'rejected')" class="w-10 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 flex items-center justify-center"><i data-feather="x" class="w-4 h-4"></i></button></div>`;
                 }
                 else if (type === 'confirmed') {
-                    actions = `<button onclick="setStatus('${o.id}', 'ready')" class="w-full mt-4 pt-2 bg-purple-500 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-purple-600 shadow-sm transition flex items-center justify-center gap-2"><i data-feather="check-circle" class="w-4 h-4"></i> PRÊT POUR LIVRAISON</button>`;
+                    actions = `<button onclick="setStatus('${o.id}', 'en_livraison')" class="w-full mt-4 pt-2 bg-purple-500 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-purple-600 shadow-sm transition flex items-center justify-center gap-2"><i data-feather="check-circle" class="w-4 h-4"></i> PRÊT POUR LIVRAISON</button>`;
                 }
                 else if (type === 'delivery') {
-                    actions = `<button onclick="setStatus('${o.id}', 'ready')" class="w-full mt-4 pt-2 bg-slate-800 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-slate-900 shadow-sm transition flex items-center justify-center gap-2"><i data-feather="check" class="w-4 h-4"></i> MARQUER LIVRÉ</button>`;
+                    const driverBadge = o.deliveryGuyName ? `<span class="text-xs font-bold bg-purple-100 text-purple-700 px-2 py-1 rounded-full">📦 ${o.deliveryGuyName}</span>` : `<span class="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded-full">⏳ En attente livreur</span>`;
+                    actions = `<div class="mt-3">${driverBadge}</div><button onclick="setStatus('${o.id}', 'delivered')" class="w-full mt-2 bg-green-500 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-green-600 shadow-sm transition flex items-center justify-center gap-2"><i data-feather="check" class="w-4 h-4"></i> MARQUER LIVRÉ</button>`;
                 }
                 let rawPhone = o.customer.phone || '';
                 let cleanPhone = rawPhone.replace(/\D/g, '');
@@ -1790,10 +1791,10 @@
 
         // Listen to available delivery runs
         function listenToAvailableRuns() {
-            // Simplified query without orderBy to avoid index requirement
+            // Query for orders in delivery status waiting for a driver
             const q = query(
                 collection(db, 'orders'),
-                where('status', '==', 'ready'),
+                where('status', '==', 'en_livraison'),
                 where('type', '==', 'livraison')
             );
 
@@ -1829,29 +1830,58 @@
 
                 orders.forEach(order => {
                     const deliveryFee = parseFloat(order.deliveryPrice || 0).toFixed(2);
+                    const totalPrice = parseFloat(order.total || 0).toFixed(2);
                     const location = order.location || 'Non spécifié';
                     const paymentMethod = order.paymentMethod || 'Espèces';
 
+                    // Phone formatting for WhatsApp/Call
+                    let rawPhone = order.customer.phone || '';
+                    let cleanPhone = rawPhone.replace(/\D/g, '');
+                    if (cleanPhone.startsWith('0')) cleanPhone = '212' + cleanPhone.substring(1);
+                    const waLink = `https://wa.me/${cleanPhone}`;
+                    const telLink = `tel:${cleanPhone}`;
+
+                    // Items list
+                    const itemsHtml = order.items.map(i => {
+                        const opts = i.options ? i.options.map(opt => `<div class="text-xs text-slate-400 pl-3 border-l-2 border-slate-100 ml-1 my-0.5">• ${opt}</div>`).join('') : '';
+                        return `<div class="mb-2"><div class="flex justify-between text-sm font-bold text-slate-700"><span><span class="text-slate-400 mr-1">${i.qty}x</span> ${i.name}</span></div>${opts}</div>`;
+                    }).join('');
+
                     container.innerHTML += `
                     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
-                        <div class="flex justify-between items-start mb-3">
+                        <div class="flex justify-between items-start mb-3 border-b border-slate-100 pb-3">
                             <div>
-                                <h3 class="font-bold text-lg text-slate-800">${order.customer.name}</h3>
+                                <h3 class="font-bold text-xl text-slate-800">${order.customer.name}</h3>
                                 <p class="text-sm text-slate-500 flex items-center gap-1 mt-1">
                                     <i data-feather="map-pin" class="w-4 h-4"></i> ${location}
                                 </p>
+                                <p class="text-sm text-green-600 font-bold mt-1">+${deliveryFee} Dh (Votre gain)</p>
                             </div>
                             <div class="text-right">
-                                <div class="text-2xl font-bold text-green-600">${deliveryFee} Dh</div>
-                                <p class="text-xs text-slate-400">Livraison</p>
+                                <div class="text-2xl font-bold text-slate-800">${totalPrice} Dh</div>
+                                <p class="text-xs text-slate-400">Total</p>
                             </div>
                         </div>
                         
-                        ${order.customer.note ? `<div class="bg-yellow-50 border border-yellow-100 p-2 rounded-lg text-xs text-yellow-800 mb-3">${order.customer.note}</div>` : ''}
+                        ${order.customer.note ? `<div class="bg-yellow-50 border border-yellow-100 p-2 rounded-lg text-xs text-yellow-800 mb-3 italic">${order.customer.note}</div>` : ''}
                         
-                        <div class="flex items-center justify-between text-sm text-slate-600 mb-4">
+                        <div class="mb-3">
+                            <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Contenu de la commande</h4>
+                            ${itemsHtml}
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-sm text-slate-600 mb-3 pt-2 border-t border-slate-100">
                             <span>💳 ${paymentMethod}</span>
                             <span class="text-xs text-slate-400">#${order.shortId || order.id.substring(0, 6)}</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <a href="${waLink}" target="_blank" class="flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white py-2.5 rounded-xl font-bold transition shadow-lg text-sm">
+                                <i data-feather="message-circle" class="w-4 h-4"></i> WhatsApp
+                            </a>
+                            <a href="${telLink}" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-xl font-bold transition shadow-lg text-sm">
+                                <i data-feather="phone" class="w-4 h-4"></i> Appeler
+                            </a>
                         </div>
 
                         <button onclick="claimDelivery('${order.id}')" class="w-full bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-xl font-bold shadow-lg transition active:scale-95">
