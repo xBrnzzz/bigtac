@@ -935,63 +935,90 @@
             container.innerHTML = '';
             orders.forEach(o => {
                 const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+                
+                // Group driver status and action button together
                 let actions = '';
                 if (type === 'pending') {
-                    actions = `<div class="flex gap-2 mt-4 pt-3 border-t border-slate-100"><button onclick="setStatus('${o.id}', 'confirmed')" class="flex-1 bg-[#059669] text-white py-2 rounded-xl text-xs font-bold hover:bg-[#047857] shadow-sm transition transform hover:scale-[1.02]">ENVOYER EN CUISINE</button><button onclick="setStatus('${o.id}', 'rejected')" class="w-10 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 flex items-center justify-center transition transform hover:scale-[1.05]"><i data-feather="x" class="w-4 h-4"></i></button></div>`;
+                    actions = `<div class="flex gap-2 mt-3 pt-3 border-t border-slate-100"><button onclick="setStatus('${o.id}', 'confirmed')" class="flex-1 bg-[#059669] text-white py-2 rounded-xl text-xs font-bold hover:bg-[#047857] shadow-sm transition transform hover:scale-[1.02]">ENVOYER EN CUISINE</button><button onclick="setStatus('${o.id}', 'rejected')" class="w-10 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 flex items-center justify-center transition transform hover:scale-[1.05]"><i data-feather="x" class="w-4 h-4"></i></button></div>`;
                 }
                 else if (type === 'confirmed') {
-                    actions = `<button onclick="setStatus('${o.id}', 'en_livraison')" class="w-full mt-4 pt-2 bg-[#7C3AED] text-white py-2.5 rounded-xl text-xs font-bold hover:bg-[#6D28D9] shadow-sm transition transform hover:scale-[1.02] flex items-center justify-center gap-2"><i data-feather="check-circle" class="w-4 h-4"></i> PRÊT POUR LIVRAISON</button>`;
+                    actions = `<div class="mt-3 pt-3 border-t border-slate-100"><button onclick="setStatus('${o.id}', 'en_livraison')" class="w-full bg-[#7C3AED] text-white py-2.5 rounded-xl text-xs font-bold hover:bg-[#6D28D9] shadow-sm transition transform hover:scale-[1.02] flex items-center justify-center gap-2"><i data-feather="check-circle" class="w-4 h-4"></i> PRÊT POUR LIVRAISON</button></div>`;
                 }
                 else if (type === 'delivery') {
-                    const driverBadge = o.deliveryGuyName ? `<span class="text-xs font-bold bg-[#F5F3FF] text-[#7C3AED] px-2 py-1 rounded-full flex items-center gap-1 w-max"><i data-feather="package" class="w-3 h-3"></i> ${o.deliveryGuyName}</span>` : `<span class="text-xs font-bold bg-slate-100 text-[#374151] px-2 py-1 rounded-full flex items-center gap-1 w-max"><i data-feather="clock" class="w-3 h-3"></i> En attente livreur</span>`;
-                    actions = `<div class="mt-3">${driverBadge}</div><button onclick="setStatus('${o.id}', 'delivered')" class="w-full mt-2 bg-[#059669] text-white py-2.5 rounded-xl text-xs font-bold hover:bg-[#047857] shadow-sm transition transform hover:scale-[1.02] flex items-center justify-center gap-2"><i data-feather="check" class="w-4 h-4"></i> MARQUER LIVRÉ</button>`;
+                    const driverBadge = o.deliveryGuyName ? `<span class="text-xs font-bold bg-[#F5F3FF] text-[#7C3AED] px-2 py-1 rounded-full flex items-center gap-1 w-max mb-2"><i data-feather="package" class="w-3 h-3"></i> ${o.deliveryGuyName}</span>` : `<span class="text-xs font-bold bg-slate-100 text-[#374151] px-2 py-1 rounded-full flex items-center gap-1 w-max mb-2"><i data-feather="clock" class="w-3 h-3"></i> En attente livreur</span>`;
+                    actions = `<div class="mt-3 pt-3 border-t border-slate-100"><div class="flex flex-col items-center">${driverBadge}<button onclick="setStatus('${o.id}', 'delivered')" class="w-full bg-[#059669] text-white py-2.5 rounded-xl text-xs font-bold hover:bg-[#047857] shadow-sm transition transform hover:scale-[1.02] flex items-center justify-center gap-2"><i data-feather="check" class="w-4 h-4"></i> MARQUER LIVRÉ</button></div></div>`;
                 }
                 else if (type === 'history') {
-                    // Show driver info and delivery fee for completed deliveries
                     if (o.deliveryGuyName && o.type === 'livraison') {
                         const deliveryFee = getDeliveryPrice(o.location);
-                        actions = `<div class="mt-3 flex items-center justify-between"><span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1"><i data-feather="check" class="w-3 h-3"></i> ${o.deliveryGuyName}</span><span class="text-xs font-bold text-green-600">+${deliveryFee.toFixed(2)} Dh</span></div>`;
+                        actions = `<div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between"><span class="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1"><i data-feather="check" class="w-3 h-3"></i> ${o.deliveryGuyName}</span><span class="text-xs font-bold text-green-600">+${deliveryFee.toFixed(2)} Dh</span></div>`;
                     }
                 }
+                
                 let rawPhone = o.customer.phone || '';
                 let cleanPhone = rawPhone.replace(/\D/g, '');
                 if (cleanPhone.startsWith('0')) cleanPhone = '212' + cleanPhone.substring(1);
                 const waLink = `https://wa.me/${cleanPhone}`;
+                
                 const itemsHtml = o.items.map(i => {
                     const opts = i.options ? i.options.map(opt => `<div class="text-xs text-slate-400 pl-3 border-l-2 border-slate-100 ml-1 my-0.5">• ${opt}</div>`).join('') : '';
                     return `<div class="mb-2"><div class="flex justify-between text-sm font-bold text-slate-700"><span><span class="text-slate-400 mr-1">${i.qty}x</span> ${i.name}</span></div>${opts}</div>`;
                 }).join('');
 
-                // Conditional rendering for Notes
                 let noteContent = o.customer.note ? o.customer.note.trim() : '';
                 let noteHtml = '';
                 if (noteContent && /[a-zA-Z0-9]/.test(noteContent)) {
-                    noteHtml = `<div class="bg-yellow-50 border border-yellow-100 p-3 rounded-xl text-xs text-yellow-800 mb-3 flex gap-2"><i data-feather="edit-3" class="w-3 h-3 mt-0.5 flex-none"></i><div><span class="font-bold">Note du client :</span> <span class="italic">${noteContent}</span></div></div>`;
+                    noteHtml = `<div class="bg-yellow-50 border border-yellow-100 p-3 rounded-xl text-xs text-yellow-800 mb-3 flex gap-2"><i data-feather="edit-3" class="w-3 h-3 mt-0.5 flex-none"></i><div><span class="font-bold">Note:</span> <span class="italic">${noteContent}</span></div></div>`;
                 }
 
+                // Clean up location display
+                let locationDisplay = o.location || 'Non spécifié';
+                // If the type is already in the location string (like "Sur Place (Table 5)"), we might want to clean it, but keeping it simple for now as requested.
+                // We just ensure it's displayed nicely next to the pin.
+
                 container.innerHTML += `
-                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition fade-in mb-3 order-card group">
-                        <div class="flex justify-between items-start mb-3 border-b border-slate-50 pb-3">
-                            <div>
-                                <div class="font-bold text-slate-800 text-base flex flex-wrap items-center gap-2">
-                                    ${o.customer.name}
-                                    <span class="text-xs font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">#${o.shortId || '--'}</span>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider text-orange-700 bg-orange-50 px-2 py-1 rounded-md ml-1">${o.type.replace('_', ' ')}</span>
-                                </div>
-                                <div class="flex items-center gap-2 mt-1 text-xs font-bold text-[#374151]"><i data-feather="map-pin" class="w-3 h-3"></i> ${o.location || 'Non spécifié'}</div>
-                                <div class="text-xs font-mono text-slate-400 flex items-center gap-1 mt-1"><i data-feather="clock" class="w-3 h-3"></i> ${date}</div>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition fade-in mb-3 order-card group flex flex-col">
+                        
+                        <!-- Zone 1: Header (Name, ID, Contact) -->
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="font-bold text-slate-800 text-base flex flex-wrap items-center gap-2">
+                                ${o.customer.name}
+                                <span class="text-xs font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">#${o.shortId || '--'}</span>
                             </div>
-                            <div class="flex gap-1 shrink-0">
+                            <div class="flex gap-1 shrink-0 ml-2">
                                 <a href="tel:${cleanPhone}" class="bg-slate-100 hover:bg-slate-200 text-[#374151] p-2 rounded-lg transition" title="Appeler"><i data-feather="phone" class="w-4 h-4"></i></a>
                                 <a href="${waLink}" target="_blank" class="bg-slate-100 hover:bg-slate-200 text-[#374151] p-2 rounded-lg transition" title="WhatsApp"><i data-feather="message-circle" class="w-4 h-4"></i></a>
                             </div>
                         </div>
-                        ${noteHtml}
-                        <div class="mb-4">${itemsHtml}</div>
-                        <div class="flex flex-col justify-end items-end pt-3 border-t border-slate-100">
-                            <span class="font-extrabold text-brand-600 text-lg">${parseFloat(o.total).toFixed(2)} <span class="text-xs font-medium text-brand-500">Dh</span></span>
+
+                        <!-- Zone 2: Details -->
+                        <div class="mb-4">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-orange-700 bg-orange-50 px-2 py-1 rounded-md">${o.type.replace('_', ' ')}</span>
+                                <div class="text-xs font-mono text-slate-400 flex items-center gap-1"><i data-feather="clock" class="w-3 h-3"></i> ${date}</div>
+                            </div>
+                            <div class="flex items-start gap-1.5 text-xs font-bold text-[#374151] mb-3">
+                                <i data-feather="map-pin" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i> 
+                                <span class="leading-relaxed">${locationDisplay}</span>
+                            </div>
+                            
+                            <div class="w-full h-px bg-slate-100 mb-3"></div> <!-- Divider -->
+                            
+                            ${noteHtml}
+                            <div class="space-y-1">
+                                ${itemsHtml}
+                            </div>
                         </div>
-                        ${actions}
+
+                        <!-- Zone 3: Action (Total & Button) -->
+                        <div class="mt-auto">
+                            <div class="w-full h-px bg-slate-100 mb-3"></div> <!-- Divider -->
+                            <div class="flex justify-between items-center bg-slate-50/50 p-2 rounded-lg">
+                                <span class="text-xs font-bold text-slate-500 uppercase">Total</span>
+                                <span class="font-extrabold text-brand-600 text-base">${parseFloat(o.total).toFixed(2)} <span class="text-xs font-medium text-brand-500">Dh</span></span>
+                            </div>
+                            ${actions}
+                        </div>
                     </div>`;
             });
             feather.replace();
