@@ -884,7 +884,7 @@
         }
 
         window.switchView = (viewId) => {
-            ['orders', 'menu', 'categories', 'promotions', 'drivers'].forEach(v => {
+            ['orders', 'menu', 'promotions', 'drivers'].forEach(v => {
                 document.getElementById(`view-${v}`).classList.add('hidden');
                 const nav = document.getElementById(`nav-${v}`);
                 if (nav) { nav.classList.replace('text-brand-600', 'text-slate-500'); nav.classList.remove('bg-brand-50'); }
@@ -1323,8 +1323,32 @@
                 btn.innerText = "Enregistrer";
             }
         });
-        window.editCategory = (id) => { const c = categories.find(x => x.id === id); if (c) { document.getElementById('cat-id').value = c.id; document.getElementById('cat-name').value = c.name; document.getElementById('btn-save-cat').innerText = "Modifier"; window.scrollTo({ top: 0, behavior: 'smooth' }); } };
-        window.resetCategoryForm = () => { document.getElementById('category-form').reset(); document.getElementById('cat-id').value = ''; document.getElementById('btn-save-cat').innerText = "Enregistrer"; };
+        window.openCategoryEditor = () => {
+            const modal = document.getElementById('category-editor-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.children[1].classList.remove('translate-x-full'), 10);
+            document.getElementById('cat-editor-title').innerText = "Nouvelle Catégorie";
+            window.resetCategoryForm();
+        };
+        window.closeCategoryEditor = () => {
+            const modal = document.getElementById('category-editor-modal');
+            modal.children[1].classList.add('translate-x-full');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+        window.editCategory = (id) => { 
+            const c = categories.find(x => x.id === id); 
+            if (c) { 
+                document.getElementById('cat-id').value = c.id; 
+                document.getElementById('cat-name').value = c.name; 
+                document.getElementById('cat-original-name').value = c.name; // Crucial for renamed updates
+                document.getElementById('btn-save-cat').innerText = "Modifier"; 
+                document.getElementById('cat-editor-title').innerText = "Modifier Catégorie";
+                const modal = document.getElementById('category-editor-modal');
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.children[1].classList.remove('translate-x-full'), 10);
+            } 
+        };
+        window.resetCategoryForm = () => { document.getElementById('category-form').reset(); document.getElementById('cat-id').value = ''; document.getElementById('cat-original-name').value = ''; document.getElementById('btn-save-cat').innerText = "Enregistrer"; document.getElementById('cat-image-preview').innerHTML = '<i data-feather="image" class="w-6 h-6 text-slate-300"></i>'; feather.replace(); };
         window.deleteCategory = async (id) => { if (confirm("Supprimer ?")) { await deleteDoc(doc(db, 'categories', id)); loadCategories(); } };
         async function loadPromotions() { const snap = await getDocs(collection(db, 'promotions')); const list = document.getElementById('promotions-list'); list.innerHTML = ''; if (snap.empty) { list.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400">Aucune promotion active.</div>`; return; } snap.forEach(d => { const p = { id: d.id, ...d.data() }; list.innerHTML += `<div class="bg-white p-4 rounded-xl border border-red-100 shadow-sm relative group flex gap-4 items-center"><img src="${p.imageUrl || 'assets/snack.png'}" class="w-16 h-16 rounded-lg object-cover bg-red-50"><div class="flex-1"><h4 class="font-bold text-slate-800">${p.name}</h4><div class="text-red-500 font-bold">${p.price} Dh</div><div class="text-xs text-slate-400 mt-1">${p.isVisible ? '🟢 Active' : '🔴 Inactive'}</div></div><div class="flex gap-2"><button onclick="openPromoEditor('${p.id}')" class="p-2 bg-slate-50 text-blue-500 rounded-lg hover:bg-blue-50 transition"><i data-feather="edit-2" class="w-4 h-4"></i></button><button onclick="deletePromo('${p.id}')" class="p-2 bg-slate-50 text-red-500 rounded-lg hover:bg-red-50 transition"><i data-feather="trash-2" class="w-4 h-4"></i></button></div></div>`; }); feather.replace(); }
         window.openPromoEditor = (id = null) => { document.getElementById('promo-editor').classList.remove('hidden'); setTimeout(() => document.getElementById('promo-editor').children[1].classList.remove('translate-x-full'), 10); document.getElementById('promo-editor-title').innerText = id ? "Modifier Promo" : "Nouvelle Promo"; document.getElementById('edit-promo-id').value = id || ''; document.getElementById('promo-form').reset(); document.getElementById('promo-image-preview').innerHTML = '<i data-feather="image" class="text-slate-300"></i>'; if (id) { getDoc(doc(db, "promotions", id)).then(snap => { if (snap.exists()) { const d = snap.data(); document.getElementById('promo-name').value = d.name; document.getElementById('promo-price').value = d.price; document.getElementById('promo-desc').value = d.description || ''; document.getElementById('promo-visible').checked = d.isVisible !== false; document.getElementById('promo-image-url').value = d.imageUrl || ''; if (d.imageUrl) document.getElementById('promo-image-preview').innerHTML = `<img src="${d.imageUrl}" class="w-full h-full object-cover">`; } }); } };
