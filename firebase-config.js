@@ -47,6 +47,7 @@ export {
     db, 
     auth,
     messaging, // --- NEW: Export Messaging service
+    firebaseConfig, // --- Export firebaseConfig for secondary app
     // Firestore functions
     collection, getDocs, addDoc, deleteDoc, updateDoc, getDoc, doc, query, orderBy, onSnapshot, serverTimestamp, where, runTransaction, writeBatch, setDoc,
     // Auth functions

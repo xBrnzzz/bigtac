@@ -737,7 +737,10 @@
     </div>
     <!-- JS Logic Reused from original file, ensures everything works as before -->
     <script type="module">
-        import { auth, db, signInWithEmailAndPassword, onAuthStateChanged, signOut, collection, addDoc, getDocs, deleteDoc, updateDoc, getDoc, doc, query, orderBy, onSnapshot, serverTimestamp, writeBatch, where, setDoc, runTransaction } from './firebase-config.js';
+        import { firebaseConfig, auth, db, signInWithEmailAndPassword, onAuthStateChanged, signOut, collection, addDoc, getDocs, deleteDoc, updateDoc, getDoc, doc, query, orderBy, onSnapshot, serverTimestamp, writeBatch, where, setDoc, runTransaction } from './firebase-config.js';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signOut as secondarySignOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        
         window.auth = auth;
         window.signOut = signOut;
         const CLOUDINARY_CLOUD_NAME = "dv0vnjnto";
@@ -1714,9 +1717,7 @@
         // ======================
 
         // Add user (Admin, Manager, Caissier, Livreur) using Secondary App to prevent logout
-        import { firebaseConfig } from './firebase-config.js';
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signOut as secondarySignOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
 
         // Initialize secondary app for user creation
         const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
