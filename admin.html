@@ -397,30 +397,39 @@
                     <h2 class="text-2xl font-bold text-slate-900">Gestion Livreurs</h2>
                 </div>
 
-                <!-- Driver Registration Form -->
+                <!-- User Registration Form -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
-                    <h3 class="font-bold text-lg text-slate-800 mb-4">Ajouter un Livreur</h3>
-                    <form id="driver-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase mb-1 block">UID Firebase</label>
-                            <input type="text" id="driver-uid"
-                                class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono text-sm"
-                                placeholder="UID from Auth" required>
-                        </div>
+                    <h3 class="font-bold text-lg text-slate-800 mb-4">Ajouter un Utilisateur</h3>
+                    <form id="user-form" class="grid grid-cols-1 md:grid-cols-5 gap-4">
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase mb-1 block">Nom Complet</label>
-                            <input type="text" id="driver-name"
+                            <input type="text" id="user-name"
                                 class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold"
-                                placeholder="Nom du livreur" required>
+                                placeholder="Nom" required>
                         </div>
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase mb-1 block">Email</label>
-                            <input type="email" id="driver-email"
+                            <input type="email" id="user-email"
                                 class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm"
-                                placeholder="email@example.com" required>
+                                placeholder="email@ex.com" required>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase mb-1 block">Mot de passe</label>
+                            <input type="password" id="user-password"
+                                class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm"
+                                placeholder="Min 6 car." required minlength="6">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase mb-1 block">Rôle</label>
+                            <select id="user-role" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold">
+                                <option value="livreur">Livreur</option>
+                                <option value="caissier">Caissier</option>
+                                <option value="manager">Manager</option>
+                                <option value="admin">Administrateur</option>
+                            </select>
                         </div>
                         <div class="flex items-end">
-                            <button type="submit"
+                            <button type="submit" id="btn-add-user"
                                 class="w-full bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-xl font-bold shadow-lg transition">
                                 <i data-feather="user-plus" class="w-4 h-4 inline mr-1"></i> Ajouter
                             </button>
@@ -747,28 +756,22 @@
 
         onAuthStateChanged(auth, async user => {
             if (user) {
-                // Fetch user profile from users collection
                 try {
                     const userDoc = await getDoc(doc(db, 'users', user.uid));
                     if (userDoc.exists()) {
                         currentUser = { uid: user.uid, ...userDoc.data() };
-
                         document.getElementById('login-section').classList.add('hidden');
 
                         // Route based on role
-                        if (currentUser.role === 'delivery') {
-                            // Driver Interface
+                        if (currentUser.role === 'delivery' || currentUser.role === 'livreur') {
                             initDriverApp();
-                        } else if (currentUser.role === 'admin') {
-                            // Admin Interface
-                            initApp();
+                        } else if (['admin', 'manager', 'caissier'].includes(currentUser.role)) {
+                            initApp(currentUser.role);
                         } else {
-                            // Unknown role
                             alert('Rôle utilisateur invalide. Contactez l\'administrateur.');
                             signOut(auth);
                         }
                     } else {
-                        // User authenticated but no profile in users collection
                         alert('Profil utilisateur introuvable. Contactez l\'administrateur.');
                         signOut(auth);
                     }
@@ -795,9 +798,32 @@
         let categories = [], items = [], currentCategoryFilter = 'all';
         let sortableItems = null, sortableCategories = null;
 
-        async function initApp() {
+        async function initApp(role) {
             await loadCategories(); await loadItems(); await loadPromotions(); initOrders(); initSettings();
-            switchView('orders');
+            
+            // Enforce UI Privileges
+            const elements = {
+                orders: [document.getElementById('nav-orders')],
+                menu: [document.getElementById('nav-menu')],
+                categories: [document.getElementById('nav-categories')],
+                promotions: [document.getElementById('nav-promotions')],
+                users: [document.getElementById('nav-drivers')] // Represents user management
+            };
+
+            // Hide/Show based on role
+            if (role === 'admin') {
+                // Show all
+                Object.values(elements).forEach(arr => arr.forEach(el => el && el.classList.remove('hidden')));
+                // Change users label to 'Utilisateurs'
+                if(elements.users[0]) elements.users[0].innerHTML = '<i data-feather="users" class="w-5 h-5"></i> Utilisateurs';
+            } else if (role === 'manager') {
+                elements.users.forEach(el => el && el.classList.add('hidden')); // Hide users
+                ['orders', 'menu', 'categories', 'promotions'].forEach(key => elements[key].forEach(el => el && el.classList.remove('hidden')));
+            } else if (role === 'caissier') {
+                ['menu', 'categories', 'promotions', 'users'].forEach(key => elements[key].forEach(el => el && el.classList.add('hidden'))); // Hide everything except orders
+            }
+
+            switchView('orders'); // Everyone defaults to orders
 
             const setupPreview = (fileId, imgId) => {
                 document.getElementById(fileId).addEventListener('change', function (e) {
@@ -807,6 +833,7 @@
             setupPreview('input-image-file', 'image-preview');
             setupPreview('promo-image-file', 'promo-image-preview');
             setupPreview('cat-image-file', 'cat-image-preview');
+            feather.replace();
         }
 
         // --- SETTINGS LOGIC ---
@@ -1683,90 +1710,137 @@
         };
 
         // ======================
-        // DRIVER MANAGEMENT (Admin)
+        // USER MANAGEMENT (Admin)
         // ======================
 
-        // Add driver to users collection
-        document.getElementById('driver-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const uid = document.getElementById('driver-uid').value.trim();
-            const name = document.getElementById('driver-name').value.trim();
-            const email = document.getElementById('driver-email').value.trim();
+        // Add user (Admin, Manager, Caissier, Livreur) using Secondary App to prevent logout
+        import { firebaseConfig } from './firebase-config.js';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signOut as secondarySignOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-            if (!uid || !name || !email) {
+        // Initialize secondary app for user creation
+        const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
+        const secondaryAuth = getAuth(secondaryApp);
+
+        document.getElementById('user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-add-user');
+            const newName = document.getElementById('user-name').value.trim();
+            const newEmail = document.getElementById('user-email').value.trim();
+            const newPassword = document.getElementById('user-password').value;
+            const newRole = document.getElementById('user-role').value;
+
+            if (!newName || !newEmail || !newPassword || !newRole) {
                 alert('Veuillez remplir tous les champs.');
                 return;
             }
 
+            btn.disabled = true;
+            btn.innerHTML = '<i data-feather="loader" class="w-4 h-4 inline mr-1 animate-spin"></i> Création...';
+            feather.replace();
+
             try {
-                await setDoc(doc(db, 'users', uid), {
-                    uid,
-                    name,
-                    email,
-                    role: 'delivery',
+                // 1. Create user in Firebase Auth using the secondary app
+                const userCredential = await createUserWithEmailAndPassword(secondaryAuth, newEmail, newPassword);
+                const newUserId = userCredential.user.uid;
+
+                // 2. Save user profile in Firestore (using the primary app's db)
+                await setDoc(doc(db, 'users', newUserId), {
+                    uid: newUserId,
+                    name: newName,
+                    email: newEmail,
+                    role: newRole,
                     createdAt: serverTimestamp()
                 });
 
-                alert(`Livreur "${name}" ajouté avec succès !`);
-                document.getElementById('driver-form').reset();
-                loadDrivers(); // Refresh table
-            } catch (e) {
-                console.error(e);
-                alert('Erreur lors de l\'ajout du livreur: ' + e.message);
+                // 3. Sign out from secondary app to clean up state
+                await secondarySignOut(secondaryAuth);
+
+                alert(`Utilisateur "${newName}" (${newRole}) ajouté avec succès !`);
+                document.getElementById('user-form').reset();
+                loadDrivers(); // Refresh table (now users table)
+            } catch (error) {
+                console.error("Error creating user:", error);
+                let msg = "Erreur lors de la création.";
+                if (error.code === 'auth/email-already-in-use') msg = "Cet email est déjà utilisé.";
+                if (error.code === 'auth/weak-password') msg = "Le mot de passe est trop faible.";
+                alert(msg);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i data-feather="user-plus" class="w-4 h-4 inline mr-1"></i> Ajouter';
+                feather.replace();
             }
         });
 
-        // Load drivers and calculate earnings
+        // Load users (formerly drivers) and calculate earnings if delivery
         async function loadDrivers() {
             const tableBody = document.getElementById('drivers-table-body');
             tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400">Chargement...</td></tr>';
 
             try {
-                // Simplified query - get all users, then filter by role
                 const snap = await getDocs(collection(db, 'users'));
-                const drivers = [];
+                const users = [];
 
                 snap.forEach(doc => {
                     const data = doc.data();
-                    if (data.role === 'delivery') {
-                        drivers.push({ id: doc.id, ...data });
-                    }
+                    // Admin only sees users if they are admin, but the table now shows everyone.
+                    // Wait, previous code only showed 'delivery', now we want to show all except the current admin maybe? Or show all.
+                    users.push({ id: doc.id, ...data });
                 });
 
-                if (drivers.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400 italic">Aucun livreur enregistré.</td></tr>';
+                if (users.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400 italic">Aucun utilisateur enregistré.</td></tr>';
                     return;
                 }
 
                 tableBody.innerHTML = '';
 
-                for (const driver of drivers) {
-                    // Calculate earnings: Get all orders for this driver
-                    const ordersQ = query(
-                        collection(db, 'orders'),
-                        where('deliveryGuyId', '==', driver.uid)
-                    );
-                    const ordersSnap = await getDocs(ordersQ);
+                for (const user of users) {
+                    let statsHtml = '<td class="p-3 text-center text-slate-400">-</td><td class="p-3 text-right text-slate-400">-</td>';
 
-                    let totalEarnings = 0;
-                    let deliveryCount = 0;
+                    if (user.role === 'delivery' || user.role === 'livreur') {
+                        // Calculate earnings for driver
+                        const ordersQ = query(
+                            collection(db, 'orders'),
+                            where('deliveryGuyId', '==', user.uid)
+                        );
+                        const ordersSnap = await getDocs(ordersQ);
 
-                    ordersSnap.forEach(orderDoc => {
-                        const order = orderDoc.data();
-                        if (order.status === 'delivered' || order.status === 'ready') {
-                            totalEarnings += getDeliveryPrice(order.location);
-                            deliveryCount++;
-                        }
-                    });
+                        let totalEarnings = 0;
+                        let deliveryCount = 0;
+
+                        ordersSnap.forEach(orderDoc => {
+                            const order = orderDoc.data();
+                            if (order.status === 'delivered' || order.status === 'ready') {
+                                totalEarnings += getDeliveryPrice(order.location);
+                                deliveryCount++;
+                            }
+                        });
+                        statsHtml = `
+                            <td class="p-3 text-center font-bold text-slate-700">${deliveryCount}</td>
+                            <td class="p-3 text-right font-bold text-green-600">${totalEarnings.toFixed(2)} Dh</td>
+                        `;
+                    }
+
+                    // Role Badge
+                    let roleBadge = '';
+                    if(user.role === 'admin') roleBadge = '<span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold">Admin</span>';
+                    else if(user.role === 'manager') roleBadge = '<span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-bold">Manager</span>';
+                    else if(user.role === 'caissier') roleBadge = '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold">Caissier</span>';
+                    else roleBadge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">Livreur</span>';
 
                     tableBody.innerHTML += `
                         <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-                            <td class="p-3 font-bold text-slate-800">${driver.name}</td>
-                            <td class="p-3 text-sm text-slate-600">${driver.email}</td>
-                            <td class="p-3 text-center font-bold text-slate-700">${deliveryCount}</td>
-                            <td class="p-3 text-right font-bold text-green-600">${totalEarnings.toFixed(2)} Dh</td>
+                            <td class="p-3 font-bold text-slate-800">
+                                <div class="flex flex-col">
+                                    <span>${user.name}</span>
+                                    <div class="mt-1">${roleBadge}</div>
+                                </div>
+                            </td>
+                            <td class="p-3 text-sm text-slate-600">${user.email}</td>
+                            ${statsHtml}
                             <td class="p-3 text-right">
-                                <button onclick="deleteDriver('${driver.uid}')" class="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition text-xs font-bold">
+                                <button onclick="deleteDriver('${user.uid}')" class="p-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition text-xs font-bold">
                                     Supprimer
                                 </button>
                             </td>
@@ -1776,7 +1850,7 @@
 
                 feather.replace();
             } catch (e) {
-                console.error('Error loading drivers:', e);
+                console.error('Error loading users:', e);
                 tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-red-500">Erreur: ${e.message}</td></tr>`;
             }
         }
