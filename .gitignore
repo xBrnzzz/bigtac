@@ -1,4 +1,6 @@
 node_modules/
+/.taste-skill/
+/.playwright-cli/
 *.log
 test_*.png
 .DS_Store
