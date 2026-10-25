@@ -10,7 +10,7 @@
         <link rel="apple-touch-icon" href="assets/logo.png">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com">
         </script>
         <script>tailwind.config = { darkMode: 'class' };</script>
@@ -54,7 +54,7 @@
                 <section id="hero" class="restaurant-intro" aria-labelledby="store-title">
                     <div class="restaurant-intro__copy">
                         <span class="store-status" id="storeStatus">Disponibilité en cours…</span>
-                        <h1 id="store-title">Une faim de <span translate="no">BIGTAC ?</span></h1>
+                        <h1 id="store-title">Grosse faim ? <span translate="no">BIGTAC !</span></h1>
                         <p>Votre tacos, à votre façon.</p>
                         <div class="restaurant-services">
                             <span>Livraison dès 4 Dh</span>
@@ -67,7 +67,7 @@
                             </i>
                         </a>
                     </div>
-                    <img src="assets/tacos-hero.jpg" alt="Tacos français grillés et frites, visuel illustratif" width="1536" height="1024" fetchpriority="high">
+                    <img src="assets/tacos-campaign.jpg" alt="Tacos français grillés et frites, visuel illustratif" width="1536" height="1024" fetchpriority="high">
                 </section>
                 <div id="closedBanner" class="notice notice-warning hidden" role="status">
                     <i data-feather="clock" aria-hidden="true">
@@ -79,7 +79,7 @@
                 </div>
                 <section id="menu-unified" aria-labelledby="menu-title">
                     <div class="store-menu-heading">
-                        <h2 id="menu-title">Qu’est-ce qui vous tente ?</h2>
+                        <h2 id="menu-title">On mange quoi ?</h2>
                         <p>Tacos, gratinés, burgers… À vous de choisir.</p>
                     </div>
                     <div id="stickyFilterBar" class="menu-toolbar">
@@ -97,18 +97,18 @@
                         </nav>
                     </div>
                     <div class="discovery-row">
-                        <section id="promotions" class="menu-feature hidden" aria-labelledby="promotions-title">
+                        <section id="promotions" class="menu-feature menu-feature--offers hidden" aria-labelledby="promotions-title">
                             <div class="section-heading">
                                 <h2 id="promotions-title">Les bons plans</h2>
-                                <span>De quoi se régaler</span>
+                                <p>À composer selon vos envies.</p>
                             </div>
                             <div id="promotionsGrid" class="featured-grid">
                             </div>
                         </section>
-                        <section id="popular" class="menu-feature hidden" aria-labelledby="popular-title">
+                        <section id="popular" class="menu-feature menu-feature--popular hidden" aria-labelledby="popular-title">
                             <div class="section-heading">
                                 <h2 id="popular-title">Les incontournables</h2>
-                                <span>À découvrir</span>
+                                <p>La sélection BIGTAC, à votre façon.</p>
                             </div>
                             <div id="popularGrid" class="featured-grid">
                             </div>
@@ -754,7 +754,7 @@
 
                 if (container && allPromotions.length > 0) {
                     section.classList.remove('hidden');
-                    container.innerHTML = allPromotions.map(promo => createCardHTML(promo, 'h3')).join('');
+                    container.innerHTML = allPromotions.map(promo => createCardHTML(promo, 'h3', 'offer')).join('');
                 }
             } catch (e) {
                 console.error("Promotions error:", e);
@@ -790,7 +790,7 @@
                 hasContent = true;
 
                 const section = document.createElement('section');
-                section.className = 'mb-14 section-block scroll-mt-32';
+                section.className = 'section-block';
                 section.id = `section-${catName}`;
 
                 section.innerHTML = `
@@ -817,22 +817,26 @@
             return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
         }
 
-        function createCardHTML(item, heading = 'h4') {
+        function createCardHTML(item, heading = 'h4', variant = 'menu') {
             const fallbackImg = categoryImages[item.category] || 'assets/snack.png';
             const name = escapeCardText(item.name);
             const itemId = encodeURIComponent(item.id).replace(/'/g, '%27');
+            const featured = variant === 'offer' || variant === 'popular';
+            const badge = variant === 'offer' ? 'Offre du moment' : 'Favori';
             return `
-                <article class="menu-card product-card">
+                <article class="menu-card product-card${featured ? ` product-card--${variant}` : ''}">
                     <div class="product-card__media">
                         <img src="${escapeCardText(item.imageUrl || fallbackImg)}" alt="${name}" width="640" height="480" loading="lazy" onerror="this.onerror=null; this.src=decodeURIComponent('${encodeURIComponent(fallbackImg).replace(/'/g, '%27')}')">
+                        ${featured ? `<span class="featured-badge">${badge}</span>` : ''}
                     </div>
                     <div class="product-card__body">
-                        ${item.isPromo ? '<span class="product-badge">Offre</span>' : ''}<${heading}>${name}</${heading}>
+                        ${item.isPromo && !featured ? '<span class="product-badge">Offre</span>' : ''}<${heading}>${name}</${heading}>
+                        ${variant === 'popular' && item.category ? `<p class="featured-category">${escapeCardText(item.category)}</p>` : ''}
                         <p class="product-card__description">${escapeCardText(item.description || 'Préparé à la commande.')}</p>
                         <div class="product-card__footer">
                             <div class="product-card__price"><small>À partir de</small><strong>${money(item.price)}</strong></div>
                             <button type="button" class="product-card__choose" onclick="openItemModal(decodeURIComponent('${itemId}'), ${item.isPromo === true})" aria-label="Choisir ${name}">
-                                <span>Choisir</span><i data-feather="plus" aria-hidden="true"></i>
+                                <span>${variant === 'offer' ? 'Composer' : 'Choisir'}</span><i data-feather="plus" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
@@ -851,7 +855,7 @@
             }
 
             popSection.classList.remove('hidden');
-            popContainer.innerHTML = populars.map(item => createCardHTML(item, 'h3')).join('');
+            popContainer.innerHTML = populars.map(item => createCardHTML(item, 'h3', 'popular')).join('');
         }
 
         let activeCategory = 'all';

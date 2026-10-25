@@ -73,7 +73,7 @@ try {
         check(await page.locator('button:visible').evaluateAll(buttons => buttons.every(button => button.getBoundingClientRect().height >= 44)), `${width}: visible buttons have 44px tap targets`);
         check(await page.locator('.restaurant-intro h1').evaluate(el => el.getBoundingClientRect().height <= parseFloat(getComputedStyle(el).lineHeight) * 2 + 1), `${width}: hero headline fits at most two lines`);
         const heroHeight = await page.locator('#hero').evaluate(el => el.getBoundingClientRect().height);
-        check(heroHeight >= (width < 768 ? 300 : 380) && heroHeight <= (width < 768 ? 360 : 450), `${width}: responsive campaign hero height`);
+        check(heroHeight >= (width < 768 ? 300 : 420) && heroHeight <= (width < 768 ? 400 : 500), `${width}: responsive campaign hero height`);
         check(await page.locator('.intro-cta').evaluate(el => {
             const bounds = el.getBoundingClientRect();
             return bounds.height >= 44 && bounds.width > 0 && bounds.bottom <= innerHeight && getComputedStyle(el).visibility === 'visible';
@@ -84,6 +84,10 @@ try {
             const top = el.getBoundingClientRect().top;
             return top >= parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-header')) && top < innerHeight;
         }), `${width}: hero CTA scrolls to the visible menu heading`);
+        await page.locator('#popularGrid').getByRole('button', { name: 'Choisir Tacos Poulet', exact: true }).click();
+        check(await page.locator('#modalItemName').innerText() === 'Tacos Poulet', `${width}: featured favourite opens its original item`);
+        check(await page.locator('.option-group').count() === 3, `${width}: featured favourite retains choices and supplements`);
+        await closeProduct(page);
         await page.locator('#categoryFilters').getByRole('button', { name: 'Burgers', exact: true }).click();
         check(await page.locator('#menuContent .section-block:not(.hidden)').count() === 1, `${width}: category browsing`);
         check(await page.locator('#categoryFilters [aria-pressed=true]').innerText() === 'Burgers', `${width}: accessible category state`);
@@ -190,6 +194,36 @@ try {
         check(await page.evaluate(() => !localStorage.getItem('activeOrderId')), `${width}: tracker dismissal`);
         await context.close();
         console.log(`PASS responsive ordering flow: ${width}px`);
+    }
+
+    // Featured layouts must work for a single recommendation and a larger rail.
+    const fixtureSource = fs.readFileSync(new URL('./fixtures/firebase.js', import.meta.url), 'utf8');
+    for (const width of [320, 768, 1440]) {
+        for (const density of ['single', 'many']) {
+            const featured = await contextAt(width);
+            const setup = density === 'single'
+                ? 'items.forEach((item, index) => item.isPopular = index === 0);'
+                : `items.forEach(item => item.isPopular = true); promotions.push(...Array.from({length: 3}, (_, index) => ({...promotions[0], id: 'offer-' + index, name: 'Menu tacos poulet, cheddar et frites', price: 1375.50})));`;
+            await featured.context.route('**/firebase-config.js', route => route.fulfill({
+                contentType: 'text/javascript', body: fixtureSource.replace('const categories=', setup + '\nconst categories=')
+            }));
+            await loaded(featured.page);
+            check(await featured.page.locator('#promotionsGrid .product-card').count() === (density === 'single' ? 1 : 4), `${width}/${density}: all configured offers are shown`);
+            check(await featured.page.locator('#popularGrid .product-card').count() === (density === 'single' ? 1 : 5), `${width}/${density}: all configured favourites are shown`);
+            check(await featured.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${width}/${density}: no page overflow`);
+            check(await featured.page.locator('.featured-grid .product-card').evaluateAll(cards => cards.every(card => {
+                const bounds = card.getBoundingClientRect();
+                return [...card.querySelectorAll('button, .product-card__price')].every(element => {
+                    const box = element.getBoundingClientRect();
+                    return box.left >= bounds.left && box.right <= bounds.right + 1 && box.bottom <= bounds.bottom;
+                });
+            })), `${width}/${density}: prices and actions remain inside their cards`);
+            await featured.page.locator('#promotionsGrid button').last().click();
+            check(await featured.page.locator('#modalItemName').innerText() === (density === 'single' ? 'Menu Tacos' : 'Menu tacos poulet, cheddar et frites'), `${width}/${density}: scrolled offer opens the correct item`);
+            await closeProduct(featured.page);
+            await snap(featured.page, `${width}-featured-${density}`);
+            await featured.context.close();
+        }
     }
 
     // Loading, failure, empty and retry states use no live services.
