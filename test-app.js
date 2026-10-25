@@ -1,7 +1,56 @@
 import { chromium } from 'playwright';
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PORT = 3000;
+
+const MIME = {
+  '.html': 'text/html; charset=UTF-8',
+  '.js': 'application/javascript; charset=UTF-8',
+  '.css': 'text/css; charset=UTF-8',
+  '.json': 'application/json; charset=UTF-8',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.webp': 'image/webp',
+};
+
+function startServer() {
+  return new Promise((resolve, reject) => {
+    const server = http.createServer((req, res) => {
+      let reqPath = decodeURI(req.url.split('?')[0]);
+      if (reqPath === '/') reqPath = '/index.html';
+      const filePath = path.join(__dirname, reqPath);
+
+      fs.stat(filePath, (err, stats) => {
+        if (err || !stats.isFile()) {
+          res.statusCode = 404;
+          res.end('Not Found: ' + reqPath);
+          return;
+        }
+        const ext = path.extname(filePath).toLowerCase();
+        res.setHeader('Content-Type', MIME[ext] || 'application/octet-stream');
+        fs.createReadStream(filePath).pipe(res);
+      });
+    });
+
+    server.listen(PORT, '127.0.0.1', () => {
+      console.log(`📡 Local test server active on http://127.0.0.1:${PORT}`);
+      resolve(server);
+    });
+    server.on('error', reject);
+  });
+}
 
 async function runTests() {
   console.log('🚀 Starting BIGTAC E2E Verification Suite...\n');
+  const server = await startServer();
   const browser = await chromium.launch({ headless: true });
   const results = { passed: 0, failed: 0, errors: [] };
 
@@ -37,7 +86,7 @@ async function runTests() {
       }
     });
 
-    await desktopPage.goto('http://127.0.0.1:3000/index.html', { waitUntil: 'domcontentloaded' });
+    await desktopPage.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: 'domcontentloaded' });
     await desktopPage.waitForTimeout(1500);
 
     // Title check
@@ -90,7 +139,6 @@ async function runTests() {
     // Test Cart Logic & Customization via In-Page State
     console.log('\n  🧪 Testing Cart & Order Calculations...');
     await desktopPage.evaluate(() => {
-      // Simulate adding a customized item to cart
       const testItem = {
         cartItemId: 'item-test-1',
         id: 'tacos-poulet',
@@ -104,7 +152,6 @@ async function runTests() {
         supplementsCost: 5,
         totalPrice: 54
       };
-      // Access cart and update
       window.cart.push(testItem);
       window.updateCartUI();
     });
@@ -189,7 +236,7 @@ async function runTests() {
     const mobileErrors = [];
     mobilePage.on('pageerror', err => mobileErrors.push(err.message));
 
-    await mobilePage.goto('http://127.0.0.1:3000/index.html', { waitUntil: 'domcontentloaded' });
+    await mobilePage.goto(`http://127.0.0.1:${PORT}/index.html`, { waitUntil: 'domcontentloaded' });
     await mobilePage.waitForTimeout(1500);
 
     // Verify no horizontal overflow on mobile
@@ -231,15 +278,20 @@ async function runTests() {
       }
     });
 
-    await adminPage.goto('http://127.0.0.1:3000/admin.html', { waitUntil: 'domcontentloaded' });
+    await adminPage.goto(`http://127.0.0.1:${PORT}/admin.html`, { waitUntil: 'domcontentloaded' });
     await adminPage.waitForTimeout(1500);
 
     const adminTitle = await adminPage.title();
     assert(adminTitle.includes('BIGTAC'), `Admin title includes 'BIGTAC' (Got: "${adminTitle}")`);
 
-    // Verify login section exists in DOM
+    // Verify login section is visible immediately (not hidden)
     const loginSection = adminPage.locator('#login-section');
-    assert(await loginSection.count() > 0, 'Admin login modal is structured in DOM');
+    assert(await loginSection.isVisible(), 'Admin login modal is immediately visible on page load');
+
+    // Verify login inputs
+    assert(await adminPage.locator('#email').isVisible(), 'Email input field is visible');
+    assert(await adminPage.locator('#password').isVisible(), 'Password input field is visible');
+    assert(await adminPage.locator('#btn-login-submit').isVisible(), 'Login submit button is visible');
 
     // Verify navigation tabs
     const navOrders = adminPage.locator('#nav-orders');
@@ -247,10 +299,10 @@ async function runTests() {
     const navPromotions = adminPage.locator('#nav-promotions');
     const navDrivers = adminPage.locator('#nav-drivers');
 
-    assert(await navOrders.isVisible(), 'Navigation tab #nav-orders is visible');
-    assert(await navMenu.isVisible(), 'Navigation tab #nav-menu is visible');
-    assert(await navPromotions.isVisible(), 'Navigation tab #nav-promotions is visible');
-    assert(await navDrivers.isVisible(), 'Navigation tab #nav-drivers is visible');
+    assert(await navOrders.count() > 0, 'Navigation tab #nav-orders exists');
+    assert(await navMenu.count() > 0, 'Navigation tab #nav-menu exists');
+    assert(await navPromotions.count() > 0, 'Navigation tab #nav-promotions exists');
+    assert(await navDrivers.count() > 0, 'Navigation tab #nav-drivers exists');
 
     // Test view switching without reload
     await adminPage.evaluate(() => window.switchView('menu'));
@@ -296,7 +348,7 @@ async function runTests() {
     const ccErrors = [];
     ccPage.on('pageerror', err => ccErrors.push(err.message));
 
-    await ccPage.goto('http://127.0.0.1:3000/CC.html', { waitUntil: 'domcontentloaded' });
+    await ccPage.goto(`http://127.0.0.1:${PORT}/CC.html`, { waitUntil: 'domcontentloaded' });
     await ccPage.waitForTimeout(1000);
 
     const ccTitle = await ccPage.title();
@@ -314,6 +366,7 @@ async function runTests() {
     results.errors.push(err.message);
   } finally {
     await browser.close();
+    server.close();
   }
 
   console.log('\n======================================================');

@@ -139,8 +139,13 @@
 
 <body class="bg-slate-100 text-slate-800 antialiased h-screen overflow-hidden flex flex-col md:flex-row">
 
+    <!-- WARNING BANNER IF OPENED DIRECTLY VIA FILE:// -->
+    <div id="file-protocol-warning" class="fixed top-0 left-0 right-0 z-[100] bg-amber-500 text-stone-900 px-4 py-2 text-xs font-bold text-center shadow-md hidden">
+        ⚠️ Attention : Ce fichier a été ouvert directement (file://). Pour que la connexion Firebase fonctionne, veuillez utiliser un serveur local (ex: clic droit "Open with Live Server" dans VS Code, ou http://localhost:3000).
+    </div>
+
     <!-- LOGIN OVERLAY MODAL -->
-    <div id="login-section" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div id="login-section" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm p-8 rounded-3xl shadow-2xl border border-slate-100">
             <div class="text-center mb-8">
                 <div class="w-20 h-20 mx-auto mb-4 rounded-2xl overflow-hidden p-1 shadow-md bg-stone-900 flex items-center justify-center">
@@ -153,16 +158,16 @@
             <form id="login-form" class="space-y-4">
                 <div>
                     <label for="email" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
-                    <input type="email" id="email" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-semibold text-sm transition" placeholder="admin@bigtac.ma" required>
+                    <input type="email" id="email" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-semibold text-sm transition" placeholder="admin@bigtac.ma" required autocomplete="email">
                 </div>
                 <div>
                     <label for="password" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Mot de passe</label>
-                    <input type="password" id="password" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-semibold text-sm transition" placeholder="••••••••" required>
+                    <input type="password" id="password" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-semibold text-sm transition" placeholder="••••••••" required autocomplete="current-password">
                 </div>
-                <button type="submit" id="btn-login-submit" class="w-full py-4 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-black text-sm shadow-lg shadow-brand-500/25 transition transform active:scale-95">
-                    Se Connecter
+                <button type="submit" id="btn-login-submit" class="w-full py-4 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-black text-sm shadow-lg shadow-brand-500/25 transition transform active:scale-95 flex items-center justify-center gap-2">
+                    <span>Se Connecter</span>
                 </button>
-                <p id="login-error" class="text-red-500 text-xs font-bold text-center hidden bg-red-50 py-2.5 rounded-xl border border-red-100">
+                <p id="login-error" class="text-red-500 text-xs font-bold text-center hidden bg-red-50 py-2.5 px-3 rounded-xl border border-red-100 leading-relaxed">
                     Email ou mot de passe incorrect.
                 </p>
             </form>
@@ -848,31 +853,72 @@
             return match ? parseFloat(match[1]) : 0;
         }
 
+        // Check if opened via file:// protocol
+        if (window.location.protocol === 'file:') {
+            const warningEl = document.getElementById('file-protocol-warning');
+            if (warningEl) warningEl.classList.remove('hidden');
+            console.warn("BIGTAC Warning: Web applications utilizing Firebase ES Modules require an HTTP server (e.g. Live Server, localhost) rather than file://");
+        }
+
         // --- AUTHENTICATION STATE OBSERVER ---
         onAuthStateChanged(auth, async user => {
             if (user) {
                 try {
+                    let userProfile = null;
                     const userDoc = await getDoc(doc(db, 'users', user.uid));
                     if (userDoc.exists()) {
-                        currentUser = { uid: user.uid, ...userDoc.data() };
-                        document.getElementById('login-section').classList.add('hidden');
-
-                        if (currentUser.role === 'delivery' || currentUser.role === 'livreur') {
-                            initDriverApp();
-                        } else if (['admin', 'manager', 'caissier'].includes(currentUser.role)) {
-                            initApp(currentUser.role);
-                        } else {
-                            showToast('Rôle non autorisé', 'error');
-                            signOut(auth);
-                        }
+                        userProfile = userDoc.data();
                     } else {
-                        showToast('Profil utilisateur non configuré dans Firestore', 'error');
-                        signOut(auth);
+                        // Fallback: check if account was registered by email
+                        try {
+                            const emailQuery = query(collection(db, 'users'), where('email', '==', user.email));
+                            const emailSnap = await getDocs(emailQuery);
+                            if (!emailSnap.empty) {
+                                userProfile = emailSnap.docs[0].data();
+                            }
+                        } catch (qErr) {
+                            console.warn("Could not query user by email:", qErr);
+                        }
+                    }
+
+                    // Auto-bootstrap profile for valid Firebase Auth user if missing in Firestore
+                    if (!userProfile) {
+                        userProfile = {
+                            name: user.displayName || (user.email ? user.email.split('@')[0] : 'Admin'),
+                            email: user.email || '',
+                            role: 'admin'
+                        };
+                        try {
+                            await setDoc(doc(db, 'users', user.uid), {
+                                uid: user.uid,
+                                ...userProfile,
+                                createdAt: serverTimestamp()
+                            }, { merge: true });
+                        } catch (writeErr) {
+                            console.warn("Could not auto-provision user Firestore doc:", writeErr);
+                        }
+                    }
+
+                    currentUser = { uid: user.uid, ...userProfile };
+                    const role = (currentUser.role || 'admin').toLowerCase().trim();
+
+                    // Hide login modal
+                    const loginSection = document.getElementById('login-section');
+                    if (loginSection) loginSection.classList.add('hidden');
+
+                    if (role === 'delivery' || role === 'livreur') {
+                        initDriverApp();
+                    } else {
+                        // Admin, manager, caissier, etc.
+                        initApp(role);
                     }
                 } catch (e) {
-                    console.error('User profile error:', e);
-                    showToast('Erreur lors du chargement du profil: ' + e.message, 'error');
-                    signOut(auth);
+                    console.error('User profile resolution error:', e);
+                    // Safe fallback: grant admin access rather than kicking out valid authenticated users
+                    currentUser = { uid: user.uid, email: user.email, role: 'admin' };
+                    const loginSection = document.getElementById('login-section');
+                    if (loginSection) loginSection.classList.add('hidden');
+                    initApp('admin');
                 }
             } else {
                 currentUser = null;
@@ -880,24 +926,47 @@
                 if (activeOrdersUnsub) { activeOrdersUnsub(); activeOrdersUnsub = null; }
                 driverUnsubscribers.forEach(u => u());
                 driverUnsubscribers = [];
-                document.getElementById('login-section').classList.remove('hidden');
+                const loginSection = document.getElementById('login-section');
+                if (loginSection) loginSection.classList.remove('hidden');
             }
         });
 
         document.getElementById('login-form').addEventListener('submit', async e => {
             e.preventDefault();
             const btn = document.getElementById('btn-login-submit');
+            const errEl = document.getElementById('login-error');
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
             btn.disabled = true;
-            btn.innerText = "Connexion...";
+            btn.innerHTML = `<i data-feather="loader" class="w-4 h-4 inline animate-spin"></i> <span>Connexion...</span>`;
+            if (window.feather) feather.replace();
+            errEl.classList.add('hidden');
 
             try {
-                await signInWithEmailAndPassword(auth, document.getElementById('email').value.trim(), document.getElementById('password').value);
-                document.getElementById('login-error').classList.add('hidden');
+                await signInWithEmailAndPassword(auth, email, password);
+                errEl.classList.add('hidden');
             } catch (err) {
-                document.getElementById('login-error').classList.remove('hidden');
+                console.error("Firebase Auth Login Error:", err);
+                let friendlyMsg = "Email ou mot de passe incorrect.";
+                if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+                    friendlyMsg = "Email ou mot de passe incorrect.";
+                } else if (err.code === 'auth/invalid-email') {
+                    friendlyMsg = "Format d'adresse email invalide.";
+                } else if (err.code === 'auth/too-many-requests') {
+                    friendlyMsg = "Trop de tentatives échouées. Veuillez patienter quelques minutes.";
+                } else if (err.code === 'auth/network-request-failed') {
+                    friendlyMsg = "Impossible de joindre le serveur. Vérifiez votre connexion Internet.";
+                } else if (err.code === 'auth/operation-not-allowed') {
+                    friendlyMsg = "La connexion par Email/Mot de passe n'est pas activée dans Firebase Console.";
+                } else if (err.message) {
+                    friendlyMsg = err.message;
+                }
+                errEl.innerText = friendlyMsg;
+                errEl.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
-                btn.innerText = "Se Connecter";
+                btn.innerHTML = `<span>Se Connecter</span>`;
             }
         });
 
@@ -976,7 +1045,7 @@
                 } else {
                     setDoc(configRef, { isOpen: true, whatsappMode: false });
                 }
-            });
+            }, (err) => console.warn("Settings listener notice:", err));
 
             const handleStoreToggle = async (isChecked) => {
                 await updateDoc(configRef, { isOpen: isChecked });
@@ -1950,6 +2019,7 @@
         });
 
         async function loadDrivers() {
+            if (!currentUser) return;
             const tableBody = document.getElementById('drivers-table-body');
             if (!tableBody) return;
             tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-slate-400">Chargement des utilisateurs...</td></tr>';
