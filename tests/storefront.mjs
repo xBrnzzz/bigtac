@@ -71,8 +71,19 @@ try {
         if (await page.evaluate(() => document.documentElement.classList.contains('dark'))) await page.locator('#btnDarkMode').click();
         check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${width}: no browsing overflow`);
         check(await page.locator('button:visible').evaluateAll(buttons => buttons.every(button => button.getBoundingClientRect().height >= 44)), `${width}: visible buttons have 44px tap targets`);
-        check(await page.locator('.restaurant-intro h1').evaluate(el => parseFloat(getComputedStyle(el).fontSize) <= 32), `${width}: compact app title`);
+        check(await page.locator('.restaurant-intro h1').evaluate(el => el.getBoundingClientRect().height <= parseFloat(getComputedStyle(el).lineHeight) * 2 + 1), `${width}: hero headline fits at most two lines`);
+        const heroHeight = await page.locator('#hero').evaluate(el => el.getBoundingClientRect().height);
+        check(heroHeight >= (width < 768 ? 300 : 380) && heroHeight <= (width < 768 ? 360 : 450), `${width}: responsive campaign hero height`);
+        check(await page.locator('.intro-cta').evaluate(el => {
+            const bounds = el.getBoundingClientRect();
+            return bounds.height >= 44 && bounds.width > 0 && bounds.bottom <= innerHeight && getComputedStyle(el).visibility === 'visible';
+        }), `${width}: ordering CTA is visible and touch-friendly`);
         await snap(page, `${width}-browse`);
+        await page.getByRole('link', { name: 'Commander maintenant', exact: true }).click();
+        check(await page.locator('#menu-unified').evaluate(el => {
+            const top = el.getBoundingClientRect().top;
+            return top >= parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-header')) && top < innerHeight;
+        }), `${width}: hero CTA scrolls to the visible menu heading`);
         await page.locator('#categoryFilters').getByRole('button', { name: 'Burgers', exact: true }).click();
         check(await page.locator('#menuContent .section-block:not(.hidden)').count() === 1, `${width}: category browsing`);
         check(await page.locator('#categoryFilters [aria-pressed=true]').innerText() === 'Burgers', `${width}: accessible category state`);
@@ -254,6 +265,10 @@ try {
     await context.close();
 
     const short = await contextAt(320);
+    await short.page.setViewportSize({ width: 320, height: 420 });
+    await loaded(short.page);
+    check(await short.page.locator('.intro-cta').evaluate(el => el.getBoundingClientRect().bottom <= innerHeight), 'Hero ordering action fits a short 320×420 viewport');
+    await snap(short.page, '320-short-hero');
     await short.page.setViewportSize({ width: 320, height: 568 });
     await loaded(short.page);
     await short.page.locator('#promotions .product-card__choose').first().click();

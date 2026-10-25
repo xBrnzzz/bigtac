@@ -1,6 +1,6 @@
 /* BIGTAC ordering theme: shared roles for browsing, sheets and checkout. */
 :root {
-    --app-bg:#f7f8f8;
+    --app-bg:#faf8f5;
     --app-surface:#fff;
     --app-soft:#f1f3f3;
     --app-ink:#202522;
@@ -20,6 +20,10 @@
     --app-header:76px;
     --app-gap:20px;
     --app-gutter:24px;
+    --app-section-warm:#f3ece3;
+    --hero-charcoal:#241d19;
+    --hero-ink:#fffaf4;
+    --hero-accent:#ffb16d;
     color-scheme:light
 }
 .dark {
@@ -38,6 +42,7 @@
     --app-success-bg:#213b2c;
     --app-error:#ffb2ba;
     --app-error-bg:#42272d;
+    --app-section-warm:#272922;
     color-scheme:dark
 }
 * {
@@ -234,34 +239,54 @@ strong {
     padding-top:24px
 }
 .restaurant-intro {
+    position:relative;
+    isolation:isolate;
     display:grid;
-    grid-template-columns:1.1fr 1fr;
-    min-height:234px;
+    min-height:420px;
     border-radius:28px;
-    background:var(--app-tint);
+    background:var(--hero-charcoal);
+    color:var(--hero-ink);
     overflow:hidden;
-    margin-bottom:24px
+    margin-bottom:28px
+}
+.restaurant-intro::after {
+    content:'';
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background:linear-gradient(90deg,var(--hero-charcoal) 10%,#241d19f5 28%,#241d19c2 42%,#241d1933 62%,#241d1900 80%)
 }
 .restaurant-intro__copy {
-    padding:28px 32px
+    position:relative;
+    z-index:2;
+    align-self:center;
+    width:48%;
+    padding:36px 40px
 }
 .restaurant-intro h1 {
-    font-size:32px;
+    font-size:clamp(36px,3.4vw,48px);
+    line-height:1.08;
     letter-spacing:-.035em;
     font-weight:800;
-    margin:12px 0 8px
+    margin:18px 0 12px
+}
+.restaurant-intro h1 span {
+    display:block;
+    color:var(--hero-accent)
 }
 .restaurant-intro p {
     font-size:16px;
-    color:var(--app-ink)
+    color:var(--hero-ink)
 }
 .restaurant-intro>img {
-    width:100%;
+    position:absolute;
+    inset:0 0 0 auto;
+    z-index:0;
+    width:80%;
     height:100%;
-    min-height:234px;
-    max-height:270px;
     object-fit:cover;
-    object-position:center 56%
+    object-position:56% 47%
 }
 .store-status {
     display:inline-flex;
@@ -284,16 +309,25 @@ strong {
 .store-status.is-closed {
     color:var(--app-error)
 }
+.restaurant-intro .store-status {
+    color:var(--hero-ink);
+    background:#241d19eb;
+    padding:6px 10px;
+    border-radius:10px
+}
+.restaurant-intro .store-status.is-open {
+    color:#b8f2cb
+}
+.restaurant-intro .store-status.is-closed {
+    color:#ffd0b3
+}
 .restaurant-services {
     display:flex;
     gap:8px 14px;
     flex-wrap:wrap;
-    color:var(--app-tint-ink);
+    color:var(--hero-ink);
     font-size:12px;
     margin-top:12px
-}
-.intro-cta {
-    margin-top:20px
 }
 .primary-button,.secondary-button,.text-button {
     min-height:46px;
@@ -321,6 +355,18 @@ strong {
 .primary-button:disabled {
     background:var(--app-soft);
     color:var(--app-muted)
+}
+.intro-cta {
+    margin-top:24px;
+    min-height:50px;
+    background:var(--hero-accent);
+    color:var(--hero-charcoal)
+}
+.intro-cta:hover {
+    background:#ffc28d
+}
+.intro-cta:focus-visible {
+    outline-color:var(--hero-ink)
 }
 .secondary-button {
     background:var(--app-soft);
@@ -357,7 +403,7 @@ strong {
     display:block
 }
 .menu-feature {
-    margin-block:24px 30px
+    margin:0
 }
 .section-heading {
     display:flex;
@@ -412,7 +458,7 @@ strong {
     min-height:40px
 }
 .store-menu-heading {
-    margin:28px 0 16px
+    margin:0 0 12px
 }
 .store-menu-heading h2 {
     font-size:26px;
@@ -507,7 +553,7 @@ strong {
     min-width:0
 }
 .section-block {
-    margin-bottom:30px;
+    margin-bottom:28px;
     scroll-margin-top:calc(var(--app-header) + 160px)
 }
 .store-category-heading {
@@ -688,7 +734,7 @@ strong {
     display:grid;
     grid-template-columns:1fr 1fr;
     gap:32px;
-    background:var(--app-surface);
+    background:var(--app-section-warm);
     padding:28px;
     border-radius:var(--app-radius);
     margin:32px 0
@@ -1470,6 +1516,13 @@ body.has-tracker {
     }
 }
 @media(max-width:1100px) {
+    .restaurant-intro {
+        min-height:390px
+    }
+    .restaurant-intro__copy {
+        width:54%;
+        padding:32px
+    }
     .ordering-layout {
         grid-template-columns:1fr
     }
@@ -1517,24 +1570,38 @@ body.has-tracker {
     }
     .restaurant-intro {
         border-radius:24px;
-        grid-template-columns:1.15fr .85fr;
-        min-height:200px;
-        margin-bottom:18px
+        min-height:clamp(300px,62svh,350px);
+        margin-bottom:22px
+    }
+    .restaurant-intro::after {
+        background:linear-gradient(180deg,#241d1900 12%,#241d1926 30%,#241d19e8 57%,var(--hero-charcoal) 74%)
     }
     .restaurant-intro__copy {
+        position:static;
+        align-self:end;
+        width:100%;
         padding:20px
     }
     .restaurant-intro h1 {
         font-size:27px;
-        margin-top:8px
+        margin:0 0 8px
+    }
+    .restaurant-intro h1 span {
+        display:inline
     }
     .restaurant-intro p {
         font-size:14px;
         line-height:1.4
     }
     .restaurant-intro>img {
-        min-height:100%;
-        max-height:none
+        width:100%;
+        height:70%;
+        object-position:54% 56%
+    }
+    .restaurant-intro .store-status {
+        position:absolute;
+        top:16px;
+        left:20px
     }
     .restaurant-services {
         font-size:11px;
@@ -1543,16 +1610,17 @@ body.has-tracker {
     }
     .intro-cta {
         margin-top:14px;
-        font-size:13px;
-        padding:10px 12px;
-        min-height:44px
+        width:100%;
+        font-size:14px;
+        padding:12px;
+        min-height:48px
     }
     .intro-cta svg {
         width:16px;
         height:16px
     }
     .store-menu-heading {
-        margin:24px 0 10px
+        margin:0 0 8px
     }
     .store-menu-heading h2 {
         font-size:24px
@@ -1573,7 +1641,7 @@ body.has-tracker {
         font-size:12px
     }
     .menu-feature {
-        margin-block:20px 24px
+        margin:0
     }
     .restaurant-info {
         gap:24px;
@@ -1792,16 +1860,16 @@ body.has-tracker {
         padding:16px
     }
     .restaurant-intro h1 {
-        font-size:24px
+        font-size:26px
     }
     .restaurant-intro p {
         font-size:13px
     }
-    .restaurant-services span:last-child {
-        display:none
+    .restaurant-intro .store-status {
+        left:16px
     }
     .intro-cta {
-        font-size:12px;
+        font-size:14px;
         gap:6px
     }
     .store-brand span {
@@ -1900,7 +1968,13 @@ body.has-tracker {
     display:grid;
     grid-template-columns:minmax(0,1fr) minmax(0,1fr);
     gap:24px;
-    min-width:0
+    min-width:0;
+    background:var(--app-section-warm);
+    margin:8px calc(-1 * var(--app-gutter)) 28px;
+    padding:24px var(--app-gutter) 16px
+}
+.discovery-row:not(:has(.menu-feature:not(.hidden))) {
+    display:none
 }
 .discovery-row .menu-feature {
     min-width:0
@@ -1950,7 +2024,10 @@ body.has-tracker {
 }
 @media(max-width:767px) {
     .discovery-row {
-        display:block
+        grid-template-columns:minmax(0,1fr);
+        gap:20px;
+        margin-bottom:24px;
+        padding-block:20px 12px
     }
     .discovery-row .featured-grid .product-card:only-child .product-card__media {
         width:112px;
@@ -1961,15 +2038,6 @@ body.has-tracker {
     }
     .product-sheet__image {
         height:112px
-    }
-    .intro-cta {
-        display:none
-    }
-    .restaurant-services span:not(:first-child) {
-        display:none
-    }
-    .restaurant-intro {
-        min-height:190px
     }
     .product-sheet .sheet-scroll {
         padding-top:10px
