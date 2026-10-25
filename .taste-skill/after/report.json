@@ -1,0 +1,1997 @@
+{
+ "url": "http://127.0.0.1:3107",
+ "at": "2026-10-25T02:47:57.569Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 5,
+   "filled": [
+    1,
+    1,
+    1,
+    0.93,
+    0.48
+   ],
+   "motion": {
+    "elements": 18,
+    "css": 7,
+    "transitions": 11,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 4319,
+     "screens": 4.8,
+     "words": 218,
+     "img": 9,
+     "video": 0,
+     "canvas": 0,
+     "svg": 29,
+     "sections": 8,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 7,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "tacos-hero.jpg",
+      "tacos-hero.jpg",
+      "tacos-hero.jpg",
+      "tacos-hero.jpg",
+      "tacos-hero.jpg",
+      "tacos-hero.jpg",
+      "snack.png"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "BIGTAC",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 348.5,
+     "vw": 24.2,
+     "font": "Outfit",
+     "weight": 900,
+     "tracking": -0.065,
+     "leading": 0.78,
+     "upper": true,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.96,
+     "top": 590,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "BIGTAC",
+     "words": 1,
+     "lines": 1,
+     "size": 348.5,
+     "font": "Outfit"
+    },
+    "headings": [
+     {
+      "text": "BIGTAC",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 348.5,
+      "vw": 24.2,
+      "font": "Outfit",
+      "weight": 900,
+      "tracking": -0.065,
+      "leading": 0.78,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.96,
+      "top": 590,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Les Plus Populaires",
+      "words": 3,
+      "chars": 19,
+      "lines": 1,
+      "size": 30,
+      "vw": 2.1,
+      "font": "Outfit",
+      "weight": 900,
+      "tracking": -0.025,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.18,
+      "top": 936,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "La carte",
+      "words": 2,
+      "chars": 8,
+      "lines": 1,
+      "size": 48,
+      "vw": 3.3,
+      "font": "Outfit",
+      "weight": 800,
+      "tracking": -0.045,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.24,
+      "top": 1533,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Tacos Français",
+      "words": 2,
+      "chars": 14,
+      "lines": 1,
+      "size": 32,
+      "vw": 2.2,
+      "font": "Outfit",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.14,
+      "top": 1741,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "Tacos Gratinés",
+      "words": 2,
+      "chars": 14,
+      "lines": 1,
+      "size": 32,
+      "vw": 2.2,
+      "font": "Outfit",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.14,
+      "top": 2315,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "Burgers",
+      "words": 1,
+      "chars": 7,
+      "lines": 1,
+      "size": 32,
+      "vw": 2.2,
+      "font": "Outfit",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.07,
+      "top": 2889,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "BIGTAC Fès",
+      "words": 2,
+      "chars": 10,
+      "lines": 1,
+      "size": 48,
+      "vw": 3.3,
+      "font": "Kaushan Script",
+      "weight": 900,
+      "tracking": 0,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.41,
+      "top": 3663,
+      "mixedFonts": [
+       "Kaushan Script",
+       "Outfit"
+      ],
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 7,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 1
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Outfit",
+       "share": 0.99,
+       "mono": false
+      },
+      {
+       "family": "Kaushan Script",
+       "share": 0.01,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      12,
+      13,
+      14,
+      16,
+      20,
+      21,
+      23,
+      30,
+      32,
+      48,
+      349
+     ],
+     "sizeCount": 11,
+     "notLoaded": [],
+     "body": {
+      "font": "Outfit",
+      "size": 16,
+      "leading": 1.63,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 13.3
+     },
+     "measureChars": 73,
+     "max": {
+      "size": 348.5,
+      "vw": 24.2,
+      "font": "Outfit",
+      "text": "BIGTAC"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 2,
+     "microLabelShare": 0.044,
+     "microSamples": [
+      "Nous Trouver & Nous Contacter",
+      "Fast-Food Haut de Gamme"
+     ],
+     "upperShare": 0.06,
+     "centerShare": 0.09,
+     "smallText": 6
+    },
+    "eyebrows": [
+     {
+      "text": "Nous Trouver & Nous Contacter",
+      "above": "BIGTAC Fès",
+      "upper": true,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 12,
+      "top": 3621
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0c0a09",
+     "bodyBgHsl": {
+      "h": 20,
+      "s": 0.14,
+      "l": 0.04
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#ea580c",
+       "top": 76,
+       "hsl": {
+        "h": 21,
+        "s": 0.9,
+        "l": 0.48
+       }
+      },
+      {
+       "color": "#171513",
+       "top": 76,
+       "hsl": {
+        "h": 30,
+        "s": 0.1,
+        "l": 0.08
+       }
+      },
+      {
+       "color": "#0c0a09",
+       "top": 3535,
+       "hsl": {
+        "h": 20,
+        "s": 0.14,
+        "l": 0.04
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#c2bab2",
+       "share": 0.22
+      },
+      {
+       "color": "#f5f5f5",
+       "share": 0.2
+      },
+      {
+       "color": "#d6d3d1",
+       "share": 0.18
+      },
+      {
+       "color": "#171513",
+       "share": 0.11
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.1
+      }
+     ],
+     "button": {
+      "bg": "#fdba74",
+      "hsl": {
+       "h": 31,
+       "s": 0.97,
+       "l": 0.72
+      },
+      "fg": "#171513"
+     },
+     "lowContrast": [
+      {
+       "text": "WhatsApp",
+       "ratio": 2,
+       "need": 4.5,
+       "size": 16,
+       "fg": "#ffffff",
+       "bg": "#25d366"
+      },
+      {
+       "text": "© 2025 BIGTAC. Tous droits réservés. Pré",
+       "ratio": 4.1,
+       "need": 4.5,
+       "size": 12,
+       "fg": "#78716c",
+       "bg": "#0c0a09"
+      },
+      {
+       "text": "Instagram (@thebigtac_01)",
+       "ratio": 4.1,
+       "need": 4.5,
+       "size": 12,
+       "fg": "#78716c",
+       "bg": "#0c0a09"
+      },
+      {
+       "text": "Haut de page ↑",
+       "ratio": 4.1,
+       "need": 4.5,
+       "size": 12,
+       "fg": "#78716c",
+       "bg": "#0c0a09"
+      }
+     ]
+    },
+    "buttons": {
+     "count": 13,
+     "inHero": 2,
+     "radius": 0,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Panier 0 Dh",
+      "Commander en ligne"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 3,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "button.flex.items-center → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(37, 211",
+      "button.flex.items-center → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(37, 99,",
+      "div.relative.rounded-3xl → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0"
+     ],
+     "gradients": 0,
+     "scrims": 1,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 2,
+     "hairlineSamples": [
+      "section#popular.py-14.bg-stone-100 1440px",
+      "div.border-t.border-stone-800 1216px"
+     ],
+     "outlinedBoxes": 3,
+     "dashed": 0,
+     "blurred": 3,
+     "roundedBoxes": 3,
+     "boxRadius": 16,
+     "squareMedia": 6,
+     "roundedMedia": 1,
+     "mediaRadius": 24,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.46
+     }
+    ],
+    "nav": {
+     "links": 4,
+     "fixed": true,
+     "height": 76,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "kaushan script",
+     "outfit"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 4319,
+    "margins": {
+     "left": 32,
+     "right": 112
+    },
+    "sections": [
+     {
+      "sel": "section#hero.store-hero",
+      "tag": "section",
+      "top": 76,
+      "height": 804,
+      "words": 16,
+      "media": 1,
+      "middle": 843,
+      "heading": null,
+      "left": 32,
+      "right": 88,
+      "textLeft": 32,
+      "textRight": 88,
+      "fullBleed": true,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#popular.py-14.bg-stone-100",
+      "tag": "section",
+      "top": 880,
+      "height": 581,
+      "words": 22,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Les Plus Populaires",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 112,
+      "right": 1019,
+      "textLeft": 112,
+      "textRight": 1019,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#menu-unified",
+      "tag": "section",
+      "top": 1461,
+      "height": 2075,
+      "words": 82,
+      "media": 4,
+      "middle": 107,
+      "heading": {
+       "text": "La carte",
+       "size": 48,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 32,
+      "textLeft": 32,
+      "textRight": 539,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#locations.py-20.bg-stone-950",
+      "tag": "section",
+      "top": 3535,
+      "height": 784,
+      "words": 81,
+      "media": 1,
+      "middle": 49,
+      "heading": {
+       "text": "BIGTAC",
+       "size": 48,
+       "tag": "h2"
+      },
+      "left": 112,
+      "right": 112,
+      "textLeft": 112,
+      "textRight": 112,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "BIGTAC",
+      "size": 348,
+      "top": 590,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 32,
+      "n": 5
+     },
+     {
+      "x": 112,
+      "n": 3
+     },
+     {
+      "x": 197,
+      "n": 2
+     },
+     {
+      "x": 164,
+      "n": 1
+     },
+     {
+      "x": 289,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 12,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0.06,
+    "voidBox": {
+     "x": 1200,
+     "y": 600,
+     "w": 240,
+     "h": 300
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 5,
+   "filled": [
+    1,
+    1,
+    0.87,
+    0.71,
+    0.64
+   ],
+   "motion": {
+    "elements": 18,
+    "css": 7,
+    "transitions": 11,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 4181,
+     "screens": 4.1,
+     "words": 216,
+     "img": 9,
+     "video": 0,
+     "canvas": 0,
+     "svg": 29,
+     "sections": 8,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 7,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "tacos-hero.jpg",
+      "tacos-hero.jpg",
+      "tacos-hero.jpg",
+      "tacos-hero.jpg",
+      "tacos-hero.jpg",
+      "tacos-hero.jpg",
+      "snack.png"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "BIGTAC",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 185.9,
+     "vw": 24.2,
+     "font": "Outfit",
+     "weight": 900,
+     "tracking": -0.065,
+     "leading": 0.78,
+     "upper": true,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.96,
+     "top": 444,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "BIGTAC",
+     "words": 1,
+     "lines": 1,
+     "size": 185.9,
+     "font": "Outfit"
+    },
+    "headings": [
+     {
+      "text": "BIGTAC",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 185.9,
+      "vw": 24.2,
+      "font": "Outfit",
+      "weight": 900,
+      "tracking": -0.065,
+      "leading": 0.78,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.96,
+      "top": 444,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Les Plus Populaires",
+      "words": 3,
+      "chars": 19,
+      "lines": 1,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Outfit",
+      "weight": 900,
+      "tracking": -0.025,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.33,
+      "top": 663,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "La carte",
+      "words": 2,
+      "chars": 8,
+      "lines": 1,
+      "size": 32,
+      "vw": 4.2,
+      "font": "Outfit",
+      "weight": 800,
+      "tracking": -0.045,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.44,
+      "top": 1228,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "BIGTAC Fès",
+      "words": 2,
+      "chars": 10,
+      "lines": 1,
+      "size": 48,
+      "vw": 6.3,
+      "font": "Kaushan Script",
+      "weight": 900,
+      "tracking": 0,
+      "leading": 1,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.94,
+      "top": 3091,
+      "mixedFonts": [
+       "Kaushan Script",
+       "Outfit"
+      ],
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 4,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 1
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Outfit",
+       "share": 0.99,
+       "mono": false
+      },
+      {
+       "family": "Kaushan Script",
+       "share": 0.01,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      12,
+      13,
+      14,
+      16,
+      18,
+      20,
+      21,
+      23,
+      24,
+      30,
+      32,
+      48,
+      186
+     ],
+     "sizeCount": 13,
+     "notLoaded": [],
+     "body": {
+      "font": "Outfit",
+      "size": 16,
+      "leading": 1.63,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 13.3
+     },
+     "measureChars": 90,
+     "max": {
+      "size": 185.9,
+      "vw": 24.2,
+      "font": "Outfit",
+      "text": "BIGTAC"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 2,
+     "microLabelShare": 0.044,
+     "microSamples": [
+      "Nous Trouver & Nous Contacter",
+      "Fast-Food Haut de Gamme"
+     ],
+     "upperShare": 0.06,
+     "centerShare": 0.09,
+     "smallText": 6
+    },
+    "eyebrows": [
+     {
+      "text": "Nous Trouver & Nous Contacter",
+      "above": "BIGTAC Fès",
+      "upper": true,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 12,
+      "top": 3049
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0c0a09",
+     "bodyBgHsl": {
+      "h": 20,
+      "s": 0.14,
+      "l": 0.04
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#ea580c",
+       "top": 76,
+       "hsl": {
+        "h": 21,
+        "s": 0.9,
+        "l": 0.48
+       }
+      },
+      {
+       "color": "#171513",
+       "top": 1188,
+       "hsl": {
+        "h": 30,
+        "s": 0.1,
+        "l": 0.08
+       }
+      },
+      {
+       "color": "#0c0a09",
+       "top": 2963,
+       "hsl": {
+        "h": 20,
+        "s": 0.14,
+        "l": 0.04
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#c2bab2",
+       "share": 0.22
+      },
+      {
+       "color": "#f5f5f5",
+       "share": 0.2
+      },
+      {
+       "color": "#d6d3d1",
+       "share": 0.18
+      },
+      {
+       "color": "#171513",
+       "share": 0.11
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.11
+      }
+     ],
+     "button": {
+      "bg": "#fdba74",
+      "hsl": {
+       "h": 31,
+       "s": 0.97,
+       "l": 0.72
+      },
+      "fg": "#171513"
+     },
+     "lowContrast": [
+      {
+       "text": "WhatsApp",
+       "ratio": 2,
+       "need": 4.5,
+       "size": 16,
+       "fg": "#ffffff",
+       "bg": "#25d366"
+      },
+      {
+       "text": "© 2025 BIGTAC. Tous droits réservés. Pré",
+       "ratio": 4.1,
+       "need": 4.5,
+       "size": 12,
+       "fg": "#78716c",
+       "bg": "#0c0a09"
+      },
+      {
+       "text": "Instagram (@thebigtac_01)",
+       "ratio": 4.1,
+       "need": 4.5,
+       "size": 12,
+       "fg": "#78716c",
+       "bg": "#0c0a09"
+      },
+      {
+       "text": "Haut de page ↑",
+       "ratio": 4.1,
+       "need": 4.5,
+       "size": 12,
+       "fg": "#78716c",
+       "bg": "#0c0a09"
+      }
+     ]
+    },
+    "buttons": {
+     "count": 13,
+     "inHero": 2,
+     "radius": 0,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Panier 0 Dh",
+      "Commander en ligne"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 3,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "button.flex.items-center → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(37, 211",
+      "button.flex.items-center → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(37, 99,",
+      "div.relative.rounded-3xl → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0"
+     ],
+     "gradients": 0,
+     "scrims": 1,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 2,
+     "hairlineSamples": [
+      "section#popular.py-14.bg-stone-100 768px",
+      "div.border-t.border-stone-800 720px"
+     ],
+     "outlinedBoxes": 3,
+     "dashed": 0,
+     "blurred": 3,
+     "roundedBoxes": 3,
+     "boxRadius": 16,
+     "squareMedia": 6,
+     "roundedMedia": 1,
+     "mediaRadius": 24,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.26
+     },
+     {
+      "type": "img",
+      "ratio": 0.09
+     }
+    ],
+    "nav": {
+     "links": 3,
+     "fixed": true,
+     "height": 76,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "kaushan script",
+     "outfit"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 4181,
+    "margins": {
+     "left": 17,
+     "right": 17
+    },
+    "sections": [
+     {
+      "sel": "section#hero.store-hero",
+      "tag": "section",
+      "top": 76,
+      "height": 531,
+      "words": 16,
+      "media": 1,
+      "middle": 233,
+      "heading": null,
+      "left": 17,
+      "right": 73,
+      "textLeft": 17,
+      "textRight": 73,
+      "fullBleed": true,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#popular.py-14.bg-stone-100",
+      "tag": "section",
+      "top": 607,
+      "height": 581,
+      "words": 22,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Les Plus Populaires",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 24,
+      "right": 435,
+      "textLeft": 24,
+      "textRight": 435,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#menu-unified",
+      "tag": "section",
+      "top": 1188,
+      "height": 1775,
+      "words": 82,
+      "media": 4,
+      "middle": 0,
+      "heading": {
+       "text": "La carte",
+       "size": 32,
+       "tag": "h2"
+      },
+      "left": 17,
+      "right": 17,
+      "textLeft": 17,
+      "textRight": 25,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#locations.py-20.bg-stone-950",
+      "tag": "section",
+      "top": 2963,
+      "height": 1218,
+      "words": 81,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "BIGTAC",
+       "size": 48,
+       "tag": "h2"
+      },
+      "left": 24,
+      "right": 24,
+      "textLeft": 24,
+      "textRight": 24,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "BIGTAC",
+      "size": 186,
+      "top": 444,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 17,
+      "n": 8
+     },
+     {
+      "x": 109,
+      "n": 2
+     },
+     {
+      "x": 76,
+      "n": 1
+     },
+     {
+      "x": 201,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 12,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 5,
+   "filled": [
+    1,
+    1,
+    0.83,
+    0.78,
+    0.58
+   ],
+   "motion": {
+    "elements": 20,
+    "css": 9,
+    "transitions": 11,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 3465,
+     "screens": 4.1,
+     "words": 210,
+     "img": 9,
+     "video": 0,
+     "canvas": 0,
+     "svg": 29,
+     "sections": 8,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 3,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "tacos-hero.jpg",
+      "tacos-hero.jpg",
+      "snack.png"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "BIGTAC",
+     "words": 1,
+     "chars": 6,
+     "lines": 1,
+     "size": 93.6,
+     "vw": 24,
+     "font": "Outfit",
+     "weight": 900,
+     "tracking": -0.065,
+     "leading": 0.78,
+     "upper": true,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.92,
+     "top": 472,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "BIGTAC",
+     "words": 1,
+     "lines": 1,
+     "size": 93.6,
+     "font": "Outfit"
+    },
+    "headings": [
+     {
+      "text": "BIGTAC",
+      "words": 1,
+      "chars": 6,
+      "lines": 1,
+      "size": 93.6,
+      "vw": 24,
+      "font": "Outfit",
+      "weight": 900,
+      "tracking": -0.065,
+      "leading": 0.78,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 472,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Les Plus Populaires",
+      "words": 3,
+      "chars": 19,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Outfit",
+      "weight": 900,
+      "tracking": -0.025,
+      "leading": 1.33,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.53,
+      "top": 615,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "La carte",
+      "words": 2,
+      "chars": 8,
+      "lines": 1,
+      "size": 32,
+      "vw": 8.2,
+      "font": "Outfit",
+      "weight": 800,
+      "tracking": -0.045,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 1124,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Tacos Français",
+      "words": 2,
+      "chars": 14,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Outfit",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.39,
+      "top": 1419,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "Tacos Gratinés",
+      "words": 2,
+      "chars": 14,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Outfit",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.39,
+      "top": 1784,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "Burgers",
+      "words": 1,
+      "chars": 7,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Outfit",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.21,
+      "top": 1992,
+      "tag": "h3",
+      "kind": "heading"
+     },
+     {
+      "text": "BIGTAC Fès",
+      "words": 2,
+      "chars": 10,
+      "lines": 1,
+      "size": 36,
+      "vw": 9.2,
+      "font": "Kaushan Script",
+      "weight": 900,
+      "tracking": 0,
+      "leading": 1.25,
+      "upper": true,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 2368,
+      "mixedFonts": [
+       "Kaushan Script",
+       "Outfit"
+      ],
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 7,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 1
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Outfit",
+       "share": 0.99,
+       "mono": false
+      },
+      {
+       "family": "Kaushan Script",
+       "share": 0.01,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      12,
+      13,
+      14,
+      16,
+      18,
+      20,
+      24,
+      32,
+      36,
+      94
+     ],
+     "sizeCount": 10,
+     "notLoaded": [],
+     "body": {
+      "font": "Outfit",
+      "size": 16,
+      "leading": 1.63,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 13.3
+     },
+     "measureChars": 45,
+     "max": {
+      "size": 93.6,
+      "vw": 24,
+      "font": "Outfit",
+      "text": "BIGTAC"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 2,
+     "microLabelShare": 0.047,
+     "microSamples": [
+      "Nous Trouver & Nous Contacter",
+      "Fast-Food Haut de Gamme"
+     ],
+     "upperShare": 0.06,
+     "centerShare": 0.05,
+     "smallText": 7
+    },
+    "eyebrows": [
+     {
+      "text": "Commander en ligne",
+      "above": "BIGTAC",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 16,
+      "top": 400
+     },
+     {
+      "text": "Nous Trouver & Nous Contacter",
+      "above": "BIGTAC Fès",
+      "upper": true,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 12,
+      "top": 2326
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0c0a09",
+     "bodyBgHsl": {
+      "h": 20,
+      "s": 0.14,
+      "l": 0.04
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#ea580c",
+       "top": 68,
+       "hsl": {
+        "h": 21,
+        "s": 0.9,
+        "l": 0.48
+       }
+      },
+      {
+       "color": "#171513",
+       "top": 1084,
+       "hsl": {
+        "h": 30,
+        "s": 0.1,
+        "l": 0.08
+       }
+      },
+      {
+       "color": "#0c0a09",
+       "top": 2240,
+       "hsl": {
+        "h": 20,
+        "s": 0.14,
+        "l": 0.04
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#c2bab2",
+       "share": 0.23
+      },
+      {
+       "color": "#f5f5f5",
+       "share": 0.2
+      },
+      {
+       "color": "#d6d3d1",
+       "share": 0.19
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.1
+      },
+      {
+       "color": "#78716c",
+       "share": 0.09
+      }
+     ],
+     "button": {
+      "bg": "#24211e",
+      "hsl": {
+       "h": 30,
+       "s": 0.09,
+       "l": 0.13
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": [
+      {
+       "text": "WhatsApp",
+       "ratio": 2,
+       "need": 4.5,
+       "size": 14,
+       "fg": "#ffffff",
+       "bg": "#25d366"
+      },
+      {
+       "text": "© 2025 BIGTAC. Tous droits réservés. Pré",
+       "ratio": 4.1,
+       "need": 4.5,
+       "size": 12,
+       "fg": "#78716c",
+       "bg": "#0c0a09"
+      },
+      {
+       "text": "Instagram (@thebigtac_01)",
+       "ratio": 4.1,
+       "need": 4.5,
+       "size": 12,
+       "fg": "#78716c",
+       "bg": "#0c0a09"
+      },
+      {
+       "text": "Haut de page ↑",
+       "ratio": 4.1,
+       "need": 4.5,
+       "size": 12,
+       "fg": "#78716c",
+       "bg": "#0c0a09"
+      }
+     ]
+    },
+    "buttons": {
+     "count": 7,
+     "inHero": 1,
+     "radius": 0,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Commander en ligne"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 3,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "button.flex.items-center → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(37, 211",
+      "button.flex.items-center → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(37, 99,",
+      "div.relative.rounded-3xl → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0"
+     ],
+     "gradients": 0,
+     "scrims": 1,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 2,
+     "hairlineSamples": [
+      "section#popular.py-14.bg-stone-100 390px",
+      "div.border-t.border-stone-800 358px"
+     ],
+     "outlinedBoxes": 3,
+     "dashed": 0,
+     "blurred": 3,
+     "roundedBoxes": 3,
+     "boxRadius": 16,
+     "squareMedia": 2,
+     "roundedMedia": 1,
+     "mediaRadius": 24,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.29
+     },
+     {
+      "type": "img",
+      "ratio": 0.11
+     }
+    ],
+    "nav": {
+     "links": 2,
+     "fixed": true,
+     "height": 68,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "kaushan script",
+     "outfit"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 3465,
+    "margins": {
+     "left": 16,
+     "right": 16
+    },
+    "sections": [
+     {
+      "sel": "section#hero.store-hero",
+      "tag": "section",
+      "top": 68,
+      "height": 491,
+      "words": 16,
+      "media": 1,
+      "middle": 0,
+      "heading": null,
+      "left": 16,
+      "right": 79,
+      "textLeft": 16,
+      "textRight": 79,
+      "fullBleed": true,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#popular.py-14.bg-stone-100",
+      "tag": "section",
+      "top": 559,
+      "height": 525,
+      "words": 21,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Les Plus Populaires",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 16,
+      "right": 117,
+      "textLeft": 16,
+      "textRight": 117,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#menu-unified",
+      "tag": "section",
+      "top": 1084,
+      "height": 1156,
+      "words": 78,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "La carte",
+       "size": 32,
+       "tag": "h2"
+      },
+      "left": 16,
+      "right": 16,
+      "textLeft": 16,
+      "textRight": 16,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section#locations.py-20.bg-stone-950",
+      "tag": "section",
+      "top": 2240,
+      "height": 1225,
+      "words": 80,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "BIGTAC",
+       "size": 36,
+       "tag": "h2"
+      },
+      "left": 16,
+      "right": 16,
+      "textLeft": 16,
+      "textRight": 21,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "BIGTAC",
+      "size": 94,
+      "top": 472,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 16,
+      "n": 8
+     },
+     {
+      "x": 101,
+      "n": 2
+     },
+     {
+      "x": 68,
+      "n": 1
+     },
+     {
+      "x": 148,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 12,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "mixed-font-headline",
+   "width": 1440,
+   "message": "1 headline(s) switch typeface or to italic mid-line (the \"one italic serif word\" move).",
+   "fix": "Set the whole headline in one face. Emphasis comes from the words.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "eyebrow",
+   "width": 1440,
+   "message": "1 eyebrow/kicker label(s) above headings: \"Nous Trouver & Nous Contacter\" above \"BIGTAC Fès\"",
+   "fix": "Delete them. If the label carried real information, fold it into the headline or the supporting sentence.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "micro-label",
+   "width": 1440,
+   "message": "2 tiny uppercase letter-spaced label(s): \"Nous Trouver & Nous Contacter\", \"Fast-Food Haut de Gamme\"",
+   "fix": "Prefer sentence case at body size.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "shadow",
+   "width": 1440,
+   "message": "3 box-shadow(s) on elements at rest: button.flex.items-center → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(37, 211 | button.flex.items-center → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(37, 99, | div.relative.rounded-3xl → rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0",
+   "fix": "Remove. Separate surfaces with a tone step or space. Shadows are for things that really float (menus, dialogs, sticky bars).",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "hairline",
+   "width": 1440,
+   "message": "2 thin rule(s)/divider line(s): section#popular.py-14.bg-stone-100 1440px | div.border-t.border-stone-800 1216px",
+   "fix": "Delete. Separate with space, a tone change, or scale. Lines are only for real tables and form fields.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "outlined-box",
+   "width": 1440,
+   "message": "3 boxes drawn with a 1px outline.",
+   "fix": "Define a surface by its fill (one tone step from the page) or leave the content unboxed.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "glass",
+   "width": 1440,
+   "message": "3 backdrop-blur surfaces.",
+   "fix": "One blurred sticky bar at most; glass cards are a tell.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "contrast",
+   "width": 1440,
+   "message": "Unreadable text: \"WhatsApp\" 2:1 (#ffffff on #25d366)",
+   "fix": "Raise contrast to at least 4.5:1 for text, 3:1 for large display.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "size-count",
+   "width": 1440,
+   "message": "11 different font sizes (12, 13, 14, 16, 20, 21, 23, 30, 32, 48, 349).",
+   "fix": "A page needs about five: display, heading, lead, body, small.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "FAIL",
+   "id": "small-text",
+   "width": 1440,
+   "message": "6 text blocks under 13px.",
+   "fix": "Nothing meant to be read goes below 13px.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "FAIL",
+   "id": "off-centre",
+   "width": 1440,
+   "message": "The page sits off-centre: its content comes to 32px from the left edge but only to 112px from the right, at 1440px.",
+   "fix": "Give the page one pair of equal margins. Check the wrapper for a max-width without margin-inline: auto, a grid with an empty last column, or padding on one side only. If one side is meant to hold air, it must still be closed by something that reaches the margin (a picture, the navigation's last item, a figure)."
+  },
+  {
+   "level": "WARN",
+   "id": "lopsided",
+   "width": 1440,
+   "message": "A section keeps its content on one side and leaves 1019px of the width empty: \"Les Plus Populaires\".",
+   "fix": "Fill the other side with what the section has (its picture, a second column, the figure), or defend the void in one sentence.",
+   "alsoAt": [
+    768
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "measure",
+   "width": 768,
+   "message": "Longest paragraph runs about 90 characters per line.",
+   "fix": "Cap paragraphs at 45–75 characters (max-width: 60ch)."
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "C:\\Users\\pc\\bigtac\\bigtac\\.taste-skill\\after\\desktop-fold.jpg",
+   "pages": [
+    "C:\\Users\\pc\\bigtac\\bigtac\\.taste-skill\\after\\desktop-page-01.jpg",
+    "C:\\Users\\pc\\bigtac\\bigtac\\.taste-skill\\after\\desktop-page-02.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "C:\\Users\\pc\\bigtac\\bigtac\\.taste-skill\\after\\tablet-fold.jpg",
+   "pages": [
+    "C:\\Users\\pc\\bigtac\\bigtac\\.taste-skill\\after\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "C:\\Users\\pc\\bigtac\\bigtac\\.taste-skill\\after\\mobile-fold.jpg",
+   "pages": [
+    "C:\\Users\\pc\\bigtac\\bigtac\\.taste-skill\\after\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

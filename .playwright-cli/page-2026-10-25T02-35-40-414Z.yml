@@ -1,0 +1,165 @@
+- generic [active] [ref=e1]:
+  - link "Aller directement au menu" [ref=e2] [cursor=pointer]:
+    - /url: "#menu-unified"
+  - banner [ref=e3]:
+    - generic [ref=e5]:
+      - link "BIGTAC Accueil" [ref=e6] [cursor=pointer]:
+        - /url: "#hero"
+        - img "Logo BIGTAC" [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]: BIGTAC
+          - generic [ref=e11]: Tacos & Grill
+      - navigation [ref=e12]:
+        - link "Accueil" [ref=e13] [cursor=pointer]:
+          - /url: "#hero"
+        - link "Offres Spéciales" [ref=e14] [cursor=pointer]:
+          - /url: "#promotions"
+        - link "La Carte" [ref=e15] [cursor=pointer]:
+          - /url: "#menu-unified"
+        - link "Contact & Adresse" [ref=e16] [cursor=pointer]:
+          - /url: "#locations"
+      - generic [ref=e17]:
+        - button "Basculer le mode sombre" [ref=e18] [cursor=pointer]
+        - button "Panier 0 Dh" [ref=e21] [cursor=pointer]:
+          - generic [ref=e26]: Panier
+          - generic [ref=e27]: 0 Dh
+  - main [ref=e28]:
+    - generic [ref=e30]:
+      - img "BIGTAC Restaurant" [ref=e33]
+      - heading "BIGTAC Tacos Français & Grill Authentique" [level=1] [ref=e34]:
+        - text: BIGTAC
+        - generic [ref=e35]: Tacos Français & Grill Authentique
+      - paragraph [ref=e36]: Recettes généreuses, sauces maison exclusives, viandes fraîches et cuisson à la commande à Fès.
+      - generic [ref=e37]:
+        - link "Commander en ligne" [ref=e38] [cursor=pointer]:
+          - /url: "#menu-unified"
+        - link "Nous Trouver à Fès" [ref=e43] [cursor=pointer]:
+          - /url: "#locations"
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - generic [ref=e50]: ⚡
+          - text: Livraison rapide
+        - generic [ref=e51]:
+          - generic [ref=e52]: 🔥
+          - text: Sauce fromagère maison
+        - generic [ref=e53]:
+          - generic [ref=e54]: ⭐
+          - text: Qualité certifiée
+    - generic [ref=e56]:
+      - generic [ref=e61]:
+        - heading "Les Plus Populaires" [level=2] [ref=e62]
+        - paragraph [ref=e63]: Les favoris plébiscités par nos clients
+      - generic [ref=e65] [cursor=pointer]:
+        - generic [ref=e66]:
+          - img "Tacos Poulet" [ref=e67]
+          - generic [ref=e68]: Populaire
+        - heading "Tacos Poulet" [level=4] [ref=e69]
+        - generic [ref=e70]:
+          - generic [ref=e71]: 22 Dh
+          - generic [ref=e72]: + Ajouter
+    - generic [ref=e74]:
+      - generic [ref=e75]:
+        - text: Notre Carte Complète
+        - heading "Choisissez Votre Festin" [level=2] [ref=e76]
+        - paragraph [ref=e77]: Tacos garnis, gratins fondants, burgers croustillants et desserts frais
+      - 'textbox "Rechercher un plat (ex: Poulet, Zinger, Cordon-bleu...)" [ref=e80]'
+      - tablist [ref=e82]:
+        - button "Tout Voir" [ref=e83] [cursor=pointer]
+        - button "Tacos Français" [ref=e84] [cursor=pointer]
+        - button "Tacos Gratinés" [ref=e85] [cursor=pointer]
+        - button "Burgers" [ref=e86] [cursor=pointer]
+      - generic [ref=e87]:
+        - generic [ref=e88]:
+          - generic [ref=e90]:
+            - heading "Tacos Français" [level=3] [ref=e91]
+            - generic [ref=e92]: "2"
+          - generic [ref=e93]:
+            - article [ref=e94] [cursor=pointer]:
+              - generic [ref=e95]:
+                - generic [ref=e96]:
+                  - img "Tacos Poulet" [ref=e97]
+                  - generic [ref=e98]: ★ Populaire
+                - generic [ref=e99]:
+                  - heading "Tacos Poulet" [level=4] [ref=e100]
+                  - paragraph [ref=e101]: Poulet, frites et sauce fromagère.
+              - generic [ref=e102]:
+                - generic [ref=e103]:
+                  - generic [ref=e104]: À partir de
+                  - generic [ref=e105]: 22 Dh
+                - button "Choisir Tacos Poulet" [ref=e106]
+            - article [ref=e108] [cursor=pointer]:
+              - generic [ref=e109]:
+                - img "Tacos Mixte" [ref=e111]
+                - generic [ref=e112]:
+                  - heading "Tacos Mixte" [level=4] [ref=e113]
+                  - paragraph [ref=e114]: Deux viandes au choix, frites et sauce fromagère.
+              - generic [ref=e115]:
+                - generic [ref=e116]:
+                  - generic [ref=e117]: À partir de
+                  - generic [ref=e118]: 25 Dh
+                - button "Choisir Tacos Mixte" [ref=e119]
+        - generic [ref=e121]:
+          - generic [ref=e123]:
+            - heading "Tacos Gratinés" [level=3] [ref=e124]
+            - generic [ref=e125]: "1"
+          - article [ref=e127] [cursor=pointer]:
+            - generic [ref=e128]:
+              - img "Poulet Gratiné" [ref=e130]
+              - generic [ref=e131]:
+                - heading "Poulet Gratiné" [level=4] [ref=e132]
+                - paragraph [ref=e133]: Tacos au poulet, gratiné au fromage.
+            - generic [ref=e134]:
+              - generic [ref=e135]:
+                - generic [ref=e136]: À partir de
+                - generic [ref=e137]: 27 Dh
+              - button "Choisir Poulet Gratiné" [ref=e138]
+        - generic [ref=e140]:
+          - generic [ref=e142]:
+            - heading "Burgers" [level=3] [ref=e143]
+            - generic [ref=e144]: "1"
+          - article [ref=e146] [cursor=pointer]:
+            - generic [ref=e147]:
+              - img "Burger" [ref=e149]
+              - generic [ref=e150]:
+                - heading "Burger" [level=4] [ref=e151]
+                - paragraph [ref=e152]: Steak, fromage, salade et sauce.
+            - generic [ref=e153]:
+              - generic [ref=e154]:
+                - generic [ref=e155]: À partir de
+                - generic [ref=e156]: 25 Dh
+              - button "Choisir Burger" [ref=e157]
+    - generic [ref=e160]:
+      - generic [ref=e161]:
+        - generic [ref=e162]:
+          - text: Nous Trouver & Nous Contacter
+          - heading "BIGTAC Fès" [level=2] [ref=e163]
+          - paragraph [ref=e164]: Venez déguster nos spécialités sur place dans un cadre convivial ou faites-vous livrer directement à domicile partout à Fès.
+          - generic [ref=e171]:
+            - heading "Adresse Principale" [level=3] [ref=e172]
+            - paragraph [ref=e173]: 2XQV+VJ5, Rue Abdelkrim Benjelloun, Fès 30050, Maroc
+            - link "Ouvrir dans Google Maps" [ref=e174] [cursor=pointer]:
+              - /url: https://maps.app.goo.gl/MpyAC424WpXYfEAw8
+          - generic [ref=e186]:
+            - heading "Horaires d'Ouverture" [level=3] [ref=e187]
+            - paragraph [ref=e188]: 7j / 7 — de 12:00 à 02:00 non-stop
+          - generic [ref=e189]:
+            - button "WhatsApp" [ref=e190] [cursor=pointer]
+            - button "Appeler" [ref=e194] [cursor=pointer]
+        - generic [ref=e199]:
+          - img "BIGTAC Restaurant Fès" [ref=e200]
+          - generic [ref=e202]:
+            - generic [ref=e203]:
+              - paragraph [ref=e204]: Fast-Food Haut de Gamme
+              - paragraph [ref=e205]: Le Tacos n°1 à Fès
+            - link "Instagram BIGTAC" [ref=e206] [cursor=pointer]:
+              - /url: https://www.instagram.com/thebigtac_01/
+              - generic [ref=e210]: Instagram
+      - generic [ref=e211]:
+        - paragraph [ref=e212]: © 2025 BIGTAC. Tous droits réservés. Préparé avec passion à Fès.
+        - generic [ref=e213]:
+          - link "Instagram (@thebigtac_01)" [ref=e214] [cursor=pointer]:
+            - /url: https://www.instagram.com/thebigtac_01/
+          - link "Haut de page ↑" [ref=e215] [cursor=pointer]:
+            - /url: "#hero"
+  - button "Ouvrir le panier":
+    - generic: "0"

@@ -98,47 +98,6 @@
             scrollbar-width: none;
         }
 
-        /* Hero backdrop */
-        .hero-banner {
-            background-image: linear-gradient(to bottom, rgba(12, 10, 9, 0.65) 0%, rgba(12, 10, 9, 0.45) 50%, rgba(12, 10, 9, 0.95) 100%), url('assets/snack.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        /* Glassmorphism */
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.7);
-        }
-        .dark .glass-nav {
-            background: rgba(28, 25, 23, 0.88);
-            border-bottom: 1px solid rgba(68, 64, 60, 0.4);
-        }
-
-        /* Menu card interactions */
-        .menu-card {
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        .menu-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 32px -8px rgba(234, 88, 12, 0.14), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Category Filter Buttons */
-        .filter-btn-pill {
-            transition: all 0.25s ease;
-            white-space: nowrap;
-        }
-        .filter-btn-pill.active {
-            background-color: #ea580c !important;
-            color: #ffffff !important;
-            border-color: #ea580c !important;
-            box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
-        }
-
         /* Reduced Motion */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -149,6 +108,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="assets/storefront.css">
 </head>
 
 <body class="bg-stone-50 dark:bg-stone-950 text-stone-800 dark:text-stone-100 antialiased selection:bg-orange-100 selection:text-orange-900 transition-colors duration-200 min-h-screen flex flex-col">
@@ -172,101 +132,46 @@
     </div>
 
     <!-- MAIN HEADER -->
-    <header class="glass-nav fixed top-0 left-0 right-0 z-40 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                
-                <!-- Logo & Brand -->
-                <a href="#hero" class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-brand-500 rounded-2xl p-1" aria-label="BIGTAC Accueil">
-                    <div class="relative w-12 h-12 rounded-full overflow-hidden shadow-md ring-2 ring-brand-500/30 group-hover:ring-brand-500 transition duration-300 bg-black flex-shrink-0">
-                        <img src="assets/logo.png" alt="Logo BIGTAC" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-300" onerror="this.src='assets/snack.png'">
-                    </div>
-                    <div class="flex flex-col">
-                        <span class="text-2xl font-bold font-script text-stone-900 dark:text-white leading-none tracking-wide">BIGTAC</span>
-                        <span class="text-[10px] text-brand-600 dark:text-brand-400 font-extrabold uppercase tracking-widest mt-0.5">Tacos & Grill</span>
-                    </div>
-                </a>
-
-                <!-- Desktop Navigation -->
-                <nav class="hidden md:flex items-center gap-8 font-semibold text-sm text-stone-600 dark:text-stone-300">
-                    <a href="#hero" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Accueil</a>
-                    <a href="#promotions" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Offres Spéciales</a>
-                    <a href="#menu-unified" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">La Carte</a>
-                    <a href="#locations" class="hover:text-brand-600 dark:hover:text-brand-400 transition-colors">Contact & Adresse</a>
-                </nav>
-
-                <!-- Actions: Dark Mode & Cart -->
-                <div class="flex items-center gap-3">
-                    
-                    <!-- Dark Mode Toggle -->
-                    <button onclick="toggleDarkMode()" id="btnDarkMode" class="p-2.5 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Basculer le mode sombre">
-                        <i data-feather="moon" id="icon-moon" class="w-5 h-5 block dark:hidden"></i>
-                        <i data-feather="sun" id="icon-sun" class="w-5 h-5 hidden dark:block text-amber-400"></i>
-                    </button>
-
-                    <!-- Cart Nav Button -->
-                    <button onclick="openCart()" id="btnNavCart" class="relative group flex items-center gap-2.5 bg-stone-100 dark:bg-stone-800 hover:bg-brand-50 dark:hover:bg-brand-950/40 text-stone-800 dark:text-white px-4 py-2.5 rounded-full transition-all border border-stone-200/60 dark:border-stone-700 hover:border-brand-300 active:scale-95 focus:outline-none focus:ring-2 focus:ring-brand-500">
-                        <div class="relative">
-                            <i data-feather="shopping-bag" class="w-5 h-5 text-stone-700 dark:text-stone-200 group-hover:text-brand-600 transition-colors"></i>
-                            <span id="navCartCount" class="absolute -top-2 -right-2 bg-brand-600 text-white text-[10px] font-black w-4 h-4 flex items-center justify-center rounded-full shadow-md hidden">0</span>
-                        </div>
-                        <span class="text-sm font-bold hidden sm:inline">Panier</span>
-                        <span id="navCartTotal" class="text-xs font-bold text-brand-600 dark:text-brand-400 hidden sm:inline pl-1 border-l border-stone-300 dark:border-stone-700">0 Dh</span>
-                    </button>
-                </div>
-
+    <header class="store-header">
+        <div class="store-header__inner">
+            <a href="#hero" class="store-brand" aria-label="BIGTAC, accueil">
+                <img src="assets/logo.png" alt="" width="48" height="48">
+                <span translate="no">BIGTAC</span>
+            </a>
+            <nav class="store-nav" aria-label="Navigation principale">
+                <a href="#menu-unified">La carte</a>
+                <a href="#promotions" class="store-nav__offers">Les offres</a>
+                <a href="#locations" class="store-nav__contact">Nous trouver</a>
+            </nav>
+            <div class="store-actions">
+                <button type="button" onclick="toggleDarkMode()" id="btnDarkMode" class="store-theme" aria-label="Basculer le mode sombre">
+                    <i data-feather="moon" id="icon-moon" class="w-5 h-5 block dark:hidden" aria-hidden="true"></i>
+                    <i data-feather="sun" id="icon-sun" class="w-5 h-5 hidden dark:block" aria-hidden="true"></i>
+                </button>
+                <button type="button" onclick="openCart()" id="btnNavCart" class="store-cart" aria-label="Ouvrir le panier">
+                    <span class="store-cart__icon">
+                        <i data-feather="shopping-bag" class="w-5 h-5" aria-hidden="true"></i>
+                        <span id="navCartCount" class="hidden" aria-live="polite">0</span>
+                    </span>
+                    <span class="store-cart__label">Panier</span>
+                    <span id="navCartTotal">0 Dh</span>
+                </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow pt-20">
-        <!-- HERO SECTION -->
-        <section id="hero" class="hero-banner relative min-h-[82vh] flex items-center justify-center py-20 px-4 text-center">
-            <div class="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
-                
-                <!-- Floating Animated Logo -->
-                <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-full p-1.5 ring-4 ring-brand-500/40 shadow-2xl animate-float overflow-hidden bg-black mb-8 relative group">
-                    <div class="absolute inset-0 bg-brand-500/20 blur-xl rounded-full"></div>
-                    <img src="assets/logo.png" alt="BIGTAC Restaurant" class="w-full h-full object-cover rounded-full relative z-10" onerror="this.src='assets/snack.png'">
+    <main class="flex-grow store-main">
+        <!-- HERO: illustrative theme photography; replace with restaurant photography when available. -->
+        <section id="hero" class="store-hero" aria-labelledby="store-title">
+            <div class="store-hero__photo">
+                <img src="assets/tacos-hero.jpg" alt="Tacos français grillés, garniture au poulet et frites" width="1536" height="1024" fetchpriority="high">
+            </div>
+            <div class="store-hero__body">
+                <div class="store-hero__intro">
+                    <p>Tacos français &amp; grill à Fès.<br>Sur place, à emporter ou en livraison.</p>
+                    <a href="#menu-unified" class="store-hero__cta">Commander en ligne <i data-feather="arrow-down-right" aria-hidden="true"></i></a>
                 </div>
-
-                <!-- Brand Title -->
-                <h1 class="text-5xl sm:text-7xl lg:text-8xl font-extrabold text-white font-script drop-shadow-xl leading-tight mb-4">
-                    BIGTAC
-                    <span class="block text-brand-500 text-3xl sm:text-5xl lg:text-6xl font-sans font-black tracking-tight mt-1 drop-shadow-md">
-                        Tacos Français & Grill Authentique
-                    </span>
-                </h1>
-
-                <p class="text-lg sm:text-2xl text-stone-200 font-light max-w-2xl mx-auto mb-10 drop-shadow leading-relaxed">
-                    Recettes généreuses, sauces maison exclusives, viandes fraîches et cuisson à la commande à Fès.
-                </p>
-
-                <!-- CTA Actions -->
-                <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                    <a href="#menu-unified" class="w-full sm:w-auto px-8 py-4 bg-brand-600 hover:bg-brand-500 text-white rounded-full font-extrabold text-lg transition-all shadow-xl shadow-brand-600/30 transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
-                        <i data-feather="book-open" class="w-5 h-5"></i>
-                        <span>Commander en ligne</span>
-                    </a>
-                    <a href="#locations" class="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 rounded-full font-bold text-lg transition-all hover:border-white/60 active:scale-95 flex items-center justify-center gap-2">
-                        <i data-feather="map-pin" class="w-5 h-5 text-brand-400"></i>
-                        <span>Nous Trouver à Fès</span>
-                    </a>
-                </div>
-
-                <!-- Trust Badges -->
-                <div class="mt-14 grid grid-cols-2 sm:grid-cols-3 gap-4 text-white text-xs sm:text-sm font-semibold">
-                    <div class="bg-black/40 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 flex items-center justify-center gap-2">
-                        <span class="text-brand-400">⚡</span> Livraison rapide
-                    </div>
-                    <div class="bg-black/40 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 flex items-center justify-center gap-2">
-                        <span class="text-brand-400">🔥</span> Sauce fromagère maison
-                    </div>
-                    <div class="bg-black/40 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 col-span-2 sm:col-span-1 flex items-center justify-center gap-2">
-                        <span class="text-brand-400">⭐</span> Qualité certifiée
-                    </div>
-                </div>
-
+                <h1 id="store-title" translate="no">BIGTAC</h1>
             </div>
         </section>
 
@@ -309,43 +214,30 @@
         </section>
 
         <!-- MAIN MENU & CARTE -->
-        <section id="menu-unified" class="py-16 bg-white dark:bg-stone-900 min-h-screen relative">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
-                <!-- Section Header -->
-                <div class="text-center max-w-2xl mx-auto mb-10">
-                    <span class="text-brand-600 dark:text-brand-400 text-xs font-black uppercase tracking-widest bg-brand-50 dark:bg-brand-950/60 px-3.5 py-1.5 rounded-full border border-brand-200/50 dark:border-brand-800">
-                        Notre Carte Complète
-                    </span>
-                    <h2 class="text-3xl sm:text-5xl font-extrabold text-stone-900 dark:text-white mt-3 font-sans tracking-tight">
-                        Choisissez Votre Festin
-                    </h2>
-                    <p class="text-stone-500 dark:text-stone-400 text-sm sm:text-base mt-2">
-                        Tacos garnis, gratins fondants, burgers croustillants et desserts frais
-                    </p>
-                </div>
-
-                <!-- Search Input Bar -->
-                <div class="max-w-xl mx-auto mb-8 relative">
-                    <div class="relative flex items-center">
-                        <i data-feather="search" class="w-5 h-5 text-stone-400 absolute left-4 pointer-events-none"></i>
-                        <input type="text" id="menuSearch" placeholder="Rechercher un plat (ex: Poulet, Zinger, Cordon-bleu...)"
-                            class="w-full pl-12 pr-12 py-3.5 bg-stone-50 dark:bg-stone-800/80 border-2 border-stone-200 dark:border-stone-700 rounded-2xl text-stone-900 dark:text-white placeholder-stone-400 text-sm sm:text-base focus:outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition shadow-sm" />
-                        <button type="button" id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-4 p-1 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200">
-                            <i data-feather="x" class="w-4 h-4"></i>
+        <section id="menu-unified" aria-labelledby="menu-title">
+            <div class="store-menu-wrap">
+                <div class="store-menu-heading">
+                    <div>
+                        <h2 id="menu-title">La carte</h2>
+                        <p>Trouvez votre prochain tacos, gratiné ou burger.</p>
+                    </div>
+                    <div class="store-search">
+                        <label for="menuSearch">Rechercher un plat</label>
+                        <i data-feather="search" aria-hidden="true"></i>
+                        <input type="search" id="menuSearch" name="menu-search" placeholder="Rechercher un plat…" autocomplete="off">
+                        <button type="button" id="clearSearchBtn" onclick="clearSearch()" class="hidden" aria-label="Effacer la recherche">
+                            <i data-feather="x" aria-hidden="true"></i>
                         </button>
                     </div>
                 </div>
-
-                <!-- Sticky Category Filter Navigation Bar -->
-                <div class="sticky top-20 z-30 py-3 -mx-4 px-4 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200/60 dark:border-stone-800 shadow-sm" id="stickyFilterBar">
-                    <div class="flex gap-2.5 overflow-x-auto hide-scrollbar max-w-7xl mx-auto py-1" id="categoryFilters" role="tablist">
-                        <!-- Category pills rendered here -->
+                <nav id="stickyFilterBar" aria-label="Catégories du menu">
+                    <div id="categoryFilters">
+                        <!-- Category controls rendered from the existing menu. -->
                     </div>
-                </div>
+                </nav>
 
                 <!-- Dynamic Menu Content Container -->
-                <div id="menuContent" class="mt-10 min-h-[400px]">
+                <div id="menuContent">
                     <!-- Skeleton Loader initially -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         <div class="bg-stone-100 dark:bg-stone-800 rounded-3xl h-80 animate-pulse"></div>
@@ -945,9 +837,7 @@
 
                 const container = document.getElementById('categoryFilters');
                 let html = `
-                    <button onclick="filterSection('all')" class="filter-btn-pill active px-5 py-2.5 rounded-full text-xs sm:text-sm font-extrabold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-700" data-cat="all">
-                        Tout Voir
-                    </button>
+                    <button type="button" onclick="filterSection('all')" class="filter-btn-pill active" data-cat="all" aria-pressed="true">Tout voir</button>
                 `;
 
                 snap.forEach(docSnap => {
@@ -956,8 +846,8 @@
                     categoryImages[d.name] = d.image || '';
 
                     html += `
-                        <button onclick="filterSection('${d.name}')" class="filter-btn-pill px-5 py-2.5 rounded-full text-xs sm:text-sm font-extrabold bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-700 hover:border-brand-500" data-cat="${d.name}">
-                            ${d.name}
+                        <button type="button" onclick="filterSection(decodeURIComponent('${encodeURIComponent(d.name).replace(/'/g, '%27')}'))" class="filter-btn-pill" data-cat="${escapeCardText(d.name)}" aria-pressed="false">
+                            ${escapeCardText(d.name)}
                         </button>
                     `;
                 });
@@ -1014,22 +904,7 @@
 
                 if (container && allPromotions.length > 0) {
                     section.classList.remove('hidden');
-                    container.innerHTML = allPromotions.map(promo => `
-                        <div class="menu-card bg-white dark:bg-stone-800/90 rounded-3xl border border-red-200 dark:border-red-950/60 p-4 shrink-0 w-[270px] snap-center cursor-pointer shadow-sm hover:shadow-xl transition" onclick="openItemModal('${promo.id}', true)">
-                            <div class="relative h-44 rounded-2xl overflow-hidden mb-3 bg-stone-100 dark:bg-stone-700">
-                                <img src="${promo.imageUrl || 'assets/snack.png'}" alt="${promo.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='assets/snack.png'" />
-                                <span class="absolute top-2.5 left-2.5 bg-red-600 text-white text-[11px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow">
-                                    Offre Promo
-                                </span>
-                            </div>
-                            <h3 class="font-extrabold text-stone-900 dark:text-white text-base truncate mb-1">${promo.name}</h3>
-                            <p class="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 min-h-[32px]">${promo.description || 'Formule promotionnelle limitée'}</p>
-                            <div class="flex items-center justify-between mt-3 pt-2 border-t border-stone-100 dark:border-stone-700">
-                                <span class="text-xl font-black text-red-600 dark:text-red-400 font-mono">${promo.price} Dh</span>
-                                <span class="text-xs bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 font-bold px-2.5 py-1 rounded-xl">Profiter →</span>
-                            </div>
-                        </div>
-                    `).join('');
+                    container.innerHTML = allPromotions.map(promo => createCardHTML(promo, 'h3')).join('');
                 }
             } catch (e) {
                 console.error("Promotions error:", e);
@@ -1063,13 +938,11 @@
                 section.id = `section-${catName}`;
 
                 section.innerHTML = `
-                    <div class="flex items-center justify-between mb-6 pb-2 border-b border-stone-200 dark:border-stone-800">
-                        <div class="flex items-center gap-3">
-                            <h3 class="text-2xl sm:text-3xl font-black text-stone-900 dark:text-white tracking-tight">${catName}</h3>
-                            <span class="text-xs font-bold text-stone-400 bg-stone-100 dark:bg-stone-800 px-2.5 py-0.5 rounded-full">${catItems.length}</span>
-                        </div>
+                    <div class="store-category-heading">
+                        <h3>${escapeCardText(catName)}</h3>
+                        <span>${catItems.length} ${catItems.length === 1 ? 'plat' : 'plats'}</span>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div class="store-product-grid">
                         ${catItems.map(item => createCardHTML(item)).join('')}
                     </div>
                 `;
@@ -1088,28 +961,29 @@
             if (window.feather) feather.replace();
         }
 
-        function createCardHTML(item) {
+        // Escaping applies to the new presentation templates only.
+        function escapeCardText(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+        }
+
+        function createCardHTML(item, heading = 'h4') {
             const fallbackImg = categoryImages[item.category] || 'assets/snack.png';
+            const name = escapeCardText(item.name);
+            const itemId = encodeURIComponent(item.id).replace(/'/g, '%27');
             return `
-                <article class="menu-card bg-white dark:bg-stone-800/80 rounded-3xl border border-stone-100 dark:border-stone-800 overflow-hidden flex flex-col justify-between cursor-pointer group shadow-sm" onclick="openItemModal('${item.id}')">
-                    <div>
-                        <div class="relative h-48 sm:h-52 overflow-hidden bg-stone-100 dark:bg-stone-700">
-                            <img src="${item.imageUrl || fallbackImg}" alt="${item.name}" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500" loading="lazy" onerror="this.src='${fallbackImg}'" />
-                            ${item.isPopular ? '<span class="absolute top-3 left-3 bg-brand-600 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-xl shadow-md">★ Populaire</span>' : ''}
-                        </div>
-                        <div class="p-5">
-                            <h4 class="font-black text-stone-900 dark:text-white text-lg leading-tight group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">${item.name}</h4>
-                            <p class="text-stone-500 dark:text-stone-400 text-xs sm:text-sm mt-1.5 line-clamp-2 leading-relaxed">${item.description || 'Préparé à la minute avec des ingrédients frais.'}</p>
-                        </div>
+                <article class="menu-card product-card">
+                    <div class="product-card__media">
+                        <img src="${escapeCardText(item.imageUrl || fallbackImg)}" alt="${name}" width="640" height="480" loading="lazy" onerror="this.onerror=null; this.src=decodeURIComponent('${encodeURIComponent(fallbackImg).replace(/'/g, '%27')}')">
                     </div>
-                    <div class="p-5 pt-0 flex items-center justify-between">
-                        <div>
-                            <span class="text-xs text-stone-400 uppercase font-bold block leading-none">À partir de</span>
-                            <span class="text-2xl font-black text-brand-600 dark:text-brand-400 font-mono">${item.price} <span class="text-xs text-stone-500">Dh</span></span>
+                    <div class="product-card__body">
+                        <${heading}>${name}</${heading}>
+                        <p class="product-card__description">${escapeCardText(item.description || 'Préparé à la commande.')}</p>
+                        <div class="product-card__footer">
+                            <div class="product-card__price"><small>À partir de</small><strong>${escapeCardText(item.price)} Dh</strong></div>
+                            <button type="button" class="product-card__choose" onclick="openItemModal(decodeURIComponent('${itemId}'), ${item.isPromo === true})" aria-label="Choisir ${name}">
+                                <span>Choisir</span><i data-feather="plus" aria-hidden="true"></i>
+                            </button>
                         </div>
-                        <button type="button" class="w-11 h-11 rounded-2xl bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 group-hover:bg-brand-600 group-hover:text-white transition flex items-center justify-center shadow-sm" aria-label="Choisir ${item.name}">
-                            <i data-feather="plus" class="w-5 h-5"></i>
-                        </button>
                     </div>
                 </article>
             `;
@@ -1126,26 +1000,16 @@
             }
 
             popSection.classList.remove('hidden');
-            popContainer.innerHTML = populars.map(item => `
-                <div class="menu-card bg-white dark:bg-stone-800/90 rounded-3xl border border-stone-200/80 dark:border-stone-700 p-4 shrink-0 w-[260px] snap-center cursor-pointer shadow-sm hover:shadow-xl transition" onclick="openItemModal('${item.id}')">
-                    <div class="relative h-40 rounded-2xl overflow-hidden mb-3 bg-stone-100 dark:bg-stone-700">
-                        <img src="${item.imageUrl || 'assets/snack.png'}" alt="${item.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='assets/snack.png'" />
-                        <span class="absolute top-2 left-2 bg-brand-600 text-white text-[10px] font-black px-2 py-0.5 rounded-lg uppercase">Populaire</span>
-                    </div>
-                    <h4 class="font-extrabold text-stone-900 dark:text-white text-base truncate">${item.name}</h4>
-                    <div class="flex items-center justify-between mt-3 pt-2 border-t border-stone-100 dark:border-stone-700">
-                        <span class="text-lg font-black text-brand-600 dark:text-brand-400 font-mono">${item.price} Dh</span>
-                        <span class="text-xs font-bold bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-400 px-2.5 py-1 rounded-xl">+ Ajouter</span>
-                    </div>
-                </div>
-            `).join('');
+            popContainer.innerHTML = populars.map(item => createCardHTML(item, 'h3')).join('');
         }
 
         // --- FILTERING & SEARCH ---
         window.filterSection = (catName) => {
-            document.querySelectorAll('.filter-btn-pill').forEach(b => b.classList.remove('active'));
-            const activeBtn = document.querySelector(`button[data-cat="${catName}"]`);
-            if (activeBtn) activeBtn.classList.add('active');
+            document.querySelectorAll('.filter-btn-pill').forEach(button => {
+                const active = button.dataset.cat === catName;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', String(active));
+            });
 
             document.querySelectorAll('.section-block').forEach(sec => {
                 if (catName === 'all' || sec.id === `section-${catName}`) {
@@ -1158,8 +1022,7 @@
             if (catName !== 'all') {
                 const el = document.getElementById(`section-${catName}`);
                 if (el) {
-                    const topPos = el.getBoundingClientRect().top + window.pageYOffset - 150;
-                    window.scrollTo({ top: topPos, behavior: 'smooth' });
+                    el.scrollIntoView({ block: 'start', behavior: 'smooth' });
                 }
             }
         };
