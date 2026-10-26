@@ -18,13 +18,14 @@
 ## Interaction and design priorities
 
 - Search and filters affect only the full menu; featured sections remain independent.
-- Category chips scroll horizontally on mobile and may stick beneath the header only inside the menu boundary. Search remains in normal flow.
+- Search and horizontally scrollable category chips stick together beneath the header only inside the menu boundary; scrollbars stay visually hidden with padded focus/touch targets.
 - Keep menu navigation targets clear of sticky chips and preserve visible cart actions.
-- Continue the rounded, energetic food-ordering direction, strong heading system, warm offer band, charcoal favourites and compact catalogue spacing. Refine composition without changing product imagery or rebuilding the page.
-- Use native layout/stickiness and immediate category navigation to avoid unnecessary motion and layout jumps.
+- Retain the rounded food-ordering direction, heading system, hero composition and section order. Coordinate orange actions, warm cream surfaces, borders and radii through CSS tokens; avoid an unnecessary dark favourites block in the light theme.
+- Offers and favourites use native horizontal carousels, original cards only, with gentle bidirectional autoplay when overflowing, pause controls, manual swiping/dragging, and keyboard navigation. Pause on interaction, focus, hover, hidden pages and open dialogs. Disable autoplay for reduced motion, zero/single items or fully visible rails.
+- Use native layout/stickiness and immediate category navigation to avoid unnecessary layout jumps.
 
 ## Verification and scope
 
-- Verify hierarchy, hero target, search, selected category state, sticky boundaries and cart at 390px and 1440px with isolated local fixtures and screenshots.
+- Verify hierarchy, hero target, search, selected category state, sticky boundaries, carousel behaviour and cart at 320px, 390px, 768px and 1440px with isolated local fixtures and screenshots.
 - Preserve Firebase, admin, customization and checkout business logic; do not access production data.
-- Leave changes uncommitted until explicitly requested.
+- Commit and push only when explicitly requested for the current refinement.

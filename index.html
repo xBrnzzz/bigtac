@@ -78,18 +78,28 @@
                     </p>
                 </div>
                 <div class="discovery-row">
-                    <section id="promotions" class="menu-feature menu-feature--offers hidden" aria-labelledby="promotions-title">
+                    <section id="promotions" class="menu-feature menu-feature--offers hidden" aria-labelledby="promotions-title" data-carousel data-carousel-label="offres">
                         <div class="section-heading">
                             <h2 id="promotions-title">Les bons plans</h2>
                             <p>À composer selon vos envies.</p>
+                            <div class="carousel-controls" data-carousel-controls hidden>
+                                <button type="button" class="icon-button" data-carousel-prev aria-label="Offre précédente" aria-controls="promotionsGrid">←</button>
+                                <button type="button" class="carousel-toggle" data-carousel-toggle aria-pressed="false">Pause</button>
+                                <button type="button" class="icon-button" data-carousel-next aria-label="Offre suivante" aria-controls="promotionsGrid">→</button>
+                            </div>
                         </div>
                         <div id="promotionsGrid" class="featured-grid">
                         </div>
                     </section>
-                    <section id="popular" class="menu-feature menu-feature--popular hidden" aria-labelledby="popular-title">
+                    <section id="popular" class="menu-feature menu-feature--popular hidden" aria-labelledby="popular-title" data-carousel data-carousel-label="favoris">
                         <div class="section-heading">
                             <h2 id="popular-title">Les incontournables</h2>
                             <p>La sélection BIGTAC, à votre façon.</p>
+                            <div class="carousel-controls" data-carousel-controls hidden>
+                                <button type="button" class="icon-button" data-carousel-prev aria-label="Favori précédent" aria-controls="popularGrid">←</button>
+                                <button type="button" class="carousel-toggle" data-carousel-toggle aria-pressed="false">Pause</button>
+                                <button type="button" class="icon-button" data-carousel-next aria-label="Favori suivant" aria-controls="popularGrid">→</button>
+                            </div>
                         </div>
                         <div id="popularGrid" class="featured-grid">
                         </div>
@@ -100,17 +110,17 @@
                         <h2 id="menu-title">Notre carte</h2>
                         <p>Tacos, gratinés, burgers… À vous de choisir.</p>
                     </div>
-                    <div class="store-search">
-                        <label for="menuSearch" class="sr-only">Rechercher dans la carte</label>
-                        <i data-feather="search" aria-hidden="true">
-                        </i>
-                        <input id="menuSearch" name="menu-search" type="search" placeholder="Un tacos, un burger…" autocomplete="off">
-                        <button class="icon-button hidden" id="clearSearchBtn" type="button" onclick="clearSearch()" aria-label="Effacer la recherche">
-                            <i data-feather="x" aria-hidden="true">
-                            </i>
-                        </button>
-                    </div>
                     <div id="stickyFilterBar" class="menu-toolbar">
+                        <div class="store-search">
+                            <label for="menuSearch" class="sr-only">Rechercher dans la carte</label>
+                            <i data-feather="search" aria-hidden="true">
+                            </i>
+                            <input id="menuSearch" name="menu-search" type="search" placeholder="Un tacos, un burger…" autocomplete="off">
+                            <button class="icon-button hidden" id="clearSearchBtn" type="button" onclick="clearSearch()" aria-label="Effacer la recherche">
+                                <i data-feather="x" aria-hidden="true">
+                                </i>
+                            </button>
+                        </div>
                         <nav id="categoryFilters" aria-label="Catégories du menu">
                         </nav>
                     </div>
@@ -495,6 +505,7 @@
         import { db, collection, getDocs, query, orderBy, addDoc, serverTimestamp, doc, onSnapshot } from './firebase-config.js';
 
         import { buildCustomizationSteps, choiceRules, selectionIssue, customizationPrice, cartSelections } from './assets/customization.js';
+        import { setupCarousel } from './assets/carousels.js';
 
         // --- CONFIG & CONSTANTS ---
         const WHATSAPP_NUMBERS = {
@@ -752,9 +763,10 @@
                     }
                 });
 
-                if (container && allPromotions.length > 0) {
-                    section.classList.remove('hidden');
+                if (container) {
+                    section.classList.toggle('hidden', allPromotions.length === 0);
                     container.innerHTML = allPromotions.map(promo => createCardHTML(promo, 'h3', 'offer')).join('');
+                    setupCarousel(container);
                 }
             } catch (e) {
                 console.error("Promotions error:", e);
@@ -851,11 +863,13 @@
 
             if (!popContainer || populars.length === 0) {
                 if (popSection) popSection.classList.add('hidden');
+                if (popContainer) { popContainer.replaceChildren(); setupCarousel(popContainer); }
                 return;
             }
 
             popSection.classList.remove('hidden');
             popContainer.innerHTML = populars.map(item => createCardHTML(item, 'h3', 'popular')).join('');
+            setupCarousel(popContainer);
         }
 
         let activeCategory = 'all';

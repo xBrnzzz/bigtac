@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test:storefront": "node tests/storefront.mjs"
+    "test:storefront": "node tests/storefront.mjs",
+    "test:carousels": "node tests/carousels.mjs"
   },
   "dependencies": {
     "playwright": "^1.64.1"
