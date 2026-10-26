@@ -34,7 +34,8 @@ try {
         for (const [section, track] of [['#promotions', '#promotionsGrid'], ['#popular', '#popularGrid']]) {
             await page.locator(track).scrollIntoViewIfNeeded();
             check(await page.locator(track).evaluate(el => el.scrollWidth > el.clientWidth), `${width}/${track}: multiple cards form a horizontal rail`);
-            await page.locator(`${section} [data-carousel-next]`).click();
+            await page.locator(track).focus();
+            await page.keyboard.press('ArrowRight');
             check(await left(page, track) > 20, `${width}/${track}: next navigation works with reduced motion`);
             await page.locator(track).focus();
             await page.keyboard.press('Home');
@@ -44,10 +45,10 @@ try {
             await page.keyboard.press('End');
             const maximum = await page.locator(track).evaluate(el => el.scrollWidth - el.clientWidth);
             check(Math.abs(await left(page, track) - maximum) <= 1, `${width}/${track}: keyboard End reaches the final card`);
-            await page.locator(`${section} [data-carousel-next]`).click();
+            await page.keyboard.press('ArrowRight');
             check(await left(page, track) <= 1, `${width}/${track}: manual next loops to the first card`);
             await reset(page, track, 35);
-            await page.locator(`${section} [data-carousel-next]`).click();
+            await page.keyboard.press('ArrowRight');
             check(await page.locator(track).evaluate(el => {
                 const step = el.firstElementChild.getBoundingClientRect().width + parseFloat(getComputedStyle(el).columnGap);
                 return Math.abs(el.scrollLeft - Math.min(step, el.scrollWidth - el.clientWidth)) <= 1;
@@ -104,12 +105,14 @@ try {
             await page.clock.runFor(1000);
             check(Math.abs(await left(page, track) - focused) <= 1, `${width}/${track}: keyboard focus pauses autoplay`);
             await blur(page);
-            await page.locator(`${section} [data-carousel-toggle]`).click();
+            await page.locator(track).focus();
+            await page.keyboard.press('Space');
             await blur(page); await page.mouse.move(0, 0);
             const paused = await left(page, track);
             await page.clock.runFor(1000);
             check(Math.abs(await left(page, track) - paused) <= 1, `${width}/${track}: explicit Pause persists without focus`);
-            await page.locator(`${section} [data-carousel-toggle]`).click();
+            await page.locator(track).focus();
+            await page.keyboard.press('Space');
             await blur(page); await page.mouse.move(0, 0);
             const maximum = await page.locator(track).evaluate(el => el.scrollWidth - el.clientWidth);
             await reset(page, track, maximum - 2);
@@ -130,6 +133,7 @@ try {
             await page.emulateMedia({ reducedMotion: 'no-preference' });
         }
         check(await page.locator('#promotionsGrid .product-card').count() === 4 && await page.locator('#popularGrid .product-card').count() === 5, `${width}: looping never duplicates product cards`);
+        check(await page.locator('[data-carousel] .section-heading button').count() === 0, `${width}: no visible Pause or arrow buttons are rendered`);
 
         await page.emulateMedia({ reducedMotion: 'reduce' });
         await reset(page, '#promotionsGrid');
@@ -169,7 +173,7 @@ try {
                 await small.page.locator('#popularGrid').scrollIntoViewIfNeeded();
                 await small.page.clock.runFor(2000);
                 check(await left(small.page, '#popularGrid') === 0 && await left(small.page, '#promotionsGrid') === 0, `${width}: single cards never autoplay even with motion enabled`);
-                check(await small.page.locator('[data-carousel-controls]:visible').count() === 0, `${width}: single items have no unnecessary carousel controls`);
+                check(await small.page.locator('[data-carousel] .section-heading button').count() === 0, `${width}: single items have no carousel buttons`);
                 check(await small.page.locator('#promotionsGrid .product-card').count() === 1 && await small.page.locator('#popularGrid .product-card').count() === 1, `${width}: single featured items render without copies`);
             } else check(!(await small.page.locator('#promotions').isVisible()) && !(await small.page.locator('#popular').isVisible()), `${width}: zero featured items leave no empty carousel`);
             await small.context.close();
@@ -180,7 +184,7 @@ try {
             await fitted.page.locator('#popularGrid').scrollIntoViewIfNeeded();
             await fitted.page.clock.runFor(2000);
             check(await fitted.page.locator('#popularGrid .product-card').count() === 2, 'Desktop fixture contains two original favourites');
-            check(!(await fitted.page.locator('#popular [data-carousel-controls]').isVisible()), 'Fully visible cards do not need carousel controls');
+            check(await fitted.page.locator('#popular .section-heading button').count() === 0, 'Fully visible cards have no carousel buttons');
             check(await left(fitted.page, '#popularGrid') === 0, 'Fully visible cards do not autoplay');
             await fitted.context.close();
         }

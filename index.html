@@ -77,29 +77,20 @@
                         Vous pouvez parcourir la carte. Les commandes reprendront à l’ouverture.
                     </p>
                 </div>
+                <p id="carouselHelp" class="sr-only">Carrousel : utilisez les flèches gauche et droite pour naviguer, ou Espace pour suspendre et reprendre le défilement.</p>
                 <div class="discovery-row">
-                    <section id="promotions" class="menu-feature menu-feature--offers hidden" aria-labelledby="promotions-title" data-carousel data-carousel-label="offres">
+                    <section id="promotions" class="menu-feature menu-feature--offers hidden" aria-labelledby="promotions-title" data-carousel>
                         <div class="section-heading">
-                            <h2 id="promotions-title">Les bons plans</h2>
+                            <h2 id="promotions-title">Promotions</h2>
                             <p>À composer selon vos envies.</p>
-                            <div class="carousel-controls" data-carousel-controls hidden>
-                                <button type="button" class="icon-button" data-carousel-prev aria-label="Offre précédente" aria-controls="promotionsGrid">←</button>
-                                <button type="button" class="carousel-toggle" data-carousel-toggle aria-pressed="false">Pause</button>
-                                <button type="button" class="icon-button" data-carousel-next aria-label="Offre suivante" aria-controls="promotionsGrid">→</button>
-                            </div>
                         </div>
                         <div id="promotionsGrid" class="featured-grid">
                         </div>
                     </section>
-                    <section id="popular" class="menu-feature menu-feature--popular hidden" aria-labelledby="popular-title" data-carousel data-carousel-label="favoris">
+                    <section id="popular" class="menu-feature menu-feature--popular hidden" aria-labelledby="popular-title" data-carousel>
                         <div class="section-heading">
-                            <h2 id="popular-title">Les incontournables</h2>
+                            <h2 id="popular-title">Best Seller</h2>
                             <p>La sélection BIGTAC, à votre façon.</p>
-                            <div class="carousel-controls" data-carousel-controls hidden>
-                                <button type="button" class="icon-button" data-carousel-prev aria-label="Favori précédent" aria-controls="popularGrid">←</button>
-                                <button type="button" class="carousel-toggle" data-carousel-toggle aria-pressed="false">Pause</button>
-                                <button type="button" class="icon-button" data-carousel-next aria-label="Favori suivant" aria-controls="popularGrid">→</button>
-                            </div>
                         </div>
                         <div id="popularGrid" class="featured-grid">
                         </div>
@@ -264,7 +255,7 @@
                     </div>
                 </div>
                 <footer class="sheet-footer">
-                    <p id="customizationHint" class="customization-hint" aria-live="polite">Personnalisez votre repas.</p>
+                    <p id="customizationHint" class="customization-hint" aria-live="polite" tabindex="-1">Personnalisez votre repas.</p>
                     <div class="product-action-row">
                         <div class="quantity-control">
                             <button type="button" id="modalQtyMinus" onclick="updateModalQty(-1)" aria-label="Diminuer la quantité">−</button>
@@ -619,6 +610,7 @@
             modal.querySelector('.modal-panel').focus({ preventScroll: true });
         };
         window.closeModalAnimation = (id, restoreFocus = true) => {
+            if (id === 'addItemModal') cancelCustomizationAdvance();
             const modal = document.getElementById(id);
             if (!modal || modal.classList.contains('hidden')) return;
             modal.classList.add('hidden');
@@ -913,7 +905,48 @@
         };
 
         const selectionErrors = {};
+        let customizationAdvanceTimer = 0;
+        function cancelCustomizationAdvance() {
+            clearTimeout(customizationAdvanceTimer);
+            customizationAdvanceTimer = 0;
+        }
+        function scrollCustomizationGroup(index, focus = true) {
+            const container = document.getElementById('modalContent');
+            const group = document.getElementById(`choice-group-${index}`);
+            const title = group?.querySelector('legend');
+            const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
+            if (title) {
+                const top = container.scrollTop + title.getBoundingClientRect().top - container.getBoundingClientRect().top - 12;
+                container.scrollTo({ top: Math.max(0, top), behavior });
+                if (focus) group.focus({ preventScroll: true });
+            } else {
+                container.scrollTo({ top: container.scrollHeight, behavior });
+                if (focus) document.getElementById('customizationHint').focus({ preventScroll: true });
+            }
+        }
+        function advanceCustomization(index, focus = true, reveal = true) {
+            if (!wizardSteps[index] || document.getElementById('addItemModal').classList.contains('hidden')) return;
+            const incomplete = wizardSteps.findIndex((step, stepIndex) => stepIndex <= index && selectionIssue(step, wizardData[stepIndex]));
+            if (incomplete >= 0) {
+                if (reveal) {
+                    showChoiceError(incomplete, selectionIssue(wizardSteps[incomplete], wizardData[incomplete]));
+                    scrollCustomizationGroup(incomplete, focus);
+                }
+                return;
+            }
+            scrollCustomizationGroup(index + 1, focus);
+        }
+        window.continueCustomization = index => {
+            cancelCustomizationAdvance();
+            advanceCustomization(index);
+        };
+        const customizationScroll = document.getElementById('modalContent');
+        customizationScroll.addEventListener('wheel', cancelCustomizationAdvance, { passive: true });
+        customizationScroll.addEventListener('touchmove', cancelCustomizationAdvance, { passive: true });
+        customizationScroll.addEventListener('pointerdown', cancelCustomizationAdvance, { passive: true });
+        document.getElementById('addItemModal').addEventListener('keydown', cancelCustomizationAdvance);
         window.openItemModal = (id, isPromo = false) => {
+            cancelCustomizationAdvance();
             currentItem = (isPromo ? allPromotions : allItems).find(item => item.id === id);
             if (!currentItem) return;
             modalQty = 1;
@@ -941,7 +974,7 @@
                 const instruction = min === max && min > 0 ? `Choisissez ${min} option${min > 1 ? 's' : ''}`
                     : min > 0 ? `Choisissez au moins ${min} option${min > 1 ? 's' : ''} · ${max} maximum`
                     : `À votre goût · ${max} option${max > 1 ? 's' : ''} maximum`;
-                return `<fieldset class="option-group" id="choice-group-${index}" aria-describedby="choice-hint-${index} choice-error-${index}">
+                return `<fieldset class="option-group" id="choice-group-${index}" tabindex="-1" aria-describedby="choice-hint-${index} choice-error-${index}">
                     <legend><span>${escapeCardText(step.title)}</span><span class="required-label">${min > 0 ? 'Obligatoire' : 'Facultatif'}</span></legend>
                     <p id="choice-hint-${index}" class="option-hint"><span>${instruction}</span><strong id="choice-count-${index}">${selected.length} / ${max}</strong></p>
                     <div class="option-list">${options.map((option, optionIndex) => {
@@ -951,6 +984,7 @@
                             <span class="option-row__name">${escapeCardText(option.name)}</span><span class="option-row__price">${optionPrice(option.price || 0)}</span>
                         </label>`;
                     }).join('')}</div><p id="choice-error-${index}" class="option-error hidden" role="alert"></p>
+                    <button type="button" class="secondary-button choice-next" id="choice-next-${index}" onclick="continueCustomization(${index})" ${selectionIssue(step, selected) ? 'disabled' : ''}>${min === 0 && !selected.length ? 'Passer' : 'Continuer'}${index === wizardSteps.length - 1 ? ' au total' : ''}</button>
                 </fieldset>`;
             }).join('');
         };
@@ -967,6 +1001,7 @@
             }
         }
         window.selectCustomizationOption = (index, optionIndex, input) => {
+            cancelCustomizationAdvance();
             const step = wizardSteps[index];
             if (!step) return;
             const { options, max, radio } = choiceRules(step);
@@ -993,6 +1028,14 @@
             showChoiceError(index, '');
             document.getElementById(`choice-count-${index}`).textContent = `${next.length} / ${max}`;
             recalcModalDisplayTotal();
+            const complete = !selectionIssue(step, next);
+            const explicitMaximum = step.type === 'choice' && Number(step.data.max) > 0;
+            if (input.checked && complete && step.type !== 'supplements' && (radio || (explicitMaximum && next.length === max))) {
+                // Keep native radio/checkbox keyboard focus; explicit Continue moves
+                // focus. Pointer selection may announce the next group's legend.
+                const preserveFocus = input.matches(':focus-visible');
+                customizationAdvanceTimer = setTimeout(() => advanceCustomization(index, !preserveFocus, false), 220);
+            }
         };
 
         function validateCustomization(reveal = false) {
@@ -1003,7 +1046,8 @@
                 if (reveal) showChoiceError(index, issue);
             });
             if (reveal && firstInvalid >= 0) {
-                document.getElementById(`choice-group-${firstInvalid}`).scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                cancelCustomizationAdvance();
+                scrollCustomizationGroup(firstInvalid, false);
                 document.querySelector(`#choice-group-${firstInvalid} input`)?.focus({ preventScroll: true });
             }
             return firstInvalid < 0;
@@ -1017,6 +1061,15 @@
             const total = customizationPrice(currentItem, wizardData, modalQty);
             document.getElementById('modalTotalPriceDisplay').textContent = money(total);
             document.getElementById('modalQtyMinus').disabled = modalQty === 1;
+            wizardSteps.forEach((step, index) => {
+                const button = document.getElementById(`choice-next-${index}`);
+                if (!button) return;
+                const selected = wizardData[index] || [];
+                const optional = choiceRules(step).min === 0;
+                button.disabled = Boolean(selectionIssue(step, selected));
+                button.textContent = optional && !selected.length ? 'Passer' : 'Continuer';
+                if (index === wizardSteps.length - 1) button.textContent = optional && !selected.length ? 'Passer au total' : 'Voir le total';
+            });
             const valid = validateCustomization();
             const missing = wizardSteps.filter((step, index) => selectionIssue(step, wizardData[index])).length;
             const hint = document.getElementById('customizationHint');

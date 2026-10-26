@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "test:storefront": "node tests/storefront.mjs",
-    "test:carousels": "node tests/carousels.mjs"
+    "test:carousels": "node tests/carousels.mjs",
+    "test:customization": "node tests/customization-navigation.mjs"
   },
   "dependencies": {
     "playwright": "^1.64.1"

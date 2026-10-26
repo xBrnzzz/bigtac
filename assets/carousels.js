@@ -4,11 +4,6 @@ const instances = new WeakMap();
 export function setupCarousel(track) {
     instances.get(track)?.destroy();
     const section = track.closest('[data-carousel]');
-    const controls = section.querySelector('[data-carousel-controls]');
-    const previous = controls.querySelector('[data-carousel-prev]');
-    const next = controls.querySelector('[data-carousel-next]');
-    const toggle = controls.querySelector('[data-carousel-toggle]');
-    const label = section.dataset.carouselLabel;
     const abort = new AbortController();
     const listen = (target, event, callback, options = {}) => target.addEventListener(event, callback, { ...options, signal: abort.signal });
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -39,12 +34,7 @@ export function setupCarousel(track) {
     }
     function update() {
         const scrollable = canScroll();
-        controls.hidden = !scrollable;
         track.tabIndex = scrollable ? 0 : -1;
-        toggle.hidden = reduced.matches;
-        toggle.textContent = userPaused ? 'Lecture' : 'Pause';
-        toggle.setAttribute('aria-pressed', String(userPaused));
-        toggle.setAttribute('aria-label', `${userPaused ? 'Reprendre' : 'Mettre en pause'} le défilement des ${label}`);
         if (!eligible()) stop();
         else if (!frame) { position = track.scrollLeft; frame = requestAnimationFrame(tick); }
     }
@@ -65,9 +55,6 @@ export function setupCarousel(track) {
             : Math.max(0, Math.min(maximum, index * step));
         track.scrollTo({ left: target, behavior: reduced.matches ? 'instant' : 'smooth' });
     }
-    listen(previous, 'click', () => move(-1));
-    listen(next, 'click', () => move(1));
-    listen(toggle, 'click', () => { userPaused = !userPaused; update(); });
     listen(section, 'pointerenter', event => { if (event.pointerType === 'mouse') { hovered = true; update(); } });
     listen(section, 'pointerleave', event => { if (event.pointerType === 'mouse') { hovered = false; update(); } });
     listen(section, 'focusin', () => { focused = true; update(); });
@@ -80,7 +67,9 @@ export function setupCarousel(track) {
     }, { passive: true });
     listen(track, 'keydown', event => {
         if (event.target !== track) return;
-        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+        if (event.key === ' ') {
+            event.preventDefault(); userPaused = !userPaused; update();
+        } else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
             event.preventDefault(); move(event.key === 'ArrowRight' ? 1 : -1);
         } else if (event.key === 'Home' || event.key === 'End') {
             event.preventDefault(); manualPause();
@@ -134,6 +123,7 @@ export function setupCarousel(track) {
     track.setAttribute('role', 'region');
     track.setAttribute('aria-roledescription', 'carrousel');
     track.setAttribute('aria-labelledby', section.getAttribute('aria-labelledby'));
+    track.setAttribute('aria-describedby', 'carouselHelp');
     const instance = { destroy() {
         stop(); clearTimeout(resumeTimer); clearTimeout(clickTimer);
         abort.abort(); intersection.disconnect(); resize.disconnect(); modal.disconnect();

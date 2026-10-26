@@ -29,8 +29,9 @@
     --offers-ground:var(--app-tint);
     --offers-ink:var(--app-ink);
     --popular-ground:var(--app-section-warm);
-    --popular-surface:var(--app-surface);
-    --popular-muted:var(--app-muted);
+    --popular-surface:#3a3a30;
+    --popular-ink:var(--hero-ink);
+    --popular-muted:#dedccc;
     color-scheme:light
 }
 .dark {
@@ -50,6 +51,9 @@
     --app-error:#ffb2ba;
     --app-error-bg:#42272d;
     --app-section-warm:#24211c;
+    --popular-surface:var(--app-surface);
+    --popular-ink:var(--app-ink);
+    --popular-muted:var(--app-muted);
     color-scheme:dark
 }
 * {
@@ -460,34 +464,6 @@ strong {
     grid-auto-columns:100%;
     cursor:auto
 }
-.carousel-controls {
-    display:flex;
-    gap:8px;
-    align-items:center;
-    margin-top:16px
-}
-.carousel-controls[hidden],.carousel-controls [hidden] {
-    display:none!important
-}
-.carousel-controls button {
-    min-height:44px;
-    border:1px solid var(--app-line);
-    background:var(--app-surface);
-    color:var(--app-ink)
-}
-.carousel-controls button:hover {
-    background:var(--app-tint)
-}
-.carousel-controls .icon-button {
-    font-size:22px
-}
-.carousel-toggle {
-    border-radius:999px;
-    min-width:70px;
-    padding:10px 14px;
-    font-weight:600;
-    font-size:13px
-}
 .featured-grid .product-card {
     display:flex;
     flex-direction:column;
@@ -609,23 +585,17 @@ strong {
     padding:32px var(--app-gutter) 24px
 }
 .menu-feature--popular .section-heading p {
-    color:var(--popular-muted)
+    color:var(--app-muted)
 }
 .menu-feature--popular .section-heading {
-    display:grid;
-    grid-template-columns:minmax(0,1fr) auto
+    display:block
 }
 .menu-feature--popular .section-heading p {
-    grid-column:1
-}
-.menu-feature--popular .carousel-controls {
-    grid-column:2;
-    grid-row:1/3;
-    margin:0
+    margin-top:8px
 }
 .featured-grid .product-card--popular {
     background:var(--popular-surface);
-    color:var(--app-ink)
+    color:var(--popular-ink)
 }
 .product-card--popular .featured-badge {
     background:var(--app-tint);
@@ -1293,6 +1263,16 @@ strong {
     border-left:3px solid var(--app-error);
     padding-left:8px
 }
+.choice-next {
+    width:100%;
+    margin-top:12px;
+    min-height:44px;
+    border:1px solid var(--app-line)
+}
+.choice-next:disabled {
+    cursor:default;
+    opacity:.65
+}
 .option-clear {
     font-size:12px;
     min-height:36px;
@@ -1924,9 +1904,6 @@ body.has-tracker {
     .product-card--popular .product-card__body,
     .menu-feature--popular .product-card:only-child .product-card__body {
         padding:14px 8px 6px
-    }
-    .menu-feature--popular .carousel-controls {
-        margin-top:12px
     }
     .featured-grid .product-card--popular h3 {
         font-size:26px
