@@ -18,6 +18,7 @@
     --app-radius:22px;
     --app-control-radius:14px;
     --app-header:76px;
+    --app-menu-offset:72px;
     --app-gap:20px;
     --app-gutter:24px;
     --app-section-warm:#f3ece3;
@@ -58,7 +59,7 @@
 }
 html {
     scroll-behavior:smooth;
-    scroll-padding-top:calc(var(--app-header) + 160px)
+    scroll-padding-top:calc(var(--app-header) + 16px)
 }
 body {
     margin:0;
@@ -627,7 +628,7 @@ strong {
     top:var(--app-header);
     z-index:25;
     background:var(--app-bg);
-    padding-block:10px 12px
+    padding-block:0 8px
 }
 .store-search {
     position:relative;
@@ -664,6 +665,7 @@ strong {
     display:flex;
     gap:8px;
     overflow-x:auto;
+    overscroll-behavior-x:contain;
     padding:12px 3px 4px;
     margin-inline:-3px;
     scrollbar-width:thin;
@@ -707,7 +709,7 @@ strong {
 }
 .section-block {
     margin-bottom:32px;
-    scroll-margin-top:calc(var(--app-header) + 160px)
+    scroll-margin-top:var(--app-menu-offset)
 }
 .store-category-heading {
     display:flex;
@@ -848,7 +850,7 @@ strong {
 }
 .desktop-basket {
     position:sticky;
-    top:calc(var(--app-header) + 160px);
+    top:calc(var(--app-header) + var(--app-menu-offset) + 16px);
     padding:24px;
     background:var(--app-surface);
     border:1px solid var(--app-line);
@@ -1645,9 +1647,6 @@ strong {
     border-radius:22px;
     background:var(--app-soft)
 }
-.search-muted {
-    display:none!important
-}
 .modal-open {
     overflow:hidden
 }
@@ -2215,7 +2214,7 @@ body.has-tracker {
     min-height:44px
 }
 #menuContent {
-    scroll-margin-top:calc(var(--app-header) + 145px)
+    scroll-margin-top:var(--app-menu-offset)
 }
 /* Featured bands share the ordering frame, with distinct offer and favourite roles. */
 .discovery-row {
@@ -2223,7 +2222,7 @@ body.has-tracker {
     grid-template-columns:minmax(0,1fr);
     gap:0;
     min-width:0;
-    margin:12px calc(-1 * var(--app-gutter)) 32px
+    margin:0 calc(-1 * var(--app-gutter)) 32px
 }
 .discovery-row:not(:has(.menu-feature:not(.hidden))) {
     display:none

@@ -77,42 +77,42 @@
                         Vous pouvez parcourir la carte. Les commandes reprendront à l’ouverture.
                     </p>
                 </div>
+                <div class="discovery-row">
+                    <section id="promotions" class="menu-feature menu-feature--offers hidden" aria-labelledby="promotions-title">
+                        <div class="section-heading">
+                            <h2 id="promotions-title">Les bons plans</h2>
+                            <p>À composer selon vos envies.</p>
+                        </div>
+                        <div id="promotionsGrid" class="featured-grid">
+                        </div>
+                    </section>
+                    <section id="popular" class="menu-feature menu-feature--popular hidden" aria-labelledby="popular-title">
+                        <div class="section-heading">
+                            <h2 id="popular-title">Les incontournables</h2>
+                            <p>La sélection BIGTAC, à votre façon.</p>
+                        </div>
+                        <div id="popularGrid" class="featured-grid">
+                        </div>
+                    </section>
+                </div>
                 <section id="menu-unified" aria-labelledby="menu-title">
                     <div class="store-menu-heading">
-                        <h2 id="menu-title">On mange quoi ?</h2>
+                        <h2 id="menu-title">Notre carte</h2>
                         <p>Tacos, gratinés, burgers… À vous de choisir.</p>
                     </div>
-                    <div id="stickyFilterBar" class="menu-toolbar">
-                        <div class="store-search">
-                            <label for="menuSearch" class="sr-only">Rechercher dans la carte</label>
-                            <i data-feather="search" aria-hidden="true">
+                    <div class="store-search">
+                        <label for="menuSearch" class="sr-only">Rechercher dans la carte</label>
+                        <i data-feather="search" aria-hidden="true">
+                        </i>
+                        <input id="menuSearch" name="menu-search" type="search" placeholder="Un tacos, un burger…" autocomplete="off">
+                        <button class="icon-button hidden" id="clearSearchBtn" type="button" onclick="clearSearch()" aria-label="Effacer la recherche">
+                            <i data-feather="x" aria-hidden="true">
                             </i>
-                            <input id="menuSearch" name="menu-search" type="search" placeholder="Un tacos, un burger…" autocomplete="off">
-                            <button class="icon-button hidden" id="clearSearchBtn" type="button" onclick="clearSearch()" aria-label="Effacer la recherche">
-                                <i data-feather="x" aria-hidden="true">
-                                </i>
-                            </button>
-                        </div>
+                        </button>
+                    </div>
+                    <div id="stickyFilterBar" class="menu-toolbar">
                         <nav id="categoryFilters" aria-label="Catégories du menu">
                         </nav>
-                    </div>
-                    <div class="discovery-row">
-                        <section id="promotions" class="menu-feature menu-feature--offers hidden" aria-labelledby="promotions-title">
-                            <div class="section-heading">
-                                <h2 id="promotions-title">Les bons plans</h2>
-                                <p>À composer selon vos envies.</p>
-                            </div>
-                            <div id="promotionsGrid" class="featured-grid">
-                            </div>
-                        </section>
-                        <section id="popular" class="menu-feature menu-feature--popular hidden" aria-labelledby="popular-title">
-                            <div class="section-heading">
-                                <h2 id="popular-title">Les incontournables</h2>
-                                <p>La sélection BIGTAC, à votre façon.</p>
-                            </div>
-                            <div id="popularGrid" class="featured-grid">
-                            </div>
-                        </section>
                     </div>
                     <p id="searchResultsHint" class="results-hint" role="status" aria-live="polite">
                     </p>
@@ -883,13 +883,12 @@
             document.getElementById('noSearchResults').classList.toggle('hidden', count > 0 || (!term && activeCategory === 'all'));
             document.getElementById('searchResultsHint').textContent = term ? `${count} plat${count > 1 ? 's' : ''} trouvé${count > 1 ? 's' : ''}` : '';
             clearBtn.classList.toggle('hidden', !searchInput.value);
-            ['popular', 'promotions'].forEach(id => document.getElementById(id).classList.toggle('search-muted', Boolean(term) || activeCategory !== 'all'));
         }
         window.filterSection = category => {
             activeCategory = category;
             searchInput.value = '';
             applyMenuFilters();
-            document.getElementById('menuContent').scrollIntoView({ block: 'start', behavior: 'smooth' });
+            document.getElementById('menuContent').scrollIntoView({ block: 'start', behavior: 'instant' });
         };
         searchInput.addEventListener('input', () => { activeCategory = 'all'; applyMenuFilters(); });
         window.clearSearch = () => {

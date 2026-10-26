@@ -70,6 +70,11 @@ try {
         await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'light' });
         if (await page.evaluate(() => document.documentElement.classList.contains('dark'))) await page.locator('#btnDarkMode').click();
         check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${width}: no browsing overflow`);
+        check(await page.evaluate(() => {
+            const sections = ['hero', 'promotions', 'popular', 'menu-unified', 'locations'].map(id => document.getElementById(id));
+            return sections.every((section, index) => !index || (sections[index - 1].getBoundingClientRect().bottom <= section.getBoundingClientRect().top));
+        }), `${width}: hero, offers, favourites and full menu follow the approved hierarchy`);
+        check(await page.locator('#menuSearch').evaluate(el => el.closest('section').id === 'menu-unified'), `${width}: search belongs only to the full menu`);
         check(await page.locator('button:visible').evaluateAll(buttons => buttons.every(button => button.getBoundingClientRect().height >= 44)), `${width}: visible buttons have 44px tap targets`);
         check(await page.locator('.restaurant-intro h1').evaluate(el => el.getBoundingClientRect().height <= parseFloat(getComputedStyle(el).lineHeight) * 2 + 1), `${width}: hero headline fits at most two lines`);
         const heroHeight = await page.locator('#hero').evaluate(el => el.getBoundingClientRect().height);
@@ -84,6 +89,11 @@ try {
             const top = el.getBoundingClientRect().top;
             return top >= parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--app-header')) && top < innerHeight;
         }), `${width}: hero CTA scrolls to the visible menu heading`);
+        check(await page.locator('#menuSearch').evaluate(el => {
+            const search = el.getBoundingClientRect();
+            const chips = document.getElementById('categoryFilters').getBoundingClientRect();
+            return search.top >= document.querySelector('.store-header').getBoundingClientRect().bottom && chips.top >= search.bottom && chips.bottom <= innerHeight;
+        }), `${width}: hero CTA reveals both search and categories`);
         await page.locator('#popularGrid').getByRole('button', { name: 'Choisir Tacos Poulet', exact: true }).click();
         check(await page.locator('#modalItemName').innerText() === 'Tacos Poulet', `${width}: featured favourite opens its original item`);
         check(await page.locator('.option-group').count() === 3, `${width}: featured favourite retains choices and supplements`);
@@ -91,8 +101,12 @@ try {
         await page.locator('#categoryFilters').getByRole('button', { name: 'Burgers', exact: true }).click();
         check(await page.locator('#menuContent .section-block:not(.hidden)').count() === 1, `${width}: category browsing`);
         check(await page.locator('#categoryFilters [aria-pressed=true]').innerText() === 'Burgers', `${width}: accessible category state`);
+        check(await page.locator('#promotions').isVisible() && await page.locator('#popular').isVisible(), `${width}: menu filters leave featured sections visible`);
+        check(await page.locator('#menuContent .product-card:visible').first().evaluate(el => el.getBoundingClientRect().top >= document.getElementById('stickyFilterBar').getBoundingClientRect().bottom), `${width}: category navigation reveals products below the sticky chips`);
+        if (width < 768) check(await page.locator('#categoryFilters').evaluate(el => el.scrollWidth > el.clientWidth), `${width}: category chips scroll horizontally`);
         await page.locator('#menuSearch').fill('aucun-plat-123');
         check(await page.locator('#noSearchResults').isVisible(), `${width}: useful empty search state`);
+        check(await page.locator('#promotions').isVisible() && await page.locator('#popular').isVisible(), `${width}: empty search cannot hide offers or favourites`);
         await page.locator('#clearSearchBtn').click();
         await page.locator('#menuSearch').fill('gratine');
         check(await page.locator('#menuContent .product-card:visible').count() === 1, `${width}: accent-insensitive search`);
