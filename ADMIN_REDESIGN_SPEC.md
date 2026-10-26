@@ -1,6 +1,6 @@
 # BIGTAC Admin 2.0 — Phase 1 specification
 
-Scope: foundation and Overview only. No live Firebase access, deployment, database migration or framework change. The future self-service, multi-restaurant platform supersedes PROJECT_CONTEXT.md's separate-site strategy; tenant isolation is not implemented by this phase.
+This document records the Phase 1 foundation and approved phase boundaries. Phase 2 Orders/Kitchen is now implemented locally; see `backend/ORDERS_PHASE2.md` and `TASK_STATUS.md` for its contract and verification. No live Firebase access, deployment, database migration or framework change. The future self-service, multi-restaurant platform supersedes PROJECT_CONTEXT.md's separate-site strategy; tenant isolation is not implemented.
 
 ## Verified audit
 
@@ -26,6 +26,7 @@ No version-controlled rules, indexes, Functions or emulator configuration were f
 - `assets/admin-model.js`: pure role capabilities, reporting timezone/boundaries and metric definitions, independently testable.
 - `assets/admin-overview.js`: bounded read-only listeners, dashboard rendering, explicit loading/empty/error/cache/truncation states. Uses the existing config document; optional display configuration reads are backward compatible and do not create fields.
 - `admin.html`: shell markup, role-aware routing, fail-closed live UID profile observer and existing operational adapters. Unsubscribe on logout/revocation; discard stale async initialization.
+- Phase 2: `admin-orders-model.js` holds pure order presentation/transition policy; `admin-orders-service.js` holds bounded subscriptions/history and transactional updates; `admin-orders.js`/`admin-orders.css` implement the Orders/Kitchen workspace and receipt/detail views. Old Orders markup/listener/render logic is removed, rather than retained as a competing flow. Backend review artifacts live under `backend/` and are not production configuration.
 - Isolated admin fixture server replaces the Firebase configuration module and **all direct SDK imports before execution**. Browser tests additionally block production Firebase endpoints. No real accounts, orders or images are uploaded.
 
 ## Navigation and permissions
@@ -63,7 +64,7 @@ The owner confirmed that the POS references have no transferable links/files and
 4. **Operations / Settings:** promotions scheduling only with supported backend, delivery assignment, cashier/payment model, safe staff invitations/disabling, configurable restaurant identity/operations.
 5. **Analytics / SaaS readiness:** trusted prices and payment ledger, server aggregates, versioned rules/indexes/emulators, membership/tenant model with isolation tests, performance and full regression. Critical authorization/security work must precede production features that depend on it.
 
-Every migration/deployment requires explicit approval, backup, compatibility plan, rollback and emulator authorization/isolation tests. Phase 1 does not authorize proceeding to Phase 2.
+Every migration/deployment requires explicit approval, backup, compatibility plan, rollback and emulator authorization/isolation tests. The owner explicitly approved Phase 2 continuation after the Phase 1 checkpoint; Phase 3 requires another review.
 
 ## Verification and limits
 

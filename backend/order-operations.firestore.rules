@@ -1,0 +1,36 @@
+// EMULATOR-ONLY policy for Phase 2 staff status transitions.
+// Not a full application ruleset: customer creation, catalog writes and driver operations
+// are intentionally denied here. Review/merge with the complete policy before deployment.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function membership() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function staff() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && membership().get('role', '') in ['admin', 'manager', 'caissier']
+        && membership().get('disabled', false) == false
+        && membership().get('isActive', true) == true
+        && !(membership().get('status', '') in ['disabled', 'inactive']);
+    }
+    function legalTransition() {
+      return (resource.data.status == 'pending' && request.resource.data.status in ['confirmed', 'rejected'])
+        || (resource.data.status == 'confirmed' && request.resource.data.status == 'en_livraison')
+        || (resource.data.status == 'en_livraison' && request.resource.data.status == 'delivered');
+    }
+    match /users/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+    match /orders/{id} {
+      allow get: if staff();
+      allow list: if staff() && request.query.limit != null && request.query.limit <= 1001;
+      allow update: if staff()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && legalTransition();
+      allow create, delete: if false;
+    }
+    match /settings/{id} { allow read: if staff(); allow write: if false; }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

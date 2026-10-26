@@ -114,10 +114,6 @@ html,body { margin:0; height:100%; }
 #views-container :is(input:not([type=checkbox]):not([type=hidden]),select,textarea) { min-height:44px; }
 #views-container .order-card { transition:border-color .15s; box-shadow:none; }
 #views-container .order-card:hover { transform:none; border-color:var(--admin-control); }
-#view-orders>div:first-child>div { flex-wrap:wrap; }
-#view-orders>div:first-child h2 { font-size:22px; }
-#view-orders>div:first-child span { animation:none; }
-#view-orders>div:nth-child(2) { display:none; min-height:48px; }
 #view-driver { position:absolute; inset:0; z-index:1; display:flex; }
 #view-driver.hidden { display:none; }
 #view-driver>nav { position:absolute; padding-bottom:max(8px,env(safe-area-inset-bottom)); }
@@ -141,15 +137,10 @@ html,body { margin:0; height:100%; }
     .admin-bottom-nav .admin-nav-link svg { width:20px; height:20px; }
     .admin-skip { left:16px; }
     .admin-body .admin-toast { bottom:calc(80px + env(safe-area-inset-bottom)); }
-    #view-orders>div:nth-child(2) { display:flex; }
-    #view-orders>div:nth-child(3) { grid-template-columns:minmax(0,1fr); }
-    #view-orders [id^=col-].hidden { display:none!important; }
-    #view-orders [id^=col-]:not(.hidden) { display:flex; }
     #view-menu { flex-direction:column; }
     #view-menu>div:first-child { width:100%; max-height:180px; border-right:0; border-bottom:1px solid var(--admin-border); }
 }
 @media(min-width:1100px) {
-    #view-orders [id^=col-] { display:flex!important; }
 }
 @media(max-width:767px) {
     .admin-page { padding:18px 16px 24px; }
@@ -169,9 +160,6 @@ html,body { margin:0; height:100%; }
     .admin-panel { padding:16px; }
     .admin-kpis { padding:0; }
     .admin-chart { min-height:120px; }
-    #view-orders>div:first-child h2 { font-size:20px; }
-    #view-orders>div:first-child>div>span { font-size:11px; }
-    #view-orders>div:nth-child(2)>button { min-height:44px; padding:8px 12px; }
     #view-menu .grid { grid-template-columns:minmax(0,1fr); }
     #view-menu>div:last-child>div:first-child { flex-wrap:wrap; gap:12px; }
     #view-promotions>div:first-child { flex-wrap:wrap; gap:12px; }

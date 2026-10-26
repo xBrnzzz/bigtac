@@ -136,6 +136,7 @@
         }
     </style>
     <link rel="stylesheet" href="assets/admin.css">
+    <link rel="stylesheet" href="assets/admin-orders.css">
 </head>
 
 <body class="bg-slate-100 text-slate-800 antialiased h-screen overflow-hidden flex flex-col md:flex-row">
@@ -178,84 +179,8 @@
     <!-- MAIN VIEWS CONTAINER -->
     <div id="views-container" class="flex-1 overflow-hidden relative bg-slate-100">
 
-        <!-- VIEW 1: LIVE ORDERS KANBAN BOARD -->
-        <div id="view-orders" class="absolute inset-0 p-4 sm:p-6 flex flex-col gap-4">
-            
-            <!-- Top Controls -->
-            <div class="flex justify-between items-center flex-none">
-                <div class="flex items-center gap-3">
-                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Gestion des Commandes</h2>
-                    <span class="text-xs font-extrabold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Synchronisation en direct
-                    </span>
-                </div>
-            </div>
-
-            <!-- Mobile Column Tabs Switcher -->
-            <div class="flex sm:hidden gap-1.5 pb-1 overflow-x-auto hide-scrollbar flex-none">
-                <button onclick="showOrderCol('pending')" id="mtab-pending" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold border border-brand-500 bg-brand-500 text-white whitespace-nowrap shadow-sm">
-                    Attente (<span id="m-badge-pending">0</span>)
-                </button>
-                <button onclick="showOrderCol('confirmed')" id="mtab-confirmed" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-600 whitespace-nowrap">
-                    Cuisine
-                </button>
-                <button onclick="showOrderCol('delivery')" id="mtab-delivery" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-600 whitespace-nowrap">
-                    Livraison
-                </button>
-                <button onclick="showOrderCol('history')" id="mtab-history" class="flex-1 py-2 px-3 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-600 whitespace-nowrap">
-                    Terminé
-                </button>
-            </div>
-
-            <!-- 4-Column Kanban Grid -->
-            <div class="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-5 min-h-0 overflow-hidden">
-                
-                <!-- COL 1: En Attente -->
-                <div id="col-pending" class="flex flex-col bg-white rounded-3xl border-l-4 border-amber-400 border-y border-r border-slate-200 shadow-sm h-full overflow-hidden">
-                    <div class="p-4 bg-amber-50/60 border-b border-amber-100 flex justify-between items-center shrink-0">
-                        <h3 class="font-extrabold text-amber-900 text-sm flex items-center gap-2">
-                            <i data-feather="clock" class="w-4 h-4 text-amber-600"></i> En Attente
-                        </h3>
-                        <span id="count-pending" class="bg-white text-amber-800 text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm border border-amber-200 font-mono">0</span>
-                    </div>
-                    <div id="list-pending" class="flex-1 overflow-y-auto p-3 space-y-3" aria-live="polite"></div>
-                </div>
-
-                <!-- COL 2: En Cuisine -->
-                <div id="col-confirmed" class="hidden lg:flex flex-col bg-white rounded-3xl border-l-4 border-blue-400 border-y border-r border-slate-200 shadow-sm h-full overflow-hidden">
-                    <div class="p-4 bg-blue-50/60 border-b border-blue-100 flex justify-between items-center shrink-0">
-                        <h3 class="font-extrabold text-blue-900 text-sm flex items-center gap-2">
-                            <i data-feather="loader" class="w-4 h-4 text-blue-600"></i> En Cuisine
-                        </h3>
-                        <span id="count-confirmed" class="bg-white text-blue-800 text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm border border-blue-200 font-mono">0</span>
-                    </div>
-                    <div id="list-confirmed" class="flex-1 overflow-y-auto p-3 space-y-3" aria-live="polite"></div>
-                </div>
-
-                <!-- COL 3: En Livraison -->
-                <div id="col-delivery" class="hidden lg:flex flex-col bg-white rounded-3xl border-l-4 border-purple-400 border-y border-r border-slate-200 shadow-sm h-full overflow-hidden">
-                    <div class="p-4 bg-purple-50/60 border-b border-purple-100 flex justify-between items-center shrink-0">
-                        <h3 class="font-extrabold text-purple-900 text-sm flex items-center gap-2">
-                            <i data-feather="truck" class="w-4 h-4 text-purple-600"></i> En Livraison
-                        </h3>
-                        <span id="count-delivery" class="bg-white text-purple-800 text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm border border-purple-200 font-mono">0</span>
-                    </div>
-                    <div id="list-delivery" class="flex-1 overflow-y-auto p-3 space-y-3" aria-live="polite"></div>
-                </div>
-
-                <!-- COL 4: Terminé -->
-                <div id="col-history" class="hidden lg:flex flex-col bg-white rounded-3xl border-l-4 border-emerald-400 border-y border-r border-slate-200 shadow-sm h-full overflow-hidden">
-                    <div class="p-4 bg-emerald-50/60 border-b border-emerald-100 flex justify-between items-center shrink-0">
-                        <h3 class="font-extrabold text-emerald-900 text-sm flex items-center gap-2">
-                            <i data-feather="check-circle" class="w-4 h-4 text-emerald-600"></i> Terminé
-                        </h3>
-                        <span id="count-history" class="bg-white text-emerald-800 text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm border border-emerald-200 font-mono">0</span>
-                    </div>
-                    <div id="list-history" class="flex-1 overflow-y-auto p-3 space-y-3" aria-live="polite"></div>
-                </div>
-
-            </div>
-        </div>
+        <!-- ORDERS & KITCHEN: rendered by the shared workspace module -->
+        <section id="view-orders" class="hidden"></section>
 
         <!-- VIEW 2: MENU & CARTE MANAGEMENT -->
         <div id="view-menu" class="absolute inset-0 p-4 sm:p-6 hidden flex flex-col">
@@ -665,6 +590,9 @@
         import { profileRole, mayView, roleViews } from './assets/admin-model.js';
         import { mountAdminShell } from './assets/admin-shell.js';
         import { createOverview } from './assets/admin-overview.js';
+        import { createOrderWorkspace } from './assets/admin-orders.js';
+        import { commitOrderTransition, commitDriverAction, operationMessage } from './assets/admin-orders-service.js';
+        import { escapeText as escapeOrderText, textValue as orderText, orderAmount } from './assets/admin-orders-model.js';
         import { 
             firebaseConfig, auth, db, 
             signInWithEmailAndPassword, onAuthStateChanged, signOut, 
@@ -688,7 +616,6 @@
         let currentCategoryFilter = 'all';
         let sortableItems = null;
         let sortableCategories = null;
-        let activeOrdersUnsub = null;
         let driverUnsubscribers = [];
         let profileUnsub = null;
         let settingsUnsub = null;
@@ -700,6 +627,26 @@
         let currentView = null;
         const shell = mountAdminShell();
         const overview = createOverview(document.getElementById('views-container'), view => window.switchView(view));
+        const orderWorkspace = createOrderWorkspace(document.getElementById('view-orders'), {
+            session:orderActor,
+            settings:()=>settingsData,toast:(...args)=>window.showToast(...args)
+        });
+        function orderActor() { return currentUser ? {...currentUser,epoch:workVersion} : null; }
+        const driverPending = new Set();
+        function refreshDriverActions() {
+            document.querySelectorAll('#view-driver button[data-driver-order]').forEach(button=>{
+                const busy=driverPending.has(button.dataset.driverOrder);
+                button.disabled=busy;
+                if(busy){button.dataset.idleLabel ||= button.textContent;button.textContent='Enregistrement…';}
+                else if(button.dataset.idleLabel){button.textContent=button.dataset.idleLabel;delete button.dataset.idleLabel;}
+            });
+        }
+        document.getElementById('view-driver').addEventListener('click',event=>{
+            const button=event.target.closest('button[data-driver-action]');
+            if(!button||button.disabled)return;
+            if(button.dataset.driverAction==='claim')window.claimDelivery(button.dataset.driverOrder);
+            else if(button.dataset.driverAction==='complete')window.markDelivered(button.dataset.driverOrder);
+        });
         function authorized(view) { return !!currentUser && mayView(currentUser.role, view); }
         function requireView(view) {
             if (authorized(view)) return true;
@@ -708,7 +655,7 @@
         }
         function cleanSession() {
             workVersion++;
-            if (activeOrdersUnsub) activeOrdersUnsub(); activeOrdersUnsub = null;
+            orderWorkspace.stop();
             if (settingsUnsub) settingsUnsub(); settingsUnsub = null;
             driverUnsubscribers.forEach(unsubscribe => unsubscribe()); driverUnsubscribers = [];
             overview.stop(); overviewStarted = false; currentView = null;
@@ -745,7 +692,7 @@
         };
 
         function getDeliveryPrice(location) {
-            if (!location) return 0;
+            if (typeof location !== 'string') return 0;
             const match = location.match(/\((\d+)\s*Dh\)/i);
             return match ? parseFloat(match[1]) : 0;
         }
@@ -868,11 +815,12 @@
         function initSettings() {
             settingsUnsub?.();
             const version=workVersion;
+            let saving=false;
             const feedback=document.getElementById('admin-settings-feedback');
             const retry=document.getElementById('admin-settings-retry');
             const inputs=['toggle-store','toggle-whatsapp'].map(id=>document.getElementById(id));
             const publish=config=>{
-                settingsData=config; shell.restaurant(config);
+                settingsData=config; shell.restaurant(config); orderWorkspace.settingsChanged();
                 if (authorized('overview')) {
                     if (overviewStarted) overview.update(config);
                     else { overview.start(config); overviewStarted=true; }
@@ -888,8 +836,8 @@
                 }
                 const config=snap.data(); publish(config);
                 inputs[0].checked=config.isOpen!==false; inputs[1].checked=config.whatsappMode===true;
-                inputs.forEach(input=>input.disabled=false);
-                feedback.textContent=snap.metadata?.fromCache ? 'Réglages en cache. Vérifiez la connexion avant une modification.' : 'Réglages synchronisés.';
+                inputs.forEach(input=>input.disabled=saving);
+                if(!saving)feedback.textContent=snap.metadata?.fromCache ? 'Réglages en cache. Vérifiez la connexion avant une modification.' : 'Réglages synchronisés.';
                 retry.hidden=true;
             },()=>{
                 if (version!==workVersion) return;
@@ -899,19 +847,23 @@
             });
             retry.onclick=()=>{ if (requireView('settings')) initSettings(); };
             async function saveSetting(field,input) {
-                if (!requireView('settings') || settingsData._unavailable) return;
+                if (!requireView('settings') || settingsData._unavailable || saving) return;
                 const checked=input.checked;
                 if (field==='isOpen' && !checked && !confirm('Fermer le restaurant ? Toutes les commandes en attente seront aussi refusées.')) {
                     input.checked=settingsData.isOpen!==false; return;
                 }
-                inputs.forEach(control=>control.disabled=true); feedback.textContent='Enregistrement…';
+                saving=true;inputs.forEach(control=>control.disabled=true); feedback.textContent='Enregistrement…';
                 try {
                     await updateDoc(doc(db,'settings','config'),{ [field]:checked });
                     // Preserve existing closure behavior, with its consequence confirmed above.
                     if (field==='isOpen' && !checked) {
                         const pending=await getDocs(query(collection(db,'orders'),where('status','==','pending')));
                         if (!authorized('settings') || version!==workVersion) return;
-                        if (!pending.empty) { const batch=writeBatch(db); pending.forEach(order=>batch.update(order.ref,{ status:'rejected' })); await batch.commit(); }
+                        const actor=orderActor();
+                        for(const order of pending.docs) {
+                            try { await commitOrderTransition({id:order.id,next:'rejected',expected:'pending',session:actor,currentSession:orderActor}); }
+                            catch(error){if(!['conflict','missing'].includes(error.code))throw error;}
+                        }
                     }
                     if (version!==workVersion) return;
                     feedback.textContent='Modification enregistrée.'; showToast('Réglage enregistré.');
@@ -920,7 +872,7 @@
                     input.checked=field==='isOpen' ? settingsData.isOpen!==false : settingsData.whatsappMode===true;
                     feedback.textContent='Modification non aboutie ou fermeture partielle. Vérifiez les réglages et les commandes avant de réessayer.';
                     showToast('Impossible de terminer la modification. Vérifiez son état.','error');
-                } finally { if (version===workVersion && authorized('settings')) inputs.forEach(control=>control.disabled=false); }
+                } finally { saving=false;if (version===workVersion && authorized('settings')) inputs.forEach(control=>control.disabled=false); }
             }
             inputs[0].onchange=()=>saveSetting('isOpen',inputs[0]);
             inputs[1].onchange=()=>saveSetting('whatsappMode',inputs[1]);
@@ -930,9 +882,9 @@
         window.switchView=async viewId=>{
             if (!requireView(viewId)) return false;
             currentView=viewId; shell.route(viewId);
-            if (viewId!=='orders' && activeOrdersUnsub) { activeOrdersUnsub(); activeOrdersUnsub=null; }
+            if (viewId!=='orders') orderWorkspace.stop();
             if (viewId==='overview') overview.visible();
-            if (viewId==='orders') { initOrders(); if (innerWidth<1100) showOrderCol('pending'); }
+            if (viewId==='orders') orderWorkspace.start();
             if (viewId==='menu') await Promise.all([loadCategories(),loadItems()]);
             if (viewId==='promotions') await loadPromotions();
             if (viewId==='drivers') await loadDrivers();
@@ -943,211 +895,8 @@
             if (currentUser && mayView(currentUser.role,view) && view!==currentView) switchView(view);
         });
 
-        window.showOrderCol = (col) => {
-            ['pending', 'confirmed', 'delivery', 'history'].forEach(c => {
-                const colEl = document.getElementById(`col-${c}`);
-                const tabEl = document.getElementById(`mtab-${c}`);
-                if (colEl) {
-                    colEl.classList.toggle('hidden', c !== col);
-                    colEl.classList.toggle('flex', c === col);
-                }
-                if (tabEl) {
-                    if (c === col) {
-                        tabEl.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold border border-brand-500 bg-brand-500 text-white whitespace-nowrap shadow-sm";
-                    } else {
-                        tabEl.className = "flex-1 py-2 px-3 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-600 whitespace-nowrap";
-                    }
-                }
-            });
-        };
-
-        // --- REAL-TIME ORDERS LISTENER ---
-        function initOrders() {
-            if (activeOrdersUnsub) activeOrdersUnsub();
-
-            const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-            activeOrdersUnsub = onSnapshot(q, snap => {
-                const pending = [], confirmed = [], delivery = [], history = [];
-
-                snap.forEach(docSnap => {
-                    const o = { id: docSnap.id, ...docSnap.data() };
-                    if (o.status === 'pending') pending.push(o);
-                    else if (o.status === 'confirmed') confirmed.push(o);
-                    else if (o.status === 'en_livraison') delivery.push(o);
-                    else history.push(o);
-                });
-
-                const badge = document.getElementById('badge-pending');
-                const mBadge = document.getElementById('m-badge-pending');
-                if (badge) {
-                    badge.innerText = pending.length;
-                    badge.classList.toggle('hidden', pending.length === 0);
-                }
-                if (mBadge) mBadge.innerText = pending.length;
-
-                document.getElementById('count-pending').innerText = pending.length;
-                document.getElementById('count-confirmed').innerText = confirmed.length;
-                document.getElementById('count-delivery').innerText = delivery.length;
-                document.getElementById('count-history').innerText = history.length;
-
-                renderOrderColumn('list-pending', pending, 'pending');
-                renderOrderColumn('list-confirmed', confirmed, 'confirmed');
-                renderOrderColumn('list-delivery', delivery, 'delivery');
-                renderOrderColumn('list-history', history, 'history');
-
-
-            }, err => console.error("Orders listener error:", err));
-        }
-
-        function renderOrderColumn(containerId, orders, type) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            if (orders.length === 0) {
-                const emptyInfo = {
-                    pending: { icon: 'clock', text: 'Aucune commande en attente' },
-                    confirmed: { icon: 'loader', text: 'Rien en préparation' },
-                    delivery: { icon: 'truck', text: 'Aucune livraison en route' },
-                    history: { icon: 'check-circle', text: 'Historique vide' }
-                }[type];
-
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-12 text-slate-300 text-center">
-                        <i data-feather="${emptyInfo.icon}" class="w-8 h-8 mb-2 opacity-40"></i>
-                        <p class="text-xs font-bold text-slate-400">${emptyInfo.text}</p>
-                    </div>
-                `;
-                if (window.feather) feather.replace();
-                return;
-            }
-
-            container.innerHTML = orders.map(o => {
-                const timeStr = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
-
-                let rawPhone = o.customer?.phone || '';
-                let cleanPhone = rawPhone.replace(/\D/g, '');
-                if (cleanPhone.startsWith('0')) cleanPhone = '212' + cleanPhone.substring(1);
-                const waLink = `https://wa.me/${cleanPhone}`;
-
-                // Action buttons based on column
-                let actions = '';
-                if (type === 'pending') {
-                    actions = `
-                        <div class="flex gap-2 mt-3 pt-3 border-t border-slate-100">
-                            <button onclick="setStatus('${o.id}', 'confirmed')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-black transition active:scale-95 shadow-sm">
-                                ENVOYER EN CUISINE
-                            </button>
-                            <button onclick="setStatus('${o.id}', 'rejected')" class="w-10 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl flex items-center justify-center transition active:scale-95" title="Refuser">
-                                <i data-feather="x" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    `;
-                } else if (type === 'confirmed') {
-                    actions = `
-                        <div class="mt-3 pt-3 border-t border-slate-100">
-                            <button onclick="setStatus('${o.id}', 'en_livraison')" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl text-xs font-black transition active:scale-95 flex items-center justify-center gap-2 shadow-sm">
-                                <i data-feather="truck" class="w-3.5 h-3.5"></i> PRÊT POUR LIVRAISON
-                            </button>
-                        </div>
-                    `;
-                } else if (type === 'delivery') {
-                    const driverBadge = o.deliveryGuyName
-                        ? `<span class="text-xs font-bold bg-purple-50 text-purple-700 px-2.5 py-1 rounded-full mb-2 inline-flex items-center gap-1.5"><i data-feather="package" class="w-3 h-3"></i> ${o.deliveryGuyName}</span>`
-                        : `<span class="text-xs font-bold bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full mb-2 inline-flex items-center gap-1.5"><i data-feather="clock" class="w-3 h-3"></i> En attente livreur</span>`;
-                    actions = `
-                        <div class="mt-3 pt-3 border-t border-slate-100 flex flex-col items-center">
-                            ${driverBadge}
-                            <button onclick="setStatus('${o.id}', 'delivered')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-xs font-black transition active:scale-95 flex items-center justify-center gap-1.5 shadow-sm">
-                                <i data-feather="check" class="w-3.5 h-3.5"></i> MARQUER LIVRÉ
-                            </button>
-                        </div>
-                    `;
-                } else if (type === 'history') {
-                    if (o.deliveryGuyName && o.type === 'livraison') {
-                        const fee = getDeliveryPrice(o.location);
-                        actions = `
-                            <div class="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
-                                <span class="font-bold text-slate-500 flex items-center gap-1"><i data-feather="user" class="w-3 h-3"></i> ${o.deliveryGuyName}</span>
-                                <span class="font-black text-emerald-600">+${fee.toFixed(2)} Dh</span>
-                            </div>
-                        `;
-                    }
-                }
-
-                // Items list
-                const itemsHtml = (o.items || []).map(i => {
-                    const optText = (i.options && i.options.length > 0)
-                        ? i.options.map(opt => `<div class="text-[11px] text-slate-400 pl-3 border-l-2 border-slate-200 ml-1 mt-0.5">• ${opt}</div>`).join('')
-                        : '';
-                    return `
-                        <div class="text-xs font-bold text-slate-800">
-                            <span class="text-brand-600 mr-1">${i.qty}x</span> ${i.name}
-                            ${optText}
-                        </div>
-                    `;
-                }).join('');
-
-                const noteHtml = (o.customer?.note && o.customer.note.trim())
-                    ? `<div class="bg-amber-50 border border-amber-200/80 p-2.5 rounded-xl text-xs text-amber-900 mb-2 font-medium"><strong>Note:</strong> ${o.customer.note}</div>`
-                    : '';
-
-                return `
-                    <div class="order-card bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col">
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="flex items-center gap-2">
-                                <span class="font-black text-slate-900 text-sm">${o.customer?.name || 'Client'}</span>
-                                <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">#${o.shortId || '--'}</span>
-                            </div>
-                            <div class="flex gap-1">
-                                <a href="tel:${cleanPhone}" class="p-1.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg transition" title="Appeler">
-                                    <i data-feather="phone" class="w-3.5 h-3.5"></i>
-                                </a>
-                                <a href="${waLink}" target="_blank" class="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg transition" title="WhatsApp">
-                                    <i data-feather="message-circle" class="w-3.5 h-3.5"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-2 mb-2 text-xs">
-                            <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-brand-50 text-brand-700">${(o.type || '').replace('_', ' ')}</span>
-                            <span class="text-[10px] font-mono text-slate-400 flex items-center gap-1">
-                                <i data-feather="clock" class="w-3 h-3"></i> ${timeStr}
-                            </span>
-                        </div>
-
-                        <p class="text-xs text-slate-500 mb-2.5 flex items-start gap-1">
-                            <i data-feather="map-pin" class="w-3 h-3 shrink-0 mt-0.5 text-slate-400"></i>
-                            <span class="line-clamp-2">${o.location || 'Sur place'}</span>
-                        </p>
-
-                        ${noteHtml}
-
-                        <div class="space-y-1.5 mb-2.5">
-                            ${itemsHtml}
-                        </div>
-
-                        <div class="mt-auto pt-2 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-400 uppercase">Total</span>
-                            <span class="font-black text-brand-600 text-base font-mono">${parseFloat(o.total || 0).toFixed(2)} Dh</span>
-                        </div>
-
-                        ${actions}
-                    </div>
-                `;
-            }).join('');
-
-            if (window.feather) feather.replace();
-        }
-
-        window.setStatus = async (id, newStatus) => {
-            try {
-                await updateDoc(doc(db, 'orders', id), { status: newStatus });
-                showToast(`Commande mise à jour: ${newStatus}`);
-            } catch (e) {
-                console.error("Status update error:", e);
-                showToast("Erreur lors de la mise à jour", "error");
-            }
-        };
+        window.showOrderCol = column => orderWorkspace.column(column);
+        window.setStatus = (id,status) => requireView('orders') ? orderWorkspace.changeStatus(id,status) : false;
 
         // --- CATEGORIES & MENU CRUD ---
         async function loadCategories() {
@@ -1970,7 +1719,7 @@
 
                 const available = [];
                 snap.forEach(d => {
-                    const data = { id: d.id, ...d.data() };
+                    const data = { ...d.data(), id: d.id };
                     if (!data.deliveryGuyId) available.push(data);
                 });
 
@@ -1981,7 +1730,7 @@
 
                 container.innerHTML = available.map(order => {
                     const fee = getDeliveryPrice(order.location);
-                    let rawPhone = order.customer?.phone || '';
+                    let rawPhone = orderText(order.customer?.phone);
                     let cleanPhone = rawPhone.replace(/\D/g, '');
                     if (cleanPhone.startsWith('0')) cleanPhone = '212' + cleanPhone.substring(1);
 
@@ -1989,17 +1738,17 @@
                         <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h3 class="font-black text-slate-900 text-base">${order.customer?.name}</h3>
+                                    <h3 class="font-black text-slate-900 text-base">${escapeOrderText(orderText(order.customer?.name,'Client'))}</h3>
                                     <p class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
-                                        <i data-feather="map-pin" class="w-3.5 h-3.5 text-slate-400"></i> ${order.location}
+                                        <i data-feather="map-pin" class="w-3.5 h-3.5 text-slate-400"></i> ${escapeOrderText(orderText(order.location,'Destination non renseignée'))}
                                     </p>
                                     <span class="text-xs font-black text-emerald-600 mt-1 inline-block">+${fee.toFixed(2)} Dh (Votre Gain)</span>
                                 </div>
-                                <span class="text-xl font-black text-slate-900 font-mono">${parseFloat(order.total || 0).toFixed(2)} Dh</span>
+                                <span class="text-xl font-black text-slate-900 font-mono">${escapeOrderText(orderAmount(order.total))}</span>
                             </div>
 
                             <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                                <a href="https://wa.me/${cleanPhone}" target="_blank" class="py-2.5 bg-emerald-50 text-emerald-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
+                                <a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener" class="py-2.5 bg-emerald-50 text-emerald-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
                                     <i data-feather="message-circle" class="w-4 h-4"></i> WhatsApp
                                 </a>
                                 <a href="tel:${cleanPhone}" class="py-2.5 bg-blue-50 text-blue-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
@@ -2007,42 +1756,30 @@
                                 </a>
                             </div>
 
-                            <button onclick="claimDelivery('${order.id}')" class="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl font-black text-sm shadow-md transition active:scale-95">
+                            <button data-driver-action="claim" data-driver-order="${escapeOrderText(order.id)}" class="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl font-black text-sm shadow-md transition active:scale-95">
                                 PRENDRE CETTE COURSE
                             </button>
                         </div>
                     `;
                 }).join('');
 
+                refreshDriverActions();
                 if (window.feather) feather.replace();
             });
 
             driverUnsubscribers.push(unsub);
         }
 
-        window.claimDelivery = async (orderId) => {
-            if (!currentUser) return;
+        window.claimDelivery = async orderId => {
+            if(driverPending.has(orderId))return false;
+            const actor=orderActor(),version=workVersion;
+            driverPending.add(orderId);refreshDriverActions();
             try {
-                await runTransaction(db, async transaction => {
-                    const orderRef = doc(db, 'orders', orderId);
-                    const snap = await transaction.get(orderRef);
-                    if (!snap.exists()) throw new Error("Commande introuvable");
-
-                    const data = snap.data();
-                    if (data.deliveryGuyId) throw new Error("Course déjà prise par un autre livreur !");
-
-                    transaction.update(orderRef, {
-                        deliveryGuyId: currentUser.uid,
-                        deliveryGuyName: currentUser.name,
-                        claimedAt: serverTimestamp()
-                    });
-                });
-
-                showToast("Course acceptée ! Retrouvez-la dans 'Mes Courses'");
-                switchDriverTab('deliveries');
-            } catch (err) {
-                showToast(err.message, "error");
-            }
+                await commitDriverAction({id:orderId,kind:'claim',session:actor,currentSession:orderActor});
+                if(version===workVersion){showToast('Course acceptée. Retrouvez-la dans Mes courses.');switchDriverTab('deliveries');}
+                return true;
+            } catch(error){if(version===workVersion)showToast(operationMessage(error),'error');return false;}
+            finally{driverPending.delete(orderId);refreshDriverActions();}
         };
 
         function listenToMyDeliveries() {
@@ -2065,9 +1802,9 @@
 
                 container.innerHTML = '';
                 snap.forEach(d => {
-                    const order = { id: d.id, ...d.data() };
+                    const order = { ...d.data(), id: d.id };
                     const fee = getDeliveryPrice(order.location);
-                    let rawPhone = order.customer?.phone || '';
+                    let rawPhone = orderText(order.customer?.phone);
                     let cleanPhone = rawPhone.replace(/\D/g, '');
                     if (cleanPhone.startsWith('0')) cleanPhone = '212' + cleanPhone.substring(1);
 
@@ -2075,15 +1812,15 @@
                         <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h3 class="font-black text-slate-900 text-base">${order.customer?.name}</h3>
-                                    <p class="text-xs text-slate-500 mt-0.5">${order.location}</p>
+                                    <h3 class="font-black text-slate-900 text-base">${escapeOrderText(orderText(order.customer?.name,'Client'))}</h3>
+                                    <p class="text-xs text-slate-500 mt-0.5">${escapeOrderText(orderText(order.location,'Destination non renseignée'))}</p>
                                     <span class="text-xs font-black text-emerald-600 mt-1 inline-block">+${fee.toFixed(2)} Dh</span>
                                 </div>
-                                <span class="text-xl font-black text-slate-900 font-mono">${parseFloat(order.total || 0).toFixed(2)} Dh</span>
+                                <span class="text-xl font-black text-slate-900 font-mono">${escapeOrderText(orderAmount(order.total))}</span>
                             </div>
 
                             <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                                <a href="https://wa.me/${cleanPhone}" target="_blank" class="py-2.5 bg-emerald-50 text-emerald-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
+                                <a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener" class="py-2.5 bg-emerald-50 text-emerald-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
                                     <i data-feather="message-circle" class="w-4 h-4"></i> WhatsApp
                                 </a>
                                 <a href="tel:${cleanPhone}" class="py-2.5 bg-blue-50 text-blue-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
@@ -2091,30 +1828,31 @@
                                 </a>
                             </div>
 
-                            <button onclick="markDelivered('${order.id}')" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-md transition active:scale-95">
-                                ✓ LIVRÉ & ENCAISSÉ
+                            <button data-driver-action="complete" data-driver-order="${escapeOrderText(order.id)}" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-md transition active:scale-95">
+                                Confirmer la livraison
                             </button>
                         </div>
                     `;
                 });
 
+                refreshDriverActions();
                 if (window.feather) feather.replace();
             });
 
             driverUnsubscribers.push(unsub);
         }
 
-        window.markDelivered = async (orderId) => {
-            if (!confirm("Confirmer la livraison et l'encaissement ?")) return;
+        window.markDelivered = async orderId => {
+            if(driverPending.has(orderId))return false;
+            if(!confirm('Confirmer la livraison ? Cette action ne confirme pas un encaissement.'))return false;
+            const actor=orderActor(),version=workVersion;
+            driverPending.add(orderId);refreshDriverActions();
             try {
-                await updateDoc(doc(db, 'orders', orderId), {
-                    status: 'delivered',
-                    deliveredAt: serverTimestamp()
-                });
-                showToast("Livraison confirmée avec succès !");
-            } catch (err) {
-                showToast("Erreur: " + err.message, "error");
-            }
+                await commitDriverAction({id:orderId,kind:'complete',session:actor,currentSession:orderActor});
+                if(version===workVersion)showToast('Livraison confirmée.');
+                return true;
+            } catch(error){if(version===workVersion)showToast(operationMessage(error),'error');return false;}
+            finally{driverPending.delete(orderId);refreshDriverActions();}
         };
 
         // Legacy handler guards are defense in depth, not server authorization.
