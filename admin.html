@@ -135,6 +135,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="assets/admin.css">
 </head>
 
 <body class="bg-slate-100 text-slate-800 antialiased h-screen overflow-hidden flex flex-col md:flex-row">
@@ -151,7 +152,7 @@
                 <div class="w-20 h-20 mx-auto mb-4 rounded-2xl overflow-hidden p-1 shadow-md bg-stone-900 flex items-center justify-center">
                     <img src="assets/logo.png" alt="BIGTAC" class="w-full h-full object-contain" onerror="this.src='assets/snack.png'">
                 </div>
-                <h1 class="text-2xl font-black text-slate-900 tracking-tight">BIGTAC Studio</h1>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight">BIGTAC Studio</h2>
                 <p class="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider">Connexion Administration</p>
             </div>
             
@@ -173,144 +174,6 @@
             </form>
         </div>
     </div>
-
-    <!-- MOBILE HEADER BAR -->
-    <header class="md:hidden bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 flex-none z-30 shadow-sm">
-        <div class="flex items-center gap-2.5">
-            <img src="assets/logo.png" alt="BIGTAC" class="h-8 w-8 object-contain rounded-lg bg-black p-0.5" onerror="this.src='assets/snack.png'">
-            <span class="font-extrabold text-base tracking-tight text-slate-900">BIGTAC <span class="text-brand-500 text-xs uppercase">Studio</span></span>
-        </div>
-        <button onclick="toggleMobileMenu()" class="p-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition" aria-label="Menu mobile">
-            <i data-feather="menu" class="w-5 h-5"></i>
-        </button>
-    </header>
-
-    <!-- MOBILE DROPDOWN MENU -->
-    <div id="mobile-menu" class="md:hidden hidden absolute top-16 left-0 right-0 bg-white shadow-2xl border-b border-slate-200 z-40 p-4 space-y-2 animate-slide-down">
-        <!-- Daily Revenue Card -->
-        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 mb-3">
-            <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Chiffre d'Affaires du Jour</span>
-            <div id="mobile-daily-revenue" class="text-2xl font-black text-slate-900 mt-0.5 font-mono">0.00 <span class="text-sm font-bold text-slate-400">Dh</span></div>
-        </div>
-
-        <!-- Store Switches -->
-        <div class="border-t border-slate-100 pt-3 pb-2 space-y-3 px-1">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-700">Restaurant Ouvert</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="mobile-toggle-store">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-            <div class="flex items-center justify-between">
-                <div>
-                    <span class="text-xs font-bold text-slate-700 block">Mode WhatsApp</span>
-                    <span class="text-[10px] text-slate-400">Commandes directes WhatsApp</span>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="mobile-toggle-whatsapp">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <nav class="border-t border-slate-100 pt-2 space-y-1">
-            <button onclick="switchView('orders'); toggleMobileMenu()" class="w-full text-left p-3 font-bold text-sm rounded-xl hover:bg-slate-100 flex items-center gap-3">
-                <i data-feather="shopping-bag" class="w-4 h-4 text-brand-500"></i> Commandes
-            </button>
-            <button onclick="switchView('menu'); toggleMobileMenu()" class="w-full text-left p-3 font-bold text-sm rounded-xl hover:bg-slate-100 flex items-center gap-3">
-                <i data-feather="grid" class="w-4 h-4 text-brand-500"></i> Menu & Carte
-            </button>
-            <button onclick="switchView('promotions'); toggleMobileMenu()" class="w-full text-left p-3 font-bold text-sm rounded-xl hover:bg-slate-100 flex items-center gap-3">
-                <i data-feather="gift" class="w-4 h-4 text-brand-500"></i> Promotions
-            </button>
-            <button onclick="switchView('drivers'); toggleMobileMenu()" class="w-full text-left p-3 font-bold text-sm rounded-xl hover:bg-slate-100 flex items-center gap-3">
-                <i data-feather="users" class="w-4 h-4 text-brand-500"></i> Utilisateurs & Livreurs
-            </button>
-            <div class="border-t border-slate-100 my-1 pt-1"></div>
-            <button onclick="signOut(auth); toggleMobileMenu()" class="w-full text-left p-3 font-bold text-sm text-red-600 rounded-xl hover:bg-red-50 flex items-center gap-3">
-                <i data-feather="log-out" class="w-4 h-4"></i> Déconnexion
-            </button>
-        </nav>
-    </div>
-
-    <!-- DESKTOP SIDEBAR -->
-    <aside class="w-64 bg-white border-r border-slate-200 flex-col hidden md:flex z-20 shrink-0">
-        <!-- Logo Area -->
-        <div class="p-6 flex items-center gap-3 border-b border-slate-100">
-            <div class="w-10 h-10 rounded-xl bg-stone-900 p-1 flex items-center justify-center shrink-0 shadow">
-                <img src="assets/logo.png" alt="BIGTAC" class="w-full h-full object-contain" onerror="this.src='assets/snack.png'">
-            </div>
-            <div>
-                <h1 class="font-black text-lg leading-none tracking-tight text-slate-900">BIGTAC</h1>
-                <span class="text-[10px] font-black text-brand-500 uppercase tracking-widest">Studio Contrôle</span>
-            </div>
-        </div>
-
-        <!-- Daily Revenue Card -->
-        <div class="px-5 py-4">
-            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 shadow-sm">
-                <div class="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Chiffre du Jour</div>
-                <div id="daily-revenue" class="text-2xl font-black text-slate-900 font-mono tracking-tight">0.00 <span class="text-xs font-bold text-slate-400">Dh</span></div>
-            </div>
-        </div>
-
-        <!-- Navigation Links -->
-        <nav class="flex-1 px-3 space-y-1.5 mt-1 overflow-y-auto">
-            <button onclick="switchView('orders')" id="nav-orders" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl font-bold text-sm text-brand-600 bg-brand-50 transition">
-                <i data-feather="shopping-bag" class="w-4 h-4"></i>
-                <span>Commandes</span>
-                <span id="badge-pending" class="ml-auto bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full hidden">0</span>
-            </button>
-
-            <button onclick="switchView('menu')" id="nav-menu" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50 transition">
-                <i data-feather="grid" class="w-4 h-4"></i>
-                <span>Menu & Carte</span>
-            </button>
-
-            <button onclick="switchView('promotions')" id="nav-promotions" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50 transition">
-                <i data-feather="gift" class="w-4 h-4"></i>
-                <span>Promotions</span>
-            </button>
-
-            <button onclick="switchView('drivers')" id="nav-drivers" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl font-bold text-sm text-slate-500 hover:bg-slate-50 transition">
-                <i data-feather="users" class="w-4 h-4"></i>
-                <span>Utilisateurs</span>
-            </button>
-        </nav>
-
-        <!-- Settings Switches Area -->
-        <div class="px-5 py-4 border-t border-slate-100 space-y-3.5 bg-slate-50/50">
-            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Paramètres Directs</div>
-
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-700">Restaurant Ouvert</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="toggle-store">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <div class="flex items-center justify-between">
-                <div>
-                    <span class="text-xs font-bold text-slate-700 block">Mode WhatsApp</span>
-                    <span class="text-[9px] text-slate-400">Direct vers WhatsApp</span>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="toggle-whatsapp">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <!-- Sign Out Button -->
-        <div class="p-4 border-t border-slate-100">
-            <button id="logout-btn" class="w-full flex items-center justify-center gap-2 text-xs font-bold text-red-600 hover:bg-red-50 py-3 rounded-xl transition">
-                <i data-feather="log-out" class="w-4 h-4"></i>
-                <span>Déconnexion</span>
-            </button>
-        </div>
-    </aside>
 
     <!-- MAIN VIEWS CONTAINER -->
     <div id="views-container" class="flex-1 overflow-hidden relative bg-slate-100">
@@ -474,19 +337,19 @@
                     <h3 class="font-extrabold text-base text-slate-900 mb-4">Créer un Nouvel Utilisateur</h3>
                     <form id="user-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
                         <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Nom Complet</label>
+                            <label for="user-name" class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Nom Complet</label>
                             <input type="text" id="user-name" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm" placeholder="Ex: Karim Alami" required>
                         </div>
                         <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Email</label>
+                            <label for="user-email" class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Email</label>
                             <input type="email" id="user-email" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="karim@bigtac.ma" required>
                         </div>
                         <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Mot de passe</label>
+                            <label for="user-password" class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Mot de passe</label>
                             <input type="password" id="user-password" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Min. 6 caractères" required minlength="6">
                         </div>
                         <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Rôle</label>
+                            <label for="user-role" class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Rôle</label>
                             <select id="user-role" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold">
                                 <option value="livreur">Livreur</option>
                                 <option value="caissier">Caissier</option>
@@ -799,6 +662,9 @@
 
     <!-- JAVASCRIPT LOGIC MODULE -->
     <script type="module">
+        import { profileRole, mayView, roleViews } from './assets/admin-model.js';
+        import { mountAdminShell } from './assets/admin-shell.js';
+        import { createOverview } from './assets/admin-overview.js';
         import { 
             firebaseConfig, auth, db, 
             signInWithEmailAndPassword, onAuthStateChanged, signOut, 
@@ -824,6 +690,34 @@
         let sortableCategories = null;
         let activeOrdersUnsub = null;
         let driverUnsubscribers = [];
+        let profileUnsub = null;
+        let settingsUnsub = null;
+        let sessionVersion = 0;
+        let workVersion = 0;
+        let settingsData = { _unavailable: true };
+        let overviewStarted = false;
+        let previewsReady = false;
+        let currentView = null;
+        const shell = mountAdminShell();
+        const overview = createOverview(document.getElementById('views-container'), view => window.switchView(view));
+        function authorized(view) { return !!currentUser && mayView(currentUser.role, view); }
+        function requireView(view) {
+            if (authorized(view)) return true;
+            showToast('Cette action n’est pas autorisée pour votre compte.', 'error');
+            return false;
+        }
+        function cleanSession() {
+            workVersion++;
+            if (activeOrdersUnsub) activeOrdersUnsub(); activeOrdersUnsub = null;
+            if (settingsUnsub) settingsUnsub(); settingsUnsub = null;
+            driverUnsubscribers.forEach(unsubscribe => unsubscribe()); driverUnsubscribers = [];
+            overview.stop(); overviewStarted = false; currentView = null;
+            currentUser = null; categories = []; items = [];
+            sortableItems?.destroy(); sortableItems = null;
+            sortableCategories?.destroy(); sortableCategories = null;
+            settingsData = { _unavailable: true }; shell.hideSession();
+            for (const id of ['list-pending','list-confirmed','list-delivery','list-history','available-runs-list','my-deliveries-list','drivers-table-body']) document.getElementById(id)?.replaceChildren();
+        }
 
         // --- TOAST NOTIFICATION SYSTEM ---
         window.showToast = (msg, type = 'success') => {
@@ -832,10 +726,13 @@
             const icon = type === 'success' ? 'check' : type === 'error' ? 'alert-circle' : 'info';
 
             container.className = `fixed bottom-6 right-6 ${bgClass} text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 z-[200] text-sm font-bold transition-all duration-300 opacity-0 translate-y-4 pointer-events-none`;
+            container.classList.add('admin-toast');
+            container.setAttribute('role', 'status');
             container.innerHTML = `
                 <i data-feather="${icon}" class="w-4 h-4 shrink-0"></i>
-                <span>${msg}</span>
+                <span></span>
             `;
+            container.querySelector('span').textContent = msg;
             document.body.appendChild(container);
             if (window.feather) feather.replace();
 
@@ -861,75 +758,37 @@
         }
 
         // --- AUTHENTICATION STATE OBSERVER ---
-        onAuthStateChanged(auth, async user => {
-            if (user) {
-                try {
-                    let userProfile = null;
-                    const userDoc = await getDoc(doc(db, 'users', user.uid));
-                    if (userDoc.exists()) {
-                        userProfile = userDoc.data();
-                    } else {
-                        // Fallback: check if account was registered by email
-                        try {
-                            const emailQuery = query(collection(db, 'users'), where('email', '==', user.email));
-                            const emailSnap = await getDocs(emailQuery);
-                            if (!emailSnap.empty) {
-                                userProfile = emailSnap.docs[0].data();
-                            }
-                        } catch (qErr) {
-                            console.warn("Could not query user by email:", qErr);
-                        }
-                    }
-
-                    // Auto-bootstrap profile for valid Firebase Auth user if missing in Firestore
-                    if (!userProfile) {
-                        userProfile = {
-                            name: user.displayName || (user.email ? user.email.split('@')[0] : 'Admin'),
-                            email: user.email || '',
-                            role: 'admin'
-                        };
-                        try {
-                            await setDoc(doc(db, 'users', user.uid), {
-                                uid: user.uid,
-                                ...userProfile,
-                                createdAt: serverTimestamp()
-                            }, { merge: true });
-                        } catch (writeErr) {
-                            console.warn("Could not auto-provision user Firestore doc:", writeErr);
-                        }
-                    }
-
-                    currentUser = { uid: user.uid, ...userProfile };
-                    const role = (currentUser.role || 'admin').toLowerCase().trim();
-
-                    // Hide login modal
-                    const loginSection = document.getElementById('login-section');
-                    if (loginSection) loginSection.classList.add('hidden');
-
-                    if (role === 'delivery' || role === 'livreur') {
-                        initDriverApp();
-                    } else {
-                        // Admin, manager, caissier, etc.
-                        initApp(role);
-                    }
-                } catch (e) {
-                    console.error('User profile resolution error:', e);
-                    // Safe fallback: grant admin access rather than kicking out valid authenticated users
-                    currentUser = { uid: user.uid, email: user.email, role: 'admin' };
-                    const loginSection = document.getElementById('login-section');
-                    if (loginSection) loginSection.classList.add('hidden');
-                    initApp('admin');
+        function resolveSession(user) {
+            const version = ++sessionVersion;
+            profileUnsub?.(); profileUnsub = null; cleanSession();
+            if (!user) { document.getElementById('login-section').classList.remove('hidden'); return; }
+            shell.deny('Vérification de votre accès au restaurant…');
+            profileUnsub = onSnapshot(doc(db, 'users', user.uid), {includeMetadataChanges:true}, snapshot => {
+                if (version !== sessionVersion) return;
+                if (snapshot.metadata?.fromCache || snapshot.metadata?.hasPendingWrites) {
+                    cleanSession(); shell.deny('Votre accès doit être vérifié en ligne. Vérifiez votre connexion puis réessayez.'); return;
                 }
-            } else {
-                currentUser = null;
-                // Clean up listeners
-                if (activeOrdersUnsub) { activeOrdersUnsub(); activeOrdersUnsub = null; }
-                driverUnsubscribers.forEach(u => u());
-                driverUnsubscribers = [];
-                const loginSection = document.getElementById('login-section');
-                if (loginSection) loginSection.classList.remove('hidden');
-            }
-        });
+                const profile = snapshot.exists() ? snapshot.data() : null;
+                const role = profileRole(profile);
+                if (!role) {
+                    cleanSession();
+                    shell.deny('Aucun profil équipe actif et reconnu pour ce compte. Demandez à un administrateur de vérifier votre accès.');
+                    return;
+                }
+                if (currentUser?.role === role) return;
+                cleanSession();
+                currentUser = { ...profile, uid: user.uid, role };
+                shell.showSession(currentUser, role);
+                if (role === 'livreur') initDriverApp();
+                else initApp(role, version);
+            }, () => {
+                if (version !== sessionVersion) return;
+                cleanSession(); shell.deny('Votre profil équipe ne peut pas être vérifié. Vérifiez votre connexion puis réessayez.');
+            });
+        }
+        onAuthStateChanged(auth, resolveSession);
+        document.getElementById('admin-access-retry').onclick = () => resolveSession(auth.currentUser || null);
+        document.getElementById('admin-access-logout').onclick = () => signOut(auth);
 
         document.getElementById('login-form').addEventListener('submit', async e => {
             e.preventDefault();
@@ -975,40 +834,17 @@
         });
 
         window.toggleMobileMenu = () => {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
+            document.getElementById('admin-more-button').click();
         };
 
         // --- MAIN APP INITIALIZATION ---
-        async function initApp(role) {
-            await Promise.all([
-                loadCategories(),
-                loadItems(),
-                loadPromotions()
-            ]);
-            initOrders();
-            initSettings();
+        async function initApp(role, version) {
+            if (authorized('settings')) initSettings();
+            if (version !== sessionVersion || !currentUser) return;
+            const requested = location.hash.slice(1);
+            switchView(mayView(role, requested) ? requested : roleViews[role][0]);
 
-            // Role-based UI visibility
-            const navUsers = document.getElementById('nav-drivers');
-            const navMenu = document.getElementById('nav-menu');
-            const navPromos = document.getElementById('nav-promotions');
-
-            if (role === 'admin') {
-                if (navUsers) navUsers.classList.remove('hidden');
-                if (navMenu) navMenu.classList.remove('hidden');
-                if (navPromos) navPromos.classList.remove('hidden');
-            } else if (role === 'manager') {
-                if (navUsers) navUsers.classList.add('hidden');
-                if (navMenu) navMenu.classList.remove('hidden');
-                if (navPromos) navPromos.classList.remove('hidden');
-            } else if (role === 'caissier') {
-                if (navUsers) navUsers.classList.add('hidden');
-                if (navMenu) navMenu.classList.add('hidden');
-                if (navPromos) navPromos.classList.add('hidden');
-            }
-
-            switchView('orders');
-
+            if (!previewsReady) {
             const setupPreview = (fileId, imgId) => {
                 const el = document.getElementById(fileId);
                 if (el) {
@@ -1022,115 +858,90 @@
             setupPreview('input-image-file', 'image-preview');
             setupPreview('promo-image-file', 'promo-image-preview');
             setupPreview('cat-image-file', 'cat-image-preview');
+            previewsReady = true;
+            }
 
             if (window.feather) feather.replace();
         }
 
-        // --- STORE SETTINGS & REVENUE ---
+        // Read-only initialization. Missing configuration never creates production data.
         function initSettings() {
-            const configRef = doc(db, 'settings', 'config');
-            onSnapshot(configRef, (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    const isOpen = data.isOpen !== false;
-                    const waMode = data.whatsappMode === true;
-
-                    document.getElementById('toggle-store').checked = isOpen;
-                    document.getElementById('toggle-whatsapp').checked = waMode;
-
-                    const mStore = document.getElementById('mobile-toggle-store');
-                    const mWa = document.getElementById('mobile-toggle-whatsapp');
-                    if (mStore) mStore.checked = isOpen;
-                    if (mWa) mWa.checked = waMode;
-                } else {
-                    setDoc(configRef, { isOpen: true, whatsappMode: false });
-                }
-            }, (err) => console.warn("Settings listener notice:", err));
-
-            const handleStoreToggle = async (isChecked) => {
-                await updateDoc(configRef, { isOpen: isChecked });
-                showToast(`Restaurant ${isChecked ? 'ouvert' : 'fermé'}`);
-
-                if (!isChecked) {
-                    const batch = writeBatch(db);
-                    const q = query(collection(db, "orders"), where("status", "==", "pending"));
-                    const snap = await getDocs(q);
-                    snap.forEach(d => batch.update(d.ref, { status: 'rejected' }));
-                    if (!snap.empty) {
-                        await batch.commit();
-                        showToast(`${snap.size} commandes en attente annulées`, 'info');
-                    }
+            settingsUnsub?.();
+            const version=workVersion;
+            const feedback=document.getElementById('admin-settings-feedback');
+            const retry=document.getElementById('admin-settings-retry');
+            const inputs=['toggle-store','toggle-whatsapp'].map(id=>document.getElementById(id));
+            const publish=config=>{
+                settingsData=config; shell.restaurant(config);
+                if (authorized('overview')) {
+                    if (overviewStarted) overview.update(config);
+                    else { overview.start(config); overviewStarted=true; }
                 }
             };
-
-            document.getElementById('toggle-store').addEventListener('change', (e) => handleStoreToggle(e.target.checked));
-            const mStore = document.getElementById('mobile-toggle-store');
-            if (mStore) mStore.addEventListener('change', (e) => handleStoreToggle(e.target.checked));
-
-            const handleWaToggle = async (isChecked) => {
-                await updateDoc(configRef, { whatsappMode: isChecked });
-                showToast(`Mode WhatsApp ${isChecked ? 'activé' : 'désactivé'}`);
-            };
-
-            document.getElementById('toggle-whatsapp').addEventListener('change', (e) => handleWaToggle(e.target.checked));
-            const mWa = document.getElementById('mobile-toggle-whatsapp');
-            if (mWa) mWa.addEventListener('change', (e) => handleWaToggle(e.target.checked));
-
-            calculateDailyRevenue();
-            setInterval(calculateDailyRevenue, 60000);
-        }
-
-        async function calculateDailyRevenue() {
-            try {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                const q = query(collection(db, "orders"), where("createdAt", ">=", today));
-                const snap = await getDocs(q);
-                let total = 0;
-                snap.forEach(docSnap => {
-                    const data = docSnap.data();
-                    if (data.status !== 'rejected') {
-                        total += parseFloat(data.total || 0);
-                    }
-                });
-
-                const formatted = `${total.toFixed(2)} <span class="text-xs font-bold text-slate-400">Dh</span>`;
-                const deskRev = document.getElementById('daily-revenue');
-                const mobRev = document.getElementById('mobile-daily-revenue');
-                if (deskRev) deskRev.innerHTML = formatted;
-                if (mobRev) mobRev.innerHTML = formatted;
-            } catch (err) {
-                console.error("Revenue calculation error:", err);
-            }
-        }
-
-        // --- VIEW SWITCHING ---
-        window.switchView = (viewId) => {
-            ['orders', 'menu', 'promotions', 'drivers'].forEach(v => {
-                const viewEl = document.getElementById(`view-${v}`);
-                if (viewEl) viewEl.classList.add('hidden');
-
-                const navEl = document.getElementById(`nav-${v}`);
-                if (navEl) {
-                    navEl.classList.remove('bg-brand-50', 'text-brand-600');
-                    navEl.classList.add('text-slate-500');
+            inputs.forEach(input=>input.disabled=true);
+            settingsUnsub=onSnapshot(doc(db,'settings','config'),snap=>{
+                if (version!==workVersion || !authorized('settings')) return;
+                if (!snap.exists()) {
+                    publish({ _unavailable:true });
+                    feedback.textContent='Configuration absente. Demandez sa préparation à un administrateur.';
+                    retry.hidden=false; return;
                 }
+                const config=snap.data(); publish(config);
+                inputs[0].checked=config.isOpen!==false; inputs[1].checked=config.whatsappMode===true;
+                inputs.forEach(input=>input.disabled=false);
+                feedback.textContent=snap.metadata?.fromCache ? 'Réglages en cache. Vérifiez la connexion avant une modification.' : 'Réglages synchronisés.';
+                retry.hidden=true;
+            },()=>{
+                if (version!==workVersion) return;
+                inputs.forEach(input=>input.disabled=true);
+                feedback.textContent='Impossible de charger les réglages. Vérifiez la connexion puis réessayez.';
+                retry.hidden=false; publish({ _unavailable:true });
             });
-
-            const targetView = document.getElementById(`view-${viewId}`);
-            if (targetView) targetView.classList.remove('hidden');
-
-            const targetNav = document.getElementById(`nav-${viewId}`);
-            if (targetNav) {
-                targetNav.classList.remove('text-slate-500');
-                targetNav.classList.add('bg-brand-50', 'text-brand-600');
+            retry.onclick=()=>{ if (requireView('settings')) initSettings(); };
+            async function saveSetting(field,input) {
+                if (!requireView('settings') || settingsData._unavailable) return;
+                const checked=input.checked;
+                if (field==='isOpen' && !checked && !confirm('Fermer le restaurant ? Toutes les commandes en attente seront aussi refusées.')) {
+                    input.checked=settingsData.isOpen!==false; return;
+                }
+                inputs.forEach(control=>control.disabled=true); feedback.textContent='Enregistrement…';
+                try {
+                    await updateDoc(doc(db,'settings','config'),{ [field]:checked });
+                    // Preserve existing closure behavior, with its consequence confirmed above.
+                    if (field==='isOpen' && !checked) {
+                        const pending=await getDocs(query(collection(db,'orders'),where('status','==','pending')));
+                        if (!authorized('settings') || version!==workVersion) return;
+                        if (!pending.empty) { const batch=writeBatch(db); pending.forEach(order=>batch.update(order.ref,{ status:'rejected' })); await batch.commit(); }
+                    }
+                    if (version!==workVersion) return;
+                    feedback.textContent='Modification enregistrée.'; showToast('Réglage enregistré.');
+                } catch {
+                    if (version!==workVersion) return;
+                    input.checked=field==='isOpen' ? settingsData.isOpen!==false : settingsData.whatsappMode===true;
+                    feedback.textContent='Modification non aboutie ou fermeture partielle. Vérifiez les réglages et les commandes avant de réessayer.';
+                    showToast('Impossible de terminer la modification. Vérifiez son état.','error');
+                } finally { if (version===workVersion && authorized('settings')) inputs.forEach(control=>control.disabled=false); }
             }
+            inputs[0].onchange=()=>saveSetting('isOpen',inputs[0]);
+            inputs[1].onchange=()=>saveSetting('whatsappMode',inputs[1]);
+        }
 
-            if (viewId === 'drivers') {
-                loadDrivers();
-            }
+        // One role policy for desktop, mobile and direct route requests.
+        window.switchView=async viewId=>{
+            if (!requireView(viewId)) return false;
+            currentView=viewId; shell.route(viewId);
+            if (viewId!=='orders' && activeOrdersUnsub) { activeOrdersUnsub(); activeOrdersUnsub=null; }
+            if (viewId==='overview') overview.visible();
+            if (viewId==='orders') { initOrders(); if (innerWidth<1100) showOrderCol('pending'); }
+            if (viewId==='menu') await Promise.all([loadCategories(),loadItems()]);
+            if (viewId==='promotions') await loadPromotions();
+            if (viewId==='drivers') await loadDrivers();
+            return true;
         };
+        window.addEventListener('hashchange',()=>{
+            const view=location.hash.slice(1);
+            if (currentUser && mayView(currentUser.role,view) && view!==currentView) switchView(view);
+        });
 
         window.showOrderCol = (col) => {
             ['pending', 'confirmed', 'delivery', 'history'].forEach(c => {
@@ -1184,7 +995,7 @@
                 renderOrderColumn('list-delivery', delivery, 'delivery');
                 renderOrderColumn('list-history', history, 'history');
 
-                calculateDailyRevenue();
+
             }, err => console.error("Orders listener error:", err));
         }
 
@@ -1340,8 +1151,11 @@
 
         // --- CATEGORIES & MENU CRUD ---
         async function loadCategories() {
+            if (!authorized('menu')) return;
+            const version=workVersion;
             try {
                 const snap = await getDocs(query(collection(db, 'categories'), orderBy('order', 'asc')));
+                if (version!==workVersion || !authorized('menu')) return;
                 categories = [];
                 snap.forEach(d => categories.push({ id: d.id, ...d.data() }));
 
@@ -1400,8 +1214,11 @@
         }
 
         async function loadItems() {
+            if (!authorized('menu')) return;
+            const version=workVersion;
             try {
                 const snap = await getDocs(query(collection(db, 'menuItems'), orderBy('order', 'asc')));
+                if (version!==workVersion || !authorized('menu')) return;
                 items = [];
                 snap.forEach(d => items.push({ id: d.id, ...d.data() }));
                 items.sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -1571,6 +1388,7 @@
 
         document.getElementById('category-form').addEventListener('submit', async e => {
             e.preventDefault();
+            if (!requireView('menu')) return;
             const btn = document.getElementById('btn-save-cat');
             btn.disabled = true;
             btn.innerText = "Sauvegarde...";
@@ -1841,8 +1659,11 @@
 
         // --- PROMOTIONS CRUD ---
         async function loadPromotions() {
+            if (!authorized('promotions')) return;
+            const version=workVersion;
             try {
                 const snap = await getDocs(collection(db, 'promotions'));
+                if (version!==workVersion || !authorized('promotions')) return;
                 const list = document.getElementById('promotions-list');
                 if (!list) return;
 
@@ -1982,6 +1803,7 @@
 
         document.getElementById('user-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!requireView('drivers')) return;
             const btn = document.getElementById('btn-add-user');
             const name = document.getElementById('user-name').value.trim();
             const email = document.getElementById('user-email').value.trim();
@@ -2019,13 +1841,15 @@
         });
 
         async function loadDrivers() {
-            if (!currentUser) return;
+            if (!authorized('drivers')) return;
+            const version=workVersion;
             const tableBody = document.getElementById('drivers-table-body');
             if (!tableBody) return;
             tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-slate-400">Chargement des utilisateurs...</td></tr>';
 
             try {
                 const snap = await getDocs(collection(db, 'users'));
+                if (version!==workVersion || !authorized('drivers')) return;
                 const users = [];
                 snap.forEach(d => users.push({ id: d.id, ...d.data() }));
 
@@ -2041,6 +1865,7 @@
                     if (u.role === 'delivery' || u.role === 'livreur') {
                         const ordersQ = query(collection(db, 'orders'), where('deliveryGuyId', '==', u.uid));
                         const ordersSnap = await getDocs(ordersQ);
+                        if (version!==workVersion || !authorized('drivers')) return;
 
                         let count = 0;
                         let earnings = 0;
@@ -2102,9 +1927,7 @@
 
         // --- DELIVERY DRIVER INTERFACE ---
         function initDriverApp() {
-            document.querySelector('aside')?.classList.add('hidden');
-            document.querySelector('header')?.classList.add('hidden');
-            document.getElementById('views-container')?.classList.add('hidden');
+            currentView='driver'; shell.route('driver');
 
             const driverView = document.getElementById('view-driver');
             if (driverView) driverView.classList.remove('hidden');
@@ -2293,6 +2116,16 @@
                 showToast("Erreur: " + err.message, "error");
             }
         };
+
+        // Legacy handler guards are defense in depth, not server authorization.
+        for (const [view,names] of Object.entries({
+            menu:['openItemEditor','saveItem','deleteItem','saveItemOrder','saveCategoryOrder','openCategoryEditor','deleteCategory','filterItems','addChoiceGroup','addOptionRow','addSupplementRow'],
+            promotions:['openPromoEditor','savePromo','deletePromo'],
+            drivers:['deleteDriver'],orders:['setStatus'],driver:['claimDelivery','markDelivered','switchDriverTab']
+        })) for (const name of names) {
+            const handler=window[name];
+            window[name]=(...args)=>requireView(view) ? handler(...args) : false;
+        }
 
         // Close slide-outs on ESC
         document.addEventListener('keydown', (e) => {

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "test:admin": "node tests/admin-model.mjs && node tests/admin.mjs",
     "test:storefront": "node tests/storefront.mjs",
     "test:carousels": "node tests/carousels.mjs",
     "test:customization": "node tests/customization-navigation.mjs"
