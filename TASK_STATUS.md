@@ -1,5 +1,37 @@
 # BIGTAC Admin 2.0 status
 
+## Current refinement — depth, contrast and operational space (27 October 2026)
+
+Owner brief `1e80d627-9fbc-4c68-b1c7-5a335ed9c0e9` supersedes prior card/header styling. Follow-up explicitly requests token-efficient finishing, commit and push; no deployment. Prior reference recreation was committed as `49018d8`.
+
+- Shared surfaces: #F0F3F7 workspace, #172033 primary text, #475569 secondary text, stronger essential-control borders, distinct panel/card elevation tokens. KPIs have richer coordinated tints, larger bold values, aligned labels and 42px bordered icon wells (32px on mobile), without hover behavior suggesting noninteractive metrics are buttons.
+- Orders: one operational toolbar for Service/Cuisine, search, filters, sound and refresh; synchronization, timezone and displayed counts share a compact metadata line. The duplicate page heading is visually hidden, retaining accessible semantics; the global page title remains visible. Phone sound/refresh controls use labeled 44px icon buttons and pressed-state feedback; queue switching and search remain available.
+- Tickets: slim status-colored edges replace large colored header bands, larger order IDs, compact service badges, stronger product names, readable modifiers, tinted instructions and dominant existing actions. Kitchen drops its forced 420px minimum and uses filled preparation actions. No item information or permitted action was removed.
+- Overview: the hourly chart is 180px when populated, with natural panel height. Zero orders render a compact explanatory state without a chart; useful operations/quick actions move above it on desktop. No fake activity or financial data. Other reporting periods and all-date queue labels remain explicit.
+- Timing presentation: the previous implicit 20-minute reference is disabled by default. Staff may explicitly choose/persist 0–240 minutes locally; 0 disables warnings. Missing/future timestamps remain neutral, and active records at least 24 hours old do not become warning badges. The 24-hour plausibility cutoff is a UI safeguard, not a verified business SLA or trusted timestamp guarantee. Real statuses, transactions, payment logic, backend permissions and timestamps are unchanged.
+
+### Measurements (CSS pixels, populated fixture)
+
+| Viewport | Orders header before → after (workspace top to board) | Board y before → after | Recovered |
+| --- | --- | --- | --- |
+| 1440×1000 | 204.7 → 102 | 280.7 → 178 | 102.7px |
+| 1535×1000 | 204.7 → 102 | 280.7 → 178 | 102.7px |
+| 390×844 | 281.5 → 224 | 341.5 → 284 | 57.5px |
+
+The desktop board measurement is the status-header container; the first tickets begin around y=260 after the retained status header. The starting implementation was already more compact than the brief's approximate y=340 baseline. At 1440px, the first ticket height also fell from 440.7 to 397.7px; no smaller product text was used to gain this space. Mobile keeps independent queue navigation rather than four squeezed columns.
+
+### Verification
+
+Already-started checks completed; no repeated full regression cycle was added after the token-efficient steering. Results: `test:orders` **56 model + 192 browser**, `test:admin` **49 model + 216 browser**, existing `admin-visual.mjs` **177**, new `admin-depth.mjs` **57** = **747 checks passed**. Focused timing tests cover explicit/disabled thresholds, very old, missing and future timestamps, live timer updates without reads/focus loss. Browser checks cover existing transitions, details/receipts, search/filters, sound, refresh/realtime, roles, dialogs, touch targets, contrast and overflow. Local fixtures only: zero production Firebase requests/writes. No real uploads, dependencies, schema or configuration changes. Customer storefront/menu suites were not rerun; their implementation was not changed.
+
+Final visual verification captured Overview/Orders, populated and empty, at **1440×1000 and 390×844**. Earlier measurement captures additionally cover 320, 768 and 1535px. Actual final captures and provided-reference/before/final comparison boards were opened and visually inspected; the previously supplied DineLink/Streak House files remained accessible. No new reference images accompanied this brief, so no claim is made about unseen images. Typography, depth and density were compared while retaining BIGTAC's dark sidebar and real four-status workflow. The latest written request for slim accents supersedes the older reference's large solid ticket bands.
+
+Artifacts: `C:\Users\pc\.codex\visualizations\2026\10\27\bigtac-admin-depth`. Native final files: `final-{overview,orders}-{populated,empty}-{1440,390}.png`. Comparison boards: `comparison-overview.png`, `comparison-orders.png` (self-contained HTML copies). Before/after geometry: `before-measurements.json`, `after-measurements.json`.
+
+Modified files: `assets/admin.css`, `assets/admin-orders.css`, `assets/admin-orders.js`, `assets/admin-orders-model.js` (display age only), `assets/admin-overview.js`, `tests/orders.mjs`, `tests/orders-model.mjs`, new `tests/admin-depth.mjs`, `TASK_STATUS.md`. Syntax/diff checks pass. Existing unrelated changes to `assets/snack.png`, `assets/tacos-hero.jpg`, and `bigtac-2/` remain excluded.
+
+Remaining: physical-device checks and existing backend/tenant/pricing/authorization release gates are unverified. Sparse product lists retain natural heights; unsupported mockup table modules, SLA progress and verified revenue remain excluded. No deployment or production operation performed. Earlier sections below are historical checkpoints.
+
 ## Current task — supplied image recreation (27 October 2026)
 
 The latest owner brief is `35ec2058-38d3-4c34-be9d-4d60e5a17728/Pasted text.txt`, with the DineLink Overview and Streak House Kitchen images as the visual targets. It supersedes the earlier three-reference visual checkpoint below. That checkpoint was committed and pushed as `081b600`; its descriptions of uncommitted files are historical. **Git follow-up: the owner explicitly authorized committing and pushing this refinement. Deployment remains unauthorized. Earlier no-commit statements below describe the implementation checkpoint.**

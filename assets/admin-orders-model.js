@@ -43,12 +43,12 @@ export function recordedItems(order) {
     }));
 }
 export function customerNotes(order) { return [...new Set([textValue(order.customer?.note),textValue(order.note)].filter(Boolean))]; }
-export function orderAge(order, now=Date.now(), threshold=20) {
+export function orderAge(order, now=Date.now(), threshold=0) {
     const date=timestampDate(order.createdAt);
     if(!date || date.getTime()>now+60000) return {minutes:null,label:'Heure non vérifiée',tone:'unknown'};
     const minutes=Math.max(0,Math.floor((now-date.getTime())/60000));
     const label=minutes<1 ? 'À l’instant' : minutes<60 ? `${minutes} min` : `${Math.floor(minutes/60)} h ${minutes%60} min`;
-    const active=ACTIVE_STATUSES.includes(order.status);
+    const active=ACTIVE_STATUSES.includes(order.status) && minutes<24*60;
     return {minutes,label,tone:active && threshold>0 ? minutes>=threshold ? 'late' : minutes>=threshold*.75 ? 'soon' : 'recent' : 'recent'};
 }
 export function filterOrders(orders, {search='',service='all',status='all',date='',kitchen=false}={}, timezone='Africa/Casablanca') {

@@ -19,6 +19,8 @@ eq(orderAge({...order,createdAt:new Date(now-21*60000)},now,20).tone,'late','Ref
 eq(orderAge({...order,createdAt:null},now).minutes,null,'No invented reception time');
 eq(orderAge({...order,createdAt:new Date(now+120000)},now).minutes,null,'Future clock anomaly is unknown');
 eq(orderAge({...order,status:'delivered',createdAt:new Date(now-12000000)},now).tone,'recent','No delay alarm on terminal orders');
+eq(orderAge({...order,createdAt:new Date(now-3600000)},now).tone,'recent','No default delay threshold');
+eq(orderAge({...order,createdAt:new Date(now-7*86400000)},now,20).tone,'recent','Old active records do not become delay alarms');
 eq(filterOrders([order],{search:'#1040'}).length,1,'Order number search');
 eq(filterOrders([order],{service:'livraison'}).length,0,'Service filter');
 eq(filterOrders([order],{kitchen:true}).length,0,'Kitchen excludes non-preparation orders');

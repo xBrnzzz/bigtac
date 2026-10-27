@@ -104,6 +104,10 @@ try {
         await page.evaluate(()=>{
             const order=__adminFixture.data.orders.find(order=>order.id==='fixture-12');order.createdAt=new Date(Date.now()-19*60000);__adminFixture.emit();
         });
+        await page.locator('#orders-filters-toggle').click();
+        await page.locator('#orders-threshold').fill('20');
+        await page.locator('#orders-threshold').dispatchEvent('change');
+        await page.locator('#orders-filters-toggle').click();
         const reads=await page.evaluate(()=>__adminFixture.queries.length);
         await page.locator('[data-open="fixture-12"]').first().focus();
         await page.clock.fastForward(61000);
