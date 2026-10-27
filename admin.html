@@ -137,6 +137,8 @@
     </style>
     <link rel="stylesheet" href="assets/admin.css">
     <link rel="stylesheet" href="assets/admin-orders.css">
+    <link rel="stylesheet" href="assets/admin-menu.css">
+    <link rel="stylesheet" href="assets/admin-legacy.css">
 </head>
 
 <body class="bg-slate-100 text-slate-800 antialiased h-screen overflow-hidden flex flex-col md:flex-row">
@@ -182,53 +184,8 @@
         <!-- ORDERS & KITCHEN: rendered by the shared workspace module -->
         <section id="view-orders" class="hidden"></section>
 
-        <!-- VIEW 2: MENU & CARTE MANAGEMENT -->
-        <div id="view-menu" class="absolute inset-0 p-4 sm:p-6 hidden flex flex-col">
-            <div class="flex justify-between items-center mb-4 flex-none">
-                <h2 class="text-2xl font-black text-slate-900 tracking-tight">Menu & Carte</h2>
-            </div>
-            
-            <div class="flex-1 flex flex-col sm:flex-row gap-4 min-h-0">
-                <!-- Categories Left Panel -->
-                <div class="w-full sm:w-72 md:w-80 flex-none flex flex-col bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden shrink-0">
-                    <div class="p-3.5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                        <span class="font-black text-xs text-slate-400 uppercase tracking-wider">Catégories</span>
-                        <div class="flex gap-1.5">
-                            <button onclick="saveCategoryOrder()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 p-2 rounded-xl transition text-xs font-bold" title="Sauvegarder l'ordre des catégories">
-                                <i data-feather="save" class="w-3.5 h-3.5"></i>
-                            </button>
-                            <button onclick="openCategoryEditor()" class="bg-brand-50 hover:bg-brand-100 text-brand-600 px-3 py-2 rounded-xl font-bold text-xs transition flex items-center gap-1">
-                                <i data-feather="plus" class="w-3.5 h-3.5"></i>
-                                <span>Ajouter</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div id="menu-categories-list" class="flex sm:flex-col overflow-x-auto sm:overflow-y-auto gap-1.5 p-2 flex-1 hide-scrollbar">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-
-                <!-- Items Right Grid -->
-                <div class="flex-1 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                    <div class="p-3.5 border-b border-slate-100 bg-slate-50 flex justify-between items-center gap-2 shrink-0">
-                        <span id="active-category-title" class="font-black text-slate-800 uppercase text-xs sm:text-sm truncate">Tous les plats</span>
-                        <div class="flex gap-2 shrink-0">
-                            <button onclick="saveItemOrder()" id="btn-save-order" class="bg-slate-800 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-slate-900 transition flex items-center gap-1.5">
-                                <i data-feather="save" class="w-3.5 h-3.5"></i>
-                                <span class="hidden sm:inline">Sauvegarder Ordre</span>
-                            </button>
-                            <button onclick="openItemEditor()" class="bg-brand-500 hover:bg-brand-600 text-white px-3.5 py-2 rounded-xl font-bold text-xs transition flex items-center gap-1.5">
-                                <i data-feather="plus" class="w-3.5 h-3.5"></i>
-                                <span>Nouveau Plat</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div id="items-grid" class="flex-1 overflow-y-auto p-4 grid grid-cols-1 md:grid-cols-2 gap-4 content-start">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Menu Builder mounts into this existing route. -->
+        <section id="view-menu" class="hidden"></section>
 
         <!-- VIEW 3: PROMOTIONS MANAGEMENT -->
         <div id="view-promotions" class="absolute inset-0 p-4 sm:p-6 hidden overflow-y-auto">
@@ -359,104 +316,6 @@
 
     </div>
 
-    <!-- ITEM EDITOR SLIDE-OUT PANEL -->
-    <div id="item-editor" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="editor-title">
-        <div class="absolute inset-0 bg-slate-950/50 backdrop-blur-sm transition-opacity" onclick="closeItemEditor()"></div>
-        <div class="absolute inset-y-0 right-0 w-full max-w-2xl bg-white shadow-2xl transform transition-transform translate-x-full flex flex-col h-full z-10 border-l border-slate-200">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
-                <h3 class="text-xl font-black text-slate-900" id="editor-title">Nouveau Plat</h3>
-                <button onclick="closeItemEditor()" class="p-2 hover:bg-slate-100 rounded-full transition"><i data-feather="x"></i></button>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto bg-slate-50 p-6">
-                <form id="item-form" class="space-y-5">
-                    <input type="hidden" id="edit-item-id">
-                    
-                    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200/80 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-[10px] font-black text-slate-400 uppercase">Nom du Plat *</label>
-                                <input type="text" id="input-name" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold mt-1" required placeholder="Ex: Tacos Poulet">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-black text-slate-400 uppercase">Prix de Base (DH) *</label>
-                                <input type="number" id="input-price" step="0.5" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold mt-1 text-brand-600" required placeholder="Ex: 22">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase">Description</label>
-                            <textarea id="input-desc" rows="2" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm mt-1" placeholder="Ingrédients, viandes au choix..."></textarea>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-[10px] font-black text-slate-400 uppercase">Catégorie *</label>
-                                <select id="input-category" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold mt-1"></select>
-                            </div>
-                            <div class="flex items-center gap-6 pt-5">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" id="input-popular" class="w-4 h-4 text-brand-500 rounded">
-                                    <span class="text-xs font-bold text-slate-700">Populaire ★</span>
-                                </label>
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" id="input-visible" class="w-4 h-4 text-brand-500 rounded" checked>
-                                    <span class="text-xs font-bold text-slate-700">Visible</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase">Image</label>
-                            <div class="flex gap-4 items-center mt-1">
-                                <div id="image-preview" class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
-                                    <i data-feather="image" class="text-slate-300"></i>
-                                </div>
-                                <input type="file" id="input-image-file" accept="image/*" class="text-xs text-slate-500 w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-600">
-                                <input type="hidden" id="input-image-url">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Variants & Supplements Tabs -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
-                        <div class="flex border-b border-slate-100">
-                            <button type="button" onclick="switchEditorTab('choices')" id="tab-choices" class="flex-1 py-3.5 text-xs font-black uppercase text-brand-600 border-b-2 border-brand-500 bg-brand-50/50 transition">
-                                Variantes & Étapes
-                            </button>
-                            <button type="button" onclick="switchEditorTab('supplements')" id="tab-supplements" class="flex-1 py-3.5 text-xs font-black uppercase text-slate-400 hover:bg-slate-50 transition border-b-2 border-transparent">
-                                Suppléments Payants
-                            </button>
-                        </div>
-                        <div class="p-5">
-                            <div id="panel-choices" class="space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs text-slate-400 font-semibold">Groupes de choix obligatoires ou multiples</span>
-                                    <button type="button" onclick="addChoiceGroup()" class="text-xs bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-xl font-bold">+ Groupe</button>
-                                </div>
-                                <div id="container-choices" class="space-y-3"></div>
-                            </div>
-
-                            <div id="panel-supplements" class="hidden space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs text-slate-400 font-semibold">Options d'extras payants (ex: Frites +5 DH)</span>
-                                    <button type="button" onclick="addSupplementRow()" class="text-xs bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-xl font-bold">+ Option</button>
-                                </div>
-                                <div id="container-supplements" class="space-y-2"></div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <div class="p-5 border-t border-slate-100 bg-white shrink-0">
-                <button onclick="saveItem()" id="btn-save-item" class="w-full py-4 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-brand-500/25 transition">
-                    Enregistrer le Plat
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- PROMOTIONS EDITOR SLIDE-OUT PANEL -->
     <div id="promo-editor" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="promo-editor-title">
         <div class="absolute inset-0 bg-slate-950/50 backdrop-blur-sm transition-opacity" onclick="closePromoEditor()"></div>
@@ -543,54 +402,12 @@
     </div>
 
     <!-- CATEGORY EDITOR SLIDE-OUT PANEL -->
-    <div id="category-editor-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="cat-editor-title">
-        <div class="absolute inset-0 bg-slate-950/50 backdrop-blur-sm transition-opacity" onclick="closeCategoryEditor()"></div>
-        <div class="absolute inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl transform transition-transform translate-x-full flex flex-col h-full z-10 border-l border-slate-200">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
-                <h3 class="text-xl font-black text-slate-900" id="cat-editor-title">Nouvelle Catégorie</h3>
-                <button onclick="closeCategoryEditor()" class="p-2 hover:bg-slate-100 rounded-full transition"><i data-feather="x"></i></button>
-            </div>
-
-            <div class="flex-1 overflow-y-auto bg-slate-50 p-6">
-                <form id="category-form" class="space-y-5">
-                    <input type="hidden" id="cat-id">
-                    <input type="hidden" id="cat-original-name">
-
-                    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200/80 space-y-4">
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Nom de la Catégorie *</label>
-                            <input type="text" id="cat-name" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm focus:border-brand-500 outline-none" required placeholder="Ex: Tacos Gratinés">
-                        </div>
-
-                        <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Image / Vignette (Optionnelle)</label>
-                            <div class="flex items-center gap-3 mt-1">
-                                <div id="cat-image-preview" class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center border border-slate-200 overflow-hidden shrink-0">
-                                    <i data-feather="image" class="w-6 h-6 text-slate-300"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <input type="file" id="cat-image-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-600">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-2">
-                        <button type="submit" id="btn-save-cat" class="w-full py-4 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-brand-500/25 transition">
-                            Enregistrer la Catégorie
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT LOGIC MODULE -->
     <script type="module">
         import { profileRole, mayView, roleViews } from './assets/admin-model.js';
         import { mountAdminShell } from './assets/admin-shell.js';
         import { icon as adminIcon } from './assets/admin-icons.js';
         import { createOverview } from './assets/admin-overview.js';
+        import { createMenuWorkspace } from './assets/admin-menu.js';
         import { createOrderWorkspace } from './assets/admin-orders.js';
         import { commitOrderTransition, commitDriverAction, operationMessage } from './assets/admin-orders-service.js';
         import { escapeText as escapeOrderText, textValue as orderText, orderAmount } from './assets/admin-orders-model.js';
@@ -612,11 +429,6 @@
         const CLOUDINARY_PRESET = "qaoutiassets";
 
         let currentUser = null;
-        let categories = [];
-        let items = [];
-        let currentCategoryFilter = 'all';
-        let sortableItems = null;
-        let sortableCategories = null;
         let driverUnsubscribers = [];
         let profileUnsub = null;
         let settingsUnsub = null;
@@ -632,6 +444,7 @@
             session:orderActor,
             settings:()=>settingsData,toast:(...args)=>window.showToast(...args)
         });
+        const menuWorkspace = createMenuWorkspace(document.getElementById('view-menu'), {session:orderActor,toast:(...args)=>window.showToast(...args),upload:uploadProductImage});
         function orderActor() { return currentUser ? {...currentUser,epoch:workVersion} : null; }
         const driverPending = new Set();
         function refreshDriverActions() {
@@ -657,12 +470,11 @@
         function cleanSession() {
             workVersion++;
             orderWorkspace.stop();
+            menuWorkspace.stop();
             if (settingsUnsub) settingsUnsub(); settingsUnsub = null;
             driverUnsubscribers.forEach(unsubscribe => unsubscribe()); driverUnsubscribers = [];
             overview.stop(); overviewStarted = false; currentView = null;
-            currentUser = null; categories = []; items = [];
-            sortableItems?.destroy(); sortableItems = null;
-            sortableCategories?.destroy(); sortableCategories = null;
+            currentUser = null;
             settingsData = { _unavailable: true }; shell.hideSession();
             for (const id of ['list-pending','list-confirmed','list-delivery','list-history','available-runs-list','my-deliveries-list','drivers-table-body']) document.getElementById(id)?.replaceChildren();
         }
@@ -800,9 +612,7 @@
                     });
                 }
             };
-            setupPreview('input-image-file', 'image-preview');
             setupPreview('promo-image-file', 'promo-image-preview');
-            setupPreview('cat-image-file', 'cat-image-preview');
             previewsReady = true;
             }
 
@@ -879,11 +689,13 @@
         // One role policy for desktop, mobile and direct route requests.
         window.switchView=async viewId=>{
             if (!requireView(viewId)) return false;
+            if(currentView==='menu'&&viewId!=='menu'&&!menuWorkspace.canLeave())return false;
+            if(viewId!=='menu')menuWorkspace.stop();
             currentView=viewId; shell.route(viewId);
             if (viewId!=='orders') orderWorkspace.stop();
             if (viewId==='overview') overview.visible();
             if (viewId==='orders') orderWorkspace.start();
-            if (viewId==='menu') await Promise.all([loadCategories(),loadItems()]);
+            if (viewId==='menu') await menuWorkspace.start();
             if (viewId==='promotions') await loadPromotions();
             if (viewId==='drivers') await loadDrivers();
             return true;
@@ -895,194 +707,6 @@
 
         window.showOrderCol = column => orderWorkspace.column(column);
         window.setStatus = (id,status) => requireView('orders') ? orderWorkspace.changeStatus(id,status) : false;
-
-        // --- CATEGORIES & MENU CRUD ---
-        async function loadCategories() {
-            if (!authorized('menu')) return;
-            const version=workVersion;
-            try {
-                const snap = await getDocs(query(collection(db, 'categories'), orderBy('order', 'asc')));
-                if (version!==workVersion || !authorized('menu')) return;
-                categories = [];
-                snap.forEach(d => categories.push({ id: d.id, ...d.data() }));
-
-                const menuList = document.getElementById('menu-categories-list');
-                const catSelect = document.getElementById('input-category');
-
-                if (menuList) {
-                    menuList.innerHTML = `
-                        <button onclick="filterItems('all')" id="cat-all" class="shrink-0 sm:w-full text-left px-3.5 py-2.5 rounded-2xl text-xs font-black transition ${currentCategoryFilter === 'all' ? 'bg-brand-50 text-brand-700 border border-brand-200' : 'text-slate-600 hover:bg-slate-50'}">
-                            Tout Voir
-                        </button>
-                    `;
-
-                    categories.forEach(c => {
-                        const isSelected = currentCategoryFilter === c.name;
-                        menuList.innerHTML += `
-                            <div class="shrink-0 sm:w-full flex justify-between items-center p-1 rounded-2xl group hover:bg-slate-50 transition border ${isSelected ? 'border-brand-200 bg-brand-50/50' : 'border-transparent'}" data-id="${c.id}">
-                                <div class="flex items-center gap-2 flex-1 min-w-0">
-                                    <span class="drag-handle text-slate-300 hover:text-brand-500 hidden sm:block pl-1 cursor-grab">
-                                        <i data-feather="move" class="w-3.5 h-3.5"></i>
-                                    </span>
-                                    <button onclick="filterItems('${c.name}')" class="flex-1 text-left px-2 py-1.5 text-xs font-bold text-slate-700 truncate">
-                                        ${c.name}
-                                    </button>
-                                </div>
-                                <div class="flex gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition pr-1">
-                                    <button onclick="openCategoryEditor('${c.id}')" class="p-1 text-blue-500 hover:text-blue-700 rounded transition" title="Modifier">
-                                        <i data-feather="edit-2" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                    <button onclick="deleteCategory('${c.id}')" class="p-1 text-red-500 hover:text-red-700 rounded transition" title="Supprimer">
-                                        <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    if (sortableCategories) sortableCategories.destroy();
-                    sortableCategories = new Sortable(menuList, {
-                        handle: '.drag-handle',
-                        animation: 150,
-                        ghostClass: 'sortable-ghost',
-                        filter: 'button#cat-all'
-                    });
-                }
-
-                if (catSelect) {
-                    catSelect.innerHTML = '<option value="">Choisir une catégorie...</option>' +
-                        categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-                }
-
-                if (window.feather) feather.replace();
-            } catch (err) {
-                console.error("Load categories error:", err);
-            }
-        }
-
-        async function loadItems() {
-            if (!authorized('menu')) return;
-            const version=workVersion;
-            try {
-                const snap = await getDocs(query(collection(db, 'menuItems'), orderBy('order', 'asc')));
-                if (version!==workVersion || !authorized('menu')) return;
-                items = [];
-                snap.forEach(d => items.push({ id: d.id, ...d.data() }));
-                items.sort((a, b) => (a.order || 0) - (b.order || 0));
-                renderItemsGrid();
-            } catch (err) {
-                console.error("Load items error:", err);
-            }
-        }
-
-        function renderItemsGrid() {
-            const grid = document.getElementById('items-grid');
-            if (!grid) return;
-
-            const filtered = currentCategoryFilter === 'all'
-                ? items
-                : items.filter(i => i.category === currentCategoryFilter);
-
-            const titleEl = document.getElementById('active-category-title');
-            if (titleEl) {
-                titleEl.innerText = currentCategoryFilter === 'all' ? 'Tous les plats' : currentCategoryFilter;
-            }
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-16 text-slate-400 italic">Aucun plat dans cette catégorie.</div>`;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(item => `
-                <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition flex items-center gap-3 group relative" data-id="${item.id}">
-                    <div class="drag-handle text-slate-300 hover:text-brand-500 p-1 cursor-grab">
-                        <i data-feather="move" class="w-4 h-4"></i>
-                    </div>
-                    <img src="${item.imageUrl || 'assets/snack.png'}" alt="" class="w-14 h-14 rounded-xl object-cover bg-slate-100 shrink-0" onerror="this.src='assets/snack.png'">
-                    
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start gap-1">
-                            <h4 class="font-extrabold text-slate-900 text-sm truncate">${item.name}</h4>
-                            <span class="font-black text-brand-600 text-xs font-mono whitespace-nowrap">${item.price} Dh</span>
-                        </div>
-                        <div class="flex items-center justify-between mt-1">
-                            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md uppercase">${item.category || ''}</span>
-                            <div class="flex gap-1.5 opacity-100 sm:opacity-0 group-hover:opacity-100 transition">
-                                <button onclick="openItemEditor('${item.id}')" class="p-1 text-blue-500 hover:text-blue-700 transition" title="Modifier">
-                                    <i data-feather="edit-2" class="w-3.5 h-3.5"></i>
-                                </button>
-                                <button onclick="deleteItem('${item.id}')" class="p-1 text-red-500 hover:text-red-700 transition" title="Supprimer">
-                                    <i data-feather="trash-2" class="w-3.5 h-3.5"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-
-            if (sortableItems) sortableItems.destroy();
-            sortableItems = new Sortable(grid, {
-                handle: '.drag-handle',
-                animation: 150,
-                ghostClass: 'sortable-ghost'
-            });
-
-            if (window.feather) feather.replace();
-        }
-
-        window.filterItems = (cat) => {
-            currentCategoryFilter = cat;
-            loadCategories();
-            renderItemsGrid();
-        };
-
-        window.saveItemOrder = async () => {
-            const grid = document.getElementById('items-grid');
-            const ids = Array.from(grid.children).map(c => c.getAttribute('data-id')).filter(Boolean);
-            if (!ids.length) return;
-
-            const btn = document.getElementById('btn-save-order');
-            btn.disabled = true;
-            btn.innerText = "Sauvegarde...";
-
-            try {
-                await Promise.all(ids.map((id, index) => updateDoc(doc(db, 'menuItems', id), { order: index })));
-                showToast("Ordre des plats sauvegardé !");
-                await loadItems();
-            } catch (e) {
-                console.error(e);
-                showToast("Erreur lors de la sauvegarde de l'ordre", "error");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Sauvegarder Ordre";
-            }
-        };
-
-        window.saveCategoryOrder = async () => {
-            const list = document.getElementById('menu-categories-list');
-            const ids = Array.from(list.children).map(c => c.getAttribute('data-id')).filter(Boolean);
-            if (!ids.length) return;
-
-            try {
-                await Promise.all(ids.map((id, index) => updateDoc(doc(db, 'categories', id), { order: index })));
-                showToast("Ordre des catégories mis à jour !");
-                await loadCategories();
-            } catch (e) {
-                console.error(e);
-                showToast("Erreur lors de la mise à jour de l'ordre", "error");
-            }
-        };
-
-        window.deleteItem = async (id) => {
-            if (!confirm("Voulez-vous vraiment supprimer cet article ?")) return;
-            try {
-                await deleteDoc(doc(db, 'menuItems', id));
-                showToast("Article supprimé");
-                loadItems();
-            } catch (e) {
-                showToast("Erreur suppression: " + e.message, "error");
-            }
-        };
 
         // --- CLOUDINARY UPLOAD HELPER ---
         async function uploadToCloudinary(file) {
@@ -1097,312 +721,23 @@
             return (await res.json()).secure_url;
         }
 
-        // --- CATEGORY EDITOR (WITH RENAME PROPAGATION) ---
-        window.openCategoryEditor = (id = null) => {
-            const modal = document.getElementById('category-editor-modal');
-            document.getElementById('category-form').reset();
-            document.getElementById('cat-image-preview').innerHTML = '<i data-feather="image" class="w-6 h-6 text-slate-300"></i>';
-
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.lastElementChild.classList.remove('translate-x-full'), 10);
-
-            if (id) {
-                const cat = categories.find(c => c.id === id);
-                if (cat) {
-                    document.getElementById('cat-id').value = cat.id;
-                    document.getElementById('cat-name').value = cat.name;
-                    document.getElementById('cat-original-name').value = cat.name;
-                    if (cat.image) {
-                        document.getElementById('cat-image-preview').innerHTML = `<img src="${cat.image}" class="w-full h-full object-cover">`;
-                    }
-                    document.getElementById('cat-editor-title').innerText = "Modifier la Catégorie";
-                    document.getElementById('btn-save-cat').innerText = "Mettre à jour";
-                }
-            } else {
-                document.getElementById('cat-id').value = '';
-                document.getElementById('cat-original-name').value = '';
-                document.getElementById('cat-editor-title').innerText = "Nouvelle Catégorie";
-                document.getElementById('btn-save-cat').innerText = "Créer la Catégorie";
-            }
-            if (window.feather) feather.replace();
-        };
-
-        window.closeCategoryEditor = () => {
-            const modal = document.getElementById('category-editor-modal');
-            modal.lastElementChild.classList.add('translate-x-full');
-            setTimeout(() => modal.classList.add('hidden'), 250);
-        };
-
-        document.getElementById('category-form').addEventListener('submit', async e => {
-            e.preventDefault();
-            if (!requireView('menu')) return;
-            const btn = document.getElementById('btn-save-cat');
-            btn.disabled = true;
-            btn.innerText = "Sauvegarde...";
-
-            try {
-                const id = document.getElementById('cat-id').value;
-                const newName = document.getElementById('cat-name').value.trim();
-                const oldName = document.getElementById('cat-original-name').value;
-                const fileInput = document.getElementById('cat-image-file');
-
-                let imageUrl = null;
-                if (fileInput.files.length > 0) {
-                    imageUrl = await uploadToCloudinary(fileInput.files[0]);
-                }
-
-                const data = { name: newName };
-                if (imageUrl) data.image = imageUrl;
-
-                if (id) {
-                    await updateDoc(doc(db, 'categories', id), data);
-
-                    // Propagate rename to all existing menuItems
-                    if (oldName && oldName !== newName) {
-                        const q = query(collection(db, 'menuItems'), where('category', '==', oldName));
-                        const itemsSnap = await getDocs(q);
-                        if (!itemsSnap.empty) {
-                            const batch = writeBatch(db);
-                            itemsSnap.forEach(d => batch.update(d.ref, { category: newName }));
-                            await batch.commit();
-                            showToast(`Catégorie renommée ! ${itemsSnap.size} articles mis à jour.`);
-                        }
-                    }
-                } else {
-                    data.order = categories.length;
-                    await addDoc(collection(db, 'categories'), data);
-                }
-
-                closeCategoryEditor();
-                await loadCategories();
-                await loadItems();
-                showToast("Catégorie enregistrée !");
-            } catch (err) {
-                console.error(err);
-                showToast("Erreur: " + err.message, "error");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Enregistrer la Catégorie";
-            }
-        });
-
-        window.deleteCategory = async (id) => {
-            if (!confirm("Voulez-vous supprimer cette catégorie ?")) return;
-            try {
-                await deleteDoc(doc(db, 'categories', id));
-                showToast("Catégorie supprimée");
-                loadCategories();
-            } catch (e) {
-                showToast("Erreur: " + e.message, "error");
-            }
-        };
-
-        // --- ITEM EDITOR LOGIC ---
-        window.openItemEditor = (id = null) => {
-            const modal = document.getElementById('item-editor');
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.lastElementChild.classList.remove('translate-x-full'), 10);
-
-            document.getElementById('editor-title').innerText = id ? "Modifier le Plat" : "Nouveau Plat";
-            document.getElementById('edit-item-id').value = id || '';
-            document.getElementById('item-form').reset();
-            document.getElementById('container-choices').innerHTML = '';
-            document.getElementById('container-supplements').innerHTML = '';
-            document.getElementById('image-preview').innerHTML = '<i data-feather="image" class="text-slate-300"></i>';
-
-            switchEditorTab('choices');
-
-            const catSelect = document.getElementById('input-category');
-            if (!id && currentCategoryFilter !== 'all') {
-                catSelect.value = currentCategoryFilter;
-            }
-
-            if (id) {
-                const item = items.find(i => i.id === id);
-                if (item) {
-                    document.getElementById('input-name').value = item.name || '';
-                    document.getElementById('input-price').value = item.price || 0;
-                    document.getElementById('input-desc').value = item.description || '';
-                    document.getElementById('input-category').value = item.category || '';
-                    document.getElementById('input-image-url').value = item.imageUrl || '';
-                    if (item.imageUrl) {
-                        document.getElementById('image-preview').innerHTML = `<img src="${item.imageUrl}" class="w-full h-full object-cover">`;
-                    }
-                    document.getElementById('input-popular').checked = !!item.isPopular;
-                    document.getElementById('input-visible').checked = item.isVisible !== false;
-
-                    if (item.mandatoryChoices) item.mandatoryChoices.forEach(g => addChoiceGroup(g));
-                    if (item.supplements) item.supplements.forEach(s => addSupplementRow(s));
-                }
-            }
-            if (window.feather) feather.replace();
-        };
-
-        window.closeItemEditor = () => {
-            const modal = document.getElementById('item-editor');
-            modal.lastElementChild.classList.add('translate-x-full');
-            setTimeout(() => modal.classList.add('hidden'), 250);
-        };
-
-        window.switchEditorTab = (tab) => {
-            document.getElementById('panel-choices').classList.toggle('hidden', tab !== 'choices');
-            document.getElementById('panel-supplements').classList.toggle('hidden', tab !== 'supplements');
-
-            const tChoice = document.getElementById('tab-choices');
-            const tSupp = document.getElementById('tab-supplements');
-
-            if (tab === 'choices') {
-                tChoice.className = "flex-1 py-3.5 text-xs font-black uppercase text-brand-600 border-b-2 border-brand-500 bg-brand-50/50 transition";
-                tSupp.className = "flex-1 py-3.5 text-xs font-black uppercase text-slate-400 hover:bg-slate-50 transition border-b-2 border-transparent";
-            } else {
-                tSupp.className = "flex-1 py-3.5 text-xs font-black uppercase text-brand-600 border-b-2 border-brand-500 bg-brand-50/50 transition";
-                tChoice.className = "flex-1 py-3.5 text-xs font-black uppercase text-slate-400 hover:bg-slate-50 transition border-b-2 border-transparent";
-            }
-        };
-
-        window.addChoiceGroup = (data = null) => {
-            const div = document.createElement('div');
-            div.className = "bg-slate-50 p-4 rounded-2xl border border-slate-200 relative group-row";
-            div.innerHTML = `
-                <button type="button" onclick="this.parentElement.remove()" class="absolute top-2.5 right-2.5 text-red-400 hover:text-red-600 p-1"><i data-feather="x" class="w-4 h-4"></i></button>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-                    <div>
-                        <label class="text-[10px] uppercase font-black text-slate-400 mb-1 block">Titre de l'étape</label>
-                        <input type="text" class="g-title w-full p-2 border border-slate-200 rounded-xl text-xs font-bold" value="${data?.title || ''}" placeholder="Ex: Taille ou Sauces">
-                    </div>
-                    <div>
-                        <label class="text-[10px] uppercase font-black text-slate-400 mb-1 block">Type</label>
-                        <select class="g-type w-full p-2 border border-slate-200 rounded-xl text-xs bg-white">
-                            <option value="radio" ${data?.type === 'radio' ? 'selected' : ''}>Choix Unique (Radio)</option>
-                            <option value="checkbox" ${data?.type === 'checkbox' ? 'selected' : ''}>Choix Multiple (Check)</option>
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-[10px] uppercase font-black text-slate-400 mb-1 block">Min</label>
-                            <input type="number" class="g-min w-full p-2 border border-slate-200 rounded-xl text-xs text-center" value="${data?.min || 0}" min="0">
-                        </div>
-                        <div>
-                            <label class="text-[10px] uppercase font-black text-slate-400 mb-1 block">Max</label>
-                            <input type="number" class="g-max w-full p-2 border border-slate-200 rounded-xl text-xs text-center" value="${data?.max || 0}" min="0">
-                        </div>
-                    </div>
-                </div>
-                <div class="g-options space-y-2 pl-3 border-l-2 border-slate-200"></div>
-                <button type="button" onclick="addOptionRow(this)" class="mt-2.5 text-xs font-bold text-brand-600 hover:underline flex items-center gap-1">+ Ajouter Option</button>
-            `;
-            document.getElementById('container-choices').appendChild(div);
-            const addBtn = div.querySelector('button[onclick^="addOptionRow"]');
-            if (data?.options && data.options.length > 0) {
-                data.options.forEach(opt => addOptionRow(addBtn, opt));
-            } else {
-                addOptionRow(addBtn);
-            }
-            if (window.feather) feather.replace();
-        };
-
-        window.addOptionRow = (btn, optData = null) => {
-            const row = document.createElement('div');
-            row.className = "flex gap-2 items-center option-row";
-            row.innerHTML = `
-                <input type="text" class="opt-name flex-1 p-2 text-xs border border-slate-200 rounded-xl" placeholder="Nom (ex: XL)" value="${optData?.name || ''}">
-                <input type="number" step="0.5" class="opt-price w-24 p-2 text-xs border border-slate-200 rounded-xl font-mono" placeholder="Prix (+)" value="${optData?.price || ''}">
-                <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-red-500 p-1"><i data-feather="minus-circle" class="w-4 h-4"></i></button>
-            `;
-            btn.previousElementSibling.appendChild(row);
-            if (window.feather) feather.replace();
-        };
-
-        window.addSupplementRow = (data = null) => {
-            const div = document.createElement('div');
-            div.className = "flex gap-3 items-center bg-slate-50 p-2.5 rounded-xl border border-slate-200 supp-row";
-            div.innerHTML = `
-                <input type="text" class="supp-name flex-1 p-2 text-xs border border-slate-200 rounded-xl" placeholder="Nom (ex: Frites)" value="${data?.name || ''}">
-                <input type="number" step="0.5" class="supp-price w-24 p-2 text-xs border border-slate-200 rounded-xl font-mono" placeholder="Prix (+)" value="${data?.price || ''}">
-                <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-red-500 p-1"><i data-feather="trash-2" class="w-4 h-4"></i></button>
-            `;
-            document.getElementById('container-supplements').appendChild(div);
-            if (window.feather) feather.replace();
-        };
-
-        window.saveItem = async () => {
-            const btn = document.getElementById('btn-save-item');
-            const categoryVal = document.getElementById('input-category').value;
-
-            if (!categoryVal) {
-                showToast("Veuillez sélectionner une catégorie", "error");
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerText = "Enregistrement...";
-
-            try {
-                const id = document.getElementById('edit-item-id').value;
-                const fileInput = document.getElementById('input-image-file');
-                let imageUrl = document.getElementById('input-image-url').value;
-
-                if (fileInput.files.length > 0) {
-                    imageUrl = await uploadToCloudinary(fileInput.files[0]);
-                }
-
-                const data = {
-                    name: document.getElementById('input-name').value.trim(),
-                    price: parseFloat(document.getElementById('input-price').value) || 0,
-                    description: document.getElementById('input-desc').value.trim(),
-                    category: categoryVal,
-                    imageUrl: imageUrl,
-                    isPopular: document.getElementById('input-popular').checked,
-                    isVisible: document.getElementById('input-visible').checked,
-                    mandatoryChoices: [],
-                    supplements: []
-                };
-
-                // Collect choices
-                document.querySelectorAll('.group-row').forEach(g => {
-                    const title = g.querySelector('.g-title').value.trim();
-                    const type = g.querySelector('.g-type').value;
-                    const min = parseInt(g.querySelector('.g-min').value) || 0;
-                    const max = parseInt(g.querySelector('.g-max').value) || 0;
-                    const options = [];
-
-                    g.querySelectorAll('.option-row').forEach(r => {
-                        const name = r.querySelector('.opt-name').value.trim();
-                        const price = parseFloat(r.querySelector('.opt-price').value) || 0;
-                        if (name) options.push({ name, price });
-                    });
-
-                    if (title && options.length > 0) {
-                        data.mandatoryChoices.push({ title, type, options, min, max });
-                    }
-                });
-
-                // Collect supplements
-                document.querySelectorAll('.supp-row').forEach(r => {
-                    const name = r.querySelector('.supp-name').value.trim();
-                    const price = parseFloat(r.querySelector('.supp-price').value) || 0;
-                    if (name) data.supplements.push({ name, price });
-                });
-
-                if (id) {
-                    await updateDoc(doc(db, 'menuItems', id), data);
-                } else {
-                    data.order = items.length;
-                    data.createdAt = serverTimestamp();
-                    await addDoc(collection(db, 'menuItems'), data);
-                }
-
-                closeItemEditor();
-                await loadItems();
-                showToast("Plat enregistré avec succès !");
-            } catch (err) {
-                console.error(err);
-                showToast("Erreur lors de l'enregistrement: " + err.message, "error");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Enregistrer le Plat";
-            }
-        };
+        // Compatibility entry points now use the Menu Builder. No parallel editor.
+        window.openItemEditor=(id=null)=>menuWorkspace.openProduct(id);
+        window.saveItem=()=>menuWorkspace.saveProduct();
+        window.openCategoryEditor=(id=null)=>menuWorkspace.openCategories(id);
+        window.filterItems=name=>menuWorkspace.filter(name);
+        function uploadProductImage(file,progress) {
+            return new Promise((resolve,reject)=>{
+                const request=new XMLHttpRequest(),form=new FormData();
+                form.append('file',file);form.append('upload_preset',CLOUDINARY_PRESET);
+                request.open('POST',`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`);
+                request.timeout=60000;
+                request.upload.onprogress=event=>{if(event.lengthComputable)progress(Math.round(event.loaded/event.total*100));};
+                request.onerror=request.ontimeout=()=>reject(new Error('Envoi de l’image impossible.'));
+                request.onload=()=>{try{const result=JSON.parse(request.responseText);if(request.status<200||request.status>=300||!/^https:\/\//.test(result.secure_url))throw Error();resolve(result.secure_url);}catch{reject(new Error('Image non acceptée par le service d’envoi.'));}};
+                request.send(form);
+            });
+        }
 
         // --- PROMOTIONS CRUD ---
         async function loadPromotions() {
@@ -1855,7 +1190,7 @@
 
         // Legacy handler guards are defense in depth, not server authorization.
         for (const [view,names] of Object.entries({
-            menu:['openItemEditor','saveItem','deleteItem','saveItemOrder','saveCategoryOrder','openCategoryEditor','deleteCategory','filterItems','addChoiceGroup','addOptionRow','addSupplementRow'],
+            menu:['openItemEditor','saveItem','openCategoryEditor','filterItems'],
             promotions:['openPromoEditor','savePromo','deletePromo'],
             drivers:['deleteDriver'],orders:['setStatus'],driver:['claimDelivery','markDelivered','switchDriverTab']
         })) for (const name of names) {
@@ -1866,9 +1201,7 @@
         // Close slide-outs on ESC
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                closeItemEditor();
                 closePromoEditor();
-                closeCategoryEditor();
             }
         });
     </script>

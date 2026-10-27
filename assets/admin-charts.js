@@ -316,7 +316,8 @@
       const maximum = Math.max(...values, ...[].concat(reference || []).map((r) => r.value));
       const rawTicks = ticks(0, maximum, 4);
       // Orders are discrete counts: low-volume charts still use whole-order ticks.
-      const yt = integerTicks && rawTicks.some(v => !Number.isInteger(v)) ? Array.from({length:Math.max(2,maximum+2)},(_,i)=>i) : rawTicks;
+      const integerStep = Math.max(1, Math.ceil(maximum / 4));
+      const yt = integerTicks ? Array.from({length:Math.ceil((maximum+1)/integerStep)+1},(_,i)=>i*integerStep) : rawTicks;
       const tick = tickFormat || format;
       const padL = 12 + Math.max(...yt.map((v) => measure(s, tick(v), 12))), padB = 26;
       const band = (w - padL) / values.length, bw = Math.max(2, band * 0.62);

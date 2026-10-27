@@ -1,6 +1,8 @@
 # BIGTAC Admin 2.0 status
 
-Current checkpoint: **Phase 1 & 2 UI/UX refinement — complete in isolated fixtures; commit and push explicitly requested**. Phase 3 has not started. Phase 1 and Phase 2 were pushed as `1fdea6a` and `05978a6`. No deployment or production Firebase access was performed.
+Latest Git authorization: the owner explicitly requested commit and push of the visual refinement and its preserved Phase 3 development checkpoint. The no-commit statements below describe the earlier implementation checkpoint. Backend/schema adoption gates remain open; no deployment or production migration is authorized by this Git request. Unrelated image changes and `bigtac-2/` remain excluded.
+
+Current checkpoint: **Reference-led admin visual transformation — complete in isolated fixtures**. The owner supplied three new desktop POS references while Phase 3 verification was in progress. That Phase 3 work is preserved as an uncommitted development checkpoint; no further customer storefront or data-model edits were made for the visual pass. Phase 4 has not started. No commit, push, deployment or production Firebase access.
 
 - [x] Audit repository, roles, workflows and data dependencies.
 - [x] Document architecture, reporting definitions, risks and phase gates in ADMIN_REDESIGN_SPEC.md.
@@ -74,3 +76,54 @@ Ready for Phase 3 Menu Builder planning/review; do not start automatically. Keep
 - Before/after screenshots and lower Overview/detail captures: `C:\Users\pc\.codex\visualizations\2026\10\27\bigtac-admin-refinement`. Files include `{before,after}-{overview,orders,kitchen,detail}-{320,390,768,1440}.png` and `after-overview-lower-{320,390,768,1440}.png`. Actual desktop, mobile, tablet, detail and lower-panel renders were visually reviewed.
 - Modified: `admin.html`, `assets/admin.css`, `assets/admin-shell.js`, `assets/admin-overview.js`, `assets/admin-orders.css`, `assets/admin-orders.js`; new `assets/admin-icons.js`, `tests/admin-visual.mjs`; `tests/fixtures/admin-server.mjs`, `TASK_STATUS.md`.
 - Remaining: physical-device verification and the existing Phase 2 backend/emulator release gates. Long order cards scroll within the queue on small screens; keyboard focus brings actions fully into view. Customer storefront, Firebase configuration, Rules, schemas and production data unchanged. Unrelated local image changes and bigtac-2 remain excluded. No deployment or Phase 3 work.
+
+## Phase 3 checkpoints
+
+- [x] Milestone A — Menu workspace, search/category/state filters, explicit stock versus publication, pending/failure feedback and responsive rows. Initial six-width isolated browser pass; real Cloudinary/Firebase are blocked or mocked.
+- [x] Milestone B — Product sections, strict prices and choices, independent unpublished duplication, image preview/validation/progress, conflict feedback and sticky Save. Initial create/edit/duplicate/upload-mock tests passed.
+- [x] Milestone C — Category rename/move/delete and ordering; shared choice/supplement library, attach/copy/detach and atomic propagation/freeze on deletion. Initial two-product propagation and no-orphan tests passed. Development schema proposals are not production migrations.
+- [ ] Milestone D release gate — local preview, live availability/cart revalidation and expanded client regressions are implemented/tested; schema adoption review, actual SDK/Rules staging and real-device verification remain pending. Production migration is not approved or performed.
+
+Initial Phase 3 evidence: 51 pure configuration checks + 111 browser checks passed. Existing storefront ordering suite: 350 passed after live menu integration. Further tests and exact final results will be recorded below. Existing unrelated images/bigtac-2 remain untouched. Do not commit, push, deploy or start Phase 4 automatically.
+
+## Reference-led visual transformation — 2026-10-27
+
+The latest attached visual brief is the current design authority. Image 2 guides the dark-sidebar Overview composition; image 3 guides status headers, accent edges and ordering hierarchy. The user explicitly requests tinted icon containers and a dark #182331 sidebar, superseding the earlier neutral-only design/skill assumptions. Image 1 contributes hierarchy and operational emphasis only; its fictional financial numbers, unimplemented modules, glows and emoji were not copied.
+
+- [x] A — Shared palette, typography and shell: #F3F6FA workspace, white rounded surfaces, dark sidebar, light outline icons, accessible orange active navigation, distinct staff profile panel, existing restaurant-open status and working profile access.
+- [x] B — Overview: expressive KPI icons, stronger metric typography, compact chart/quick-action composition, operational counters plus a genuine next pending order, real ranked quantities and coordinated charts. No invented trends, revenue, payment status, search module or extra navigation.
+- [x] C — Orders/Kitchen: tinted queue headers, circular counters, orange/blue/teal/green card accents, strong order IDs/totals, concise modifier presentation, visible notes, readable next actions and unchanged status transitions. Local reception-age references stay amber; no invented preparation-delay timestamps.
+- [x] D — Consistency: preserve the Phase 3 Menu Builder, restyle legacy Promotions/Staff/Settings/Delivery using scoped adapters, adapt Staff rows to mobile cards, retain driver-specific navigation and improve touch actions. No role or backend permissions added.
+- [x] E — Final responsive captures, visual inspection, role checks and focused regressions completed (evidence below).
+
+Reference comparison after actual screenshot inspection: dark/light separation, orange navigation, KPI icon tiles and the chart-left/attention-right composition now follow the references. The quick-action panel was shortened after the first render; sidebar active-icon contrast and crowded integer chart ticks were corrected. The attention panel spans the two left panels on desktop; tablet attention becomes a full-width operational summary, and mobile prioritizes that summary. Lower widgets retain their natural data-driven heights instead of adding empty white space. Sparse chart bars reflect fixture order timestamps; no extra counts were manufactured to fill a graph. Financial/payment limitations remain visible.
+
+Visual-pass modified files: `admin.html`, `assets/admin.css`, new `assets/admin-legacy.css`, `assets/admin-shell.js`, `assets/admin-overview.js`, `assets/admin-orders.css`, `assets/admin-charts.js`, `tests/admin-visual.mjs`, `ADMIN_REDESIGN_SPEC.md`, `TASK_STATUS.md`.
+
+Preserved earlier Phase 3 files remain uncommitted: `assets/admin-menu.js`, `assets/admin-menu.css`, `assets/admin-menu-service.js`, `assets/menu-model.js`, `assets/customization.js`, `assets/storefront.css`, `index.html`, `package.json`, `tests/menu.mjs`, `tests/menu-model.mjs`, `tests/admin.mjs`, `tests/fixtures/admin-firebase.js`, `tests/fixtures/firebase.js`, `backend/MENU_PHASE3.md`, plus the Phase 3 integration portions of `admin.html`/shell/status. Hashes of the storefront, customization/model and menu service were recorded before the visual pass and verified unchanged afterward. No schema, coordination field, fixture order contract, pricing or checkout change was introduced for styling.
+
+Earlier Phase 3 expanded regression now passes **51 pure + 136 browser checks**, including bulk stock/publication/moves, unique ordering under simultaneous creates, shared-group concurrent attachment, stale editor refusal, upload failure/retry, cache/read/cap handling and historical-order preservation. Those are isolated fixture tests, not server authorization certification. The development contract/release approval/staging work in `backend/MENU_PHASE3.md` is still outstanding; Phase 3 is not declared production-ready by this visual refinement.
+
+Screenshots: `C:\Users\pc\.codex\visualizations\2026\10\27\bigtac-admin-reference-transform`. Real before captures: `before-{overview,orders,kitchen,detail}-{320,390,768,1440}.png`. Updated application captures: `after-{overview,orders,kitchen,detail,menu,promotions,drivers,settings}-{320,390,768,1024,1440}.png`; `after-overview-lower-{width}.png`, `after-orders-history-{width}.png`, role-specific mobile captures, and complete content exports `after-{overview,orders}-full-{390,1440}.png`. Complete exports use a taller real browser viewport at the same width; regular screenshots retain the original desktop/mobile viewport for comparisons. History screenshots load records through the existing bounded History control; no orders are created. Fixture images/accounts/orders are fictional.
+
+Review: Web Interface Guidelines checked for the changed presentation. Taste source lint: 0 failures, 10 explained warnings (explicit semantic blue, controlled shadows, disabled blur adapters, clock formatting and unavailable-value dashes). Browser inspection: 0 failures; Overview has one grouped row-height warning (intentional spanning attention/natural lower-widget heights), Orders has metadata-density, variable real-order heights and existing bottom-nav text inset warnings. Purple delivery and tinted icon containers are deliberate user-directed allowances. No measured text contrast failures, gradients, glows or page overflow.
+
+Remaining: physical iOS/Android keyboard/safe-area verification, existing backend permission/pricing/payment gates, and the preserved Phase 3 development/schema adoption review. Legacy team/driver financial calculations were not rewritten or certified. No production writes, real uploads, migration, commit, push, deployment or Phase 4 work. Pre-existing `assets/snack.png`, `assets/tacos-hero.jpg` and `bigtac-2/` changes remain outside this task.
+
+### Final verification evidence
+
+**1,580 checks passed** across the current preserved implementation:
+
+| Suite | Actual result |
+| --- | --- |
+| `npm run test:admin` | 49 model + 218 browser = 267 |
+| `npm run test:orders` | 54 model + 192 browser = 246 |
+| `npm run test:menu` | 51 model + 136 browser = 187 |
+| `node tests/admin-visual.mjs` | 177 visual/role/accessibility checks |
+| `npm run test:storefront` | 350 |
+| `npm run test:carousels` | 205 |
+| `npm run test:customization` | 148 |
+
+Visual widths: 320, 390, 768, 1024 and 1440px. Existing regressions additionally cover 375px/900px. Checked active navigation and semantic text contrast, no horizontal page/frame overflow, chart tick spacing/integer counts, visible drawer footers, keyboard-accessible queue actions, bounded history, desktop profile access, role-specific landing screens, Staff mobile rows, notification styling and zero writes while browsing. All suites block production Firebase; three Phase 3 image requests are mocked, with no real uploads. Syntax/diff checks pass. Before/after/full-content screenshots were opened and visually compared with the user’s references; complete Overview and Orders exports were reviewed, along with tablet/mobile/Kitchen/Staff/Settings/Promotions/driver renders.
+
+No new dependency was installed. Existing customer/model/service hashes match the pre-visual checkpoint. No commit, push, deployment, production migration or Phase 4 work was performed. The reference-led visual work is complete; the separate Phase 3/backend adoption gates above remain open.

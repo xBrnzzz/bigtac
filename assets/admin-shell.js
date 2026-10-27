@@ -19,17 +19,17 @@ export function mountAdminShell() {
     shell.innerHTML = `
         <a class="admin-skip" href="#views-container">Aller au contenu</a>
         <aside class="admin-sidebar" aria-label="Navigation principale">
-            <a class="admin-brand" href="index.html" target="_blank" rel="noopener"><img src="assets/logo.png" width="40" height="40" alt=""><span><strong data-restaurant-name>BIGTAC</strong><small>Gestion du restaurant</small></span></a>
+            <a class="admin-brand" href="index.html" target="_blank" rel="noopener"><img src="assets/logo.png" width="44" height="44" alt=""><span><strong data-restaurant-name>BIGTAC</strong><small>Admin 2.0</small></span></a>
             <nav id="admin-desktop-nav"></nav>
             <div class="admin-account"><span class="admin-avatar" aria-hidden="true">E</span><span><strong data-staff-name></strong><small data-staff-role></small></span></div>
             <button id="logout-btn" class="admin-text-button">${icon('log-out')}Déconnexion</button>
         </aside>
         <div class="admin-workspace">
-            <header class="admin-topbar"><div class="admin-location"><span data-restaurant-name>BIGTAC</span><span aria-hidden="true">/</span><h1 id="admin-page-name">Vue d’ensemble</h1></div><div class="admin-top-actions"><span id="admin-connection" role="status">Connexion…</span><button id="admin-more-button" class="admin-icon-button" aria-label="Ouvrir le menu" aria-expanded="false">${icon('menu')}</button><a class="admin-preview" href="index.html" target="_blank" rel="noopener">Voir le site ${icon('external-link')}</a></div></header>
+            <header class="admin-topbar"><div class="admin-location"><span data-restaurant-name>BIGTAC</span><span aria-hidden="true">/</span><h1 id="admin-page-name">Vue d’ensemble</h1></div><div class="admin-top-actions"><span id="admin-store-status" class="admin-store-status" hidden></span><span id="admin-connection" role="status">Connexion…</span><a class="admin-preview" href="index.html" target="_blank" rel="noopener">Voir le site ${icon('external-link')}</a><button id="admin-profile-button" class="admin-profile-button" aria-label="Ouvrir votre espace équipe" aria-expanded="false"><span class="admin-avatar" aria-hidden="true">E</span></button><button id="admin-more-button" class="admin-icon-button" aria-label="Ouvrir le menu" aria-expanded="false">${icon('menu')}</button></div></header>
             <div id="admin-content-slot"></div>
         </div>
         <nav id="admin-bottom-nav" class="admin-bottom-nav" aria-label="Navigation mobile"></nav>
-        <dialog id="admin-more" class="admin-more" aria-labelledby="admin-more-title"><header><h2 id="admin-more-title">Votre espace</h2><button id="admin-more-close" class="admin-icon-button" aria-label="Fermer le menu">${icon('x')}</button></header><nav id="admin-more-nav"></nav><a class="admin-button" href="index.html" target="_blank" rel="noopener">Voir le site client</a><button id="admin-more-logout" class="admin-button">Déconnexion</button></dialog>`;
+        <dialog id="admin-more" class="admin-more" aria-labelledby="admin-more-title"><header><h2 id="admin-more-title">Votre espace</h2><button id="admin-more-close" class="admin-icon-button" aria-label="Fermer le menu">${icon('x')}</button></header><div class="admin-more-identity"><span class="admin-avatar" aria-hidden="true">E</span><span><strong data-staff-name></strong><small data-staff-role></small></span></div><nav id="admin-more-nav"></nav><a class="admin-button" href="index.html" target="_blank" rel="noopener">Voir le site client</a><button id="admin-more-logout" class="admin-button">Déconnexion</button></dialog>`;
     document.body.append(shell);
     shell.querySelector('#admin-content-slot').replaceWith(views);
     views.setAttribute('role', 'main'); views.tabIndex = -1;
@@ -37,15 +37,31 @@ export function mountAdminShell() {
     const settings = document.createElement('section'); settings.id = 'view-settings'; settings.className = 'admin-page hidden';
     settings.innerHTML = `<div class="admin-page-heading"><h2>Paramètres opérationnels</h2><p>Les contrôles existants du restaurant. Les réglages de marque arrivent dans une phase ultérieure.</p></div><div class="admin-panel admin-settings-panel"><div class="admin-setting-row"><div><label for="toggle-store">Restaurant ouvert</label><p>La fermeture annule aussi les commandes en attente. Une confirmation est demandée avant toute fermeture.</p></div><input id="toggle-store" type="checkbox" disabled></div><div class="admin-setting-row"><div><label for="toggle-whatsapp">Commandes WhatsApp</label><p>Utiliser le parcours WhatsApp existant.</p></div><input id="toggle-whatsapp" type="checkbox" disabled></div><p id="admin-settings-feedback" role="status">Chargement des réglages…</p><button class="admin-button" id="admin-settings-retry" hidden>Réessayer</button></div>`;
     views.append(settings);
+    // Reuse the shared visual system without replacing legacy business handlers.
+    for(const [id,glyph] of [['view-promotions','tag'],['view-drivers','users'],['view-driver','truck'],['view-settings','sliders']]) {
+        const heading=document.querySelector(`#${id} h2`);
+        if(heading)heading.insertAdjacentHTML('afterbegin',icon(glyph));
+    }
+    const teamTable=document.querySelector('#view-drivers table');
+    teamTable.setAttribute('role','table');
+    const teamLabels=[...teamTable.querySelectorAll('th')].map(cell=>cell.textContent.trim());
+    new MutationObserver(()=>teamTable.querySelectorAll('tbody tr').forEach(row=>{
+        row.setAttribute('role','row');
+        [...row.cells].forEach((cell,index)=>{cell.dataset.label=teamLabels[index];cell.setAttribute('role','cell');});
+        row.querySelectorAll('button:not([aria-label])').forEach(button=>button.setAttribute('aria-label',button.title||'Supprimer ce compte'));
+    })).observe(teamTable.querySelector('tbody'),{childList:true});
     const gate = document.createElement('section'); gate.id = 'admin-access'; gate.className = 'admin-access'; gate.hidden = true;
     gate.innerHTML = `<div class="admin-panel"><img src="assets/logo.png" width="48" height="48" alt="BIGTAC"><h1>Accès au restaurant indisponible</h1><p id="admin-access-message" role="alert"></p><button id="admin-access-retry" class="admin-button primary">Réessayer</button><button id="admin-access-logout" class="admin-button">Se déconnecter</button></div>`;
     document.body.append(gate);
     const more = document.getElementById('admin-more');
-    const closeMore = () => { more.close(); document.getElementById('admin-more-button').setAttribute('aria-expanded', 'false'); };
-    const openMore = () => { more.showModal(); document.getElementById('admin-more-button').setAttribute('aria-expanded', 'true'); };
+    const expanded = value => ['admin-more-button','admin-profile-button'].forEach(id=>document.getElementById(id).setAttribute('aria-expanded',String(value)));
+    const closeMore = () => { more.close(); expanded(false); };
+    const openMore = () => { more.showModal(); expanded(true); };
     document.getElementById('admin-more-button').onclick = openMore;
+    document.getElementById('admin-profile-button').onclick = openMore;
     document.getElementById('admin-more-close').onclick = closeMore;
-    more.addEventListener('close', () => document.getElementById('admin-more-button').setAttribute('aria-expanded', 'false'));
+    more.addEventListener('close', () => expanded(false));
+    more.addEventListener('cancel', () => expanded(false));
     document.getElementById('admin-more-logout').onclick = () => { closeMore(); document.getElementById('logout-btn').click(); };
     shell.addEventListener('click', event => {
         const moreButton = event.target.closest('[data-more]');
@@ -59,7 +75,7 @@ export function mountAdminShell() {
     document.getElementById('email').name = 'email'; document.getElementById('password').name = 'password';
     document.getElementById('login-error').setAttribute('role', 'alert');
     // Shared focus containment for the preserved legacy editors.
-    const editors = ['item-editor','promo-editor','category-editor-modal'].map(id=>document.getElementById(id));
+    const editors = ['promo-editor'].map(id=>document.getElementById(id));
     let activeEditor = null, returnFocus = null;
     const focusables = root => [...root.querySelectorAll('button:not(:disabled), input:not(:disabled):not([type="hidden"]), select:not(:disabled), textarea:not(:disabled), a[href], [tabindex="0"]')].filter(element=>element.getClientRects().length);
     for (const editor of editors) {
@@ -88,7 +104,7 @@ export function mountAdminShell() {
         else if (!event.shiftKey && document.activeElement===last) { event.preventDefault(); first?.focus(); }
     });
     window.addEventListener('offline', () => connection()); window.addEventListener('online', () => connection());
-    function connection() { document.getElementById('admin-connection').textContent = navigator.onLine ? 'Connecté' : 'Hors connexion'; }
+    function connection() { const status=document.getElementById('admin-connection');status.textContent=navigator.onLine?'Connecté':'Hors connexion';status.dataset.offline=String(!navigator.onLine); }
     connection();
     return {
         showSession(profile, role) {
@@ -96,7 +112,7 @@ export function mountAdminShell() {
             shell.dataset.role = role;
             shell.querySelectorAll('[data-staff-name]').forEach(node => node.textContent = profile.name || profile.email || 'Équipe');
             shell.querySelectorAll('[data-staff-role]').forEach(node => node.textContent = labels[role]);
-            shell.querySelector('.admin-avatar').textContent = (profile.name || 'E').slice(0, 1).toUpperCase();
+            shell.querySelectorAll('.admin-avatar').forEach(node=>node.textContent=(profile.name || 'E').slice(0,1).toUpperCase());
             const allowed = destinations.filter(([view]) => mayView(role, view));
             const nav = document.getElementById('admin-desktop-nav'); nav.replaceChildren();
             for (const group of ['Opérations', 'Catalogue', 'Gestion']) {
@@ -112,7 +128,7 @@ export function mountAdminShell() {
             shell.hidden = true; shell.inert = true; gate.hidden = true;
             if (more.open) closeMore();
             views.querySelectorAll(':scope > [id^="view-"]').forEach(view => view.classList.add('hidden'));
-            for (const id of ['item-editor', 'promo-editor', 'category-editor-modal']) document.getElementById(id)?.classList.add('hidden');
+            for (const id of ['promo-editor']) document.getElementById(id)?.classList.add('hidden');
         },
         deny(message) { this.hideSession(); login.classList.add('hidden'); gate.hidden = false; document.getElementById('admin-access-message').textContent = message; },
         route(view) {
@@ -122,7 +138,11 @@ export function mountAdminShell() {
             if (location.hash !== `#${view}`) history.replaceState(null, '', `#${view}`);
             views.focus({ preventScroll: true });
         },
-        restaurant(config = {}) { shell.querySelectorAll('[data-restaurant-name]').forEach(node => node.textContent = config.restaurantName || 'BIGTAC'); },
+        restaurant(config = {}) {
+            shell.querySelectorAll('[data-restaurant-name]').forEach(node => node.textContent = config.restaurantName || 'BIGTAC');
+            const status=document.getElementById('admin-store-status');status.hidden=!!config._unavailable;
+            status.textContent=config.isOpen===false?'Fermé':'Ouvert';status.dataset.open=String(config.isOpen!==false);
+        },
         allowed: roleViews
     };
 }

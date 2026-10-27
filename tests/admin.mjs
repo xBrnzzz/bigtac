@@ -71,7 +71,7 @@ try {
                 await page.locator('#item-editor').waitFor({state:'hidden'});
                 check(await page.evaluate(()=>__adminFixture.data.menuItems[0].name==='Tacos poulet modifié'),'Legacy product save persists in fixture');
                 await page.evaluate(()=>openCategoryEditor('tacos'));
-                check(await page.locator('#category-editor-modal').isVisible(),'Category editor preserved');
+                check(await page.locator('#menu-categories-dialog').isVisible(),'Category editor preserved');
                 await page.keyboard.press('Escape');
             }
             await page.evaluate(()=>switchView('promotions'));

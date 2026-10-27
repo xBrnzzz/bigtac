@@ -21,12 +21,18 @@ const orders = Array.from({ length: 24 }, (_, i) => ({
 }));
 const profile = { id:'fixture-staff', uid: 'fixture-staff', name: 'Équipe démo', email: 'fixture@example.test', role };
 const data = {
+    modifierGroups: [],
     users: [profile], orders: parameters.has('empty') ? [] : orders,
     categories: [{ id: 'tacos', name: 'Tacos', order: 0 }, { id: 'burgers', name: 'Burgers', order: 1 }],
     menuItems: [{ id: 'tacos', name: 'Tacos poulet', category: 'Tacos', order: 0, price: 45, imageUrl: 'assets/tacos-campaign.jpg', isVisible: true, mandatoryChoices: [], supplements: [] }, { id: 'burger', name: 'Burger maison', category: 'Burgers', order: 1, price: 55, imageUrl: 'assets/tacos-campaign.jpg', isVisible: true }],
     promotions: [{ id: 'duo', name: 'Menu duo', price: 80, imageUrl: 'assets/tacos-campaign.jpg', isVisible: true }],
     settings: [{ id: 'config', isOpen: true, whatsappMode: false, reportingTimezone: 'Africa/Casablanca', restaurantName: 'BIGTAC' }]
 };
+if(parameters.get('menu')==='rich') {
+    data.categories.push({id:'sides',name:'Accompagnements',order:2});
+    data.menuItems[0].isPopular=true;
+    for(const [index,name] of ['Frites cheddar','Nuggets','Tenders','Oignons croustillants'].entries())data.menuItems.push({id:`side-${index}`,name,description:'Accompagnement de démonstration.',category:'Accompagnements',price:15+index*5,order:index+2,imageUrl:'assets/tacos-campaign.jpg',isAvailable:index!==1,isVisible:index!==3,isPopular:index===0,mandatoryChoices:[],supplements:[{name:'Sauce cheddar',price:4}]});
+}
 if(parameters.get('orders')==='rich') {
     data.orders=Array.from({length:16},(_,i)=>({
         id:`fixture-${i}`,shortId:String(1040+i),status:['pending','confirmed','en_livraison','delivered'][i%4],
@@ -82,11 +88,12 @@ export function onSnapshot(ref, optionsOrNext, nextOrError, errorCallback) {
         if (!listeners.has(listener)) return;
         if (parameters.has('profile-error') && ref.name === 'users') return error?.(Error('Fixture profile unavailable'));
         if ((parameters.has('orders-error') || window.__adminFixture.failOrders) && ref.name === 'orders') return error?.(Error('Fixture orders unavailable'));
+        if (window.__adminFixture.failMenu && ['categories','menuItems'].includes(ref.name)) return error?.(Error('Fixture menu unavailable'));
         next(snapshot(ref));
     });
     return () => listeners.delete(listener);
 }
-function emit() { for (const listener of [...listeners]) { if (!listeners.has(listener)) continue; if (window.__adminFixture.failOrders && listener.ref.name==='orders') listener.error?.(Error('Fixture orders unavailable')); else listener.next(snapshot(listener.ref)); } }
+function emit() { for (const listener of [...listeners]) { if (!listeners.has(listener)) continue; if (window.__adminFixture.failOrders && listener.ref.name==='orders') listener.error?.(Error('Fixture orders unavailable')); else if(window.__adminFixture.failMenu&&['menuItems','categories'].includes(listener.ref.name))listener.error?.(Error('Fixture menu unavailable'));else listener.next(snapshot(listener.ref)); } }
 export function onAuthStateChanged(_auth, callback) { authListeners.add(callback); queueMicrotask(() => callback(user)); return () => authListeners.delete(callback); }
 export async function signInWithEmailAndPassword() { user = { uid: 'fixture-staff', email: 'fixture@example.test' }; for (const cb of authListeners) cb(user); return { user }; }
 export async function signOut() { user = null; for (const cb of authListeners) cb(null); }
@@ -102,6 +109,11 @@ export async function addDoc(ref, value) { const id = `new-${writes.length}`; aw
 export async function deleteDoc(ref) { writes.push({ kind: 'delete', ref }); data[ref.name] = data[ref.name].filter(row => (row.id || row.uid) !== ref.id); emit(); }
 export const writeBatch = () => { const tasks = []; return { update: (ref, value) => tasks.push(() => updateDoc(ref, value)), commit: () => Promise.all(tasks.map(fn => fn())) }; };
 function checkOrderWrite(ref,value) {
+    if(['categories','menuItems','modifierGroups','settings'].includes(ref.name)) {
+        const member=data.users.find(row=>(row.id||row.uid)===user?.uid);
+        if(!member||!['admin','manager'].includes(member.role)||member.disabled||member.isActive===false)throw Object.assign(Error('Fixture catalog permission denied'),{code:'permission-denied'});
+        if(value.price!=null && (!Number.isFinite(Number(value.price))||Number(value.price)<0))throw Object.assign(Error('Fixture invalid price'),{code:'permission-denied'});
+    }
     if(ref.name!=='orders')return;
     const membership=data.users.find(row=>(row.id||row.uid)===user?.uid), role=membership?.role==='delivery'?'livreur':membership?.role;
     const before=data.orders.find(row=>row.id===ref.id), after={...before,...value}, keys=Object.keys(value);
@@ -117,13 +129,19 @@ export const runTransaction = async (_db, fn) => {
     window.__adminFixture.transactions++;
     for(let attempt=0;attempt<3;attempt++) {
         const reads=[],tasks=[];
-        const result=await fn({ get:async ref=>{const snap=await getDoc(ref);reads.push({ref,version:JSON.stringify(snap.data())});return snap;},update:(ref,value)=>tasks.push({ref,value}) });
+        const result=await fn({ get:async ref=>{const snap=await getDoc(ref);reads.push({ref,version:JSON.stringify(snap.data())});return snap;},update:(ref,value)=>tasks.push({kind:'update',ref,value}),set:(ref,value)=>tasks.push({kind:'set',ref,value}),delete:ref=>tasks.push({kind:'delete',ref,value:{}}) });
         if(window.__adminFixture.writeDelay)await new Promise(resolve=>setTimeout(resolve,window.__adminFixture.writeDelay));
         if(window.__adminFixture.beforeCommit){const callback=window.__adminFixture.beforeCommit;window.__adminFixture.beforeCommit=null;callback();}
         if(reads.some(read=>JSON.stringify(snapshot(read.ref).data())!==read.version))continue;
         if(window.__adminFixture.failWrites)throw Object.assign(Error('Fixture write rejected'),{code:'unavailable'});
         tasks.forEach(({ref,value})=>checkOrderWrite(ref,value));
-        tasks.forEach(({ref,value})=>{writes.push({kind:'transaction',ref,value});Object.assign(data[ref.name].find(row=>(row.id||row.uid)===ref.id),value);});emit();return result;
+        tasks.forEach(({kind,ref,value})=>{
+            writes.push({kind:'transaction',ref,value});data[ref.name] ||= [];
+            const row=data[ref.name].find(row=>(row.id||row.uid)===ref.id);
+            if(kind==='delete')data[ref.name]=data[ref.name].filter(row=>(row.id||row.uid)!==ref.id);
+            else if(kind==='set'){if(row)Object.assign(row,value);else data[ref.name].push({...value,id:ref.id});}
+            else Object.assign(row,value);
+        });emit();return result;
     }
     throw Object.assign(Error('Fixture concurrent update'),{code:'aborted'});
 };

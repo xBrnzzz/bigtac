@@ -1,0 +1,53 @@
+/* Presentation adapters for preserved Promotions, Team and Delivery workflows. */
+:is(#view-promotions,#view-drivers,#view-driver) { background:var(--admin-ground)!important; color:var(--admin-text); }
+:is(#view-promotions,#view-drivers)>div.max-w-5xl { max-width:1200px; }
+:is(#view-promotions,#view-drivers,#view-driver) h2 { display:flex; align-items:center; gap:10px; font-size:26px; font-weight:800; letter-spacing:-.025em; color:var(--admin-text); }
+:is(#view-promotions,#view-drivers,#view-driver) h2>.admin-glyph { width:26px; height:26px; color:var(--admin-primary); }
+:is(#view-promotions,#view-drivers,#view-driver) .bg-white { background:var(--admin-surface); border-color:var(--admin-border); box-shadow:var(--admin-shadow); border-radius:var(--admin-radius); }
+:is(#view-promotions,#view-drivers,#view-driver) :is(.text-slate-400,.text-slate-500,.text-slate-600) { color:var(--admin-muted); }
+:is(#view-promotions,#view-drivers,#view-driver,#promo-editor) .font-mono { font-family:var(--font); font-variant-numeric:tabular-nums; }
+:is(#view-promotions,#view-drivers,#view-driver,#promo-editor) svg { stroke-width:1.8; }
+:is(#view-promotions,#view-drivers) label { font-size:13px; font-weight:600; text-transform:none; letter-spacing:0; color:var(--admin-muted); }
+:is(#view-promotions,#view-drivers) :is(input,select) { background:white; border:1px solid var(--admin-control); color:var(--admin-text); font-size:14px; font-weight:500; }
+:is(#view-promotions,#view-drivers,#view-driver) :is(.bg-brand-500,.bg-brand-600) { background:var(--admin-primary); color:white; box-shadow:none; }
+#view-promotions>div>div:first-child>button { background:var(--admin-primary); border:1px solid var(--admin-primary); min-height:44px; box-shadow:none; }
+#view-promotions>div>div:first-child>button:hover { background:var(--admin-primary-hover); }
+#view-promotions #promotions-list>div { border-top:3px solid var(--admin-orange-border); }
+#promotions-list button { min-width:44px; min-height:44px; }
+#promotions-list .text-red-600 { color:var(--admin-orange-ink); }
+#promotions-list span { font-size:12px; }
+#promotions-list .text-emerald-600 { color:var(--admin-positive); }
+#view-drivers>div>div.bg-white:first-of-type { border-top:3px solid var(--admin-blue-border); }
+#view-drivers table { font-variant-numeric:tabular-nums; }
+#view-drivers th { color:var(--admin-muted); text-transform:none; font-weight:600; font-size:12px; letter-spacing:0; }
+#view-drivers td button { min-width:44px; min-height:44px; }
+#view-driver>div:first-child { border-radius:0; border-color:var(--admin-border); }
+#view-driver>nav { box-shadow:0 -2px 8px #17203308; border-radius:0; }
+#view-driver :is(#driver-tab-available,#driver-tab-deliveries)>h2 { font-size:21px; }
+#view-driver [data-driver-action=complete] { background:var(--admin-positive); min-height:46px; box-shadow:none; }
+#view-driver [data-driver-action=claim] { min-height:46px; box-shadow:none; }
+#view-driver :is(button,a) { min-height:44px; }
+#promo-editor>div:last-child { border-radius:0; }
+#promo-editor :is(h2,h3) { color:var(--admin-text); }
+#promo-editor :is(input,select,textarea) { border-color:var(--admin-control); background:white; color:var(--admin-text); }
+#promo-editor label { text-transform:none; letter-spacing:0; font-size:13px; }
+#btn-save-promo { background:var(--admin-primary); box-shadow:none; }
+#view-settings .admin-panel { border-top:3px solid var(--admin-blue-border); }
+#view-settings .admin-setting-row:last-of-type { border-bottom:0; }
+@media(max-width:767px) {
+    :is(#view-promotions,#view-drivers) h2 { font-size:23px; line-height:1.3; }
+    :is(#view-promotions,#view-drivers) :is(input,select,textarea) { font-size:16px; }
+    #view-promotions>div>div:first-child>button { width:100%; justify-content:center; }
+    #promotions-list>div { display:grid; grid-template-columns:64px minmax(0,1fr); gap:12px; }
+    #promotions-list>div>div:last-child { grid-column:1/-1; justify-content:flex-end; }
+    #view-drivers table { display:block; min-width:0; }
+    #view-drivers thead { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+    #view-drivers tbody { display:block; }
+    #view-drivers tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); padding:12px; gap:6px 12px; border-bottom:1px solid var(--admin-border); }
+    #view-drivers td { display:block; padding:6px 0; white-space:normal; overflow-wrap:anywhere; text-align:left; }
+    #view-drivers td:nth-child(1),#view-drivers td:nth-child(2) { grid-column:1/-1; }
+    #view-drivers td::before { content:attr(data-label); display:block; font-size:12px; color:var(--admin-muted); margin-bottom:4px; }
+    #view-drivers td:last-child { grid-column:1/-1; text-align:right; }
+    #view-drivers td:last-child::before { display:none; }
+    #view-driver :is(#driver-tab-available,#driver-tab-deliveries)>h2 { font-size:19px; }
+}

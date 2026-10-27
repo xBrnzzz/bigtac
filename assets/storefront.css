@@ -2322,3 +2322,6 @@ body.has-tracker {
     justify-content:flex-start;
     padding-inline:0
 }
+/* Live catalog stock feedback; ordering layout and visual direction are retained. */
+.product-card__choose:disabled { opacity:.65; cursor:not-allowed; }
+.cart-menu-warning { margin:8px 20px; padding:12px; border-radius:12px; background:#fff4df; color:#7a440c; font-size:14px; }

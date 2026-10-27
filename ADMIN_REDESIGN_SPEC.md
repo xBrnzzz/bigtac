@@ -39,6 +39,9 @@ Permission migration gate: reconcile existing Auth UIDs against verified staff r
 
 ## Design decisions
 
+Current visual direction (2026-10-27): the owner’s three supplied POS references supersede the original neutral Framed sheet appearance below. Keep the existing architecture and Plus Jakarta Sans; use a dark #182331 sidebar, #F3F6FA workspace, clear white panels, orange active navigation, tinted semantic icon tiles and a compact chart/attention/quick-action composition. The original Phase 1 style description is historical, not a requirement to revert these changes. Reference percentages, payment/revenue claims, new-order entry, global search and extra modules are not implemented unless actual data/workflows support them. See TASK_STATUS.md for screenshots and verification. Phase 3 Menu Builder development remains preserved; this visual pass does not alter its data contract or customer storefront.
+
+
 Question: **What needs attention in the restaurant right now, and how is today's ordering activity?** Main action: open the live order queue. Face: existing logo, Plus Jakarta Sans and restrained BIGTAC orange on order activity. Signature: restaurant handoff queue (accept → prepare → assign delivery), computed from real active order states.
 
 Taste skill: Framed sheet, seed 1097938476, retained brand palette/type. Neutral L-frame, white inset sheet, 16px radius and hairlines; no dashboard hero, gradients, icon KPI tiles, fabricated deltas or decorative charts. Shared KPI strip and compact actionable lists. At 1440px: 228 sidebar + 8 inset + 1204 work area; 24px internal gutters, grid columns share the same edges. Phone: single sheet, two-column figures, full-width charts and 44px actions. Light theme only for Phase 1; a partial dark theme would harm consistency.

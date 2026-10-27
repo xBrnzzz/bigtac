@@ -284,6 +284,7 @@
                         </i>
                     </button>
                 </header>
+                <p id="cartMenuWarning" class="cart-menu-warning" role="alert" hidden></p>
                 <div id="cartItemsContainer" class="sheet-scroll cart-items">
                 </div>
                 <footer class="sheet-footer">
@@ -495,6 +496,7 @@
     <script type="module">
         import { db, collection, getDocs, query, orderBy, addDoc, serverTimestamp, doc, onSnapshot } from './firebase-config.js';
 
+        import {available as menuAvailable,listed as menuListed,categoryFor,cartMenuIssue,fingerprint as menuFingerprint} from './assets/menu-model.js';
         import { buildCustomizationSteps, choiceRules, selectionIssue, customizationPrice, cartSelections } from './assets/customization.js';
         import { setupCarousel } from './assets/carousels.js';
 
@@ -517,6 +519,8 @@
         let allPromotions = [];
         let allCategories = [];
         let categoryImages = {};
+        let categoryRows=[],rawMenuItems=[],categoriesReady=false,itemsReady=false,promotionsReady=false,stockReady=false;
+        let stopMenuItems=null,stopMenuCategories=null;
         let cart = [];
         window.cart = cart;
         let currentItem = null;
@@ -682,64 +686,50 @@
         }
 
         // --- CATEGORIES & MENU FETCHING ---
-        async function fetchCategories() {
-            try {
-                const q = query(collection(db, "categories"), orderBy("order", "asc"));
-                const snap = await getDocs(q);
-                allCategories = [];
-                categoryImages = {};
-
-                const container = document.getElementById('categoryFilters');
-                let html = `
-                    <button type="button" onclick="filterSection('all')" class="filter-btn-pill active" data-cat="all" aria-pressed="true">Tout voir</button>
-                `;
-
-                snap.forEach(docSnap => {
-                    const d = docSnap.data();
-                    allCategories.push(d.name);
-                    categoryImages[d.name] = d.image || '';
-
-                    html += `
-                        <button type="button" onclick="filterSection(decodeURIComponent('${encodeURIComponent(d.name).replace(/'/g, '%27')}'))" class="filter-btn-pill" data-cat="${escapeCardText(d.name)}" aria-pressed="false">
-                            ${escapeCardText(d.name)}
-                        </button>
-                    `;
-                });
-
-                if (container) container.innerHTML = html;
-            } catch (e) {
-                console.error("Failed to load categories:", e);
+        function applyLiveCatalog() {
+            stockReady=categoriesReady&&itemsReady&&promotionsReady;
+            if(!categoriesReady||!itemsReady)return;
+            allItems=rawMenuItems.filter(item=>menuListed(item,categoryRows)).map(item=>({...item,category:categoryFor(item,categoryRows)?.name||item.category}));
+            allCategories=categoryRows.filter(row=>row.isVisible!==false).map(row=>row.name);
+            categoryImages=Object.fromEntries(categoryRows.map(row=>[row.name,row.image||'']));
+            const controls=document.getElementById('categoryFilters');
+            controls.innerHTML='<button type="button" onclick="filterSection(\'all\')" class="filter-btn-pill active" data-cat="all" aria-pressed="true">Tout voir</button>'+allCategories.map(name=>`<button type="button" onclick="filterSection(decodeURIComponent('${encodeURIComponent(name).replace(/'/g,'%27')}'))" class="filter-btn-pill" data-cat="${escapeCardText(name)}" aria-pressed="false">${escapeCardText(name)}</button>`).join('');
+            if(activeCategory!=='all'&&!allCategories.includes(activeCategory))activeCategory='all';
+            renderMenuSections(allItems);renderPopular(allItems);applyMenuFilters();
+            document.getElementById('menuContent').setAttribute('aria-busy','false');
+            if(currentItem&&!currentItem.isPromo&&!document.getElementById('addItemModal').classList.contains('hidden')) {
+                const fresh=allItems.find(item=>item.id===currentItem.id);
+                if(!fresh||!menuAvailable(fresh)||menuFingerprint(fresh)!==menuFingerprint(currentItem)) {closeAddItemModal();showToast('Ce produit vient de changer. Ouvrez-le à nouveau pour vérifier vos choix.','error');}
             }
+            updateCartUI();
         }
-
-        async function fetchItems() {
-            try {
-                const q = query(collection(db, "menuItems"), orderBy('order', 'asc'));
-                const snap = await getDocs(q);
-
-                allItems = [];
-                snap.forEach(docSnap => {
-                    const data = docSnap.data();
-                    if (data.isVisible !== false) {
-                        allItems.push({ id: docSnap.id, ...data });
-                    }
-                });
-
-                allItems.sort((a, b) => (a.order || 0) - (b.order || 0));
-                renderMenuSections(allItems);
-                renderPopular(allItems);
-                document.getElementById('menuContent').setAttribute('aria-busy', 'false');
-                applyMenuFilters();
-            } catch (e) {
-                console.error("Failed to load items:", e);
-                document.getElementById('menuContent').setAttribute('aria-busy', 'false');
-                const container = document.getElementById('menuContent');
-                if (container) {
-                    container.innerHTML = '<div class="empty-state" role="alert"><i data-feather="wifi-off" aria-hidden="true"></i><h3>La carte se fait attendre</h3><p>Vérifiez votre connexion, puis réessayez.</p><button type="button" class="secondary-button" onclick="retryMenu()">Réessayer</button></div>';
-                    refreshIcons();
-                }
-            }
+        function catalogError() {
+            stockReady=false;
+            document.getElementById('menuContent').setAttribute('aria-busy','false');
+            document.getElementById('menuContent').innerHTML='<div class="empty-state" role="alert"><h3>La carte se fait attendre</h3><p>Vérifiez votre connexion, puis réessayez.</p><button type="button" class="secondary-button" onclick="retryMenu()">Réessayer</button></div>';
+            updateCartUI();
         }
+        function fetchCategories() {
+            stopMenuCategories?.();categoriesReady=false;
+            return new Promise(resolve=>{
+                stopMenuCategories=onSnapshot(query(collection(db,'categories'),orderBy('order','asc')),snapshot=>{
+                    categoryRows=[];snapshot.forEach(row=>categoryRows.push({...row.data(),id:row.id}));
+                    categoriesReady=!snapshot.metadata?.fromCache;applyLiveCatalog();resolve();
+                },()=>{categoriesReady=false;catalogError();resolve();});
+            });
+        }
+        function fetchItems() {
+            stopMenuItems?.();itemsReady=false;
+            return new Promise(resolve=>{
+                stopMenuItems=onSnapshot(query(collection(db,'menuItems'),orderBy('order','asc')),snapshot=>{
+                    rawMenuItems=[];snapshot.forEach(row=>rawMenuItems.push({...row.data(),id:row.id}));
+                    rawMenuItems.sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0));
+                    itemsReady=!snapshot.metadata?.fromCache;applyLiveCatalog();resolve();
+                },()=>{itemsReady=false;catalogError();resolve();});
+            });
+        }
+        window.addEventListener('pagehide',()=>{stopMenuItems?.();stopMenuCategories?.();});
+        window.addEventListener('pageshow',event=>{if(event.persisted)window.retryMenu();});
 
         async function fetchPromotions() {
             try {
@@ -760,7 +750,9 @@
                     container.innerHTML = allPromotions.map(promo => createCardHTML(promo, 'h3', 'offer')).join('');
                     setupCarousel(container);
                 }
+                promotionsReady=true;applyLiveCatalog();
             } catch (e) {
+                promotionsReady=false;stockReady=false;updateCartUI();
                 console.error("Promotions error:", e);
             }
         }
@@ -839,8 +831,8 @@
                         <p class="product-card__description">${escapeCardText(item.description || 'Préparé à la commande.')}</p>
                         <div class="product-card__footer">
                             <div class="product-card__price"><small>À partir de</small><strong>${money(item.price)}</strong></div>
-                            <button type="button" class="product-card__choose" onclick="openItemModal(decodeURIComponent('${itemId}'), ${item.isPromo === true})" aria-label="Choisir ${name}">
-                                <span>${variant === 'offer' ? 'Composer' : 'Choisir'}</span><i data-feather="plus" aria-hidden="true"></i>
+                            <button type="button" class="product-card__choose" ${menuAvailable(item)?'':'disabled'} onclick="openItemModal(decodeURIComponent('${itemId}'), ${item.isPromo === true})" aria-label="Choisir ${name}">
+                                <span>${menuAvailable(item) ? variant === 'offer' ? 'Composer' : 'Choisir' : 'Rupture de stock'}</span><i data-feather="plus" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
@@ -948,7 +940,7 @@
         window.openItemModal = (id, isPromo = false) => {
             cancelCustomizationAdvance();
             currentItem = (isPromo ? allPromotions : allItems).find(item => item.id === id);
-            if (!currentItem) return;
+            if (!currentItem || !menuAvailable(currentItem)) return showToast('Ce produit est en rupture de stock.','error');
             modalQty = 1;
             wizardData = {};
             Object.keys(selectionErrors).forEach(key => delete selectionErrors[key]);
@@ -1086,12 +1078,13 @@
         window.handleWizardAction = () => addToCartFromModal();
 
         window.addToCartFromModal = () => {
-            if (!currentItem || !validateCustomization(true)) return;
+            if (!currentItem || !menuAvailable(currentItem) || !stockReady || !validateCustomization(true)) return;
             const { selectedOptions, supplements } = cartSelections(wizardSteps, wizardData);
             cart.push({
                 cartId: `${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-                id: currentItem.id, name: currentItem.name, imageUrl: currentItem.imageUrl || '', category: currentItem.category || '',
+                id: currentItem.id, isPromo: currentItem.isPromo===true, name: currentItem.name, imageUrl: currentItem.imageUrl || '', category: currentItem.category || '',
                 qty: modalQty, unitBasePrice: currentItem.price, selectedOptions, supplements,
+                choiceSelections:wizardSteps.map((step,index)=>({step,index})).filter(({step})=>step.type==='choice').map(({step,index})=>({title:step.title,options:(wizardData[index]||[]).map(({name,price})=>({name,price}))})),
                 totalPrice: customizationPrice(currentItem, wizardData, modalQty)
             });
             localStorage.setItem('bigtacCart', JSON.stringify(cart));
@@ -1127,8 +1120,11 @@
             document.body.classList.toggle('has-cart', Boolean(cart.length));
             document.getElementById('desktopCartPreview').textContent = cart.length ? `${totalQty} article${totalQty > 1 ? 's' : ''} dans votre panier. Encore une envie ?` : 'Choisissez vos plats, on s’occupe du reste.';
             const checkoutButton = document.getElementById('btnGoToCheckout');
-            checkoutButton.disabled = !cart.length || appConfig.isOpen === false;
-            checkoutButton.textContent = appConfig.isOpen === false ? 'Le restaurant est fermé' : 'Passer commande';
+            const catalogIssue=cart.length&&stockReady?cartMenuIssue(cart,rawMenuItems,categoryRows,allPromotions):'';
+            document.getElementById('cartMenuWarning').hidden=!catalogIssue;
+            document.getElementById('cartMenuWarning').textContent=catalogIssue;
+            checkoutButton.disabled = !cart.length || appConfig.isOpen === false || !stockReady || !!catalogIssue;
+            checkoutButton.textContent = appConfig.isOpen === false ? 'Le restaurant est fermé' : !stockReady ? 'Vérification de la carte…' : catalogIssue ? 'Vérifier le panier' : 'Passer commande';
             refreshIcons();
         };
         window.updateCartItemQty = (index, change) => {
@@ -1155,7 +1151,12 @@
         window.openCart = () => openModalAnimation('cartModal');
         window.closeCart = () => closeModalAnimation('cartModal');
 
+        function verifyCartMenu() {
+            const issue=!stockReady?'La carte doit être vérifiée avant de commander. Actualisez-la.':cartMenuIssue(cart,rawMenuItems,categoryRows,allPromotions);
+            if(issue){showToast(issue,'error');return false;}return true;
+        }
         window.openCheckoutModal = () => {
+            if(!verifyCartMenu())return;
             if (!cart.length) return showToast('Choisissez un plat avant de passer commande.', 'error');
             switchModal('cartModal', 'nameModal');
         };
@@ -1232,6 +1233,7 @@
 
         // --- ORDER SUBMISSION & WHATSAPP ROUTING ---
         window.finalizeOrder = async () => {
+            if(!verifyCartMenu())return;
             if (!appConfig.isOpen) {
                 showToast("Le restaurant est actuellement fermé", "error");
                 return;

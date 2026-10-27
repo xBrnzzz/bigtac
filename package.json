@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "test:menu": "node tests/menu-model.mjs && node tests/menu.mjs",
     "test:orders": "node tests/orders-model.mjs && node tests/orders.mjs",
     "test:admin": "node tests/admin-model.mjs && node tests/admin.mjs",
     "test:storefront": "node tests/storefront.mjs",

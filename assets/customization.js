@@ -2,9 +2,10 @@
 export function buildCustomizationSteps(item) {
     const steps = (item.mandatoryChoices || []).map(group => ({
         type: 'choice', title: group.title || 'Votre choix',
-        data: { ...group, options: group.options || [] }
+        data: { ...group, options: (group.options || []).filter(option=>option.isAvailable!==false) }
     }));
-    if (item.supplements?.length) steps.push({ type: 'supplements', title: 'Suppléments', data: item.supplements });
+    const supplements=(item.supplements||[]).filter(option=>option.isAvailable!==false);
+    if (supplements.length) steps.push({ type: 'supplements', title: 'Suppléments', data: supplements });
     return steps;
 }
 
@@ -25,6 +26,7 @@ export function selectionIssue(step, selections = []) {
     if (min > Math.min(options.length, max)) return 'Ce choix est indisponible. Choisissez un autre plat ou contactez le restaurant.';
     if (selections.length < min) return `Choisissez ${min === 1 ? 'au moins une option' : `au moins ${min} options`} pour continuer.`;
     if (selections.length > max) return `Choisissez au maximum ${max} option${max > 1 ? 's' : ''}.`;
+    if(selections.some(selection=>!options.some(option=>option.name===selection.name&&Number(option.price||0)===Number(selection.price||0))))return 'Une option a changé ou n’est plus disponible. Recommencez ce choix.';
     return '';
 }
 

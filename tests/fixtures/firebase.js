@@ -16,7 +16,10 @@ const items = [
 ];
 const promotions=[{...base,id:'promo',isPromo:true,name:'Menu Tacos',price:35,description:'Un tacos, des frites et une boisson.',mandatoryChoices:[choices[0]]}];
 const categories=['Tacos Français','Gratinés','Burgers','À côté'];
+const categoryRows=categories.map((name,i)=>({id:'cat'+i,name,order:i}));
+const catalogListeners=new Set();
 window.__fixture={orders:[],failMenu:scenario==='error',failSubmission:scenario==='submit-error',failTracking:scenario==='tracker-error',state:'pending',tracker:null,setStatus(status){this.state=status;this.tracker?.({exists:()=>true,data:()=>({shortId:1234,status,type:'livraison'})});}};
+Object.assign(window.__fixture,{menuItems:items,categories:categoryRows,catalogListeners,emitCatalog(){for(const listener of catalogListeners)getDocs(listener.ref).then(listener.next,listener.error);}});
 export const collection=(_,name)=>name;
 export const doc=(_,name,id)=>({name,id});
 export const query=x=>x;
@@ -25,10 +28,14 @@ export const serverTimestamp=()=>new Date();
 export const getDocs=async name=>{
  await new Promise(r=>setTimeout(r,scenario==='loading'?1800:80));
  if(window.__fixture.failMenu&&name==='menuItems')throw new Error('Mock network failure');
- const rows=scenario==='empty'?[]:name==='menuItems'?items:name==='categories'?categories.map((name,i)=>({id:'cat'+i,name,order:i})):promotions;
+ const rows=scenario==='empty'?[]:name==='menuItems'?items:name==='categories'?categoryRows:promotions;
  return {forEach:fn=>rows.forEach(x=>fn({id:x.id,data:()=>x})),empty:!rows.length};
 };
-export const onSnapshot=(ref,callback)=>{
+export const onSnapshot=(ref,callback,error)=>{
+ if(typeof ref==='string'&&['menuItems','categories'].includes(ref)) {
+   const listener={ref,next:callback,error};catalogListeners.add(listener);getDocs(ref).then(value=>{if(catalogListeners.has(listener))callback(value);},error);
+   return ()=>catalogListeners.delete(listener);
+ }
  if(ref.name==='settings') callback({exists:()=>true,data:()=>({isOpen:scenario!=='closed',whatsappMode:scenario==='whatsapp'})});
  else if(ref.name==='orders'){
    const next=typeof callback==='function'?callback:callback.next;
