@@ -8,7 +8,8 @@
     "test:admin": "node tests/admin-model.mjs && node tests/admin.mjs",
     "test:storefront": "node tests/storefront.mjs",
     "test:carousels": "node tests/carousels.mjs",
-    "test:customization": "node tests/customization-navigation.mjs"
+    "test:customization": "node tests/customization-navigation.mjs",
+    "test:operations": "node tests/operations-model.mjs && node tests/operations-service.mjs && node tests/operations.mjs && node tests/operations-responsive.mjs"
   },
   "dependencies": {
     "playwright": "^1.64.1"

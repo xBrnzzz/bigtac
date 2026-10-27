@@ -178,7 +178,7 @@
                     </div>
                     <div>
                         <h3>Les horaires</h3>
-                        <p>7j / 7, de 12:00 à 02:00</p>
+                        <p id="restaurant-hours">7j / 7, de 12:00 à 02:00</p>
                         <p>Une question sur votre commande ?</p>
                         <div class="contact-actions">
                             <button type="button" class="secondary-button" onclick="contactWhatsApp()">WhatsApp</button>
@@ -498,6 +498,7 @@
 
         import {available as menuAvailable,listed as menuListed,categoryFor,cartMenuIssue,fingerprint as menuFingerprint} from './assets/menu-model.js';
         import { buildCustomizationSteps, choiceRules, selectionIssue, customizationPrice, cartSelections } from './assets/customization.js';
+        import {promotionState,orderingAvailable,safeURL} from './assets/operations-model.js';
         import { setupCarousel } from './assets/carousels.js';
 
         // --- CONFIG & CONSTANTS ---
@@ -515,8 +516,11 @@
 
         // --- STATE MANAGEMENT ---
         let appConfig = { isOpen: true, whatsappMode: false };
+        let configReady=false;
+        let orderSubmitting=false;
         let allItems = [];
         let allPromotions = [];
+        let rawPromotions=[],stopPromotions=null,promoTimer=null;
         let allCategories = [];
         let categoryImages = {};
         let categoryRows=[],rawMenuItems=[],categoriesReady=false,itemsReady=false,promotionsReady=false,stockReady=false;
@@ -656,7 +660,8 @@
             updateCartUI();
 
             // Real-time store configuration
-            onSnapshot(doc(db, "settings", "config"), (docSnap) => {
+            onSnapshot(doc(db, "settings", "config"), {includeMetadataChanges:true}, (docSnap) => {
+                configReady=docSnap.exists()&&!docSnap.metadata?.fromCache&&!docSnap.metadata?.hasPendingWrites;
                 if (docSnap.exists()) {
                     appConfig = docSnap.data();
                     const banner = document.getElementById('closedBanner');
@@ -665,9 +670,9 @@
                     status.textContent = appConfig.isOpen === false ? 'Fermé pour le moment' : 'Commandes ouvertes';
                     status.classList.toggle('is-open', appConfig.isOpen !== false);
                     status.classList.toggle('is-closed', appConfig.isOpen === false);
-                    updateCartUI();
-                }
-            }, () => { document.getElementById('storeStatus').textContent = 'Horaires à confirmer'; });
+                    applyRestaurantConfig();updateCartUI();
+                }else{configReady=false;applyRestaurantConfig();updateCartUI();}
+            }, () => { configReady=false;document.getElementById('storeStatus').textContent = 'Horaires à confirmer';updateCartUI(); });
 
             // Fetch categories, items, and promotions concurrently
             try {
@@ -683,6 +688,21 @@
             initOrderTracker();
             renderDeliveryZones();
             if (window.feather) feather.replace();
+        }
+
+        const modes=['livraison','emporter','sur_place'];
+        const profileDefaults={description:document.querySelector('.restaurant-intro__copy>p').textContent,logoUrl:document.querySelector('.store-brand img').getAttribute('src'),address:document.querySelector('#locations>div>p').textContent,map:document.querySelector('#locations>div>a').href,hours:document.getElementById('restaurant-hours').textContent,instagram:document.querySelector('.app-footer>a:last-child').href};
+        function storeAvailable(){return configReady&&modes.some(mode=>orderingAvailable(appConfig,mode));}
+        function applyRestaurantConfig(){
+            const open=storeAvailable(),status=document.getElementById('storeStatus');status.textContent=open?'Commandes ouvertes':'Commandes indisponibles';status.classList.toggle('is-open',open);status.classList.toggle('is-closed',!open);document.getElementById('closedBanner').classList.toggle('hidden',open);
+            document.querySelectorAll('.service-choice').forEach((button,index)=>{button.disabled=!configReady||!orderingAvailable(appConfig,modes[index]);button.setAttribute('aria-disabled',String(button.disabled));});
+            if(appConfig.restaurantName){const brand=document.querySelector('.store-brand>span');brand.firstChild.textContent=appConfig.restaurantName;document.querySelector('.store-brand').setAttribute('aria-label',appConfig.restaurantName+', accueil');document.querySelector('#store-title span').textContent=appConfig.restaurantName+' !';document.querySelector('.app-footer>a').textContent=appConfig.restaurantName;}
+            document.querySelector('.restaurant-intro__copy>p').textContent=appConfig.description||profileDefaults.description;
+            document.querySelector('.store-brand img').src=appConfig.logoUrl&&safeURL(appConfig.logoUrl)?appConfig.logoUrl:profileDefaults.logoUrl;
+            document.querySelector('#locations>div>p').textContent=appConfig.address||profileDefaults.address;document.querySelector('#locations>div>a').href=appConfig.address?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(appConfig.address):profileDefaults.map;
+            document.querySelector('.app-footer>a:last-child').href=appConfig.instagramUrl&&safeURL(appConfig.instagramUrl)?appConfig.instagramUrl:profileDefaults.instagram;
+            if(Array.isArray(appConfig.openingHours)&&appConfig.openingHours.length===7)document.getElementById('restaurant-hours').textContent=appConfig.openingHours.map((h,i)=>['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'][i]+': '+(h.closed?'fermé':h.start+'–'+h.end)).join(' · ');else document.getElementById('restaurant-hours').textContent=profileDefaults.hours;
+            document.getElementById('btnFinalize').disabled=orderSubmitting||!storeAvailable()||!!checkoutData.type&&!orderingAvailable(appConfig,checkoutData.type);
         }
 
         // --- CATEGORIES & MENU FETCHING ---
@@ -728,33 +748,28 @@
                 },()=>{itemsReady=false;catalogError();resolve();});
             });
         }
-        window.addEventListener('pagehide',()=>{stopMenuItems?.();stopMenuCategories?.();});
+        window.addEventListener('pagehide',()=>{stopMenuItems?.();stopMenuCategories?.();stopPromotions?.();clearInterval(promoTimer);});
         window.addEventListener('pageshow',event=>{if(event.persisted)window.retryMenu();});
 
-        async function fetchPromotions() {
-            try {
-                const snap = await getDocs(collection(db, "promotions"));
-                const container = document.getElementById('promotionsGrid');
-                const section = document.getElementById('promotions');
-                allPromotions = [];
-
-                snap.forEach(docSnap => {
-                    const data = docSnap.data();
-                    if (data.isVisible !== false) {
-                        allPromotions.push({ id: docSnap.id, isPromo: true, ...data });
-                    }
-                });
-
-                if (container) {
-                    section.classList.toggle('hidden', allPromotions.length === 0);
-                    container.innerHTML = allPromotions.map(promo => createCardHTML(promo, 'h3', 'offer')).join('');
-                    setupCarousel(container);
-                }
-                promotionsReady=true;applyLiveCatalog();
-            } catch (e) {
-                promotionsReady=false;stockReady=false;updateCartUI();
-                console.error("Promotions error:", e);
+        function renderLivePromotions(){
+            allPromotions=rawPromotions.filter(p=>promotionState(p)==='active');
+            const container=document.getElementById('promotionsGrid');
+            document.getElementById('promotions').classList.toggle('hidden',!allPromotions.length);
+            container.innerHTML=allPromotions.map(p=>createCardHTML(p,'h3','offer')).join('');setupCarousel(container);
+            if(currentItem?.isPromo&&!document.getElementById('addItemModal').classList.contains('hidden')){
+                const fresh=allPromotions.find(p=>p.id===currentItem.id);
+                if(!fresh||menuFingerprint(fresh)!==menuFingerprint(currentItem)){closeAddItemModal();showToast('Cette offre a changé ou n’est plus disponible.','error');}
             }
+            applyLiveCatalog();
+        }
+        function fetchPromotions(){
+            stopPromotions?.();clearInterval(promoTimer);promotionsReady=false;
+            return new Promise(resolve=>{
+                stopPromotions=onSnapshot(collection(db,'promotions'),{includeMetadataChanges:true},snap=>{
+                    rawPromotions=snap.docs.map(d=>({...d.data(),id:d.id,isPromo:true}));promotionsReady=!(snap.metadata?.fromCache||snap.metadata?.hasPendingWrites);renderLivePromotions();resolve();
+                },()=>{promotionsReady=false;stockReady=false;updateCartUI();resolve();});
+                promoTimer=setInterval(()=>{applyRestaurantConfig();if(menuFingerprint(allPromotions)!==menuFingerprint(rawPromotions.filter(p=>promotionState(p)==='active')))renderLivePromotions();else updateCartUI();},30000);
+            });
         }
 
         window.retryMenu = async () => {
@@ -1078,6 +1093,7 @@
         window.handleWizardAction = () => addToCartFromModal();
 
         window.addToCartFromModal = () => {
+            if(currentItem?.isPromo&&promotionState(currentItem)!=='active'){showToast('Cette offre n’est plus disponible.','error');return;}
             if (!currentItem || !menuAvailable(currentItem) || !stockReady || !validateCustomization(true)) return;
             const { selectedOptions, supplements } = cartSelections(wizardSteps, wizardData);
             cart.push({
@@ -1123,8 +1139,8 @@
             const catalogIssue=cart.length&&stockReady?cartMenuIssue(cart,rawMenuItems,categoryRows,allPromotions):'';
             document.getElementById('cartMenuWarning').hidden=!catalogIssue;
             document.getElementById('cartMenuWarning').textContent=catalogIssue;
-            checkoutButton.disabled = !cart.length || appConfig.isOpen === false || !stockReady || !!catalogIssue;
-            checkoutButton.textContent = appConfig.isOpen === false ? 'Le restaurant est fermé' : !stockReady ? 'Vérification de la carte…' : catalogIssue ? 'Vérifier le panier' : 'Passer commande';
+            checkoutButton.disabled = !cart.length || !storeAvailable() || !stockReady || !!catalogIssue;
+            checkoutButton.textContent = !storeAvailable() ? 'Le restaurant est fermé' : !stockReady ? 'Vérification de la carte…' : catalogIssue ? 'Vérifier le panier' : 'Passer commande';
             refreshIcons();
         };
         window.updateCartItemQty = (index, change) => {
@@ -1151,7 +1167,9 @@
         window.openCart = () => openModalAnimation('cartModal');
         window.closeCart = () => closeModalAnimation('cartModal');
 
-        function verifyCartMenu() {
+        function verifyCartMenu(mode=null) {
+            allPromotions=rawPromotions.filter(p=>promotionState(p)==='active');
+            if(!storeAvailable()||mode&&(!modes.includes(mode)||!orderingAvailable(appConfig,mode))){showToast('Ce mode de commande n’est plus disponible. Choisissez un autre mode.','error');return false;}
             const issue=!stockReady?'La carte doit être vérifiée avant de commander. Actualisez-la.':cartMenuIssue(cart,rawMenuItems,categoryRows,allPromotions);
             if(issue){showToast(issue,'error');return false;}return true;
         }
@@ -1184,6 +1202,7 @@
             });
         }
         window.selectService = type => {
+            if(!modes.includes(type)||!storeAvailable()||!orderingAvailable(appConfig,type)){showToast('Service indisponible. Choisissez un autre mode.','error');return;}
             checkoutData.type = type;
             if (type === 'livraison') {
                 selectedZoneId = null;
@@ -1218,6 +1237,7 @@
             switchModal('deliveryZoneModal', 'summaryModal');
         };
         function populateSummary(type) {
+            document.getElementById('btnFinalize').disabled=orderSubmitting||!storeAvailable()||!orderingAvailable(appConfig,type);
             document.getElementById('summaryName').textContent = checkoutData.name;
             document.getElementById('summaryPhone').textContent = checkoutData.phone;
             document.getElementById('summaryLocation').textContent = checkoutData.location;
@@ -1233,13 +1253,15 @@
 
         // --- ORDER SUBMISSION & WHATSAPP ROUTING ---
         window.finalizeOrder = async () => {
-            if(!verifyCartMenu())return;
+            if(orderSubmitting)return;
+            if(!verifyCartMenu(checkoutData.type))return;
             if (!appConfig.isOpen) {
                 showToast("Le restaurant est actuellement fermé", "error");
                 return;
             }
 
             if (cart.length === 0) return;
+            orderSubmitting=true;
 
             document.getElementById('orderSubmissionError').classList.add('hidden');
             const btn = document.getElementById('btnFinalize');
@@ -1254,7 +1276,7 @@
 
             // WHATSAPP DIRECT MODE
             if (appConfig.whatsappMode) {
-                const phoneNumber = WHATSAPP_NUMBERS['default'];
+                const phoneNumber = String(appConfig.whatsappNumber||WHATSAPP_NUMBERS['default']).replace(/[^0-9]/g,'').replace(/^0/,'212');
                 let msg = `*🍔 NOUVELLE COMMANDE - BIGTAC FÈS*\n\n`;
                 msg += `👤 *Client:* ${checkoutData.name}\n`;
                 msg += `📞 *Tél:* ${checkoutData.phone}\n`;
@@ -1280,6 +1302,7 @@
                 closeModalAnimation('summaryModal');
 
                 window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+                orderSubmitting=false;
                 if (btn) {
                     btn.disabled = false;
                     btn.innerText = "Confirmer la Commande";
@@ -1331,8 +1354,9 @@
                 submissionError.classList.remove('hidden');
                 showToast("Erreur de connexion. Veuillez réessayer.", "error");
             } finally {
+                orderSubmitting=false;
                 if (btn) {
-                    btn.disabled = false;
+                    btn.disabled = !storeAvailable()||!orderingAvailable(appConfig,checkoutData.type);
                     btn.innerText = "Confirmer la Commande";
                 }
             }
@@ -1413,8 +1437,8 @@
             } catch (e) {}
         }
 
-        window.contactWhatsApp = () => window.open('https://wa.me/212663339105', '_blank');
-        window.contactCall = () => window.open('tel:+212663339105', '_self');
+        window.contactWhatsApp = () => window.open('https://wa.me/'+String(appConfig.whatsappNumber||WHATSAPP_NUMBERS.default).replace(/[^0-9]/g,'').replace(/^0/,'212'), '_blank', 'noopener');
+        window.contactCall = () => window.open('tel:'+String(appConfig.phone||'+212663339105').replace(/[^+0-9]/g,''), '_self');
 
         // Robust initialization across DOM states
         if (document.readyState === 'loading') {

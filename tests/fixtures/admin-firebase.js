@@ -109,7 +109,7 @@ export async function addDoc(ref, value) { const id = `new-${writes.length}`; aw
 export async function deleteDoc(ref) { writes.push({ kind: 'delete', ref }); data[ref.name] = data[ref.name].filter(row => (row.id || row.uid) !== ref.id); emit(); }
 export const writeBatch = () => { const tasks = []; return { update: (ref, value) => tasks.push(() => updateDoc(ref, value)), commit: () => Promise.all(tasks.map(fn => fn())) }; };
 function checkOrderWrite(ref,value) {
-    if(['categories','menuItems','modifierGroups','settings'].includes(ref.name)) {
+    if(['categories','menuItems','modifierGroups','settings','promotions'].includes(ref.name)) {
         const member=data.users.find(row=>(row.id||row.uid)===user?.uid);
         if(!member||!['admin','manager'].includes(member.role)||member.disabled||member.isActive===false)throw Object.assign(Error('Fixture catalog permission denied'),{code:'permission-denied'});
         if(value.price!=null && (!Number.isFinite(Number(value.price))||Number(value.price)<0))throw Object.assign(Error('Fixture invalid price'),{code:'permission-denied'});
@@ -123,7 +123,9 @@ function checkOrderWrite(ref,value) {
     const staffStatus=staff&&keys.every(key=>key==='status')&&path[before?.status]?.includes(after.status);
     const driverClaim=valid&&role==='livreur'&&before?.status==='en_livraison'&&before?.type==='livraison'&&!before.deliveryGuyId&&after.deliveryGuyId===user.uid&&keys.every(key=>['deliveryGuyId','deliveryGuyName','claimedAt'].includes(key));
     const driverComplete=valid&&role==='livreur'&&before?.status==='en_livraison'&&before?.type==='livraison'&&before?.deliveryGuyId===user.uid&&after.status==='delivered'&&keys.every(key=>['status','deliveredAt'].includes(key));
-    if(!staffStatus&&!driverClaim&&!driverComplete)throw Object.assign(Error('Fixture permission denied'),{code:'permission-denied'});
+    const target=data.users.find(row=>(row.id||row.uid)===value.deliveryGuyId);
+    const assignment=valid&&['admin','manager'].includes(role)&&before?.status==='en_livraison'&&before.type==='livraison'&&keys.every(key=>['deliveryGuyId','deliveryGuyName'].includes(key))&&(!value.deliveryGuyId||target&&['delivery','livreur'].includes(target.role)&&target.disabled!==true&&target.isActive!==false&&!['disabled','inactive'].includes(target.status));
+    if(!staffStatus&&!driverClaim&&!driverComplete&&!assignment)throw Object.assign(Error('Fixture permission denied'),{code:'permission-denied'});
 }
 export const runTransaction = async (_db, fn) => {
     window.__adminFixture.transactions++;

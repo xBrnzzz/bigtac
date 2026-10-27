@@ -407,6 +407,9 @@
         import { mountAdminShell } from './assets/admin-shell.js';
         import { icon as adminIcon } from './assets/admin-icons.js';
         import { createOverview } from './assets/admin-overview.js';
+        import { operationsService } from './assets/operations-service.js';
+        import { createSettingsEditor } from './assets/admin-settings-editor.js';
+        import { createPromotions } from './assets/admin-promotions.js';
         import { createMenuWorkspace } from './assets/admin-menu.js';
         import { createOrderWorkspace } from './assets/admin-orders.js';
         import { commitOrderTransition, commitDriverAction, operationMessage } from './assets/admin-orders-service.js';
@@ -418,8 +421,9 @@
             query, orderBy, onSnapshot, serverTimestamp, writeBatch, where, setDoc, runTransaction 
         } from './firebase-config.js';
 
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signOut as secondarySignOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import {limit} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import {staffAdministration} from "./assets/staff-service.js";
+
 
         // Expose auth to window for event handlers
         window.auth = auth;
@@ -471,6 +475,8 @@
             workVersion++;
             orderWorkspace.stop();
             menuWorkspace.stop();
+            promotionsWorkspace.stop();
+            settingsEditor.clear();
             if (settingsUnsub) settingsUnsub(); settingsUnsub = null;
             driverUnsubscribers.forEach(unsubscribe => unsubscribe()); driverUnsubscribers = [];
             overview.stop(); overviewStarted = false; currentView = null;
@@ -628,7 +634,7 @@
             const retry=document.getElementById('admin-settings-retry');
             const inputs=['toggle-store','toggle-whatsapp'].map(id=>document.getElementById(id));
             const publish=config=>{
-                settingsData=config; shell.restaurant(config); orderWorkspace.settingsChanged();
+                settingsData=config; settingsEditor.update(config); shell.restaurant(config); orderWorkspace.settingsChanged();
                 if (authorized('overview')) {
                     if (overviewStarted) overview.update(config);
                     else { overview.start(config); overviewStarted=true; }
@@ -642,7 +648,7 @@
                     feedback.textContent='Configuration absente. Demandez sa préparation à un administrateur.';
                     retry.hidden=false; return;
                 }
-                const config=snap.data(); publish(config);
+                const config=snap.data(); publish(config);settingsEditor.update(config,!!(snap.metadata?.fromCache||snap.metadata?.hasPendingWrites));
                 inputs[0].checked=config.isOpen!==false; inputs[1].checked=config.whatsappMode===true;
                 inputs.forEach(input=>input.disabled=saving);
                 if(!saving)feedback.textContent=snap.metadata?.fromCache ? 'Réglages en cache. Vérifiez la connexion avant une modification.' : 'Réglages synchronisés.';
@@ -662,7 +668,7 @@
                 }
                 saving=true;inputs.forEach(control=>control.disabled=true); feedback.textContent='Enregistrement…';
                 try {
-                    await updateDoc(doc(db,'settings','config'),{ [field]:checked });
+                    await operationsService(orderActor).settings({[field]:checked},{...settingsData,id:'config'});
                     // Preserve existing closure behavior, with its consequence confirmed above.
                     if (field==='isOpen' && !checked) {
                         const pending=await getDocs(query(collection(db,'orders'),where('status','==','pending')));
@@ -691,6 +697,7 @@
             if (!requireView(viewId)) return false;
             if(currentView==='menu'&&viewId!=='menu'&&!menuWorkspace.canLeave())return false;
             if(viewId!=='menu')menuWorkspace.stop();
+            if(viewId!=='promotions')promotionsWorkspace.stop();
             currentView=viewId; shell.route(viewId);
             if (viewId!=='orders') orderWorkspace.stop();
             if (viewId==='overview') overview.visible();
@@ -739,273 +746,32 @@
             });
         }
 
-        // --- PROMOTIONS CRUD ---
-        async function loadPromotions() {
-            if (!authorized('promotions')) return;
-            const version=workVersion;
-            try {
-                const snap = await getDocs(collection(db, 'promotions'));
-                if (version!==workVersion || !authorized('promotions')) return;
-                const list = document.getElementById('promotions-list');
-                if (!list) return;
+        // Phase 4 reuses the existing offer editor and styling.
+        const promotionsWorkspace=createPromotions({session:orderActor,toast:(...args)=>showToast(...args),upload:uploadToCloudinary,settings:()=>settingsData});
+        const settingsEditor=createSettingsEditor({session:orderActor,toast:(...args)=>showToast(...args),upload:uploadToCloudinary});
+        function loadPromotions(){promotionsWorkspace.start();}
+        window.openPromoEditor=id=>promotionsWorkspace.open(id);
+        window.closePromoEditor=()=>promotionsWorkspace.close();
+        window.savePromo=()=>promotionsWorkspace.save();
+        window.deletePromo=()=>showToast('Utilisez Supprimer dans la liste des offres.','error');
+        window.switchPromoTab=tab=>{document.getElementById('promo-panel-choices').classList.toggle('hidden',tab!=='choices');document.getElementById('promo-panel-supplements').classList.toggle('hidden',tab!=='supplements');};
 
-                if (snap.empty) {
-                    list.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 italic">Aucune promotion enregistrée.</div>`;
-                    return;
-                }
-
-                list.innerHTML = '';
-                snap.forEach(docSnap => {
-                    const p = { id: docSnap.id, ...docSnap.data() };
-                    list.innerHTML += `
-                        <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-sm flex items-center gap-3.5">
-                            <img src="${p.imageUrl || 'assets/snack.png'}" class="w-16 h-16 rounded-2xl object-cover bg-red-50 shrink-0" onerror="this.src='assets/snack.png'">
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-extrabold text-slate-900 text-sm truncate">${p.name}</h4>
-                                <div class="text-red-600 font-black text-sm font-mono mt-0.5">${p.price} Dh</div>
-                                <span class="text-[10px] font-bold ${p.isVisible !== false ? 'text-emerald-600' : 'text-slate-400'}">
-                                    ${p.isVisible !== false ? '● En Ligne' : '○ Masquée'}
-                                </span>
-                            </div>
-                            <div class="flex gap-1">
-                                <button onclick="openPromoEditor('${p.id}')" class="p-2 text-blue-500 hover:bg-blue-50 rounded-xl transition" title="Modifier">
-                                    <i data-feather="edit-2" class="w-4 h-4"></i>
-                                </button>
-                                <button onclick="deletePromo('${p.id}')" class="p-2 text-red-500 hover:bg-red-50 rounded-xl transition" title="Supprimer">
-                                    <i data-feather="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                if (window.feather) feather.replace();
-            } catch (err) {
-                console.error("Load promos error:", err);
-            }
+        // Staff administration fails closed until a trusted service is verified.
+        const staffForm=document.getElementById('user-form');
+        staffForm.querySelectorAll('input,select,button').forEach(control=>control.disabled=true);
+        document.getElementById('user-password').value='';
+        const staffNotice=document.createElement('p');staffNotice.className='admin-notice';staffNotice.setAttribute('role','status');staffNotice.textContent='Création, rôles et désactivation indisponibles : service sécurisé de gestion des comptes requis.';staffForm.before(staffNotice);
+        staffForm.addEventListener('submit',async event=>{event.preventDefault();try{await staffAdministration.create();}catch(error){showToast(error.message,'error');}});
+        async function loadDrivers(){
+            if(!authorized('drivers'))return;const version=workVersion,body=document.getElementById('drivers-table-body');body.textContent='Chargement…';
+            try{
+                const snap=await getDocs(query(collection(db,'users'),limit(201)));if(version!==workVersion||!authorized('drivers'))return;
+                if(snap.metadata?.fromCache||snap.docs.length>200)throw Error('Liste non confirmée ou partielle.');
+                const labels=document.querySelectorAll('#view-drivers th');if(labels.length>=5){labels[2].textContent='État';labels[3].textContent='Accès';}
+                body.innerHTML=snap.docs.map(d=>{const u=d.data(),role=profileRole(u);return `<tr><td class="p-3.5"><strong>${escapeOrderText(String(u.name||'Sans nom'))}</strong><p>${escapeOrderText(String(u.role||'Non renseigné'))}</p></td><td class="p-3.5">${escapeOrderText(String(u.email||''))}</td><td class="p-3.5">${role?'Actif':'Accès désactivé ou profil invalide'}</td><td class="p-3.5">${role?'Profil reconnu':'Refusé'}</td><td class="p-3.5"><button class="admin-button" disabled>Service sécurisé requis</button></td></tr>`;}).join('')||'<tr><td colspan="5">Aucun compte enregistré.</td></tr>';
+            }catch(error){body.innerHTML='<tr><td colspan="5">Lecture impossible. Rechargez Équipe pour réessayer.</td></tr>';}
         }
-
-        window.openPromoEditor = (id = null) => {
-            const modal = document.getElementById('promo-editor');
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.lastElementChild.classList.remove('translate-x-full'), 10);
-
-            document.getElementById('promo-editor-title').innerText = id ? "Modifier la Promotion" : "Nouvelle Promotion";
-            document.getElementById('edit-promo-id').value = id || '';
-            document.getElementById('promo-form').reset();
-            document.getElementById('promo-image-preview').innerHTML = '<i data-feather="image" class="text-slate-300"></i>';
-            document.getElementById('promo-container-choices').innerHTML = '';
-            document.getElementById('promo-container-supplements').innerHTML = '';
-
-            switchPromoTab('choices');
-
-            if (id) {
-                getDoc(doc(db, "promotions", id)).then(snap => {
-                    if (snap.exists()) {
-                        const d = snap.data();
-                        document.getElementById('promo-name').value = d.name || '';
-                        document.getElementById('promo-price').value = d.price || 0;
-                        document.getElementById('promo-desc').value = d.description || '';
-                        document.getElementById('promo-visible').checked = d.isVisible !== false;
-                        document.getElementById('promo-image-url').value = d.imageUrl || '';
-                        if (d.imageUrl) {
-                            document.getElementById('promo-image-preview').innerHTML = `<img src="${d.imageUrl}" class="w-full h-full object-cover">`;
-                        }
-                    }
-                });
-            }
-            if (window.feather) feather.replace();
-        };
-
-        window.closePromoEditor = () => {
-            const modal = document.getElementById('promo-editor');
-            modal.lastElementChild.classList.add('translate-x-full');
-            setTimeout(() => modal.classList.add('hidden'), 250);
-        };
-
-        window.switchPromoTab = (tab) => {
-            document.getElementById('promo-panel-choices').classList.toggle('hidden', tab !== 'choices');
-            document.getElementById('promo-panel-supplements').classList.toggle('hidden', tab !== 'supplements');
-        };
-
-        window.savePromo = async () => {
-            const btn = document.getElementById('btn-save-promo');
-            btn.disabled = true;
-            btn.innerText = "Sauvegarde...";
-
-            try {
-                const id = document.getElementById('edit-promo-id').value;
-                const fileInput = document.getElementById('promo-image-file');
-                let imageUrl = document.getElementById('promo-image-url').value;
-
-                if (fileInput.files.length > 0) {
-                    imageUrl = await uploadToCloudinary(fileInput.files[0]);
-                }
-
-                const data = {
-                    name: document.getElementById('promo-name').value.trim(),
-                    price: parseFloat(document.getElementById('promo-price').value) || 0,
-                    description: document.getElementById('promo-desc').value.trim(),
-                    imageUrl: imageUrl,
-                    isVisible: document.getElementById('promo-visible').checked
-                };
-
-                if (id) {
-                    await updateDoc(doc(db, 'promotions', id), data);
-                } else {
-                    await addDoc(collection(db, 'promotions'), data);
-                }
-
-                closePromoEditor();
-                await loadPromotions();
-                showToast("Promotion enregistrée !");
-            } catch (err) {
-                console.error(err);
-                showToast("Erreur: " + err.message, "error");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Sauvegarder la Promotion";
-            }
-        };
-
-        window.deletePromo = async (id) => {
-            if (!confirm("Voulez-vous supprimer cette promotion ?")) return;
-            try {
-                await deleteDoc(doc(db, 'promotions', id));
-                showToast("Promotion supprimée");
-                loadPromotions();
-            } catch (e) {
-                showToast("Erreur: " + e.message, "error");
-            }
-        };
-
-        // --- USERS & DRIVERS MANAGEMENT ---
-        const secondaryApp = initializeApp(firebaseConfig, "SecondaryAdminApp");
-        const secondaryAuth = getAuth(secondaryApp);
-
-        document.getElementById('user-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!requireView('drivers')) return;
-            const btn = document.getElementById('btn-add-user');
-            const name = document.getElementById('user-name').value.trim();
-            const email = document.getElementById('user-email').value.trim();
-            const password = document.getElementById('user-password').value;
-            const role = document.getElementById('user-role').value;
-
-            btn.disabled = true;
-            btn.innerHTML = `<i data-feather="loader" class="w-4 h-4 inline animate-spin"></i> Création...`;
-            if (window.feather) feather.replace();
-
-            try {
-                const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
-                const uid = cred.user.uid;
-
-                await setDoc(doc(db, 'users', uid), {
-                    uid: uid,
-                    name: name,
-                    email: email,
-                    role: role,
-                    createdAt: serverTimestamp()
-                });
-
-                await secondarySignOut(secondaryAuth);
-                document.getElementById('user-form').reset();
-                showToast(`Compte "${name}" créé avec succès !`);
-                loadDrivers();
-            } catch (err) {
-                console.error(err);
-                showToast("Erreur création compte: " + err.message, "error");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i data-feather="user-plus" class="w-4 h-4 inline mr-1"></i> Ajouter`;
-                if (window.feather) feather.replace();
-            }
-        });
-
-        async function loadDrivers() {
-            if (!authorized('drivers')) return;
-            const version=workVersion;
-            const tableBody = document.getElementById('drivers-table-body');
-            if (!tableBody) return;
-            tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-slate-400">Chargement des utilisateurs...</td></tr>';
-
-            try {
-                const snap = await getDocs(collection(db, 'users'));
-                if (version!==workVersion || !authorized('drivers')) return;
-                const users = [];
-                snap.forEach(d => users.push({ id: d.id, ...d.data() }));
-
-                if (users.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="5" class="text-center py-6 text-slate-400 italic">Aucun utilisateur enregistré.</td></tr>';
-                    return;
-                }
-
-                tableBody.innerHTML = '';
-                for (const u of users) {
-                    let statsHtml = '<td class="p-3.5 text-center text-slate-400">-</td><td class="p-3.5 text-right text-slate-400 font-mono">-</td>';
-
-                    if (u.role === 'delivery' || u.role === 'livreur') {
-                        const ordersQ = query(collection(db, 'orders'), where('deliveryGuyId', '==', u.uid));
-                        const ordersSnap = await getDocs(ordersQ);
-                        if (version!==workVersion || !authorized('drivers')) return;
-
-                        let count = 0;
-                        let earnings = 0;
-                        ordersSnap.forEach(od => {
-                            const data = od.data();
-                            if (data.status === 'delivered') {
-                                count++;
-                                earnings += getDeliveryPrice(data.location);
-                            }
-                        });
-
-                        statsHtml = `
-                            <td class="p-3.5 text-center font-bold text-slate-800">${count}</td>
-                            <td class="p-3.5 text-right font-black text-emerald-600 font-mono">${earnings.toFixed(2)} Dh</td>
-                        `;
-                    }
-
-                    const roleBadgeClass = {
-                        admin: 'bg-red-100 text-red-700',
-                        manager: 'bg-purple-100 text-purple-700',
-                        caissier: 'bg-blue-100 text-blue-700',
-                        livreur: 'bg-emerald-100 text-emerald-700'
-                    }[u.role] || 'bg-slate-100 text-slate-700';
-
-                    tableBody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-3.5">
-                                <div class="font-extrabold text-slate-900">${u.name || 'Sans nom'}</div>
-                                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${roleBadgeClass}">${u.role}</span>
-                            </td>
-                            <td class="p-3.5 text-xs text-slate-600 font-mono">${u.email}</td>
-                            ${statsHtml}
-                            <td class="p-3.5 text-right">
-                                <button onclick="deleteDriver('${u.uid}')" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold transition">
-                                    Supprimer
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }
-
-                if (window.feather) feather.replace();
-            } catch (e) {
-                console.error("Load drivers error:", e);
-                tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-red-500">Erreur: ${e.message}</td></tr>`;
-            }
-        }
-
-        window.deleteDriver = async (uid) => {
-            if (!confirm("Voulez-vous supprimer ce compte ?")) return;
-            try {
-                await deleteDoc(doc(db, 'users', uid));
-                showToast("Utilisateur supprimé");
-                loadDrivers();
-            } catch (err) {
-                showToast("Erreur: " + err.message, "error");
-            }
-        };
+        window.deleteDriver=async()=>{try{await staffAdministration.remove();}catch(error){showToast(error.message,'error');return false;}};
 
         // --- DELIVERY DRIVER INTERFACE ---
         function initDriverApp() {
@@ -1040,80 +806,10 @@
         };
 
         function listenToAvailableRuns() {
-            const q = query(
-                collection(db, 'orders'),
-                where('status', '==', 'en_livraison'),
-                where('type', '==', 'livraison')
-            );
-
-            const unsub = onSnapshot(q, snap => {
-                const container = document.getElementById('available-runs-list');
-                if (!container) return;
-
-                const available = [];
-                snap.forEach(d => {
-                    const data = { ...d.data(), id: d.id };
-                    if (!data.deliveryGuyId) available.push(data);
-                });
-
-                if (available.length === 0) {
-                    container.innerHTML = `<div class="text-center py-12 text-slate-400 italic">Aucune course disponible actuellement.</div>`;
-                    return;
-                }
-
-                container.innerHTML = available.map(order => {
-                    const fee = getDeliveryPrice(order.location);
-                    let rawPhone = orderText(order.customer?.phone);
-                    let cleanPhone = rawPhone.replace(/\D/g, '');
-                    if (cleanPhone.startsWith('0')) cleanPhone = '212' + cleanPhone.substring(1);
-
-                    return `
-                        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-black text-slate-900 text-base">${escapeOrderText(orderText(order.customer?.name,'Client'))}</h3>
-                                    <p class="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
-                                        <i data-feather="map-pin" class="w-3.5 h-3.5 text-slate-400"></i> ${escapeOrderText(orderText(order.location,'Destination non renseignée'))}
-                                    </p>
-                                    <span class="text-xs font-black text-emerald-600 mt-1 inline-block">+${fee.toFixed(2)} Dh (Votre Gain)</span>
-                                </div>
-                                <span class="text-xl font-black text-slate-900 font-mono">${escapeOrderText(orderAmount(order.total))}</span>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                                <a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener" class="py-2.5 bg-emerald-50 text-emerald-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
-                                    <i data-feather="message-circle" class="w-4 h-4"></i> WhatsApp
-                                </a>
-                                <a href="tel:${cleanPhone}" class="py-2.5 bg-blue-50 text-blue-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
-                                    <i data-feather="phone" class="w-4 h-4"></i> Appeler
-                                </a>
-                            </div>
-
-                            <button data-driver-action="claim" data-driver-order="${escapeOrderText(order.id)}" class="w-full py-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-2xl font-black text-sm shadow-md transition active:scale-95">
-                                PRENDRE CETTE COURSE
-                            </button>
-                        </div>
-                    `;
-                }).join('');
-
-                refreshDriverActions();
-                if (window.feather) feather.replace();
-            });
-
-            driverUnsubscribers.push(unsub);
+            // No read of unassigned order documents until a trusted redacted feed exists.
+            document.getElementById('available-runs-list').innerHTML='<p class="admin-notice">Les courses sont attribuées par un responsable. La liste publique est désactivée en attendant un service de données limitées.</p>';
         }
-
-        window.claimDelivery = async orderId => {
-            if(driverPending.has(orderId))return false;
-            const actor=orderActor(),version=workVersion;
-            driverPending.add(orderId);refreshDriverActions();
-            try {
-                await commitDriverAction({id:orderId,kind:'claim',session:actor,currentSession:orderActor});
-                if(version===workVersion){showToast('Course acceptée. Retrouvez-la dans Mes courses.');switchDriverTab('deliveries');}
-                return true;
-            } catch(error){if(version===workVersion)showToast(operationMessage(error),'error');return false;}
-            finally{driverPending.delete(orderId);refreshDriverActions();}
-        };
+        window.claimDelivery=async()=>{showToast('Demandez l’attribution de cette course à un responsable.','error');return false;};
 
         function listenToMyDeliveries() {
             if (!currentUser) return;
@@ -1137,6 +833,7 @@
                 snap.forEach(d => {
                     const order = { ...d.data(), id: d.id };
                     const fee = getDeliveryPrice(order.location);
+                    const address=orderText(order.customer?.address||order.address);
                     let rawPhone = orderText(order.customer?.phone);
                     let cleanPhone = rawPhone.replace(/\D/g, '');
                     if (cleanPhone.startsWith('0')) cleanPhone = '212' + cleanPhone.substring(1);
@@ -1161,6 +858,7 @@
                                 </a>
                             </div>
 
+                            ${address?`<p>${escapeOrderText(address)}</p><a class="admin-button w-full" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}">Ouvrir l’adresse dans Maps</a>`:''}
                             <button data-driver-action="complete" data-driver-order="${escapeOrderText(order.id)}" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-md transition active:scale-95">
                                 Confirmer la livraison
                             </button>

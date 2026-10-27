@@ -73,6 +73,13 @@ export function cartMenuIssue(cart,items,categories,promotions=[]) {
         if(row.isPromo || !items.some(item=>item.id===row.id)&&promotions.some(item=>item.id===row.id)) {
             const promo=promotions.find(item=>item.id===row.id);
             if(!promo||promo.isVisible===false||!available(promo))return `${row.name} n’est plus disponible. Retirez cette offre du panier.`;
+            if(Number(row.unitBasePrice)!==Number(promo.price))return `Le prix de ${row.name} a changé. Composez cette offre à nouveau.`;
+            const possible=[...(promo.mandatoryChoices||[]).flatMap(group=>group.options||[]),...(promo.supplements||[])];
+            if([...(row.selectedOptions||[]),...(row.supplements||[])].some(option=>!possible.some(current=>available(current)&&current.name===option.name&&Number(current.price)===Number(option.price))))return `Les options de ${row.name} ont changé. Composez cette offre à nouveau.`;
+            for(const [index,step]of buildCustomizationSteps(promo).filter(step=>step.type==='choice').entries()){
+                const rule=choiceRules(step),recorded=row.choiceSelections?.[index];
+                if(selectionIssue(step,recorded&&recorded.title===step.title?recorded.options:(row.selectedOptions||[]).filter(o=>rule.options.some(current=>current.name===o.name))))return `Les choix de ${row.name} ont changé. Composez cette offre à nouveau.`;
+            }
             continue; // Promotions retain their independent pricing/configuration.
         }
         const product=items.find(item=>item.id===row.id);

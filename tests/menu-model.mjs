@@ -38,7 +38,12 @@ check(!!cartMenuIssue(cart,[{...product,isAvailable:false}],categories),'Stock c
 check(!!cartMenuIssue(cart,[{...product,price:35}],categories),'Price change requires reconfiguration');
 check(!!cartMenuIssue(cart,[],categories),'Deleted product invalidates cart');
 check(!!cartMenuIssue([{...cart[0],selectedOptions:[{name:'Missing',price:2}]}],[product],categories),'Removed option invalidates cart');
-check(!cartMenuIssue([{id:'promo',isPromo:true,name:'Offre'}],[],categories,[{id:'promo'}]),'Promotion kept separate');
+const offer={id:'promo',name:'Offre',price:50,mandatoryChoices:[],supplements:[]},offerCart={id:'promo',isPromo:true,name:'Offre',unitBasePrice:50};
+check(!cartMenuIssue([offerCart],[],categories,[offer]),'Promotion kept separate');
+check(!!cartMenuIssue([offerCart],[],categories,[{...offer,price:55}]),'Changed offer price requires reconfiguration');
+check(!!cartMenuIssue([{...offerCart,selectedOptions:[{name:'Removed',price:2}]}],[],categories,[offer]),'Removed offer option blocks checkout');
+check(!!cartMenuIssue([offerCart],[],categories,[{...offer,mandatoryChoices:[group]}]),'New required offer group blocks checkout');
+check(!cartMenuIssue([{...offerCart,selectedOptions:[group.options[0]],choiceSelections:[{title:group.title,options:[group.options[0]]}]}],[],categories,[{...offer,mandatoryChoices:[group]}]),'Valid configured offer remains compatible');
 check(!!cartMenuIssue([{id:'promo',isPromo:true,name:'Offre'}],[],categories,[]),'Removed promotion blocks checkout');
 check(!imageIssue({type:'image/png',size:400}),'Image accepted');
 check(!!imageIssue({type:'image/svg+xml',size:400}),'Active SVG upload rejected');

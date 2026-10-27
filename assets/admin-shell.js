@@ -44,10 +44,10 @@ export function mountAdminShell() {
     }
     const teamTable=document.querySelector('#view-drivers table');
     teamTable.setAttribute('role','table');
-    const teamLabels=[...teamTable.querySelectorAll('th')].map(cell=>cell.textContent.trim());
+    const teamLabels=()=>[...teamTable.querySelectorAll('th')].map(cell=>cell.textContent.trim());
     new MutationObserver(()=>teamTable.querySelectorAll('tbody tr').forEach(row=>{
         row.setAttribute('role','row');
-        [...row.cells].forEach((cell,index)=>{cell.dataset.label=teamLabels[index];cell.setAttribute('role','cell');});
+        [...row.cells].forEach((cell,index)=>{cell.dataset.label=teamLabels()[index];cell.setAttribute('role','cell');});
         row.querySelectorAll('button:not([aria-label])').forEach(button=>button.setAttribute('aria-label',button.title||'Supprimer ce compte'));
     })).observe(teamTable.querySelector('tbody'),{childList:true});
     const gate = document.createElement('section'); gate.id = 'admin-access'; gate.className = 'admin-access'; gate.hidden = true;
