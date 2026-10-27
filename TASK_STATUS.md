@@ -1,5 +1,21 @@
 # BIGTAC Admin 2.0 status
 
+## Current styling refinement — solid colors and mandatory elevation (27 October 2026)
+
+Implemented the latest owner request as CSS-only presentation changes. Git follow-up: the owner explicitly requested pushing this refinement, authorizing its commit and push. Deployment remains unauthorized. The prior refinement was committed as `b6b694d`; older authorizations below are historical.
+
+- Solid orange #C2410C, blue #1D4ED8, green #047857, purple #6D28D9 and navy #0F172A on KPI cards, operational summary tiles, quick actions, Kanban headers/counters, active queue/mode controls and status/service badges. Text, icons and values on these colored elements are white. The workspace remains light; ordinary order cards and order-detail reading surfaces remain white with dark text. Sidebar structure/styling is retained.
+- Central elevation tokens use the requested resting shadow `0 4px 14px rgba(15,23,42,.14), 0 1px 3px rgba(15,23,42,.08)` and interactive hover shadow `0 12px 28px rgba(15,23,42,.20), 0 4px 10px rgba(15,23,42,.10)`. Major panels, KPIs, order cards, operational tiles and quick actions visibly separate from the workspace. Removed the existing high-specificity rule cancelling order-card shadows.
+- Only clickable order cards, operational links, quick actions and next-order links lift 2px on hover, with 200ms transitions. Informational KPI/panel cards do not move. Focus outlines remain; focus-within increases card elevation. Reduced motion disables hover travel and transitions. No gradients, new borders/thickness, dimensions, spacing, typography, structure or layout changes.
+
+Modified files: `assets/admin.css`, `assets/admin-orders.css`, `TASK_STATUS.md`. No JavaScript, Firebase, data model, order transition, permission, storefront or production configuration changes. Existing unrelated image changes and `bigtac-2/` remain untouched.
+
+Verification: one focused local-fixture Playwright pass, **31 checks passed**, followed by two narrowly scoped active-mobile-icon color checks after correcting an inherited navigation icon color. At **1440×1000 and 390×844**, key card/panel/header/toolbar rectangles, padding, gaps, font sizes and weights exactly match committed HEAD CSS. Checked white foregrounds, visible resting shadows, nonmoving KPIs, 2px clickable hover, reduced-motion suppression, page overflow, search, filters, Service/Cuisine switching, detail opening/white reading surface, Escape and refresh. Browsing/smoke actions wrote no fixture data; zero production Firebase requests in the focused pass. No real orders/accounts/uploads or full regression suite. Actual operational transitions and physical devices were not retested because functionality is unchanged. Syntax is CSS-only; `git diff --check` passes.
+
+Screenshots opened and visually inspected: `C:\Users\pc\.codex\visualizations\2026\10\27\bigtac-admin-solid\overview-1440.png`, `orders-1440.png`, `overview-390.png`, `orders-390.png`, `overview-actions-1440.png`. Screens show solid colors, white foregrounds, distinct white reading cards and noticeable elevation. No new visual blockers found; physical-device/browser diversity and existing backend release gates remain unverified.
+
+Earlier sections below document previous checkpoints.
+
 ## Current refinement — depth, contrast and operational space (27 October 2026)
 
 Owner brief `1e80d627-9fbc-4c68-b1c7-5a335ed9c0e9` supersedes prior card/header styling. Follow-up explicitly requests token-efficient finishing, commit and push; no deployment. Prior reference recreation was committed as `49018d8`.
