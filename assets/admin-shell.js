@@ -1,4 +1,5 @@
 import { mayView, roleViews } from './admin-model.js';
+import { icon } from './admin-icons.js';
 
 const destinations = [
     ['overview', 'Vue d’ensemble', 'home', 'Opérations'], ['orders', 'Commandes', 'shopping-bag', 'Opérations'],
@@ -6,7 +7,6 @@ const destinations = [
     ['drivers', 'Équipe', 'users', 'Gestion'], ['settings', 'Paramètres', 'sliders', 'Gestion']
 ];
 const labels = { admin: 'Administrateur', manager: 'Manager', caissier: 'Caissier', livreur: 'Livreur' };
-const icon = name => `<i data-feather="${name}" aria-hidden="true"></i>`;
 const navLink = ([id, label, glyph]) => `<a class="admin-nav-link" data-view="${id}" href="#${id}">${icon(glyph)}<span>${label}</span></a>`;
 
 export function mountAdminShell() {

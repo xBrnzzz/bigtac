@@ -589,6 +589,7 @@
     <script type="module">
         import { profileRole, mayView, roleViews } from './assets/admin-model.js';
         import { mountAdminShell } from './assets/admin-shell.js';
+        import { icon as adminIcon } from './assets/admin-icons.js';
         import { createOverview } from './assets/admin-overview.js';
         import { createOrderWorkspace } from './assets/admin-orders.js';
         import { commitOrderTransition, commitDriverAction, operationMessage } from './assets/admin-orders-service.js';
@@ -669,20 +670,17 @@
         // --- TOAST NOTIFICATION SYSTEM ---
         window.showToast = (msg, type = 'success') => {
             const container = document.createElement('div');
-            const bgClass = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-slate-900';
-            const icon = type === 'success' ? 'check' : type === 'error' ? 'alert-circle' : 'info';
-
-            container.className = `fixed bottom-6 right-6 ${bgClass} text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 z-[200] text-sm font-bold transition-all duration-300 opacity-0 translate-y-4 pointer-events-none`;
+            const glyph = type === 'success' ? 'check' : type === 'error' ? 'alert' : 'bell';
+            container.className = 'fixed bottom-6 right-6 px-5 py-3.5 rounded-2xl flex items-center gap-3 z-[200] text-sm font-semibold opacity-0 translate-y-4 pointer-events-none';
             container.classList.add('admin-toast');
+            container.dataset.tone = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
             container.setAttribute('role', 'status');
             container.innerHTML = `
-                <i data-feather="${icon}" class="w-4 h-4 shrink-0"></i>
+                ${adminIcon(glyph)}
                 <span></span>
             `;
             container.querySelector('span').textContent = msg;
             document.body.appendChild(container);
-            if (window.feather) feather.replace();
-
             requestAnimationFrame(() => container.classList.remove('opacity-0', 'translate-y-4'));
 
             setTimeout(() => {
