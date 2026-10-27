@@ -1,5 +1,9 @@
 # BIGTAC Admin 2.0 status
 
+## Current task — round Commandes components (27 October 2026)
+
+Increased existing Orders/Kitchen radii: cards, filter panels, queue-history footer and detail metadata 22px; controls, inputs, tabs, status headers and notices 16px; small badges/age labels 12px. Shared buttons and icon buttons are rounded within Orders/detail only; the detail drawer has rounded left corners. Circular counters/icons stay circular. No spacing, dimensions, colors, typography or JavaScript changed. Modified `assets/admin-orders.css` and this file. Fixture smoke checks at 390 and 1440px passed: computed card/input radii, no page overflow, detail opening/Escape dismissal and zero fixture writes. Diff check passes. Git follow-up: the owner authorized commit and push. No deployment; unrelated local files remain untouched. Earlier sections are historical.
+
 ## Current styling refinement — solid colors and mandatory elevation (27 October 2026)
 
 Implemented the latest owner request as CSS-only presentation changes. Git follow-up: the owner explicitly requested pushing this refinement, authorizing its commit and push. Deployment remains unauthorized. The prior refinement was committed as `b6b694d`; older authorizations below are historical.
