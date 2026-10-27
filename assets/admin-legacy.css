@@ -1,7 +1,7 @@
 /* Presentation adapters for preserved Promotions, Team and Delivery workflows. */
 :is(#view-promotions,#view-drivers,#view-driver) { background:var(--admin-ground)!important; color:var(--admin-text); }
 :is(#view-promotions,#view-drivers)>div.max-w-5xl { max-width:1200px; }
-:is(#view-promotions,#view-drivers,#view-driver) h2 { display:flex; align-items:center; gap:10px; font-size:26px; font-weight:800; letter-spacing:-.025em; color:var(--admin-text); }
+:is(#view-promotions,#view-drivers,#view-driver) h2 { display:flex; align-items:center; gap:10px; font-size:24px; font-weight:650; letter-spacing:-.025em; color:var(--admin-text); }
 :is(#view-promotions,#view-drivers,#view-driver) h2>.admin-glyph { width:26px; height:26px; color:var(--admin-primary); }
 :is(#view-promotions,#view-drivers,#view-driver) .bg-white { background:var(--admin-surface); border-color:var(--admin-border); box-shadow:var(--admin-shadow); border-radius:var(--admin-radius); }
 :is(#view-promotions,#view-drivers,#view-driver) :is(.text-slate-400,.text-slate-500,.text-slate-600) { color:var(--admin-muted); }
@@ -12,12 +12,12 @@
 :is(#view-promotions,#view-drivers,#view-driver) :is(.bg-brand-500,.bg-brand-600) { background:var(--admin-primary); color:white; box-shadow:none; }
 #view-promotions>div>div:first-child>button { background:var(--admin-primary); border:1px solid var(--admin-primary); min-height:44px; box-shadow:none; }
 #view-promotions>div>div:first-child>button:hover { background:var(--admin-primary-hover); }
-#view-promotions #promotions-list>div { border-top:3px solid var(--admin-orange-border); }
+#view-promotions #promotions-list>div { border-color:var(--admin-border); }
 #promotions-list button { min-width:44px; min-height:44px; }
 #promotions-list .text-red-600 { color:var(--admin-orange-ink); }
 #promotions-list span { font-size:12px; }
 #promotions-list .text-emerald-600 { color:var(--admin-positive); }
-#view-drivers>div>div.bg-white:first-of-type { border-top:3px solid var(--admin-blue-border); }
+#view-drivers>div>div.bg-white:first-of-type { border-color:var(--admin-border); }
 #view-drivers table { font-variant-numeric:tabular-nums; }
 #view-drivers th { color:var(--admin-muted); text-transform:none; font-weight:600; font-size:12px; letter-spacing:0; }
 #view-drivers td button { min-width:44px; min-height:44px; }
@@ -32,7 +32,7 @@
 #promo-editor :is(input,select,textarea) { border-color:var(--admin-control); background:white; color:var(--admin-text); }
 #promo-editor label { text-transform:none; letter-spacing:0; font-size:13px; }
 #btn-save-promo { background:var(--admin-primary); box-shadow:none; }
-#view-settings .admin-panel { border-top:3px solid var(--admin-blue-border); }
+#view-settings .admin-panel { border-color:var(--admin-border); }
 #view-settings .admin-setting-row:last-of-type { border-bottom:0; }
 @media(max-width:767px) {
     :is(#view-promotions,#view-drivers) h2 { font-size:23px; line-height:1.3; }

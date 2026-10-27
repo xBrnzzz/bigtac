@@ -1,5 +1,37 @@
 # BIGTAC Admin 2.0 status
 
+## Current task — supplied image recreation (27 October 2026)
+
+The latest owner brief is `35ec2058-38d3-4c34-be9d-4d60e5a17728/Pasted text.txt`, with the DineLink Overview and Streak House Kitchen images as the visual targets. It supersedes the earlier three-reference visual checkpoint below. That checkpoint was committed and pushed as `081b600`; its descriptions of uncommitted files are historical. **Git follow-up: the owner explicitly authorized committing and pushing this refinement. Deployment remains unauthorized. Earlier no-commit statements below describe the implementation checkpoint.**
+
+Implemented scope:
+- Shared shell: 208px charcoal sidebar (#191E28), orange active navigation, white 76px desktop header, existing staff identity/profile access, lighter neutral workspace (#F3F4F4), more restrained shadows and 14px shared card radius. Desktop navigation remains visible at 1024px; bottom navigation remains below 1000px.
+- Overview: remove the repeated large page banner, put the real reporting date/timezone beneath the header title, retain four lightly tinted KPIs and meaningful small icons, use a balanced chart/operations row and product-list/recent-orders lower row. Preserve quick actions, 7-day reporting, service breakdown, genuine oldest pending order and financial limitations. Orange line/area charts connect actual hourly/daily counts with integer axes; no smoothed or manufactured data points.
+- Add a four-row recent-order presentation using the already loaded bounded 7-day data, recorded IDs, service types, item snapshots, times, states and totals. No new query, collection or write. Queue links retain keyboard and modified-click behavior. Mobile/tablet omit the dense item-summary column; order detail remains available in Orders.
+- Orders/Service: preserve the four-status board, filtering, search, counters, timers, notifications, history and transactional actions. Tickets now use the second image's full-width colored header, round outline icon, visible ID, service label, reception-time row, separated products/options, notes, total and real next action.
+- Kitchen: three ticket columns on large desktops, two on tablet, full-width single cards on mobile. Warm amber preparation headers, clean outlined actions and consistent ticket spacing. Preserve contact privacy and genuine preparation actions. No fake Start/Pause timer, progress bar, SLA or delayed state.
+- Menu, Promotions, Team, Delivery and Settings retain existing workflows and inherit the same shared shell, surfaces, borders and heading weights; remove unrelated accent borders rather than layering more overrides.
+
+Modified files: `assets/admin.css`, `assets/admin-shell.js`, `assets/admin-icons.js`, `assets/admin-overview.js`, `assets/admin-orders.css`, `assets/admin-orders.js`, `assets/admin-menu.css`, `assets/admin-legacy.css`, `tests/admin.mjs`, new `tests/admin-reference.mjs`, `ADMIN_REDESIGN_SPEC.md`, `TASK_STATUS.md`. No customer/storefront, Firebase configuration, model/service, schema or production data changes. Pre-existing changes to `assets/snack.png`, `assets/tacos-hero.jpg` and `bigtac-2/` remain untouched.
+
+### Current-task verification — complete in safe local fixtures
+
+**924 focused checks passed:** admin 49 model + 216 browser; orders 54 model + 192 browser; menu 51 model + 136 browser; shared visual/role review 177; new reference-size/recents/ticket review 49. The admin browser total changes by two because 1024px now uses the desktop sidebar/profile rather than the mobile secondary-menu checks. No assertions about order rules or permissions were removed. A parallel navigation timeout passed on a serial menu rerun.
+
+No production Firebase requests in fixture suites; all three upload requests mocked. Checked stock/editor saves, required/optional modifiers, stale/concurrent changes, role boundaries/revocation, pending/error/retry behavior, queue transitions, filtering, sound opt-in, timer updates, bounded history, contact privacy, drawers, receipts, keyboard focus, no horizontal overflow, contrast, integer chart axes, recent-order navigation/HTML escaping and full-width mobile tickets. Current customer storefront/backend/model/service files have no diff from the committed checkpoint; customer suites were not rerun for this admin-only refinement. Syntax and diff checks pass. No dependencies installed.
+
+Final visual capture widths: 320, 390, 768, 1024, 1440, plus reference-size 1024×1024 and 1920×1254. Existing regressions also exercise 375 and 900px. Reference-size before captures serve committed HEAD assets from Git in the isolated fixture server without resetting the checkout; before/after use the same fixed fictional clock and order dataset.
+
+Screenshot root: `C:\Users\pc\.codex\visualizations\2026\10\27\bigtac-admin-pixel-reference`.
+- Exact-size native captures: `after-reference-overview-1024x1024.png`, `after-reference-orders-1920x1254.png`, `after-reference-kitchen-1920x1254.png`, plus each screen at `390x844` and `768x1024` and matching `before-reference-*` captures.
+- Side-by-side supplied reference / before / after: `comparison-overview.png` and `comparison-kitchen.png`, with self-contained HTML copies.
+- Other modules/roles: `after-{overview,orders,kitchen,detail,menu,promotions,drivers,settings}-{320,390,768,1024,1440}.png`, lower Overview, loaded-history and driver/cashier/manager captures.
+- Final review: `visual-review.txt`; `inspection-overview/report.json` (0 FAIL, 2 WARN) and `inspection-orders/report.json` (0 FAIL, 1 WARN). Every generated inspector fold/page screenshot was opened. Source lint has no failures; warnings concern reference-directed subtle surface shadows, blur/monospace disabling adapters and unavailable-value dashes. Browser warnings concern small secondary metadata and intentionally natural product-list heights when only two products exist. Reference ticket circles and semantic purple are explicit allowances.
+
+Remaining visual differences are deliberate: BIGTAC branding/French text and existing font, no outer mockup frame, shared dark sidebar, real supported modules instead of table/guest widgets, actual values instead of invented trends, and reception-age badges instead of fake cooking timers/progress. Overview's product list may be shorter than the recent-order table with sparse data. Physical iOS/Android testing and the existing backend/schema/tenant/pricing/authorization release gates remain unverified. No further phase started; no commit, push, deployment, production read/write or migration performed for this task.
+
+Earlier phase reports below are historical context.
+
 Latest Git authorization: the owner explicitly requested commit and push of the visual refinement and its preserved Phase 3 development checkpoint. The no-commit statements below describe the earlier implementation checkpoint. Backend/schema adoption gates remain open; no deployment or production migration is authorized by this Git request. Unrelated image changes and `bigtac-2/` remain excluded.
 
 Current checkpoint: **Reference-led admin visual transformation — complete in isolated fixtures**. The owner supplied three new desktop POS references while Phase 3 verification was in progress. That Phase 3 work is preserved as an uncommitted development checkpoint; no further customer storefront or data-model edits were made for the visual pass. Phase 4 has not started. No commit, push, deployment or production Firebase access.

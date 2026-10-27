@@ -1,5 +1,7 @@
 # BIGTAC Admin 2.0 — Phase 1 specification
 
+**Current visual target (27 October 2026):** the owner-supplied DineLink Overview and Streak House Kitchen images in brief `35ec2058-38d3-4c34-be9d-4d60e5a17728` supersede the earlier visual references. Use a #191E28 shared dark sidebar, #F3F4F4 workspace, compact white header, pale KPIs, orange data charts, lower product/recent-order panels, and ticket header bands. Keep the requested shared dark sidebar and real four-status Service board despite the second image's white sidebar and three-column kitchen grid. Kitchen uses three desktop ticket columns. Unsupported table/reservation modules, payment metrics, timer controls and SLA data are excluded. See the newest TASK_STATUS.md section for implementation, comparisons and verification; historical design notes below are not instructions to revert this direction.
+
 This document records the Phase 1 foundation and approved phase boundaries. Phase 2 Orders/Kitchen is now implemented locally; see `backend/ORDERS_PHASE2.md` and `TASK_STATUS.md` for its contract and verification. No live Firebase access, deployment, database migration or framework change. The future self-service, multi-restaurant platform supersedes PROJECT_CONTEXT.md's separate-site strategy; tenant isolation is not implemented.
 
 ## Verified audit

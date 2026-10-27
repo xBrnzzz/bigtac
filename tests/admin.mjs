@@ -83,7 +83,7 @@ try {
             await page.evaluate(()=>switchView('settings'));
             check(await page.locator('#toggle-store').isEnabled(), 'Legacy settings available to admin');
             await page.evaluate(()=>switchView('overview'));
-            if (width<1100) {
+            if (width<1000) {
                 await page.locator('#admin-more-button').click();
                 check(await page.locator('#admin-more').isVisible(), 'Secondary menu opens');
                 await page.keyboard.press('Escape');

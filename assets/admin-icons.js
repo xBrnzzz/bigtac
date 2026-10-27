@@ -12,6 +12,7 @@ const paths = {
     x: '<path d="m6 6 12 12M6 18 18 6"/>',
     'external-link': '<path d="M14 3h7v7m0-7L10 14M10 3H3v18h18v-7"/>',
     arrow: '<path d="M4 12h16m-6-6 6 6-6 6"/>',
+    'chevron-down': '<path d="m6 9 6 6 6-6"/>',
     refresh: '<path d="M20 8a8 8 0 1 0 0 8M20 3v5h-5"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',

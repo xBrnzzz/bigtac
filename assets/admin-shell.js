@@ -25,7 +25,7 @@ export function mountAdminShell() {
             <button id="logout-btn" class="admin-text-button">${icon('log-out')}Déconnexion</button>
         </aside>
         <div class="admin-workspace">
-            <header class="admin-topbar"><div class="admin-location"><span data-restaurant-name>BIGTAC</span><span aria-hidden="true">/</span><h1 id="admin-page-name">Vue d’ensemble</h1></div><div class="admin-top-actions"><span id="admin-store-status" class="admin-store-status" hidden></span><span id="admin-connection" role="status">Connexion…</span><a class="admin-preview" href="index.html" target="_blank" rel="noopener">Voir le site ${icon('external-link')}</a><button id="admin-profile-button" class="admin-profile-button" aria-label="Ouvrir votre espace équipe" aria-expanded="false"><span class="admin-avatar" aria-hidden="true">E</span></button><button id="admin-more-button" class="admin-icon-button" aria-label="Ouvrir le menu" aria-expanded="false">${icon('menu')}</button></div></header>
+            <header class="admin-topbar"><div class="admin-location"><h1 id="admin-page-name">Vue d’ensemble</h1><span data-restaurant-name>BIGTAC</span></div><div class="admin-top-actions"><span id="admin-store-status" class="admin-store-status" hidden></span><span id="admin-connection" role="status">Connexion…</span><a class="admin-preview" href="index.html" target="_blank" rel="noopener">Voir le site ${icon('external-link')}</a><button id="admin-profile-button" class="admin-profile-button" aria-label="Ouvrir votre espace équipe" aria-expanded="false"><span class="admin-avatar" aria-hidden="true">E</span><span class="admin-profile-copy"><strong data-staff-name></strong><small data-staff-role></small></span>${icon('chevron-down')}</button><button id="admin-more-button" class="admin-icon-button" aria-label="Ouvrir le menu" aria-expanded="false">${icon('menu')}</button></div></header>
             <div id="admin-content-slot"></div>
         </div>
         <nav id="admin-bottom-nav" class="admin-bottom-nav" aria-label="Navigation mobile"></nav>
@@ -132,6 +132,8 @@ export function mountAdminShell() {
         },
         deny(message) { this.hideSession(); login.classList.add('hidden'); gate.hidden = false; document.getElementById('admin-access-message').textContent = message; },
         route(view) {
+            shell.dataset.screen=view;
+            document.getElementById('overview-window').hidden=view!=='overview';
             views.querySelectorAll(':scope > [id^="view-"]').forEach(node => node.classList.toggle('hidden', node.id !== `view-${view}`));
             document.getElementById('admin-page-name').textContent = destinations.find(entry => entry[0] === view)?.[1] || 'Livraisons';
             shell.querySelectorAll('[data-view]').forEach(link => { if (link.dataset.view === view) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current'); });
