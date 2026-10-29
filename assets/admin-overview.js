@@ -25,12 +25,14 @@ export function createOverview(container, navigate) {
         </div>`;
     container.prepend(page);
     // The reference uses one title/date header rather than a second page banner.
-    document.querySelector('.admin-location').append(page.querySelector('#overview-window'));
+    const heading=document.createElement('header');heading.className='admin-page-heading';heading.innerHTML='<div><h2>Vue d’ensemble</h2><p>Votre service, en un regard.</p></div>';
+    heading.append(page.querySelector('#overview-window'));page.prepend(heading);
     page.querySelector('[data-panel=attention] .admin-panel-head').after(page.querySelector('#overview-finding'));
     page.querySelector('[data-panel=hourly] .admin-panel-head').append(page.querySelector('#overview-refresh'));
     const freshness=page.querySelector('#overview-freshness');freshness.className='admin-subtle';
     page.querySelector('[data-panel=hourly]').append(freshness);
     page.querySelector('[data-panel=actions] .admin-panel-head').append(page.querySelector('[data-view=orders]'));
+    page.querySelector('[data-panel=actions]').append(page.querySelector('#overview-next-order'),page.querySelector('#overview-delay'));
     page.querySelector('.admin-freshness').remove();
     const dashboardGrid=page.querySelector('.admin-overview-grid');
     for(const panel of ['hourly','attention','products','recent','actions','trend','services'])dashboardGrid.append(page.querySelector(`[data-panel="${panel}"]`));
@@ -69,7 +71,7 @@ export function createOverview(container, navigate) {
         if (readyHistory) {
             const countTicks = value => Number.isInteger(value) ? integer(value) : '';
             const hourStep=Math.max(1,Math.ceil(Math.max(...summary.hours)/4));
-            if(summary.count>0)windowCharts().line(node('hourly'), { labels: summary.hours.map((_, i) => `${i} h`), series:[{name:'Commandes',values:summary.hours,colour:'var(--admin-accent)'}], fill:true, tickFormat:countTicks, yTicks:Array.from({length:Math.ceil((Math.max(...summary.hours)+1)/hourStep)+1},(_,i)=>i*hourStep), height:180 });
+            if(summary.count>0)windowCharts().bars(node('hourly'), { labels:summary.hours.map((_,i)=>`${i} h`),values:summary.hours,highlight:summary.hours.indexOf(Math.max(...summary.hours)),colour:'var(--admin-accent)',mutedColour:'#eac3ab',integerTicks:true,tickFormat:countTicks,height:180 });
             const dayCounts=summary.days.map(day=>day.count), tickStep=Math.max(1,Math.ceil(Math.max(...dayCounts)/4));
             windowCharts().line(node('trend'), { labels: summary.days.map(day => new Intl.DateTimeFormat('fr-MA', { day:'2-digit', month:'2-digit', timeZone:'UTC' }).format(new Date(`${day.key}T12:00:00Z`))), series:[{name:'Commandes',values:dayCounts,colour:'var(--admin-accent)'}], fill:true, tickFormat:countTicks, yTicks:Array.from({length:Math.ceil((Math.max(...dayCounts)+1)/tickStep)+1},(_,i)=>i*tickStep), height:160 });
             page.dataset.emptyActivity=String(summary.count===0);

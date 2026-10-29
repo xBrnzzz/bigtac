@@ -3,6 +3,7 @@ import {limit} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestor
 import {operationsService} from './operations-service.js';
 import {offerIssues,promotionState,stateLabels,localInstant,localInput,validZone} from './operations-model.js';
 import {copy,newId,imageIssue} from './menu-model.js';
+import {icon} from './admin-icons.js';
 const e=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function createPromotions({session,toast,upload,settings}){
     const service=operationsService(session),$=id=>document.getElementById(id);let stop=null,timer=null,rows=[],expected=null,groups=[],extras=[],busy=false,blocked=true,epoch=0;
@@ -12,7 +13,7 @@ export function createPromotions({session,toast,upload,settings}){
     const allowed=()=>['admin','manager'].includes(session()?.role);
     const zone=()=>validZone(settings()?.reportingTimezone)?settings().reportingTimezone:'Africa/Casablanca';
     function render(){
-        const labels=rows.map(p=>`<div class="bg-white p-4 rounded-3xl border shadow-sm flex flex-wrap items-center gap-3.5"><img src="${e(p.imageUrl||'assets/tacos-campaign.jpg')}" alt="" width="64" height="64" class="w-16 h-16 rounded-2xl object-cover"><div class="flex-1 min-w-0"><h4 class="font-extrabold truncate">${e(p.name)}</h4><p>${e(p.price)} DH · ${stateLabels[promotionState(p)]}</p><p>${p.startsAt?'Début : '+e(localInput(p.startsAt,zone())):''} ${p.endsAt?'Fin : '+e(localInput(p.endsAt,zone())):''}</p></div><div class="flex flex-wrap gap-1 w-full sm:w-auto">${[['edit','Modifier'],['duplicate','Copier'],['toggle',p.isVisible===false?'Activer':'Désactiver'],['delete','Supprimer']].map(([action,label])=>`<button class="admin-button" data-promo-action="${action}" data-id="${e(p.id)}" ${busy||blocked?'disabled':''}>${label}</button>`).join('')}</div></div>`).join('');
+        const labels=rows.map(p=>`<div class="bg-white p-4 rounded-3xl border shadow-sm flex flex-wrap items-center gap-3.5"><img src="${e(p.imageUrl||'assets/tacos-campaign.jpg')}" alt="" width="64" height="64" class="w-16 h-16 rounded-2xl object-cover"><div class="flex-1 min-w-0"><h4 class="font-extrabold truncate">${e(p.name)}</h4><p>${e(p.price)} DH · ${stateLabels[promotionState(p)]}</p><p>${p.startsAt?'Début : '+e(localInput(p.startsAt,zone())):''} ${p.endsAt?'Fin : '+e(localInput(p.endsAt,zone())):''}</p></div><div class="promo-actions">${[['edit','Modifier'],['duplicate','Copier'],['toggle',p.isVisible===false?'Activer':'Désactiver'],['delete','Supprimer']].map(([action,label])=>`<button class="admin-button" data-promo-action="${action}" data-id="${e(p.id)}" ${busy||blocked?'disabled':''}>${icon(({edit:'edit',duplicate:'copy',toggle:p.isVisible===false?'check':'off',delete:'trash'})[action])}<span>${label}</span></button>`).join('')}</div></div>`).join('');
         $('promotions-list').innerHTML=labels||'<p>Aucune offre enregistrée.</p>';
     }
     function draw(){

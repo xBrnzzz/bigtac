@@ -66,7 +66,7 @@ try {
                 if (screen === 'orders' || screen === 'kitchen') {
                     const action = page.locator(screen === 'kitchen' ? '#list-confirmed .primary' : '#list-pending .primary').first();
                     await action.focus();
-                    const bounds = await action.evaluate(el => { const rect=el.getBoundingClientRect(), list=el.closest('.orders-list').getBoundingClientRect(); return { height:rect.height, top:rect.top, bottom:rect.bottom, listTop:list.top, listBottom:list.bottom, focused:document.activeElement===el }; });
+                    const bounds = await action.evaluate(el => { const rect=el.getBoundingClientRect(), list=el.closest('.orders-workspace').getBoundingClientRect(); return { height:rect.height, top:rect.top, bottom:rect.bottom, listTop:list.top, listBottom:list.bottom, focused:document.activeElement===el }; });
                     check(bounds.focused && bounds.height>=44 && bounds.top>=bounds.listTop && bounds.bottom<=bounds.listBottom+1, `${screen} primary action reachable ${width}: ${JSON.stringify(bounds)}`);
                 }
             }
@@ -78,7 +78,7 @@ try {
             await page.screenshot({path:path.join(output,`after-orders-history-${width}.png`),fullPage:true});
             if([390,1440].includes(width)) {
                 await page.evaluate(()=>showOrderCol('pending'));
-                await completeCapture(page,`after-orders-full-${width}`,await page.locator('.orders-list').evaluateAll(lists=>Math.max(...lists.filter(el=>el.getClientRects().length).map(el=>el.scrollHeight-el.clientHeight))));
+                await completeCapture(page,`after-orders-full-${width}`,await page.locator('.orders-workspace').evaluate(el=>Math.max(0,el.scrollHeight-el.clientHeight)));
             }
             check(await page.locator('#list-history .order-card').count()>0,'Existing bounded history can be viewed');
             for(const view of ['menu','promotions','drivers','settings']) {
@@ -113,7 +113,9 @@ try {
         await page.goto(`${url}/admin.html?role=${role}`,{waitUntil:'domcontentloaded'});
         const view=role==='livreur'?'driver':role==='caissier'?'orders':'overview';
         await page.locator(`#view-${view}`).waitFor({state:'visible'});
-        if(role==='livreur')await page.locator('#available-runs-list>div').first().waitFor();
+        // Phase 4 intentionally withholds the unassigned feed until a trusted,
+        // redacted backend exists; do not wait for fictional claimable cards.
+        if(role==='livreur')check(await page.locator('[data-driver-action=claim]').count()===0,'Unassigned delivery claim remains unavailable');
         await page.screenshot({path:path.join(output,`after-role-${role}-390.png`),fullPage:true});
         check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`${role} landing fits`);
         check(await page.evaluate(()=>__adminFixture.writes.length===0),`${role} visual review creates no writes`);

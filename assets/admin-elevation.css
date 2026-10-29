@@ -1,0 +1,127 @@
+/* One shared elevation policy, including preserved legacy admin components.
+   Transparent borders retain existing geometry. Functional indicators are below.
+   !important is confined to this policy to supersede CDN/legacy surface rules. */
+.admin-body :where(*) {border-color:transparent!important}
+.admin-body :where(*)::before,.admin-body :where(*)::after {border-color:transparent!important}
+
+/* Controls are always shallower than their containing cards. */
+.admin-body :where(button,summary,input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea,.admin-button,.admin-icon-button,.order-detail-link,.menu-stock) {
+    box-shadow:var(--shadow-control)!important;
+    transition:box-shadow 180ms ease,background-color 180ms ease,color 180ms ease;
+}
+.admin-body :where(.admin-panel,.admin-kpis,.order-card,.menu-products,.admin-restaurant-tile,.admin-more-identity,.orders-column>footer,.menu-empty,[class~=bg-white][class*=rounded]:not(button,input,select,textarea,summary,a)) {
+    box-shadow:var(--shadow-card)!important;
+    transition:box-shadow 180ms ease;
+}
+.admin-body :where(.settings-hours,.menu-image-editor,.menu-choice-group,.menu-option-row,.menu-check,.menu-category-editor,.menu-library-intro,.menu-shared-attach,.orders-filters,.orders-feedback,.menu-feedback,.admin-notice) {
+    box-shadow:var(--shadow-control)!important;
+}
+.admin-body :where(dialog,.admin-more,.order-detail,.menu-dialog,.menu-row-actions details[open]>div,.menu-approved-filters[open]>div,#promo-editor>div:last-child,.admin-toast,.admin-bottom-nav,#view-driver>nav) {
+    box-shadow:var(--shadow-floating)!important;
+}
+
+/* Navigation and text actions remain quiet until selected or interacted with. */
+.admin-body :where(.admin-nav-link,.admin-text-button,.order-open,.admin-location,.admin-panel-head,.admin-topbar,.admin-sidebar,.order-ticket-footer,.menu-product-main,.menu-product-bottom,.settings-day,.admin-attention-row,.admin-attention-total,.admin-next-order) {
+    box-shadow:none!important;
+}
+.admin-body .admin-nav-link[aria-current],.admin-body .orders-tabs button[aria-pressed=true] {box-shadow:var(--shadow-control)!important}
+.admin-body :where(.admin-more,.order-detail,.menu-dialog)>:is(header,footer) {box-shadow:none!important}
+.admin-body :where(.menu-row-actions details[open]>div .admin-button) {box-shadow:none!important}
+.admin-body #promo-editor>div:first-child {box-shadow:none!important}
+
+/* Rest and hover never move the controls or operational cards. */
+.admin-body :where(button,.admin-button,.admin-icon-button,.order-detail-link,.order-card,.menu-product,.admin-attention-row,.admin-next-order) {transform:none!important}
+@media(hover:hover) {
+    .admin-body :where(button:not(:disabled),summary,.admin-button:not(:disabled),.order-detail-link,input:not(:disabled):not([type=checkbox]):not([type=radio]):not([type=hidden]),select:not(:disabled),textarea:not(:disabled)):hover {
+        box-shadow:var(--shadow-hover)!important;
+    }
+    .admin-body :where(.order-card,.menu-product,.admin-attention-row,.admin-next-order):hover {box-shadow:var(--shadow-hover)!important}
+}
+.admin-body :where(button:disabled,input:disabled,select:disabled,textarea:disabled,.menu-stock[aria-busy=true]) {box-shadow:none!important}
+.admin-body :where(button,a,summary,input,select,textarea):focus-visible {outline:2px solid var(--admin-accent)!important;outline-offset:3px}
+.admin-body [aria-invalid=true] {outline:2px solid var(--admin-negative)!important;outline-offset:2px}
+.admin-body input:is([type=checkbox],[type=radio]) {box-shadow:none!important;border-color:var(--admin-control)!important}
+.admin-body input::file-selector-button {border-color:transparent!important;box-shadow:var(--shadow-control);border-radius:8px;transition:box-shadow 180ms ease}
+.admin-body .menu-product:has(.menu-select input:checked) {outline:2px solid var(--admin-accent);outline-offset:2px}
+
+/* Receipt perforations are meaningful separators, not surface decoration. */
+.admin-body .order-ticket-footer {border-top-color:#dce0e6!important}
+.admin-body .order-detail .order-products li+li {border-top-color:#dce0e6!important}
+
+/* White table rows share a parent surface; don't stack card shadows inside it. */
+@media(min-width:768px) {.admin-body .menu-product {box-shadow:none!important}}
+@media(max-width:767px) {
+    .admin-body .menu-products {box-shadow:none!important}
+    .admin-body .menu-product {box-shadow:var(--shadow-card)!important}
+}
+.admin-body .orders-tabs {padding:3px;margin:-3px}
+.admin-body :where(.admin-chart,.admin-product-row,.admin-recent-table tr,.menu-category-list article,.menu-library article) {box-shadow:none!important}
+.admin-body .order-open:hover {box-shadow:none!important}
+@media(hover:hover) {.admin-body #views-container :where(.order-card,.menu-product,.admin-attention-row,.admin-next-order):hover {box-shadow:var(--shadow-hover)!important}}
+
+/* Separation by context: fills identify fields; elevation identifies surfaces.
+   White fields remain white inside tinted groups, with no nested float effect. */
+.admin-body :where(.admin-panel,.menu-dialog,.order-detail,.admin-more,#promo-editor,[class~=bg-white]) :where(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]),select,textarea) {
+    background:var(--admin-field-surface)!important;
+    box-shadow:none!important;
+}
+.admin-body :where(.menu-choice-group,.menu-category-editor,.menu-image-editor,.menu-shared-attach,.menu-library-intro,#promo-container-choices>section,#promo-container-supplements>div) :where(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]),select,textarea) {
+    background:var(--admin-surface)!important;
+}
+.admin-body .menu-option-row :where(input:not([type=checkbox]):not([type=radio]),select,textarea) {background:var(--admin-field-surface)!important}
+@media(hover:hover) {
+    .admin-body :where(.admin-panel,.menu-dialog,.order-detail,.admin-more,#promo-editor,[class~=bg-white]) :where(input:not(:disabled):not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]),select:not(:disabled),textarea:not(:disabled)):hover {
+        background:var(--admin-field-hover)!important;box-shadow:var(--shadow-control)!important;
+    }
+}
+.admin-body :where(input:not([type=checkbox]):not([type=radio]),select,textarea):focus-visible {background:var(--admin-surface)!important;box-shadow:none!important}
+.admin-body :where(input:not([type=checkbox]):not([type=radio]),select,textarea)[aria-invalid=true] {background:var(--admin-red-bg)!important}
+
+/* Neutral buttons need a recognizable face on a white parent, not more shadow. */
+.admin-body :where(.admin-button:not(.primary):not(.is-destructive):not([data-transition]):not([data-promo-action=delete]):not([aria-pressed=true]),.admin-icon-button,.admin-profile-button,.order-detail-link,#promo-editor [data-pedit]) {
+    background:var(--admin-neutral-control)!important;
+    box-shadow:none!important;
+}
+.admin-body #promo-editor [data-pedit] {min-height:44px;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:650}
+@media(hover:hover) {
+    .admin-body :where(.admin-button:not(.primary):not(.is-destructive):not([data-transition]):not([data-promo-action=delete]):not([aria-pressed=true]):not(:disabled),.admin-icon-button:not(:disabled),.admin-profile-button:not(:disabled),.order-detail-link:not(:disabled),#promo-editor [data-pedit]:not(:disabled)):hover {
+        background:var(--admin-neutral-hover)!important;box-shadow:var(--shadow-control)!important;
+    }
+}
+.admin-body :where(.admin-button:not(.primary):not(.is-destructive):not([data-transition]):not([data-promo-action=delete]):not([aria-pressed=true]),.admin-icon-button,.order-detail-link):active {background:var(--admin-raised)!important}
+.admin-body .menu-row-actions details[open]>div .admin-button:not(:disabled) {background:transparent!important;box-shadow:none!important}
+.admin-body .menu-row-actions details[open]>div .admin-button:hover {background:var(--admin-orange-bg)!important}
+.admin-body :where(.menu-choice-group,.menu-category-editor,.menu-image-editor,.menu-shared-attach,.menu-library-intro)>.admin-button:not(.primary):not(.is-destructive):not(:disabled),.admin-body :where(#promo-container-choices,#promo-container-supplements) [data-pedit]:not(:disabled) {background:var(--admin-surface)!important}
+@media(hover:hover) {
+    .admin-body :where(.menu-choice-group,.menu-category-editor,.menu-image-editor,.menu-shared-attach,.menu-library-intro)>.admin-button:not(.primary):not(.is-destructive):not(:disabled):hover,.admin-body :where(#promo-container-choices,#promo-container-supplements) [data-pedit]:not(:disabled):hover {background:var(--admin-neutral-hover)!important;box-shadow:var(--shadow-control)!important}
+}
+.admin-body :where(.orders-search-row,.menu-tools)>.admin-button:not(.primary):not([aria-pressed=true]):not(:disabled) {background:var(--admin-surface)!important;box-shadow:var(--shadow-control)!important}
+.admin-body .order-reject:not(:disabled) {background:var(--admin-red-bg)!important;color:var(--admin-negative)!important}
+.admin-body .order-reject:not(:disabled):hover {background:#fee3df!important}
+.admin-body #promo-editor>div:last-child>div:first-child>button {background:var(--admin-neutral-control);box-shadow:none!important;min-width:44px;min-height:44px;display:grid;place-items:center}
+.admin-body input::file-selector-button {background:var(--admin-neutral-control);color:var(--admin-text);min-height:44px;padding:8px 12px;font:600 12px var(--font);box-shadow:none}
+.admin-body .menu-image-editor input::file-selector-button {background:var(--admin-surface)}
+
+/* Tabs are grouped in a quiet tray, with one distinct selected destination. */
+.admin-body .menu-editor-tabs {background:var(--admin-neutral-control);border-radius:12px;padding:4px;gap:4px}
+.admin-body .menu-editor-tabs button {background:transparent!important;box-shadow:none!important}
+.admin-body .menu-editor-tabs button[aria-pressed=true] {background:var(--admin-active)!important;color:var(--admin-orange-ink);box-shadow:none!important}
+.admin-body .menu-editor-tabs button:not([aria-pressed=true]):hover {background:var(--admin-neutral-hover)!important}
+.admin-body :where(.menu-dialog,.order-detail,.admin-more)>:where(header,footer) {background:var(--admin-section-surface)!important}
+.admin-body .menu-approved-filters>summary {background:var(--admin-surface)!important}
+.admin-body .orders-tabs button:not([aria-pressed=true]) {box-shadow:none!important}
+@media(min-width:768px) {.admin-body .menu-category-chips .admin-button:not([aria-pressed=true]) {background:transparent!important;box-shadow:none!important}}
+@media(max-width:767px) {.admin-body .menu-category-chips .admin-button:not([aria-pressed=true]) {background:var(--admin-surface)!important;box-shadow:var(--shadow-control)!important}}
+@media(hover:hover) {.admin-body .menu-category-chips .admin-button:not([aria-pressed=true]):hover {background:var(--admin-neutral-hover)!important;box-shadow:var(--shadow-control)!important}}
+
+/* Navigation has one floating parent; its children do not each float. */
+.admin-body .admin-bottom-nav,.admin-body #view-driver>nav {background:var(--admin-surface);box-shadow:var(--shadow-floating)!important;isolation:isolate}
+.admin-body .admin-bottom-nav :where(a,button),.admin-body #view-driver>nav button {box-shadow:none!important}
+.admin-body .admin-bottom-nav .admin-nav-link[aria-current] {background:var(--admin-active);color:var(--admin-orange-ink);box-shadow:none!important}
+.admin-body :where(button:disabled,input:disabled:not([type=checkbox]):not([type=radio]),select:disabled,textarea:disabled) {background:#eef0f3!important;color:var(--admin-muted)!important;box-shadow:none!important;opacity:1;cursor:not-allowed}
+.admin-body .menu-stock[aria-busy=true] {background:var(--admin-orange-bg)!important;color:var(--admin-orange-ink)!important;cursor:wait}
+@media(prefers-reduced-motion:reduce) {.admin-body :where(button,a,input,select,textarea,summary) {transition:none!important}}
+@media(forced-colors:active) {
+    .admin-body :where(button,input,select,textarea,summary,dialog,.admin-panel,.order-card,.menu-product) {border-color:ButtonText!important}
+    .admin-body :where(button,a,summary,input,select,textarea):focus-visible {outline-color:Highlight!important}
+}

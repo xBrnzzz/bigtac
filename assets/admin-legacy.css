@@ -31,6 +31,18 @@
 #promo-editor :is(h2,h3) { color:var(--admin-text); }
 #promo-editor :is(input,select,textarea) { border-color:var(--admin-control); background:white; color:var(--admin-text); }
 #promo-editor label { text-transform:none; letter-spacing:0; font-size:13px; }
+/* Legacy option controls share the editor's field geometry and group hierarchy. */
+#promo-container-choices>section,#promo-container-supplements>div {background:var(--admin-neutral-control);border-radius:12px;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#promo-container-choices>section>* {margin:0!important;min-width:0}
+#promo-container-choices>section>:is(input,select,div) {grid-column:1/-1}
+#promo-container-choices>section>label {display:grid;gap:6px;align-content:end;color:var(--admin-muted);font-size:12px}
+#promo-container-choices :is(input,select),#promo-container-supplements input {min-height:44px;min-width:0;max-width:100%;padding:10px 12px;border-radius:11px;font:inherit}
+#promo-container-choices>section>label>input {width:100%}
+#promo-container-choices>section>div,#promo-container-supplements>div {display:grid;gap:8px}
+#promo-container-choices>section>div>div,#promo-container-supplements>div>div {display:grid;grid-template-columns:minmax(0,1fr) 80px;gap:8px}
+#promo-container-choices>section>div>div>input,#promo-container-supplements>div>div>input {width:100%}
+#promo-container-supplements>div>* {grid-column:1/-1}
+#promo-editor [data-pedit] {justify-self:start;white-space:normal;text-align:left}
 #btn-save-promo { background:var(--admin-primary); box-shadow:none; }
 #view-settings .admin-panel { border-color:var(--admin-border); }
 #view-settings .admin-setting-row:last-of-type { border-bottom:0; }

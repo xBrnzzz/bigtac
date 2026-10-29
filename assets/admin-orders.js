@@ -17,13 +17,17 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
         <div id="orders-filters" class="orders-filters" hidden><label>Service<select id="orders-service"><option value="all">Tous les services</option><option value="livraison">Livraison</option><option value="emporter">À emporter</option><option value="sur_place">Sur place</option></select></label><label>Statut<select id="orders-status"><option value="all">Tous les statuts</option><option value="pending">En attente</option><option value="confirmed">En cuisine</option><option value="en_livraison">Prêt / livraison</option><option value="history">Terminées</option><option value="delivered">Remises / livrées</option><option value="rejected">Refusées</option><option value="ready">Prêtes (ancien statut)</option></select></label><label>Date de réception<input id="orders-date" type="date" name="order-date"></label><label>Repère local (min)<input id="orders-threshold" type="number" min="0" max="240" step="1" value="0" inputmode="numeric"><small>0 : aucun avertissement. Repère local depuis réception, pas délai de cuisson.</small></label><button id="orders-clear" class="admin-button">Effacer les filtres</button></div>
         <div id="orders-notification" class="orders-notification" role="status" hidden>${icon('bell')}<span></span><button class="admin-button" id="orders-show-new">Voir les nouvelles</button></div>
         <div id="orders-error" class="orders-feedback" role="alert" hidden></div><div id="orders-summary" class="orders-summary" role="status"></div>
-        <nav class="orders-tabs" aria-label="Files de commandes">${ORDER_COLUMNS.map(column=>`<button id="mtab-${column.id}" data-tab="${column.id}" data-tone="${column.tone}" aria-pressed="${column.id==='pending'}">${icon(queueIcon(column.id))}${column.label} <span id="count-${column.id}">—</span></button>`).join('')}</nav>
+        <nav class="orders-tabs" aria-label="Files de commandes"><button id="mtab-all" data-tab="all" aria-pressed="true">${icon('home')}Toutes <span id="count-all">—</span></button>${ORDER_COLUMNS.map(column=>`<button id="mtab-${column.id}" data-tab="${column.id}" data-tone="${column.tone}" aria-pressed="${column.id==='pending'}">${icon(queueIcon(column.id))}${column.label} <span id="count-${column.id}">—</span></button>`).join('')}</nav>
         <div class="orders-board">${ORDER_COLUMNS.map(column=>`<section id="col-${column.id}" class="orders-column" data-column="${column.id}" data-tone="${column.tone}" aria-labelledby="order-heading-${column.id}"><header><div><h3 id="order-heading-${column.id}" tabindex="-1">${icon(queueIcon(column.id))}${column.label}</h3><p>${column.hint}</p></div><span data-count="${column.id}" aria-label="Commandes affichées">—</span></header><div id="list-${column.id}" class="orders-list"></div>${column.id==='history'?'<footer><button id="orders-history-more" class="admin-button">Charger l’historique</button><p id="orders-history-note">7 derniers jours. Chargement à la demande.</p></footer>':''}</section>`).join('')}</div>`;
     const toolbar=root.querySelector('.orders-toolbar');
     toolbar.append(root.querySelector('.orders-utilities'));
     const metadata=document.createElement('div');metadata.className='orders-metadata';
     for(const id of ['orders-connection','orders-period','orders-summary'])metadata.append(root.querySelector('#'+id));
     toolbar.after(metadata);
+    const heading=root.querySelector('.orders-heading');
+    heading.append(root.querySelector('.orders-mode'));
+    toolbar.prepend(root.querySelector('.orders-tabs'));
+    root.querySelector('.orders-control-row').remove();
     root.querySelector('#orders-sound').setAttribute('aria-label','Activer ou désactiver les notifications sonores');
     root.querySelector('#orders-refresh').setAttribute('aria-label','Actualiser les commandes');
     const dialog=document.createElement('dialog'); dialog.id='order-detail'; dialog.className='order-detail'; dialog.setAttribute('aria-labelledby','order-detail-title');
@@ -32,7 +36,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     const receipt=document.createElement('section'); receipt.id='order-print-receipt'; receipt.hidden=true; document.body.append(receipt);
     let active=[],historyOrders=[],historyCursor=null,hasMore=true,historyLoaded=false,historyBusy=false,historyError='',historyRequest=0;
     let stopLive=null,stopDetail=null,timer=null,selected=null,detailError='',detailCached=false;
-    let enabled=false,epoch=0,activeError='',loading=true,cached=false,partial=false,kitchen=false,tab='pending',timezone='Africa/Casablanca',newCount=0;
+    let enabled=false,epoch=0,activeError='',loading=true,cached=false,partial=false,kitchen=false,tab='all',timezone='Africa/Casablanca',newCount=0;
     let filter={search:'',service:'all',status:'all',date:''},threshold=0,tracker=null,audio=null,sound=false;
     let deliveryDrivers=[],driverError='',driverLoaded=false,driverRequest=0,assignmentBusy=false;
     const assignments=operationsService(session);
@@ -47,8 +51,8 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     function canAct() { return enabled && !!profile() && !loading && !cached && !activeError && navigator.onLine; }
     function actionMarkup(order,detail=false) {
         const state=pending.get(order.id),failure=failures.get(order.id),next=nextOrderAction(order),disabled=assignmentBusy || !canAct() || !!state || detail && (detailCached||!!detailError);
-        const primary=next?`<button class="admin-button primary" data-transition="${next.status}" ${disabled?'disabled':''}>${icon(next.status==='confirmed'?'chef':next.status==='en_livraison'?'package':'check')}${state ? state.waiting?'Confirmation en attente…':'Enregistrement…' : next.label}</button>`:'';
-        return `<div class="order-actions" data-order-id="${e(order.id)}">${primary}${order.status==='pending'?`<button class="admin-button order-reject" data-transition="rejected" ${disabled?'disabled':''}>${icon('x')}Refuser</button>`:''}</div>${failure?`<div class="order-operation-error" role="alert"><p>${e(failure.message)}</p>${next && !['conflict','missing','permission','transition'].includes(failure.code)?`<button class="admin-button" data-retry="${e(order.id)}" ${disabled?'disabled':''}>Réessayer</button>`:''}</div>`:''}`;
+        const primary=next?`<button class="admin-button primary" data-transition="${next.status}" data-service="${e(order.type)}" aria-busy="${!!state}" ${disabled?'disabled':''}>${icon(next.status==='confirmed'?'chef':next.status==='en_livraison'?'package':'check')}${state ? state.waiting?'Confirmation en attente…':'Enregistrement…' : next.label}</button>`:'';
+        return `<div class="order-actions" data-order-id="${e(order.id)}">${primary}${order.status==='pending'?`<button class="admin-button order-reject" data-transition="rejected" ${disabled?'disabled':''}>${icon('x')}<span>Refuser</span></button>`:''}</div>${failure?`<div class="order-operation-error" role="alert"><p>${e(failure.message)}</p>${next && !['conflict','missing','permission','transition'].includes(failure.code)?`<button class="admin-button" data-retry="${e(order.id)}" ${disabled?'disabled':''}>Réessayer</button>`:''}</div>`:''}`;
     }
     function itemMarkup(order,detail=false) {
         const items=recordedItems(order);
@@ -58,7 +62,8 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     function noteMarkup(order) { return customerNotes(order).map(note=>`<div class="order-instructions"><b>${icon('note')}Consigne client</b><p>${e(note)}</p></div>`).join(''); }
     function ageMarkup(order) { const age=orderAge(order,Date.now(),threshold); return `<span class="order-age" data-age-id="${e(order.id)}" data-age-tone="${age.tone}" title="Temps depuis réception">${e(age.label)}${age.tone==='late'?' · repère dépassé':age.tone==='soon'?' · à surveiller':''}</span>`; }
     function cardMarkup(order) {
-        return `<div class="order-card-heading"><button class="order-open" data-open="${e(order.id)}" aria-label="Ouvrir la commande ${e(orderNumber(order))}"><strong>#${e(orderNumber(order))}</strong></button><span class="order-service" data-service="${e(order.type)}">${icon(serviceIcon(order.type))}${e(serviceName(order.type))}</span><span class="order-status" data-state="${e(order.status)}">${e(statusName(order))}</span></div><div class="order-ticket-time"><small>Reçue à ${e(clock(timestampDate(order.createdAt)))}</small>${ageMarkup(order)}</div>${table(order)?`<div class="order-meta"><span>${icon('grid')}${table(order)}</span></div>`:''}${itemMarkup(order)}${noteMarkup(order)}${!kitchen?`<div class="order-card-total"><span>Total enregistré</span><strong>${money(order)}</strong></div>`:''}${actionMarkup(order)}<button class="order-detail-link" data-open="${e(order.id)}">${icon('note')}Détails & reçu</button>`;
+        return `<div class="order-card-heading"><button class="order-open" data-open="${e(order.id)}" aria-label="Ouvrir la commande ${e(orderNumber(order))}"><small>Commande</small><strong>#${e(orderNumber(order))}</strong></button><span class="order-status" data-state="${e(order.status)}">${e(statusName(order))}</span></div><div class="order-ticket-time"><span class="order-service" data-service="${e(order.type)}">${icon(serviceIcon(order.type))}${e(serviceName(order.type))}${table(order)?' · '+table(order):''}</span>${ageMarkup(order)}</div><div class="order-ticket-content">${itemMarkup(order)}${noteMarkup(order)}</div><footer class="order-ticket-footer">${!kitchen?`<div class="order-card-total"><span>Total enregistré</span><strong>${money(order)}</strong></div>`:''}${actionMarkup(order)}<button class="order-detail-link" data-open="${e(order.id)}" aria-label="Détails et reçu de la commande ${e(orderNumber(order))}">${icon('arrow')}<span class="sr-only">Détails & reçu</span></button></footer>`;
+
     }
     function updateTimers() {
         if(!enabled) return;
@@ -85,10 +90,12 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
         const filtered=filterOrders(data,{...filter,kitchen},timezone).sort((a,b)=>(timestampDate(a.createdAt)?.getTime()||0)-(timestampDate(b.createdAt)?.getTime()||0));
         $('orders-summary').textContent=loading?'Chargement des files…':`${filtered.length} commande(s) affichée(s)${filter.search?' · recherche dans les commandes chargées':''}${kitchen?' · vue cuisine, coordonnées masquées':''}`;
         $('orders-mode-service').setAttribute('aria-pressed',String(!kitchen)); $('orders-mode-kitchen').setAttribute('aria-pressed',String(kitchen));
+        $('count-all').textContent=String(filtered.filter(order=>orderColumn(order.status)!=='history').length);
+        $('mtab-all').setAttribute('aria-pressed',String(tab==='all'&&!kitchen));
         const present=new Set();
         for(const column of ORDER_COLUMNS) {
             const rows=filtered.filter(order=>orderColumn(order.status)===column.id); if(column.id==='history') rows.reverse();
-            const list=$(`list-${column.id}`); const count=column.id==='history' && !historyLoaded && !rows.length ? '—' : String(rows.length);
+            const list=$(`list-${column.id}`); list.dataset.empty=String(!rows.length); const count=column.id==='history' && !historyLoaded && !rows.length ? '—' : String(rows.length);
             $(`count-${column.id}`).textContent=count; root.querySelector(`[data-count="${column.id}"]`).textContent=count;
             $(`mtab-${column.id}`).setAttribute('aria-pressed',String(tab===column.id));
             const empty=list.querySelector('.orders-queue-empty'); if(empty) empty.remove();
@@ -199,7 +206,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
         } catch(error){if(version===epoch && request===historyRequest)historyError=operationMessage(error);}
         finally{if(version===epoch && request===historyRequest){historyBusy=false;render();}}
     }
-    function setTab(id) {if(!ORDER_COLUMNS.some(column=>column.id===id))return;tab=kitchen?'confirmed':id;if(id==='history'&&!historyLoaded&&!historyBusy)historyPage();render();}
+    function setTab(id) {if(id!=='all'&&!ORDER_COLUMNS.some(column=>column.id===id))return;tab=kitchen?'confirmed':id;if(id==='history'&&!historyLoaded&&!historyBusy)historyPage();render();}
     function subscribe() {
         stopLive?.();loading=true;activeError='';cached=false;render();const version=epoch;
         stopLive=watchActiveOrders(snapshot=>{

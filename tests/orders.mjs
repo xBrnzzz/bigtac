@@ -141,7 +141,8 @@ try {
             for(let i=0;i<75;i++)__adminFixture.data.orders.push({...row,id:`history-${i}`,shortId:`H${i}`,status:'delivered',createdAt:new Date(Date.now()-i*60000)});
             __adminFixture.emit();
         });
-        await page.locator('#orders-history-more').click();
+        await page.locator('#mtab-history').click();
+        await page.waitForFunction(()=>document.getElementById('orders-history-note').textContent.startsWith('30 chargée'));
         await page.waitForFunction(()=>document.getElementById('orders-history-note').textContent.startsWith('30 chargée'));
         check(await page.locator('#list-history .order-card').count()===30,'History is paginated, not loaded entirely');
         await page.locator('#orders-history-more').click();
@@ -157,7 +158,7 @@ try {
         await page.evaluate(()=>{__adminFixture.failOrders=true;__adminFixture.emit();});
         check(await page.locator('#orders-error').innerText().then(text=>text.length>0),'Live read error visible');
         check(await page.locator('#list-pending .order-card').count()===0,'Failed live queue does not present stale actionable cards');
-        await page.evaluate(()=>__adminFixture.failOrders=false);await page.locator('#orders-refresh').click();
+        await page.evaluate(()=>__adminFixture.failOrders=false);await page.locator('#orders-refresh').click();await page.locator('#mtab-pending').click();
         await page.locator('#list-pending .order-card').first().waitFor();
         check(await page.locator('#orders-error').isHidden(),'Successful live retry clears error');
         await page.evaluate(()=>{const row=__adminFixture.data.orders[0];__adminFixture.data.orders=Array.from({length:250},(_,i)=>({...row,id:`queue-${i}`,status:'pending'}));__adminFixture.emit();});

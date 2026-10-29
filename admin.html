@@ -11,7 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
@@ -20,7 +20,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        sans: ['Manrope', 'system-ui', 'sans-serif'],
                     },
                     colors: {
                         brand: {
@@ -139,6 +139,9 @@
     <link rel="stylesheet" href="assets/admin-orders.css">
     <link rel="stylesheet" href="assets/admin-menu.css">
     <link rel="stylesheet" href="assets/admin-legacy.css">
+    <link rel="stylesheet" href="assets/admin-approved.css">
+    <link rel="stylesheet" href="assets/admin-polish.css">
+    <link rel="stylesheet" href="assets/admin-elevation.css">
 </head>
 
 <body class="bg-slate-100 text-slate-800 antialiased h-screen overflow-hidden flex flex-col md:flex-row">
@@ -192,7 +195,7 @@
             <div class="max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-2xl font-black text-slate-900 tracking-tight">Gestion des Promotions</h2>
+                        <h2 class="text-2xl font-black text-slate-900 tracking-tight">Promotions</h2>
                         <p class="text-xs text-slate-500">Offres en vitrine visibles sur la page d'accueil</p>
                     </div>
                     <button onclick="openPromoEditor()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2.5 rounded-2xl font-bold text-sm shadow-lg shadow-red-600/20 flex items-center gap-2">
@@ -210,7 +213,7 @@
         <div id="view-drivers" class="absolute inset-0 p-4 sm:p-6 hidden overflow-y-auto">
             <div class="max-w-5xl mx-auto space-y-6">
                 <div>
-                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Comptes Utilisateurs & Livreurs</h2>
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Équipe</h2>
                     <p class="text-xs text-slate-500">Gérez les accès administrateurs, managers, caissiers et livreurs</p>
                 </div>
 

@@ -1,6 +1,11 @@
 // Small local outline set. One 24px grid and 1.8px stroke throughout the POS;
 // no CDN, runtime replacement pass, or additional package needed for these views.
 const paths = {
+    edit: '<path d="m15 4 5 5M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15l-1 6 5-2"/>',
+    copy: '<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V3H3v13h5"/>',
+    trash: '<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>',
+    up: '<path d="M12 20V4m-6 6 6-6 6 6"/>',
+    down: '<path d="M12 4v16m-6-6 6 6 6-6"/>',
     home: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="11" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="18" width="7" height="3" rx="1"/>',
     'shopping-bag': '<path d="M5 7h14l1 14H4L5 7Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
     grid: '<path d="M3 3v5a3 3 0 0 0 6 0V3M6 3v18M20 3c-4 3-4 8 0 9V3Zm0 9v9"/>',

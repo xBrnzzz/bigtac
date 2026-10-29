@@ -20,7 +20,7 @@ export function mountAdminShell() {
         <a class="admin-skip" href="#views-container">Aller au contenu</a>
         <aside class="admin-sidebar" aria-label="Navigation principale">
             <a class="admin-brand" href="index.html" target="_blank" rel="noopener"><img src="assets/logo.png" width="44" height="44" alt=""><span><strong data-restaurant-name>BIGTAC</strong><small>Admin 2.0</small></span></a>
-            <nav id="admin-desktop-nav"></nav>
+            <div class="admin-restaurant-tile">${icon('grid')}<div><strong data-restaurant-name>BIGTAC</strong><small>Votre restaurant</small></div>${icon('chevron-down')}</div><nav id="admin-desktop-nav"></nav>
             <div class="admin-account"><span class="admin-avatar" aria-hidden="true">E</span><span><strong data-staff-name></strong><small data-staff-role></small></span></div>
             <button id="logout-btn" class="admin-text-button">${icon('log-out')}Déconnexion</button>
         </aside>
