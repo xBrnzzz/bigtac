@@ -21,6 +21,29 @@
 #view-drivers table { font-variant-numeric:tabular-nums; }
 #view-drivers th { color:var(--admin-muted); text-transform:none; font-weight:600; font-size:12px; letter-spacing:0; }
 #view-drivers td button { min-width:44px; min-height:44px; }
+/* One compact, borderless employee card at every breakpoint. */
+.admin-team-accounts,.admin-team-table-wrap {min-width:0}
+.admin-team-heading {margin-bottom:12px}
+#view-drivers .admin-team-list {display:block;width:100%;min-width:0}
+#view-drivers .admin-team-columns {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#view-drivers .admin-team-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px;padding:2px}
+#view-drivers .admin-employee-card {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto minmax(54px,1fr) auto;gap:12px 0;padding:16px;background:var(--admin-surface);border-radius:var(--admin-radius);min-width:0}
+#view-drivers .admin-employee-card>td {display:block;min-width:0;padding:0;text-align:left;white-space:normal;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+#view-drivers .admin-employee-identity,#view-drivers .admin-employee-email,#view-drivers .admin-employee-action {grid-column:1/-1}
+#view-drivers .admin-employee-identity strong {display:block;font-size:15px;font-weight:800;line-height:1.4}
+#view-drivers .admin-employee-identity p {margin:3px 0 0;color:var(--admin-muted);font-size:12px}
+#view-drivers .admin-employee-label {display:block;color:var(--admin-muted);font-size:11px;font-weight:600;line-height:1.5}
+#view-drivers .admin-employee-card>.admin-employee-email {display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline}
+#view-drivers .admin-employee-card>.admin-employee-status,#view-drivers .admin-employee-card>.admin-employee-access {padding:9px 10px;background:var(--admin-ground)}
+#view-drivers .admin-employee-status {border-radius:10px 0 0 10px}
+#view-drivers .admin-employee-access {border-radius:0 10px 10px 0}
+#view-drivers .admin-employee-state {color:var(--admin-positive);font-weight:650}
+#view-drivers .admin-employee-state::before {content:'';display:inline-block;width:5px;height:5px;margin-right:6px;border-radius:50%;background:currentColor;vertical-align:middle}
+#view-drivers .admin-employee-state.is-unrecognized {color:var(--admin-negative)}
+#view-drivers .admin-employee-action .admin-button {width:100%;white-space:normal;font-size:12px}
+#view-drivers .admin-employee-action .admin-button:disabled {opacity:1;cursor:not-allowed}
+#view-drivers .admin-team-message {display:block;grid-column:1/-1;padding:16px;background:var(--admin-surface);border-radius:var(--admin-radius)}
+#view-drivers .admin-team-message td {display:block;white-space:normal;color:var(--admin-muted);font-size:13px}
 #view-driver>div:first-child { border-radius:0; border-color:var(--admin-border); }
 #view-driver>nav { box-shadow:0 -2px 8px #17203308; border-radius:0; }
 #view-driver :is(#driver-tab-available,#driver-tab-deliveries)>h2 { font-size:21px; }
@@ -52,14 +75,5 @@
     #view-promotions>div>div:first-child>button { width:100%; justify-content:center; }
     #promotions-list>div { display:grid; grid-template-columns:64px minmax(0,1fr); gap:12px; }
     #promotions-list>div>div:last-child { grid-column:1/-1; justify-content:flex-end; }
-    #view-drivers table { display:block; min-width:0; }
-    #view-drivers thead { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
-    #view-drivers tbody { display:block; }
-    #view-drivers tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); padding:12px; gap:6px 12px; border-bottom:1px solid var(--admin-border); }
-    #view-drivers td { display:block; padding:6px 0; white-space:normal; overflow-wrap:anywhere; text-align:left; }
-    #view-drivers td:nth-child(1),#view-drivers td:nth-child(2) { grid-column:1/-1; }
-    #view-drivers td::before { content:attr(data-label); display:block; font-size:12px; color:var(--admin-muted); margin-bottom:4px; }
-    #view-drivers td:last-child { grid-column:1/-1; text-align:right; }
-    #view-drivers td:last-child::before { display:none; }
     #view-driver :is(#driver-tab-available,#driver-tab-deliveries)>h2 { font-size:19px; }
 }

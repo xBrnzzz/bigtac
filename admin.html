@@ -250,28 +250,28 @@
                     </form>
                 </div>
 
-                <!-- Users Table -->
-                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                        <h3 class="font-extrabold text-slate-700 text-sm">Liste des Comptes</h3>
+                <!-- Employee cards retain the existing table hooks and column semantics. -->
+                <section class="admin-team-accounts" aria-labelledby="team-accounts-title">
+                    <div class="admin-team-heading">
+                        <h3 id="team-accounts-title" class="font-extrabold text-slate-700 text-sm">Liste des Comptes</h3>
                     </div>
-                    <div class="overflow-x-auto w-full">
-                        <table class="w-full min-w-max text-sm">
-                            <thead class="bg-slate-50/80 border-b border-slate-100">
+                    <div class="admin-team-table-wrap">
+                        <table class="admin-team-list" role="table" aria-labelledby="team-accounts-title">
+                            <thead class="admin-team-columns" role="rowgroup">
                                 <tr>
-                                    <th class="text-left p-3.5 text-xs font-black text-slate-400 uppercase">Utilisateur</th>
-                                    <th class="text-left p-3.5 text-xs font-black text-slate-400 uppercase">Email</th>
-                                    <th class="text-center p-3.5 text-xs font-black text-slate-400 uppercase">Courses Validées</th>
-                                    <th class="text-right p-3.5 text-xs font-black text-slate-400 uppercase">Gains Livreur</th>
-                                    <th class="text-right p-3.5 text-xs font-black text-slate-400 uppercase">Action</th>
+                                    <th id="team-column-user" scope="col">Utilisateur</th>
+                                    <th id="team-column-email" scope="col">Email</th>
+                                    <th id="team-column-state" scope="col">Courses Validées</th>
+                                    <th id="team-column-access" scope="col">Gains Livreur</th>
+                                    <th id="team-column-action" scope="col">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="drivers-table-body" class="divide-y divide-slate-100">
+                            <tbody id="drivers-table-body" class="admin-team-grid" role="rowgroup">
                                 <!-- Populated by JS -->
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </section>
             </div>
         </div>
 
@@ -771,8 +771,8 @@
                 const snap=await getDocs(query(collection(db,'users'),limit(201)));if(version!==workVersion||!authorized('drivers'))return;
                 if(snap.metadata?.fromCache||snap.docs.length>200)throw Error('Liste non confirmée ou partielle.');
                 const labels=document.querySelectorAll('#view-drivers th');if(labels.length>=5){labels[2].textContent='État';labels[3].textContent='Accès';}
-                body.innerHTML=snap.docs.map(d=>{const u=d.data(),role=profileRole(u);return `<tr><td class="p-3.5"><strong>${escapeOrderText(String(u.name||'Sans nom'))}</strong><p>${escapeOrderText(String(u.role||'Non renseigné'))}</p></td><td class="p-3.5">${escapeOrderText(String(u.email||''))}</td><td class="p-3.5">${role?'Actif':'Accès désactivé ou profil invalide'}</td><td class="p-3.5">${role?'Profil reconnu':'Refusé'}</td><td class="p-3.5"><button class="admin-button" disabled>Service sécurisé requis</button></td></tr>`;}).join('')||'<tr><td colspan="5">Aucun compte enregistré.</td></tr>';
-            }catch(error){body.innerHTML='<tr><td colspan="5">Lecture impossible. Rechargez Équipe pour réessayer.</td></tr>';}
+                body.innerHTML=snap.docs.map(d=>{const u=d.data(),role=profileRole(u);return `<tr class="admin-employee-card" role="row"><td class="admin-employee-identity" headers="team-column-user" role="cell"><strong>${escapeOrderText(String(u.name||'Sans nom'))}</strong><p>${escapeOrderText(String(u.role||'Non renseigné'))}</p></td><td class="admin-employee-email" headers="team-column-email" role="cell"><span class="admin-employee-label">Email</span><span>${escapeOrderText(String(u.email||''))}</span></td><td class="admin-employee-status" headers="team-column-state" role="cell"><span class="admin-employee-label">État</span><span class="admin-employee-state${role?'':' is-unrecognized'}">${role?'Actif':'Accès désactivé ou profil invalide'}</span></td><td class="admin-employee-access" headers="team-column-access" role="cell"><span class="admin-employee-label">Accès</span><span>${role?'Profil reconnu':'Refusé'}</span></td><td class="admin-employee-action" headers="team-column-action" role="cell"><button class="admin-button" disabled>Service sécurisé requis</button></td></tr>`;}).join('')||'<tr class="admin-team-message"><td colspan="5">Aucun compte enregistré.</td></tr>';
+            }catch(error){body.innerHTML='<tr class="admin-team-message"><td colspan="5">Lecture impossible. Rechargez Équipe pour réessayer.</td></tr>';}
         }
         window.deleteDriver=async()=>{try{await staffAdministration.remove();}catch(error){showToast(error.message,'error');return false;}};
 

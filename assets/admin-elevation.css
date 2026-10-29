@@ -9,7 +9,7 @@
     box-shadow:var(--shadow-control)!important;
     transition:box-shadow 180ms ease,background-color 180ms ease,color 180ms ease;
 }
-.admin-body :where(.admin-panel,.admin-kpis,.order-card,.menu-products,.admin-restaurant-tile,.admin-more-identity,.orders-column>footer,.menu-empty,[class~=bg-white][class*=rounded]:not(button,input,select,textarea,summary,a)) {
+.admin-body :where(.admin-panel,.admin-kpis,.order-card,.menu-products,.admin-restaurant-tile,.admin-more-identity,.orders-column>footer,.menu-empty,.admin-employee-card,[class~=bg-white][class*=rounded]:not(button,input,select,textarea,summary,a)) {
     box-shadow:var(--shadow-card)!important;
     transition:box-shadow 180ms ease;
 }
