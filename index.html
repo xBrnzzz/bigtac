@@ -497,7 +497,7 @@
         import { db, collection, getDocs, query, orderBy, addDoc, serverTimestamp, doc, onSnapshot } from './firebase-config.js';
 
         import {available as menuAvailable,listed as menuListed,categoryFor,cartMenuIssue,fingerprint as menuFingerprint} from './assets/menu-model.js';
-        import { buildCustomizationSteps, choiceRules, selectionIssue, customizationPrice, cartSelections } from './assets/customization.js';
+        import { buildCustomizationSteps, choiceRules, selectionIssue, customizationPrice, cartSelections, cartChoiceSelections, optionSnapshot, moneyCents } from './assets/customization.js';
         import {promotionState,orderingAvailable,safeURL} from './assets/operations-model.js';
         import { setupCarousel } from './assets/carousels.js';
 
@@ -956,6 +956,7 @@
             cancelCustomizationAdvance();
             currentItem = (isPromo ? allPromotions : allItems).find(item => item.id === id);
             if (!currentItem || !menuAvailable(currentItem)) return showToast('Ce produit est en rupture de stock.','error');
+            try{moneyCents(currentItem.price);[...(currentItem.mandatoryChoices||[]).flatMap(group=>group.options||[]),...(currentItem.supplements||[])].filter(menuAvailable).forEach(option=>moneyCents(option.price||0));}catch{return showToast('Le prix de cette configuration doit être vérifié par le restaurant.','error');}
             modalQty = 1;
             wizardData = {};
             Object.keys(selectionErrors).forEach(key => delete selectionErrors[key]);
@@ -1015,7 +1016,7 @@
             const option = options[optionIndex];
             if (!option) return;
             const selections = wizardData[index] || [];
-            const selected = { optionIndex, name: option.name, price: Number(option.price) || 0 };
+            const selected = { optionIndex, ...optionSnapshot({...option,price:Number(option.price)||0}) };
             let next;
             if (input.checked && radio) next = [selected];
             else if (input.checked) next = [...selections, selected];
@@ -1100,7 +1101,7 @@
                 cartId: `${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
                 id: currentItem.id, isPromo: currentItem.isPromo===true, name: currentItem.name, imageUrl: currentItem.imageUrl || '', category: currentItem.category || '',
                 qty: modalQty, unitBasePrice: currentItem.price, selectedOptions, supplements,
-                choiceSelections:wizardSteps.map((step,index)=>({step,index})).filter(({step})=>step.type==='choice').map(({step,index})=>({title:step.title,options:(wizardData[index]||[]).map(({name,price})=>({name,price}))})),
+                choiceSelections:cartChoiceSelections(wizardSteps,wizardData),
                 totalPrice: customizationPrice(currentItem, wizardData, modalQty)
             });
             localStorage.setItem('bigtacCart', JSON.stringify(cart));
@@ -1117,7 +1118,8 @@
         window.updateCartUI = () => {
             window.cart = cart;
             const totalQty = cart.reduce((sum, item) => sum + Number(item.qty), 0);
-            const totalPrice = cart.reduce((sum, item) => sum + Number(item.totalPrice), 0);
+            let invalidCartAmount=false;
+            const totalPrice = cart.reduce((sum, item) => {try{return sum+moneyCents(item.totalPrice);}catch{invalidCartAmount=true;return sum;}}, 0)/100;
             const container = document.getElementById('cartItemsContainer');
             if (!container) return;
             if (!cart.length) {
@@ -1136,7 +1138,7 @@
             document.body.classList.toggle('has-cart', Boolean(cart.length));
             document.getElementById('desktopCartPreview').textContent = cart.length ? `${totalQty} article${totalQty > 1 ? 's' : ''} dans votre panier. Encore une envie ?` : 'Choisissez vos plats, on s’occupe du reste.';
             const checkoutButton = document.getElementById('btnGoToCheckout');
-            const catalogIssue=cart.length&&stockReady?cartMenuIssue(cart,rawMenuItems,categoryRows,allPromotions):'';
+            const catalogIssue=invalidCartAmount?'Le montant d’un article ancien est invalide. Retirez-le puis composez-le à nouveau.':cart.length&&stockReady?cartMenuIssue(cart,rawMenuItems,categoryRows,allPromotions):'';
             document.getElementById('cartMenuWarning').hidden=!catalogIssue;
             document.getElementById('cartMenuWarning').textContent=catalogIssue;
             checkoutButton.disabled = !cart.length || !storeAvailable() || !stockReady || !!catalogIssue;
@@ -1147,9 +1149,10 @@
             const item = cart[index];
             if (!item) return;
             if (item.qty + change <= 0) return removeCartItem(index);
-            const unitPrice = item.totalPrice / item.qty;
+            let unitPrice;try{unitPrice=moneyCents(item.totalPrice)/item.qty;}catch{showToast('Ce montant est invalide. Retirez cet article puis composez-le à nouveau.','error');return;}
+            if(!Number.isSafeInteger(unitPrice)){showToast('Ce panier ancien doit être recomposé avant de modifier la quantité.','error');return;}
             item.qty += change;
-            item.totalPrice = unitPrice * item.qty;
+            item.totalPrice = unitPrice * item.qty/100;
             localStorage.setItem('bigtacCart', JSON.stringify(cart));
             updateCartUI();
         };

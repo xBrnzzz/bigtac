@@ -1,5 +1,30 @@
 # BIGTAC Admin 2.0 status
 
+## Current — Product deletion & concurrency bugfix (2 November 2026)
+
+Owner instructed: “PUSH AND COMMIT”. This commit bundles the approved menu logic improvements and the fix for product deletion and concurrency fingerprint conflicts.
+
+- **Product Deletion:** Added transactional deletion for single products and bulk products via `service.product(..., {remove: true})` and `service.bulk(..., {remove: true})` in `assets/admin-menu-service.js`. Unlinks removed product IDs from attached `modifierGroups` and purges `productCategories` mapping. Added "Supprimer" button in product row `•••` action menu, "Supprimer le produit" in the item-editor dialog footer, and "Supprimer de la carte" in the bulk action menu.
+- **Concurrency Fingerprint Fix:** Fixed false `"Ce contenu a changé sur un autre appareil..."` rejections by making `fingerprint()` in `assets/menu-model.js` key-order agnostic with deterministic recursive sorting and Firestore Timestamp / Date serialization.
+- **Test coverage:** 47 logic model checks + 55 logic browser checks + 55 menu model checks + 140 menu browser checks + 350 storefront checks + 148 customization navigation checks. Total 795+ checks passing cleanly. Pre-existing image modifications and `bigtac-2/` remain untouched.
+
+## Previous — focused Menu Builder logic improvements (28 October 2026)
+
+At the owner's explicit “PUSH FIRST” instruction, the completed Phase 4 checkpoint was committed/pushed to `origin/main` as **`7b82649`**. This subsequent customization pass remains **local and uncommitted**. The historical Phase 4 no-commit notes below describe that earlier implementation stage.
+
+Inspected `admin-menu.js`, `menu-model.js`, `customization.js`, `admin-menu-service.js`, customer customization/cart code and `backend/MENU_PHASE3.md`. Capability classification and separately gated proposals are recorded in `backend/MENU_LOGIC_IMPROVEMENTS.md`.
+
+- Added owner-friendly Exactly One / Up To / At Least / Between presets and required/optional controls, mapping exclusively to existing radio/checkbox/min/max fields. No new persisted selection-rule type. Shared supplement groups retain their existing optional, one-unit-per-option semantics.
+- Added draft templates for sizes/sauces/meats, option duplication with fresh existing-contract UUIDs/distinct names, Move Down and useful focus restoration. Shared/independent editing, availability switches, unsaved-change guards and local preview remain. Group validation now appears inline; invalid preview money gets readable feedback. One CSS declaration wraps new option actions on mobile; no admin redesign.
+- Local cart snapshots retain existing option/shared-group IDs, or positional metadata for independent legacy groups. Cart validation prefers IDs, adapts legacy name/price and positional records, rejects duplicate/sold-out/replaced choices and ambiguous ungrouped legacy selections. Reordering identified groups remains compatible; changed/incomplete configurations request explicit reconfiguration. Products and historical order snapshots are not backfilled or silently rewritten. Different configurations retain separate cart entries.
+- Current per-option price semantics now use integer cents for customization, local cart subtotals and quantity adjustment; legacy negative size differences remain readable. Invalid money/quantities block with feedback. Inexact old line-unit division requests reconfiguration rather than silently rewriting the amount. The legacy checkout payload/calculation and kitchen receipt format are unchanged; client totals are still untrusted.
+
+**862 focused/regression checks passed:** 44 new logic model + 55 new logic browser + 55 existing menu model + 136 Menu Builder browser + 350 storefront + 148 guided customization + 42 Phase 4 model + 32 Phase 4 browser compatibility. Responsive editor controls checked at 320/390/768/1440px; existing suites additionally cover 375/1024px. Tested presets/templates, independent/shared saves, duplicate/reorder IDs, inline validation, unsaved protection, preview, stock, legacy/grouped carts, distinct configurations, cent arithmetic, stale identities, valid-only progression and reduced motion. Browser fixtures replace Firebase; zero production Firebase requests, no real orders/accounts/uploads. Three existing menu image-upload cases use mocked responses. Syntax and diff checks pass. No screenshot redesign suite or dependencies added; no real Rules/emulator or physical-device certification.
+
+Changed files in this pass: `assets/admin-menu.js`, `assets/admin-menu.css`, `assets/menu-model.js`, `assets/customization.js`, customization/cart portions of `index.html`; new `tests/menu-logic-model.mjs`, `tests/menu-logic.mjs`; `backend/MENU_LOGIC_IMPROVEMENTS.md`, `backend/MENU_PHASE3.md` and this status file. `admin-menu-service.js` was inspected and retained. Phase 4-specific modules, settings, staff, delivery and checkout submission code remain unchanged.
+
+**Not activated / requires separate approval:** included-selection/paid-overage pricing, quantity-limited supplements/group-unit limits, new persisted minor-unit price contracts, independent-group ID adoption and new order-snapshot identity/quantity fields. These require approved contracts, trusted price validation and compatible kitchen/receipt consumers. Existing Phase 3/4 release gates remain. No production data/schema/Rules changes, migration, infrastructure, deployment or Phase 5. No commit/push of this new pass. Pre-existing image changes and `bigtac-2/` remain untouched.
+
 ## Current — Phase 4 approved local implementation (27 October 2026)
 
 The owner explicitly approved local A → B → C → D and additive contracts, superseding the historical approval-pending entry below. **Local implementation is complete within the approved restrictions; infrastructure-dependent capabilities remain blocked.** Existing Admin 2.0 styling and Phase 3 architecture are retained. No Phase 5 work.

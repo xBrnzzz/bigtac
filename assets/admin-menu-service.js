@@ -25,11 +25,22 @@ export function createMenuService(session) {
     }
     const unchanged=(snapshot,expected)=>{if(!snapshot.exists()||fingerprint({...snapshot.data(),id:snapshot.id})!==fingerprint(expected))throw new MenuError('Ce contenu a changé sur un autre appareil. Fermez cette fiche et rechargez avant de réessayer.');};
     return {
-        async product(draft,expected,categories) {
+        async product(draft,expected,categories,{remove=false}={}) {
             const id=expected?.id || newId();
             return transact(async (tx,state)=>{
                 const itemRef=ref('menuItems',id),before=await tx.get(itemRef);
                 if(expected)unchanged(before,expected);else if(before.exists())throw new MenuError('Cet identifiant existe déjà. Réessayez.');
+                if(remove) {
+                    const groupIds=[...new Set(expected?.modifierGroupIds||before.data()?.modifierGroupIds||[])];
+                    const groupDocs=await Promise.all(groupIds.map(gid=>tx.get(ref('modifierGroups',gid))));
+                    for(const groupSnap of groupDocs.filter(g=>g.exists())) {
+                        const pids=(groupSnap.data().productIds||[]).filter(pid=>pid!==id);
+                        tx.update(ref('modifierGroups',groupSnap.id),{productIds:pids});
+                    }
+                    if(state.productCategories)delete state.productCategories[id];
+                    tx.delete(itemRef);
+                    return id;
+                }
                 const category=categories.find(row=>row.id===draft.categoryId || !draft.categoryId&&row.name===draft.category);
                 if(!category)throw new MenuError('Choisissez une catégorie.');
                 const categorySnap=await tx.get(ref('categories',category.id));
@@ -52,13 +63,27 @@ export function createMenuService(session) {
                 return id;
             });
         },
-        async bulk(rows,patch) {
+        async bulk(rows,patch,{remove=false}={}) {
             if(!rows.length||rows.length>MENU_LIMIT)throw new MenuError('Sélectionnez entre 1 et 300 produits.');
             return transact(async (tx,state)=>{
                 const snapshots=await Promise.all(rows.map(row=>tx.get(ref('menuItems',row.id))));
+                rows.forEach((row,index)=>unchanged(snapshots[index],row));
+                if(remove) {
+                    const allGroupIds=[...new Set(rows.flatMap(r=>r.modifierGroupIds||[]))];
+                    const groupDocs=await Promise.all(allGroupIds.map(gid=>tx.get(ref('modifierGroups',gid))));
+                    const removedIds=new Set(rows.map(r=>r.id));
+                    for(const groupSnap of groupDocs.filter(g=>g.exists())) {
+                        const pids=(groupSnap.data().productIds||[]).filter(pid=>!removedIds.has(pid));
+                        tx.update(ref('modifierGroups',groupSnap.id),{productIds:pids});
+                    }
+                    for(const row of rows) {
+                        if(state.productCategories)delete state.productCategories[row.id];
+                        tx.delete(ref('menuItems',row.id));
+                    }
+                    return;
+                }
                 let category=null;
                 if(patch.categoryId){category=await tx.get(ref('categories',patch.categoryId));if(!category.exists())throw new MenuError('La catégorie n’existe plus.');}
-                rows.forEach((row,index)=>unchanged(snapshots[index],row));
                 rows.forEach(row=>tx.update(ref('menuItems',row.id),{...patch,...(category?{category:category.data().name}:{})}));
                 if(category)for(const row of rows)state.productCategories={...(state.productCategories||{}),[row.id]:category.id};
             });

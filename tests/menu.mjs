@@ -98,6 +98,27 @@ try {
             const draft={name:'Création simultanée',price:12,categoryId:categories[0].id,isVisible:false,isAvailable:true,mandatoryChoices:[],supplements:[],modifierGroupIds:[],order:50};
             return Promise.all([service.product(draft,null,categories),service.product({...draft,name:'Seconde création'},null,categories)]);
         });check(concurrent[0]!==concurrent[1],'Simultaneous creates get distinct IDs');check(await page.evaluate(()=>new Set(__adminFixture.data.menuItems.map(row=>row.order)).size===__adminFixture.data.menuItems.length),'Simultaneous creates get distinct positions');
+        await page.locator(`[data-product="${concurrent[0]}"] summary`).click();
+        await page.locator(`[data-product="${concurrent[0]}"] [data-menu-action=delete-product]`).click();
+        await page.waitForFunction(id=>!__adminFixture.data.menuItems.some(row=>row.id===id),concurrent[0]);
+        check(await page.evaluate(id=>!__adminFixture.data.menuItems.some(row=>row.id===id),concurrent[0]),'Row action deletes product');
+        await page.locator(`[data-product="${concurrent[1]}"] [data-menu-action=edit]`).click();
+        await page.locator('#item-editor [data-menu-action=delete-product]').click();
+        await page.locator('#item-editor').waitFor({state:'hidden'});
+        await page.waitForFunction(id=>!__adminFixture.data.menuItems.some(row=>row.id===id),concurrent[1]);
+        check(await page.evaluate(id=>!__adminFixture.data.menuItems.some(row=>row.id===id),concurrent[1]),'Editor footer deletes product');
+        const bulkIds=await page.evaluate(async()=>{
+            const {createMenuService}=await import('./assets/admin-menu-service.js');const service=createMenuService(()=>({uid:'fixture-staff',role:'admin',epoch:0})),cats=__adminFixture.data.categories;
+            const p1=await service.product({name:'Suppr 1',price:10,categoryId:cats[0].id,isVisible:false,isAvailable:true,mandatoryChoices:[],supplements:[],modifierGroupIds:[],order:60},null,cats);
+            const p2=await service.product({name:'Suppr 2',price:10,categoryId:cats[0].id,isVisible:false,isAvailable:true,mandatoryChoices:[],supplements:[],modifierGroupIds:[],order:61},null,cats);
+            return [p1,p2];
+        });
+        for(const id of bulkIds)await page.locator(`[data-select="${id}"]`).check();
+        await page.locator('#menu-bulk-action').selectOption('delete');
+        await action(page,'bulk').click();
+        await page.waitForFunction(ids=>!__adminFixture.data.menuItems.some(row=>ids.includes(row.id)),bulkIds);
+        check(await page.evaluate(ids=>!__adminFixture.data.menuItems.some(row=>ids.includes(row.id)),bulkIds),'Bulk product deletion removes selected items');
+        check(await page.locator('#menu-bulk').isHidden(),'Bulk action bar hidden after bulk delete');
         await action(page,'groups').click();await action(page,'edit-group','#menu-groups-dialog').first().click();await page.locator('#menu-group-editor [data-option-field=price]').fill('7');await page.evaluate(()=>{
             __adminFixture.beforeCommit=()=>{const group=__adminFixture.data.modifierGroups[0],product=__adminFixture.data.menuItems.find(row=>row.id==='tacos');group.productIds=['tacos'];product.modifierGroupIds=[group.id];product.mandatoryChoices.push({...group,sourceGroupId:group.id});__adminFixture.emit();};
         });await action(page,'save-group','#menu-group-editor').click();await page.locator('#menu-group-editor').waitFor({state:'hidden'});check(await page.evaluate(()=>__adminFixture.data.menuItems.find(row=>row.id==='tacos').mandatoryChoices.find(row=>row.sourceGroupId).options[0].price===7),'Shared edit retries and includes concurrent attachment');await page.keyboard.press('Escape');
