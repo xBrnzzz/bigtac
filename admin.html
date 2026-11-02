@@ -532,7 +532,8 @@
             profileUnsub = onSnapshot(doc(db, 'users', user.uid), {includeMetadataChanges:true}, snapshot => {
                 if (version !== sessionVersion) return;
                 if (snapshot.metadata?.fromCache || snapshot.metadata?.hasPendingWrites) {
-                    cleanSession(); shell.deny('Votre accès doit être vérifié en ligne. Vérifiez votre connexion puis réessayez.'); return;
+                    shell.deny('Vérification en ligne de votre accès auprès du serveur…');
+                    return;
                 }
                 const profile = snapshot.exists() ? snapshot.data() : null;
                 const role = profileRole(profile);
@@ -812,7 +813,17 @@
             // No read of unassigned order documents until a trusted redacted feed exists.
             document.getElementById('available-runs-list').innerHTML='<p class="admin-notice">Les courses sont attribuées par un responsable. La liste publique est désactivée en attendant un service de données limitées.</p>';
         }
-        window.claimDelivery=async()=>{showToast('Demandez l’attribution de cette course à un responsable.','error');return false;};
+        window.claimDelivery = async orderId => {
+            if(!orderId || driverPending.has(orderId)) return false;
+            const actor=orderActor(),version=workVersion;
+            driverPending.add(orderId);refreshDriverActions();
+            try {
+                await commitDriverAction({id:orderId,kind:'claim',session:actor,currentSession:orderActor});
+                if(version===workVersion)showToast('Course attribuée.');
+                return true;
+            } catch(error){if(version===workVersion)showToast(operationMessage(error),'error');return false;}
+            finally{driverPending.delete(orderId);refreshDriverActions();}
+        };
 
         function listenToMyDeliveries() {
             if (!currentUser) return;

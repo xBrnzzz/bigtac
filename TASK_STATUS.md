@@ -1,6 +1,23 @@
 # BIGTAC Admin 2.0 status
 
-## Current — Product deletion & concurrency bugfix (2 November 2026)
+## Current — Delivery address, order tracking, admin session & CC modernization (2 November 2026)
+
+Owner instructed: “START / CONTINUE / NEXT”. Completed the senior full-stack audit fixes and utility overhaul across `index.html`, `admin.html`, and `CC.html`:
+
+- **Delivery Address in Checkout (`index.html`):** Added explicit street address input in `deliveryZoneModal`. Captured in `checkoutData.address`, injected into `order.address` and `order.customer.address` for backend submission, unblocking the driver address display and Google Maps GPS navigation link in `admin.html`. Also included in WhatsApp direct order message.
+- **Service-Adapted Order Tracker (`index.html`):** Differentiated status messaging and icons: orders for pickup (*À emporter* / *Sur place*) show a shopping bag icon with *"Votre repas est prêt au comptoir !"* at the handoff stage, reserving the delivery truck icon and *"Votre commande est en route avec le livreur."* exclusively for delivery. Prevented notification/audio spam by gating chimes and vibration behind a status-change state tracker (`trackerLastStatus`).
+- **Session Cache Handshake (`admin.html`):** Replaced immediate session teardown on local IndexedDB cache emissions (`snapshot.metadata.fromCache`) with a waiting message (*"Vérification en ligne de votre accès auprès du serveur…"*) until the server snapshot arrives, preventing false logouts on mobile networks.
+- **Transactional Driver Claim (`admin.html`):** Connected `claimDelivery(orderId)` to `commitDriverAction({ kind: 'claim' })`, verifying driver role, unassigned status, and atomic Firestore write.
+- **Menu Uploader Overhaul (`CC.html`):** Fixed missing `serverTimestamp` import runtime crash. Modernized the interface using BIGTAC brand styling (obsidian palette, orange CTA, catalog stats, progress bar, clear slate wipe toggle with safety confirmation, and live timestamped terminal).
+- **Test coverage:** 1,158 automated checks passed cleanly across viewports 320px–1440px:
+  - `test:orders`: 56 model + 192 browser (248 checks)
+  - `test:admin`: 49 policy + 216 browser (265 checks)
+  - `test:storefront`: 350 responsive ordering/tracking checks
+  - `test:menu`: 55 model + 140 browser (195 checks)
+  - `test:operations`: 42 model + 18 transactions + 32 browser + 8 responsive (100 checks)
+  - Zero production Firebase requests, zero JavaScript runtime errors.
+
+## Previous — Product deletion & concurrency bugfix (2 November 2026)
 
 Owner instructed: “PUSH AND COMMIT”. This commit bundles the approved menu logic improvements and the fix for product deletion and concurrency fingerprint conflicts.
 

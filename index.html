@@ -413,14 +413,24 @@
                 <header class="sheet-heading">
                     <div>
                         <p class="step-label">2 / 3 · Livraison</p>
-                        <h2 id="zoneModalTitle">Votre quartier à Fès</h2>
+                        <h2 id="zoneModalTitle">Votre quartier &amp; adresse à Fès</h2>
                     </div>
                     <button class="icon-button" type="button" onclick="closeModalAnimation('deliveryZoneModal')" aria-label="Fermer les quartiers">
                         <i data-feather="x" aria-hidden="true">
                         </i>
                     </button>
                 </header>
-                <div id="zoneList" class="sheet-scroll zone-list" aria-label="Quartiers et frais de livraison">
+                <div class="sheet-scroll form-fields">
+                    <p class="help-text">Choisissez votre quartier puis précisez votre adresse exacte.</p>
+                    <div id="zoneList" class="zone-list" aria-label="Quartiers et frais de livraison">
+                    </div>
+                    <div class="field" style="margin-top: 14px;">
+                        <label for="customerAddress">
+                            Adresse exacte de livraison
+                            <span>pour le livreur</span>
+                        </label>
+                        <textarea id="customerAddress" name="address" rows="2" placeholder="Rue, N° d'immeuble, résidence, étage, repère…"></textarea>
+                    </div>
                 </div>
                 <footer class="sheet-footer">
                     <p id="zoneHint" class="help-text" aria-live="polite">Choisissez votre quartier pour voir les frais.</p>
@@ -531,7 +541,7 @@
         let modalQty = 1;
         let wizardSteps = [];
         let wizardData = {};
-        let checkoutData = { name: '', phone: '', note: '', type: '', location: '', deliveryPrice: 0 };
+        let checkoutData = { name: '', phone: '', note: '', type: '', address: '', location: '', deliveryPrice: 0 };
         let activeOrderUnsubscribe = null;
         let selectedZoneId = null;
 
@@ -1215,6 +1225,7 @@
                 switchModal('serviceModal', 'deliveryZoneModal');
             } else {
                 checkoutData.deliveryPrice = 0;
+                checkoutData.address = '';
                 checkoutData.location = type === 'sur_place' ? 'Sur Place (Rue Abdelkrim Benjelloun)' : 'À Emporter (Comptoir BIGTAC)';
                 populateSummary(type);
                 switchModal('serviceModal', 'summaryModal');
@@ -1234,8 +1245,11 @@
         window.confirmDeliveryZone = () => {
             const zone = DELIVERY_ZONES.find(value => value.id === selectedZoneId);
             if (!zone) return;
+            const addressInput = document.getElementById('customerAddress');
+            const address = addressInput ? addressInput.value.trim() : '';
             checkoutData.deliveryPrice = zone.price;
-            checkoutData.location = `Livraison: ${zone.name} (${zone.price} Dh) - ${zone.areas}`;
+            checkoutData.address = address;
+            checkoutData.location = address ? `Livraison: ${zone.name} (${zone.price} Dh) - ${address}` : `Livraison: ${zone.name} (${zone.price} Dh) - ${zone.areas}`;
             populateSummary('livraison');
             switchModal('deliveryZoneModal', 'summaryModal');
         };
@@ -1284,6 +1298,7 @@
                 msg += `👤 *Client:* ${checkoutData.name}\n`;
                 msg += `📞 *Tél:* ${checkoutData.phone}\n`;
                 msg += `📍 *Service:* ${checkoutData.type.toUpperCase()}\n`;
+                if (checkoutData.address) msg += `🏠 *Adresse:* ${checkoutData.address}\n`;
                 msg += `📌 *Adresse / Locus:* ${checkoutData.location}\n\n`;
                 msg += `*DÉTAIL DU PANIER:*\n`;
 
@@ -1304,7 +1319,8 @@
                 updateCartUI();
                 closeModalAnimation('summaryModal');
 
-                window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+                const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(msg)}`;
+                window.open(waUrl, '_blank');
                 orderSubmitting=false;
                 if (btn) {
                     btn.disabled = false;
@@ -1321,8 +1337,10 @@
                     customer: {
                         name: checkoutData.name,
                         phone: checkoutData.phone,
+                        address: checkoutData.address || "",
                         note: checkoutData.note || ""
                     },
+                    address: checkoutData.address || "",
                     items: cart.map(item => ({
                         name: item.name,
                         qty: item.qty,
@@ -1365,6 +1383,7 @@
             }
         };
 
+        let trackerLastStatus = null;
         function initOrderTracker() {
             const activeId = localStorage.getItem('activeOrderId');
             if (!activeId) return;
@@ -1373,23 +1392,25 @@
             const status = document.getElementById('trackerStatus');
             const icon = document.getElementById('trackerIcon');
             const bar = document.getElementById('trackerBar');
-            const states = {
-                pending: ['Le restaurant va confirmer votre commande.', 'clock', 20],
-                confirmed: ['Votre repas est en préparation.', 'coffee', 50],
-                en_livraison: ['Votre commande est prête ou en route.', 'truck', 75],
-                ready: ['Votre repas est prêt au comptoir.', 'check-circle', 100],
-                delivered: ['Commande terminée. Bon appétit !', 'check-circle', 100],
-                rejected: ['Le restaurant a annulé la commande. Contactez-le pour en savoir plus.', 'alert-circle', 100]
-            };
             activeOrderUnsubscribe = onSnapshot(doc(db, 'orders', activeId), {
                 next: snapshot => {
                     if (!snapshot.exists()) {
                         localStorage.removeItem('activeOrderId');
                         tracker.classList.add('hidden');
                         document.body.classList.remove('has-tracker');
+                        trackerLastStatus = null;
                         return;
                     }
                     const data = snapshot.data();
+                    const isPickup = data.type === 'emporter' || data.type === 'sur_place';
+                    const states = {
+                        pending: ['Le restaurant va confirmer votre commande.', 'clock', 20],
+                        confirmed: ['Votre repas est en préparation en cuisine.', 'coffee', 50],
+                        en_livraison: [isPickup ? 'Votre repas est prêt au comptoir !' : 'Votre commande est en route avec le livreur.', isPickup ? 'shopping-bag' : 'truck', 75],
+                        ready: ['Votre repas est prêt au comptoir.', 'check-circle', 100],
+                        delivered: ['Commande terminée. Bon appétit !', 'check-circle', 100],
+                        rejected: ['Le restaurant a annulé la commande. Contactez-le pour en savoir plus.', 'alert-circle', 100]
+                    };
                     const [message, symbol, progress] = states[data.status] || ['Le suivi de votre commande sera actualisé ici.', 'clock', 0];
                     tracker.classList.remove('hidden');
                     document.body.classList.add('has-tracker');
@@ -1401,9 +1422,12 @@
                     bar.style.width = `${progress}%`;
                     bar.setAttribute('aria-valuenow', progress);
                     refreshIcons();
-                    if (data.status === 'confirmed') triggerSafeNotification('BIGTAC', 'Votre commande est en cuisine !');
-                    else if (data.status === 'en_livraison') triggerSafeNotification('BIGTAC', 'Votre commande est prête ou en route.');
-                    else if (data.status === 'ready' || data.status === 'delivered') triggerSafeNotification('BIGTAC', 'Commande terminée. Bon appétit !');
+                    if (data.status !== trackerLastStatus) {
+                        trackerLastStatus = data.status;
+                        if (data.status === 'confirmed') triggerSafeNotification('BIGTAC', 'Votre commande est en cuisine !');
+                        else if (data.status === 'en_livraison') triggerSafeNotification('BIGTAC', isPickup ? 'Votre repas est prêt au comptoir !' : 'Votre livreur est en route !');
+                        else if (data.status === 'ready' || data.status === 'delivered') triggerSafeNotification('BIGTAC', 'Commande terminée. Bon appétit !');
+                    }
                 },
                 error: error => {
                     console.error('Tracker listener error:', error);
@@ -1418,6 +1442,7 @@
         window.closeTracker = () => {
             if (activeOrderUnsubscribe) activeOrderUnsubscribe();
             localStorage.removeItem('activeOrderId');
+            trackerLastStatus = null;
             document.getElementById('orderTracker').classList.add('hidden');
             document.body.classList.remove('has-tracker');
         };
