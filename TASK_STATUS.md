@@ -1,9 +1,10 @@
 # BIGTAC Admin 2.0 status
 
-## Current — Delivery address, order tracking, admin session & CC modernization (2 November 2026)
+## Current — Dine-in QR Table Ordering, Delivery Address, Tracking & Admin Session (2 November 2026)
 
-Owner instructed: “START / CONTINUE / NEXT”. Completed the senior full-stack audit fixes and utility overhaul across `index.html`, `admin.html`, and `CC.html`:
+Owner instructed: “START / CONTINUE / NEXT”. Completed the senior full-stack audit fixes, table QR dining workflow, and utility overhaul across `index.html`, `admin.html`, and `CC.html`:
 
+- **Dine-in QR Table Ordering (`index.html`):** Detects `?table=...` or `?t=...` from table QR code scans. Shows a prominent table badge in hero and service modal, auto-populates `checkoutData.tableNumber`, and sets reception to `"Sur Place (Table X)"`. Added optional table input in confirmation modal for customers ordering dine-in without a QR scan. Transmits `order.tableNumber` and `order.table` into Firestore and WhatsApp message, seamlessly linking with existing kitchen/receipt display (`Sur place · Table X`).
 - **Delivery Address in Checkout (`index.html`):** Added explicit street address input in `deliveryZoneModal`. Captured in `checkoutData.address`, injected into `order.address` and `order.customer.address` for backend submission, unblocking the driver address display and Google Maps GPS navigation link in `admin.html`. Also included in WhatsApp direct order message.
 - **Service-Adapted Order Tracker (`index.html`):** Differentiated status messaging and icons: orders for pickup (*À emporter* / *Sur place*) show a shopping bag icon with *"Votre repas est prêt au comptoir !"* at the handoff stage, reserving the delivery truck icon and *"Votre commande est en route avec le livreur."* exclusively for delivery. Prevented notification/audio spam by gating chimes and vibration behind a status-change state tracker (`trackerLastStatus`).
 - **Session Cache Handshake (`admin.html`):** Replaced immediate session teardown on local IndexedDB cache emissions (`snapshot.metadata.fromCache`) with a waiting message (*"Vérification en ligne de votre accès auprès du serveur…"*) until the server snapshot arrives, preventing false logouts on mobile networks.

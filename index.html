@@ -61,6 +61,9 @@
                             <span>À emporter</span>
                             <span>Sur place</span>
                         </div>
+                        <div id="tableNotice" class="restaurant-services hidden" style="margin-top: 10px;">
+                            <span style="background: var(--app-accent); color: var(--app-on-accent); font-weight: 700; border: none;">🪑 Commande à la Table <b id="tableNoticeNumber"></b></span>
+                        </div>
                         <a class="primary-button intro-cta" href="#menu-unified">
                             Commander maintenant
                             <i data-feather="arrow-down" aria-hidden="true">
@@ -394,8 +397,8 @@
                         <i data-feather="coffee" aria-hidden="true">
                         </i>
                         <span>
-                            <strong>Sur place</strong>
-                            <small>On se retrouve au restaurant</small>
+                            <strong id="serviceSurPlaceTitle">Sur place</strong>
+                            <small id="serviceSurPlaceSubtitle">On se retrouve au restaurant</small>
                         </span>
                         <i data-feather="chevron-right" aria-hidden="true">
                         </i>
@@ -474,6 +477,13 @@
                         </div>
                         <button class="text-button" type="button" onclick="switchModal('summaryModal','serviceModal')">Modifier</button>
                     </div>
+                    <div id="tableInputContainer" class="field hidden" style="margin: 4px 0 10px 0;">
+                        <label for="tableNumberInput" style="font-size: 13px;">
+                            Numéro de table
+                            <span>facultatif</span>
+                        </label>
+                        <input id="tableNumberInput" type="text" placeholder="Ex. 4" style="padding: 8px 12px; font-size: 14px; border-radius: 12px;">
+                    </div>
                     <section class="summary-order" aria-labelledby="summary-order-title">
                         <h3 id="summary-order-title">Votre repas</h3>
                         <div id="summaryItems">
@@ -541,9 +551,27 @@
         let modalQty = 1;
         let wizardSteps = [];
         let wizardData = {};
-        let checkoutData = { name: '', phone: '', note: '', type: '', address: '', location: '', deliveryPrice: 0 };
+        let checkoutData = { name: '', phone: '', note: '', type: '', address: '', tableNumber: '', location: '', deliveryPrice: 0 };
         let activeOrderUnsubscribe = null;
         let selectedZoneId = null;
+
+        // Detect QR code table identifier (?table=4 or ?t=4)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlTable = (urlParams.get('table') || urlParams.get('t') || '').trim();
+        if (urlTable) {
+            const cleanTable = urlTable.replace(/^table\s*/i, '');
+            checkoutData.tableNumber = cleanTable;
+            const notice = document.getElementById('tableNotice');
+            const noticeNum = document.getElementById('tableNoticeNumber');
+            if (notice && noticeNum) {
+                noticeNum.textContent = cleanTable;
+                notice.classList.remove('hidden');
+            }
+            const surPlaceTitle = document.getElementById('serviceSurPlaceTitle');
+            const surPlaceSub = document.getElementById('serviceSurPlaceSubtitle');
+            if (surPlaceTitle) surPlaceTitle.textContent = `Sur place · Table ${cleanTable}`;
+            if (surPlaceSub) surPlaceSub.textContent = 'Service direct à votre table';
+        }
 
         // Load cart from storage safely
         try {
@@ -1226,7 +1254,11 @@
             } else {
                 checkoutData.deliveryPrice = 0;
                 checkoutData.address = '';
-                checkoutData.location = type === 'sur_place' ? 'Sur Place (Rue Abdelkrim Benjelloun)' : 'À Emporter (Comptoir BIGTAC)';
+                if (type === 'sur_place') {
+                    checkoutData.location = checkoutData.tableNumber ? `Sur Place (Table ${checkoutData.tableNumber})` : 'Sur Place (Rue Abdelkrim Benjelloun)';
+                } else {
+                    checkoutData.location = 'À Emporter (Comptoir BIGTAC)';
+                }
                 populateSummary(type);
                 switchModal('serviceModal', 'summaryModal');
             }
@@ -1259,6 +1291,14 @@
             document.getElementById('summaryPhone').textContent = checkoutData.phone;
             document.getElementById('summaryLocation').textContent = checkoutData.location;
             document.getElementById('summaryType').textContent = type === 'sur_place' ? 'Sur place' : type === 'emporter' ? 'À emporter' : 'Livraison';
+            const tableBox = document.getElementById('tableInputContainer');
+            const tableInput = document.getElementById('tableNumberInput');
+            if (tableBox) {
+                tableBox.classList.toggle('hidden', type !== 'sur_place');
+                if (type === 'sur_place' && tableInput) {
+                    tableInput.value = checkoutData.tableNumber || '';
+                }
+            }
             document.getElementById('summaryItems').innerHTML = cart.map(item => `<div class="summary-item"><div><span>${item.qty} × ${escapeCardText(item.name)}</span><strong>${money(item.totalPrice)}</strong></div>${cartOptionsHTML(item)}</div>`).join('');
             const total = cart.reduce((sum, item) => sum + Number(item.totalPrice), 0) + (type === 'livraison' ? checkoutData.deliveryPrice : 0);
             document.getElementById('summaryDeliveryFee').classList.toggle('hidden', type !== 'livraison');
@@ -1267,6 +1307,12 @@
             document.getElementById('orderSubmissionError').classList.add('hidden');
             document.getElementById('confirmationHint').textContent = appConfig.whatsappMode ? 'Votre demande sera ouverte dans WhatsApp. Envoyez le message pour commander.' : 'Le restaurant confirmera votre commande.';
         }
+        document.getElementById('tableNumberInput')?.addEventListener('input', event => {
+            const val = event.target.value.trim().replace(/^table\s*/i, '');
+            checkoutData.tableNumber = val;
+            checkoutData.location = val ? `Sur Place (Table ${val})` : 'Sur Place (Rue Abdelkrim Benjelloun)';
+            document.getElementById('summaryLocation').textContent = checkoutData.location;
+        });
 
         // --- ORDER SUBMISSION & WHATSAPP ROUTING ---
         window.finalizeOrder = async () => {
@@ -1299,6 +1345,7 @@
                 msg += `📞 *Tél:* ${checkoutData.phone}\n`;
                 msg += `📍 *Service:* ${checkoutData.type.toUpperCase()}\n`;
                 if (checkoutData.address) msg += `🏠 *Adresse:* ${checkoutData.address}\n`;
+                if (checkoutData.tableNumber) msg += `🪑 *Table:* ${checkoutData.tableNumber}\n`;
                 msg += `📌 *Adresse / Locus:* ${checkoutData.location}\n\n`;
                 msg += `*DÉTAIL DU PANIER:*\n`;
 
@@ -1341,6 +1388,8 @@
                         note: checkoutData.note || ""
                     },
                     address: checkoutData.address || "",
+                    tableNumber: checkoutData.tableNumber || "",
+                    table: checkoutData.tableNumber || "",
                     items: cart.map(item => ({
                         name: item.name,
                         qty: item.qty,
