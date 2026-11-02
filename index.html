@@ -1257,25 +1257,31 @@
                 if (type === 'sur_place') {
                     checkoutData.location = checkoutData.tableNumber ? `Sur Place (Table ${checkoutData.tableNumber})` : 'Sur Place (Rue Abdelkrim Benjelloun)';
                 } else {
-                    checkoutData.location = 'À Emporter (Comptoir BIGTAC)';
+                    checkoutData.location = `À Emporter (Comptoir ${appConfig.restaurantName || 'BIGTAC'})`;
                 }
                 populateSummary(type);
                 switchModal('serviceModal', 'summaryModal');
             }
         };
+        function getDeliveryZones() {
+            return (Array.isArray(appConfig.deliveryZones) && appConfig.deliveryZones.length) ? appConfig.deliveryZones : DELIVERY_ZONES;
+        }
         function renderDeliveryZones() {
-            document.getElementById('zoneList').innerHTML = DELIVERY_ZONES.map(zone => `<button type="button" class="zone-option" aria-pressed="${selectedZoneId === zone.id}" onclick="selectZone(${zone.id})"><span>${escapeCardText(zone.name)}<strong>${money(zone.price)}</strong></span><small>${escapeCardText(zone.areas)}</small></button>`).join('');
+            const zones = getDeliveryZones();
+            document.getElementById('zoneList').innerHTML = zones.map(zone => `<button type="button" class="zone-option" aria-pressed="${selectedZoneId === zone.id}" onclick="selectZone(${zone.id})"><span>${escapeCardText(zone.name)}<strong>${money(zone.price)}</strong></span><small>${escapeCardText(zone.areas)}</small></button>`).join('');
         }
         window.selectZone = id => {
-            const zone = DELIVERY_ZONES.find(value => value.id === id);
+            const zones = getDeliveryZones();
+            const zone = zones.find(value => value.id === id);
             if (!zone) return;
             selectedZoneId = id;
-            document.querySelectorAll('.zone-option').forEach((button, index) => button.setAttribute('aria-pressed', String(DELIVERY_ZONES[index].id === id)));
+            document.querySelectorAll('.zone-option').forEach((button, index) => button.setAttribute('aria-pressed', String(zones[index]?.id === id)));
             document.getElementById('btnConfirmZone').disabled = false;
             document.getElementById('zoneHint').textContent = `Livraison : ${money(zone.price)} pour ${zone.name}.`;
         };
         window.confirmDeliveryZone = () => {
-            const zone = DELIVERY_ZONES.find(value => value.id === selectedZoneId);
+            const zones = getDeliveryZones();
+            const zone = zones.find(value => value.id === selectedZoneId);
             if (!zone) return;
             const addressInput = document.getElementById('customerAddress');
             const address = addressInput ? addressInput.value.trim() : '';
@@ -1340,7 +1346,8 @@
             // WHATSAPP DIRECT MODE
             if (appConfig.whatsappMode) {
                 const phoneNumber = String(appConfig.whatsappNumber||WHATSAPP_NUMBERS['default']).replace(/[^0-9]/g,'').replace(/^0/,'212');
-                let msg = `*🍔 NOUVELLE COMMANDE - BIGTAC FÈS*\n\n`;
+                const brandName = appConfig.restaurantName || 'BIGTAC';
+                let msg = `*🍔 NOUVELLE COMMANDE - ${brandName.toUpperCase()}*\n\n`;
                 msg += `👤 *Client:* ${checkoutData.name}\n`;
                 msg += `📞 *Tél:* ${checkoutData.phone}\n`;
                 msg += `📍 *Service:* ${checkoutData.type.toUpperCase()}\n`;
@@ -1473,9 +1480,10 @@
                     refreshIcons();
                     if (data.status !== trackerLastStatus) {
                         trackerLastStatus = data.status;
-                        if (data.status === 'confirmed') triggerSafeNotification('BIGTAC', 'Votre commande est en cuisine !');
-                        else if (data.status === 'en_livraison') triggerSafeNotification('BIGTAC', isPickup ? 'Votre repas est prêt au comptoir !' : 'Votre livreur est en route !');
-                        else if (data.status === 'ready' || data.status === 'delivered') triggerSafeNotification('BIGTAC', 'Commande terminée. Bon appétit !');
+                        const brand = appConfig.restaurantName || 'BIGTAC';
+                        if (data.status === 'confirmed') triggerSafeNotification(brand, 'Votre commande est en cuisine !');
+                        else if (data.status === 'en_livraison') triggerSafeNotification(brand, isPickup ? 'Votre repas est prêt au comptoir !' : 'Votre livreur est en route !');
+                        else if (data.status === 'ready' || data.status === 'delivered') triggerSafeNotification(brand, 'Commande terminée. Bon appétit !');
                     }
                 },
                 error: error => {

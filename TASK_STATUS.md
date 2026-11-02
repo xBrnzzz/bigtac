@@ -1,6 +1,23 @@
 # BIGTAC Admin 2.0 status
 
-## Current — Dine-in QR Table Ordering, Delivery Address, Tracking & Admin Session (2 November 2026)
+## Current — Client Template Customization, Dynamic Delivery Zones & Admin Login Diagnosis (2 November 2026)
+
+Owner instructed: “PUSH AND COMMIT AFTER”. Implemented client template reusability enhancements and admin login diagnostic feedback across `index.html` and `admin.html`:
+
+- **Dynamic Delivery Zones (`index.html`):** `getDeliveryZones()` dynamically renders zones and prices from Firestore configuration (`appConfig.deliveryZones`), while maintaining default Moroccan travel zones when unconfigured, allowing independent client deployments without markup changes.
+- **Dynamic Restaurant Branding in WhatsApp & Tracker (`index.html`):** Order messages for direct WhatsApp checkout now dynamically adapt to `appConfig.restaurantName` (e.g. `*🍔 NOUVELLE COMMANDE - TACOS DU ROI*`), and tracking notifications use dynamic brand name instead of hardcoded strings.
+- **Admin Login Access Diagnosis (`admin.html`):** When authenticated Firebase users attempt admin access without an authorized role, the access denial now specifies the authenticated user identity and clarifies required Firestore `users` collection provisioning. Added explicit distinction for Firestore `permission-denied` rules errors with detailed console reporting.
+- **Comprehensive Test Suite Passes:** 1,511 checks across all 7 automated test suites:
+  - `test:storefront`: 350 responsive ordering/tracking checks (320px, 375px, 390px, 768px, 1440px)
+  - `test:menu`: 55 model + 140 browser (195 checks)
+  - `test:orders`: 56 model + 192 browser (248 checks)
+  - `test:admin`: 49 policy + 216 browser (265 checks)
+  - `test:operations`: 42 model + 18 transactions + 32 browser + 8 responsive (100 checks)
+  - `test:carousels`: 205 checks
+  - `test:customization`: 148 checks
+  - Zero production Firebase requests, zero runtime JavaScript errors.
+
+## Previous — Dine-in QR Table Ordering, Delivery Address, Tracking & Admin Session (2 November 2026)
 
 Owner instructed: “START / CONTINUE / NEXT”. Completed the senior full-stack audit fixes, table QR dining workflow, and utility overhaul across `index.html`, `admin.html`, and `CC.html`:
 

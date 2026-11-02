@@ -539,7 +539,7 @@
                 const role = profileRole(profile);
                 if (!role) {
                     cleanSession();
-                    shell.deny('Aucun profil équipe actif et reconnu pour ce compte. Demandez à un administrateur de vérifier votre accès.');
+                    shell.deny(`Aucun profil équipe actif et reconnu pour ce compte (${user.email || user.uid}). Un document dans la collection 'users' avec un rôle valide (admin, manager, caissier, livreur) est requis.`);
                     return;
                 }
                 if (currentUser?.role === role) return;
@@ -548,9 +548,14 @@
                 shell.showSession(currentUser, role);
                 if (role === 'livreur') initDriverApp();
                 else initApp(role, version);
-            }, () => {
+            }, error => {
                 if (version !== sessionVersion) return;
-                cleanSession(); shell.deny('Votre profil équipe ne peut pas être vérifié. Vérifiez votre connexion puis réessayez.');
+                console.error("Session profile listener error:", error);
+                cleanSession();
+                const reason = error?.code === 'permission-denied'
+                    ? "Accès refusé par les règles de sécurité. Vérifiez les autorisations Firestore de votre compte."
+                    : "Votre profil équipe ne peut pas être vérifié. Vérifiez votre connexion puis réessayez.";
+                shell.deny(reason);
             });
         }
         onAuthStateChanged(auth, resolveSession);
