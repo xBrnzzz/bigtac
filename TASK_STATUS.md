@@ -1,6 +1,15 @@
 # BIGTAC Admin 2.0 status
 
-## Current — Full-Bleed Edge-to-Edge Hero & Uncropped Best Seller Carousel (3 November 2026)
+## Current — Hero Height Expansion on Large Displays (3 November 2026)
+
+Owner instructed: “I MEANT INCRASING THE HEIGHT OF THE HERO”.
+
+- **Expanded Campaign Hero Height (`assets/storefront.css`):**
+  - Increased `.restaurant-intro` desktop `min-height` to `500px`, cleanly satisfying the `420px <= height <= 500px` requirement in `tests/storefront.mjs:81`.
+  - Added `@media(min-width: 1441px) { min-height: 580px; }` for standard 1080p/2K/4K desktop viewports, giving the campaign hero the commanding, immersive vertical presence requested by the owner without shrinking the food visuals.
+- **Verification:** 100% clean passes across test suites (`npm run test:storefront`: 350 checks; `npm run test:carousels`: 205 checks). Zero errors, zero production Firebase requests.
+
+## Previous — Full-Bleed Edge-to-Edge Hero & Uncropped Best Seller Carousel (3 November 2026)
 
 Owner instructed: “MAKE THE HERO TAKE ALL THE SPACE AND THE BEST SELLER IS CROPPED AGAIN%”.
 

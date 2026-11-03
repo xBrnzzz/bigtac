@@ -253,12 +253,17 @@ strong {
     position:relative;
     isolation:isolate;
     display:grid;
-    min-height:480px;
+    min-height:500px;
     border-radius:0;
     margin:0 calc(-1 * var(--app-gutter)) 28px;
     background:var(--hero-charcoal);
     color:var(--hero-ink);
     overflow:hidden
+}
+@media(min-width:1441px) {
+    .restaurant-intro {
+        min-height:580px
+    }
 }
 .restaurant-intro::after {
     content:'';
