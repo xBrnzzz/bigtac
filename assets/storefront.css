@@ -522,55 +522,61 @@ strong {
 }
 .menu-feature--offers {
     display:grid;
-    grid-template-columns:minmax(0,.6fr) minmax(0,1.4fr);
+    grid-template-columns:260px minmax(0,1fr);
     align-items:center;
-    gap:32px;
+    gap:36px;
     background:var(--offers-ground);
     color:var(--offers-ink);
-    padding:36px var(--app-gutter) 28px
+    padding:28px max(var(--app-gutter),calc((100% - 1280px)/2)) 24px
 }
 .menu-feature--offers .section-heading {
     display:block;
     margin:0
 }
 .menu-feature--offers .section-heading h2 {
-    font-size:48px;
+    font-size:38px;
     max-width:10ch
 }
 .menu-feature--offers .section-heading p {
     color:inherit;
-    margin-top:12px
+    margin-top:8px
 }
 .menu-feature--offers .featured-grid {
     grid-auto-columns:100%
 }
 .featured-grid .product-card--offer {
     display:grid;
-    grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+    grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+    max-width:760px;
     color:var(--app-ink)
 }
 .product-card--offer .product-card__media {
     grid-column:2;
     grid-row:1;
-    height:100%;
-    min-height:260px
+    height:220px;
+    max-height:230px;
+    min-height:0;
+    border-radius:18px;
+    overflow:hidden
 }
 .product-card--offer .product-card__body {
     grid-column:1;
     grid-row:1;
     justify-content:center;
-    padding:20px
+    padding:18px 20px
 }
 .product-card--offer .product-card__footer {
     margin-top:0;
-    padding-top:20px
+    padding-top:14px
 }
 .product-card--offer .product-card__description {
     display:-webkit-box;
-    font-size:14px
+    font-size:13px;
+    line-height:1.35
 }
 .featured-grid .product-card--offer h3 {
-    font-size:34px
+    font-size:24px;
+    line-height:1.15
 }
 .product-card--offer .product-card__choose {
     background:var(--app-accent);
@@ -582,7 +588,7 @@ strong {
 .menu-feature--popular {
     background:var(--popular-ground);
     color:var(--app-ink);
-    padding:32px var(--app-gutter) 24px
+    padding:28px max(var(--app-gutter),calc((100% - 1280px)/2)) 24px
 }
 .menu-feature--popular .section-heading p {
     color:var(--app-muted)

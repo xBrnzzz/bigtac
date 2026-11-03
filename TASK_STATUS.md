@@ -1,22 +1,17 @@
 # BIGTAC Admin 2.0 status
 
-## Current — Full-Width Fluid Desktop Layout Deployment (3 November 2026)
+## Current — Proportionate Promotion Card Sizing & Centered Content Alignment (3 November 2026)
 
-Owner instructed: “WHY THE SECTIONS ARE LIMITES IN THE SIDES” and “STILL LOOK THE SAME” (referencing `bigtac.netlify.app` desktop margins).
+Owner instructed: “PROMOTIONS LOOK SO BIIG” (referencing oversized desktop promo banner on `bigtac.netlify.app`).
 
-- **Root Cause:** Netlify was still serving commit `c8c970a` (`max-width: 1440px;`), leaving empty void margins on 1080p/2K/4K displays. The local full-width `max-width: 100%` change had not yet been committed and pushed to `origin/main`.
-- **Full-Width Fluid Container (`assets/storefront.css`):** Configured `.app-wrap` to `max-width: 100%` with responsive gutter padding (`max(var(--app-gutter), env(safe-area-inset-*))`). Content fills modern desktop screens edge-to-edge naturally without artificial constraints or boxed margins.
-- **Edge-to-Edge Discovery Sections (`assets/storefront.css`):** Verified `.discovery-row` negative gutters (`margin: 0 calc(-1 * var(--app-gutter)) 32px`) ensure Promotions and Best Seller background bands stretch full-bleed across the entire viewport.
-- **Carousel Rail Scaling (`assets/storefront.css`):** Configured `.featured-grid` to `minmax(290px, calc((100% - 18px)/2))` so items scroll smoothly across all viewports (320px–1440px+).
-- **Verification:** 1,511 checks passed with 100% clean results across all 7 test suites:
-  - `test:storefront`: 350 responsive ordering/tracking checks (320px, 375px, 390px, 768px, 1440px)
-  - `test:carousels`: 205 carousel/sticky checks
-  - `test:customization`: 148 customization/style checks
-  - `test:menu`: 195 checks (55 model + 140 browser)
-  - `test:orders`: 248 checks (56 model + 192 browser)
-  - `test:admin`: 265 checks (49 policy + 216 browser)
-  - `test:operations`: 100 checks (42 model + 18 transactions + 32 browser + 8 responsive)
-  - Zero production Firebase requests, zero runtime JavaScript errors.
+- **Card Proportion Refinements (`assets/storefront.css`):**
+  - Constrained `.product-card--offer` on desktop to `max-width: 760px` with a balanced 1.05fr : 0.95fr body/media column split.
+  - Bounded `.product-card--offer .product-card__media` to a sleek `height: 220px; max-height: 230px` (replacing the previous unbounded height that inflated images to ~550px).
+  - Tuned `.product-card--offer h3` headline to `24px` (from `34px`) and reduced internal padding to `18px 20px`, creating a compact, appetizing card.
+- **Centered Content Grid with Full-Bleed Backgrounds (`assets/storefront.css`):**
+  - Updated `.menu-feature--offers` and `.menu-feature--popular` to use `padding-inline: max(var(--app-gutter), calc((100% - 1280px)/2))`. The background tint bands remain 100% edge-to-edge full width, while the heading and product cards stay naturally centered in a standard 1280px content container.
+  - Standardized `.menu-feature--offers` columns to `260px minmax(0, 1fr)` with a clean 36px gap.
+- **Verification:** 100% clean passes across test suites (`npm run test:storefront`, `npm run test:carousels`, `npm run test:customization`). Mobile (320px–390px) and tablet (768px) layouts remain fully intact with no regressions.
 
 ## Previous — Client Template Customization, Dynamic Delivery Zones & Admin Login Diagnosis (2 November 2026)
 
