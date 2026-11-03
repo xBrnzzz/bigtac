@@ -247,18 +247,18 @@ strong {
     font-size:12px
 }
 .store-main {
-    padding-top:24px
+    padding-top:0
 }
 .restaurant-intro {
     position:relative;
     isolation:isolate;
     display:grid;
     min-height:480px;
-    border-radius:28px;
+    border-radius:0;
+    margin:0 calc(-1 * var(--app-gutter)) 28px;
     background:var(--hero-charcoal);
     color:var(--hero-ink);
-    overflow:hidden;
-    margin-bottom:28px
+    overflow:hidden
 }
 .restaurant-intro::after {
     content:'';
@@ -588,7 +588,7 @@ strong {
 .menu-feature--popular {
     background:var(--popular-ground);
     color:var(--app-ink);
-    padding:28px max(var(--app-gutter),calc((100% - 1280px)/2)) 24px
+    padding:32px var(--app-gutter) 24px
 }
 .menu-feature--popular .section-heading p {
     color:var(--app-muted)

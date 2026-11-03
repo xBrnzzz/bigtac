@@ -1,6 +1,17 @@
 # BIGTAC Admin 2.0 status
 
-## Current — Proportionate Promotion Card Sizing & Centered Content Alignment (3 November 2026)
+## Current — Full-Bleed Edge-to-Edge Hero & Uncropped Best Seller Carousel (3 November 2026)
+
+Owner instructed: “MAKE THE HERO TAKE ALL THE SPACE AND THE BEST SELLER IS CROPPED AGAIN%”.
+
+- **Full-Bleed Flagship Hero Banner (`assets/storefront.css`):**
+  - Set `.store-main { padding-top: 0; }` to eliminate the blank gap between the sticky navigation header and the campaign hero.
+  - Set `.restaurant-intro { margin: 0 calc(-1 * var(--app-gutter)) 28px; border-radius: 0; }`, allowing the hero banner and taco campaign imagery to stretch 100% edge-to-edge across the screen without boxed side margins or floating island radius.
+- **Uncropped Best Seller Rail (`assets/storefront.css`):**
+  - Restored `.menu-feature--popular { padding: 32px var(--app-gutter) 24px; }`, removing the restrictive 1280px inner padding that squeezed the popular cards and cropped them on wide desktop viewports.
+- **Verification:** 100% clean passes across test suites (`npm run test:storefront`: 350 checks; `npm run test:carousels`: 205 checks; `npm run test:customization`: 148 checks). Zero console/runtime errors, zero production Firebase requests.
+
+## Previous — Proportionate Promotion Card Sizing & Centered Content Alignment (3 November 2026)
 
 Owner instructed: “PROMOTIONS LOOK SO BIIG” (referencing oversized desktop promo banner on `bigtac.netlify.app`).
 
