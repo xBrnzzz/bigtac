@@ -28,7 +28,7 @@ export function setupCarousel(track) {
         if (position >= maximum - .5) direction = -1;
         if (position <= .5) direction = 1;
         // Gentle bidirectional loop; no teleport, duplicate cards or duplicate actions.
-        position = Math.max(0, Math.min(maximum, position + direction * elapsed * .018));
+        position = Math.max(0, Math.min(maximum, position + direction * elapsed * .048));
         track.scrollLeft = position;
         frame = requestAnimationFrame(tick);
     }

@@ -94,7 +94,7 @@ try {
             const initial = await left(page, track);
             await page.clock.runFor(1000);
             const advanced = await left(page, track);
-            check(advanced - initial >= 10 && advanced - initial <= 24, `${width}/${track}: autoplay advances slowly at approximately 18px/s`);
+            check(advanced - initial >= 30 && advanced - initial <= 65, `${width}/${track}: autoplay advances at a brisk pace (~48px/s)`);
             await page.locator(section).hover();
             const hovered = await left(page, track);
             await page.clock.runFor(1000);
