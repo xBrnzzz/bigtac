@@ -1,13 +1,17 @@
 import { mayView, roleViews } from './admin-model.js';
 import { icon } from './admin-icons.js';
+import { i18n, t } from './i18n.js';
 
 const destinations = [
-    ['overview', 'Vue d’ensemble', 'home', 'Opérations'], ['orders', 'Commandes', 'shopping-bag', 'Opérations'],
-    ['menu', 'Menu & produits', 'grid', 'Catalogue'], ['promotions', 'Promotions', 'tag', 'Catalogue'],
-    ['drivers', 'Équipe', 'users', 'Gestion'], ['settings', 'Paramètres', 'sliders', 'Gestion']
+    ['overview', 'Vue d’ensemble', 'home', 'Opérations', 'admin.overview'],
+    ['orders', 'Commandes', 'shopping-bag', 'Opérations', 'admin.orders'],
+    ['menu', 'Menu & produits', 'grid', 'Catalogue', 'admin.menu'],
+    ['promotions', 'Promotions', 'tag', 'Catalogue', 'admin.promotions'],
+    ['drivers', 'Équipe', 'users', 'Gestion', 'admin.team'],
+    ['settings', 'Paramètres', 'sliders', 'Gestion', 'admin.settings']
 ];
 const labels = { admin: 'Administrateur', manager: 'Manager', caissier: 'Caissier', livreur: 'Livreur' };
-const navLink = ([id, label, glyph]) => `<a class="admin-nav-link" data-view="${id}" href="#${id}">${icon(glyph)}<span>${label}</span></a>`;
+const navLink = ([id, label, glyph, , i18nKey]) => `<a class="admin-nav-link" data-view="${id}" href="#${id}">${icon(glyph)}<span data-i18n="${i18nKey || ''}">${label}</span></a>`;
 
 export function mountAdminShell() {
     document.querySelector('body > header')?.remove();
@@ -22,14 +26,14 @@ export function mountAdminShell() {
             <a class="admin-brand" href="index.html" target="_blank" rel="noopener"><img src="assets/logo.png" width="44" height="44" alt=""><span><strong data-restaurant-name>BIGTAC</strong><small>Admin 2.0</small></span></a>
             <div class="admin-restaurant-tile">${icon('grid')}<div><strong data-restaurant-name>BIGTAC</strong><small>Votre restaurant</small></div>${icon('chevron-down')}</div><nav id="admin-desktop-nav"></nav>
             <div class="admin-account"><span class="admin-avatar" aria-hidden="true">E</span><span><strong data-staff-name></strong><small data-staff-role></small></span></div>
-            <button id="logout-btn" class="admin-text-button">${icon('log-out')}Déconnexion</button>
+            <button id="logout-btn" class="admin-text-button">${icon('log-out')}<span data-i18n="admin.logout">Déconnexion</span></button>
         </aside>
         <div class="admin-workspace">
-            <header class="admin-topbar"><div class="admin-location"><h1 id="admin-page-name">Vue d’ensemble</h1><span data-restaurant-name>BIGTAC</span></div><div class="admin-top-actions"><div class="lang-selector relative" id="adminLangSelector"><button type="button" id="btnAdminLang" class="lang-toggle-btn" onclick="toggleLangMenu('adminLangDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Langue / Language / اللغة"><span class="lang-globe" aria-hidden="true">🌐</span><span class="lang-current current-lang-code">FR</span></button><div id="adminLangDropdown" class="lang-menu hidden" role="menu"><button type="button" class="lang-option" data-lang-btn="fr" onclick="setAppLanguage('fr')" role="menuitem"><span class="lang-flag">🇫🇷</span> <span>Français</span></button><button type="button" class="lang-option" data-lang-btn="en" onclick="setAppLanguage('en')" role="menuitem"><span class="lang-flag">🇬🇧</span> <span>English</span></button><button type="button" class="lang-option" data-lang-btn="ar" onclick="setAppLanguage('ar')" role="menuitem"><span class="lang-flag">🇲🇦</span> <span>العربية</span></button></div></div><span id="admin-store-status" class="admin-store-status" hidden></span><span id="admin-connection" role="status">Connexion…</span><a class="admin-preview" href="index.html" target="_blank" rel="noopener">Voir le site ${icon('external-link')}</a><button id="admin-profile-button" class="admin-profile-button" aria-label="Ouvrir votre espace équipe" aria-expanded="false"><span class="admin-avatar" aria-hidden="true">E</span><span class="admin-profile-copy"><strong data-staff-name></strong><small data-staff-role></small></span>${icon('chevron-down')}</button><button id="admin-more-button" class="admin-icon-button" aria-label="Ouvrir le menu" aria-expanded="false">${icon('menu')}</button></div></header>
+            <header class="admin-topbar"><div class="admin-location"><h1 id="admin-page-name">Vue d’ensemble</h1><span data-restaurant-name>BIGTAC</span></div><div class="admin-top-actions"><div class="lang-selector relative" id="adminLangSelector"><button type="button" id="btnAdminLang" class="lang-toggle-btn" onclick="toggleLangMenu('adminLangDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Langue / Language / اللغة"><span class="lang-globe" aria-hidden="true">🌐</span><span class="lang-current current-lang-code">FR</span></button><div id="adminLangDropdown" class="lang-menu hidden" role="menu"><button type="button" class="lang-option" data-lang-btn="fr" onclick="setAppLanguage('fr')" role="menuitem"><span class="lang-flag">🇫🇷</span> <span>Français</span></button><button type="button" class="lang-option" data-lang-btn="en" onclick="setAppLanguage('en')" role="menuitem"><span class="lang-flag">🇬🇧</span> <span>English</span></button><button type="button" class="lang-option" data-lang-btn="ar" onclick="setAppLanguage('ar')" role="menuitem"><span class="lang-flag">🇲🇦</span> <span>العربية</span></button></div></div><span id="admin-store-status" class="admin-store-status" hidden></span><span id="admin-connection" role="status">Connexion…</span><a class="admin-preview" href="index.html" target="_blank" rel="noopener"><span data-i18n="admin.view_site">Voir le site</span> ${icon('external-link')}</a><button id="admin-profile-button" class="admin-profile-button" aria-label="Ouvrir votre espace équipe" aria-expanded="false"><span class="admin-avatar" aria-hidden="true">E</span><span class="admin-profile-copy"><strong data-staff-name></strong><small data-staff-role></small></span>${icon('chevron-down')}</button><button id="admin-more-button" class="admin-icon-button" aria-label="Ouvrir le menu" aria-expanded="false">${icon('menu')}</button></div></header>
             <div id="admin-content-slot"></div>
         </div>
         <nav id="admin-bottom-nav" class="admin-bottom-nav" aria-label="Navigation mobile"></nav>
-        <dialog id="admin-more" class="admin-more" aria-labelledby="admin-more-title"><header><h2 id="admin-more-title">Votre espace</h2><button id="admin-more-close" class="admin-icon-button" aria-label="Fermer le menu">${icon('x')}</button></header><div class="admin-more-identity"><span class="admin-avatar" aria-hidden="true">E</span><span><strong data-staff-name></strong><small data-staff-role></small></span></div><nav id="admin-more-nav"></nav><a class="admin-button" href="index.html" target="_blank" rel="noopener">Voir le site client</a><button id="admin-more-logout" class="admin-button">Déconnexion</button></dialog>`;
+        <dialog id="admin-more" class="admin-more" aria-labelledby="admin-more-title"><header><h2 id="admin-more-title">Votre espace</h2><button id="admin-more-close" class="admin-icon-button" aria-label="Fermer le menu">${icon('x')}</button></header><div class="admin-more-identity"><span class="admin-avatar" aria-hidden="true">E</span><span><strong data-staff-name></strong><small data-staff-role></small></span></div><nav id="admin-more-nav"></nav><a class="admin-button" href="index.html" target="_blank" rel="noopener" data-i18n="admin.view_site">Voir le site client</a><button id="admin-more-logout" class="admin-button" data-i18n="admin.logout">Déconnexion</button></dialog>`;
     document.body.append(shell);
     shell.querySelector('#admin-content-slot').replaceWith(views);
     views.setAttribute('role', 'main'); views.tabIndex = -1;
@@ -123,6 +127,7 @@ export function mountAdminShell() {
             const primary = allowed.filter(([id]) => ['overview', 'orders', 'menu'].includes(id));
             document.getElementById('admin-bottom-nav').innerHTML = primary.map(navLink).join('') + `<button class="admin-nav-link" data-more>${icon('menu')}<span>Plus</span></button>`;
             if (window.feather) window.feather.replace();
+            i18n.setLang(i18n.getLang());
         },
         hideSession() {
             shell.hidden = true; shell.inert = true; gate.hidden = true;

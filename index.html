@@ -71,19 +71,19 @@
             <main class="app-wrap store-main">
                 <section id="hero" class="restaurant-intro" aria-labelledby="store-title">
                     <div class="restaurant-intro__copy">
-                        <span class="store-status" id="storeStatus">Disponibilité en cours…</span>
-                        <h1 id="store-title">Grosse faim ? <span translate="no">BIGTAC !</span></h1>
-                        <p>Votre tacos, à votre façon.</p>
+                        <span class="store-status" id="storeStatus" data-i18n="hero.status_loading">Disponibilité en cours…</span>
+                        <h1 id="store-title"><span data-i18n="hero.title_lead">Grosse faim ?</span> <span translate="no">BIGTAC !</span></h1>
+                        <p data-i18n="hero.subtitle">Votre tacos, à votre façon.</p>
                         <div class="restaurant-services">
-                            <span>Livraison dès 4 Dh</span>
-                            <span>À emporter</span>
-                            <span>Sur place</span>
+                            <span data-i18n="hero.delivery_fee">Livraison dès 4 Dh</span>
+                            <span data-i18n="hero.takeaway">À emporter</span>
+                            <span data-i18n="hero.dinein">Sur place</span>
                         </div>
                         <div id="tableNotice" class="restaurant-services hidden" style="margin-top: 10px;">
-                            <span style="background: var(--app-accent); color: var(--app-on-accent); font-weight: 700; border: none;">🪑 Commande à la Table <b id="tableNoticeNumber"></b></span>
+                            <span style="background: var(--app-accent); color: var(--app-on-accent); font-weight: 700; border: none;"><span data-i18n="hero.table_order">🪑 Commande à la Table</span> <b id="tableNoticeNumber"></b></span>
                         </div>
                         <a class="primary-button intro-cta" href="#menu-unified">
-                            Commander maintenant
+                            <span data-i18n="hero.cta">Commander maintenant</span>
                             <i data-feather="arrow-down" aria-hidden="true">
                             </i>
                         </a>
@@ -94,24 +94,24 @@
                     <i data-feather="clock" aria-hidden="true">
                     </i>
                     <p>
-                        <strong>Le restaurant est fermé.</strong>
-                        Vous pouvez parcourir la carte. Les commandes reprendront à l’ouverture.
+                        <strong data-i18n="hero.closed_title">Le restaurant est fermé.</strong>
+                        <span data-i18n="hero.closed_desc">Vous pouvez parcourir la carte. Les commandes reprendront à l’ouverture.</span>
                     </p>
                 </div>
                 <p id="carouselHelp" class="sr-only">Carrousel : utilisez les flèches gauche et droite pour naviguer, ou Espace pour suspendre et reprendre le défilement.</p>
                 <div class="discovery-row">
                     <section id="promotions" class="menu-feature menu-feature--offers hidden" aria-labelledby="promotions-title" data-carousel>
                         <div class="section-heading">
-                            <h2 id="promotions-title">Promotions</h2>
-                            <p>À composer selon vos envies.</p>
+                            <h2 id="promotions-title" data-i18n="sections.promotions">Promotions</h2>
+                            <p data-i18n="sections.promotions_sub">À composer selon vos envies.</p>
                         </div>
                         <div id="promotionsGrid" class="featured-grid">
                         </div>
                     </section>
                     <section id="popular" class="menu-feature menu-feature--popular hidden" aria-labelledby="popular-title" data-carousel>
                         <div class="section-heading">
-                            <h2 id="popular-title">Best Seller</h2>
-                            <p>La sélection BIGTAC, à votre façon.</p>
+                            <h2 id="popular-title" data-i18n="sections.bestseller">Best Seller</h2>
+                            <p data-i18n="sections.bestseller_sub">La sélection BIGTAC, à votre façon.</p>
                         </div>
                         <div id="popularGrid" class="featured-grid">
                         </div>
@@ -119,16 +119,16 @@
                 </div>
                 <section id="menu-unified" aria-labelledby="menu-title">
                     <div class="store-menu-heading">
-                        <h2 id="menu-title">Notre carte</h2>
-                        <p>Tacos, gratinés, burgers… À vous de choisir.</p>
+                        <h2 id="menu-title" data-i18n="sections.menu">Notre carte</h2>
+                        <p data-i18n="sections.menu_sub">Tacos, gratinés, burgers… À vous de choisir.</p>
                     </div>
                     <div id="stickyFilterBar" class="menu-toolbar">
                         <div class="store-search">
-                            <label for="menuSearch" class="sr-only">Rechercher dans la carte</label>
+                            <label for="menuSearch" class="sr-only" data-i18n="search.label">Rechercher dans la carte</label>
                             <i data-feather="search" aria-hidden="true">
                             </i>
-                            <input id="menuSearch" name="menu-search" type="search" placeholder="Un tacos, un burger…" autocomplete="off">
-                            <button class="icon-button hidden" id="clearSearchBtn" type="button" onclick="clearSearch()" aria-label="Effacer la recherche">
+                            <input id="menuSearch" name="menu-search" type="search" placeholder="Un tacos, un burger…" autocomplete="off" data-i18n-placeholder="search.placeholder">
+                            <button class="icon-button hidden" id="clearSearchBtn" type="button" onclick="clearSearch()" aria-label="Effacer la recherche" data-i18n-aria="search.clear">
                                 <i data-feather="x" aria-hidden="true">
                                 </i>
                             </button>
@@ -160,57 +160,57 @@
                             <div id="noSearchResults" class="empty-state hidden">
                                 <i data-feather="search" aria-hidden="true">
                                 </i>
-                                <h3>Aucun plat trouvé</h3>
-                                <p>Essayez un autre nom ou retrouvez toute la carte.</p>
-                                <button class="secondary-button" type="button" onclick="clearSearch()">Voir toute la carte</button>
+                                <h3 data-i18n="search.no_result">Aucun plat trouvé</h3>
+                                <p data-i18n="search.no_result_sub">Essayez un autre nom ou retrouvez toute la carte.</p>
+                                <button class="secondary-button" type="button" onclick="clearSearch()" data-i18n="search.view_all">Voir toute la carte</button>
                             </div>
                         </div>
                         <aside class="desktop-basket" aria-labelledby="basket-preview-title">
                             <i data-feather="shopping-bag" aria-hidden="true">
                             </i>
-                            <h2 id="basket-preview-title">Votre pause gourmande</h2>
-                            <p id="desktopCartPreview">Choisissez vos plats, on s’occupe du reste.</p>
+                            <h2 id="basket-preview-title" data-i18n="desktop_basket.title">Votre pause gourmande</h2>
+                            <p id="desktopCartPreview" data-i18n="desktop_basket.sub_empty">Choisissez vos plats, on s’occupe du reste.</p>
                             <div class="basket-preview-total">
-                                <span>Total</span>
+                                <span data-i18n="desktop_basket.total">Total</span>
                                 <strong id="desktopCartTotal">0 Dh</strong>
                             </div>
                             <button class="primary-button" type="button" onclick="openCart()">
-                                Voir mon panier
+                                <span data-i18n="desktop_basket.btn">Voir mon panier</span>
                                 <i data-feather="arrow-right" aria-hidden="true">
                                 </i>
                             </button>
-                            <p class="basket-note">Frais de livraison précisés à la commande.</p>
+                            <p class="basket-note" data-i18n="desktop_basket.note">Frais de livraison précisés à la commande.</p>
                         </aside>
                     </div>
                 </section>
                 <section id="locations" class="restaurant-info" aria-labelledby="info-title">
                     <div>
-                        <h2 id="info-title">On se retrouve à Fès</h2>
+                        <h2 id="info-title" data-i18n="location.title">On se retrouve à Fès</h2>
                         <p>
                             2XQV+VJ5, Rue Abdelkrim Benjelloun,
                             <br>
                             Fès 30050, Maroc
                         </p>
                         <a href="https://maps.app.goo.gl/MpyAC424WpXYfEAw8" target="_blank" rel="noopener noreferrer">
-                            Ouvrir l’itinéraire
+                            <span data-i18n="location.itinerary">Ouvrir l’itinéraire</span>
                             <i data-feather="external-link" aria-hidden="true">
                             </i>
                         </a>
                     </div>
                     <div>
-                        <h3>Les horaires</h3>
-                        <p id="restaurant-hours">7j / 7, de 12:00 à 02:00</p>
-                        <p>Une question sur votre commande ?</p>
+                        <h3 data-i18n="location.hours_title">Les horaires</h3>
+                        <p id="restaurant-hours" data-i18n="location.hours_val">7j / 7, de 12:00 à 02:00</p>
+                        <p data-i18n="location.question">Une question sur votre commande ?</p>
                         <div class="contact-actions">
-                            <button type="button" class="secondary-button" onclick="contactWhatsApp()">WhatsApp</button>
-                            <button type="button" class="secondary-button" onclick="contactCall()">Appeler</button>
+                            <button type="button" class="secondary-button" onclick="contactWhatsApp()" data-i18n="location.whatsapp">WhatsApp</button>
+                            <button type="button" class="secondary-button" onclick="contactCall()" data-i18n="location.call">Appeler</button>
                         </div>
                     </div>
                 </section>
             </main>
             <footer class="app-footer app-wrap">
                 <a href="#hero" translate="no">BIGTAC</a>
-                <span>Tacos &amp; grill à Fès</span>
+                <span data-i18n="footer.desc">Tacos &amp; grill à Fès</span>
                 <a href="https://www.instagram.com/thebigtac_01/" target="_blank" rel="noopener noreferrer">
                     Instagram
                     <i data-feather="external-link" aria-hidden="true">
@@ -220,7 +220,7 @@
         </div>
         <button data-app-content type="button" id="fabCart" class="mobile-cart-bar hidden" onclick="openCart()">
             <span class="mobile-cart-bar__count" id="fabCount">0</span>
-            <span>Voir mon panier</span>
+            <span data-i18n="cart.view_cart">Voir mon panier</span>
             <strong id="fabTotal">0 Dh</strong>
             <i data-feather="arrow-right" aria-hidden="true">
             </i>
@@ -233,14 +233,14 @@
                 </span>
                 <div>
                     <p class="tracker-label">
-                        Votre commande
+                        <span data-i18n="tracker.title">Votre commande</span>
                         <strong id="trackerId">
                         </strong>
                     </p>
-                    <p id="trackerStatus">En attente de confirmation…</p>
-                    <button id="trackerRetry" class="text-button hidden" type="button" onclick="retryOrderTracker()">Réessayer le suivi</button>
+                    <p id="trackerStatus" data-i18n="tracker.status_pending">En attente de confirmation…</p>
+                    <button id="trackerRetry" class="text-button hidden" type="button" onclick="retryOrderTracker()" data-i18n="tracker.retry">Réessayer le suivi</button>
                 </div>
-                <button type="button" class="icon-button" onclick="closeTracker()" aria-label="Fermer le suivi">
+                <button type="button" class="icon-button" onclick="closeTracker()" aria-label="Fermer le suivi" data-i18n-aria="tracker.close_aria">
                     <i data-feather="x" aria-hidden="true">
                     </i>
                 </button>
@@ -276,15 +276,15 @@
                     </div>
                 </div>
                 <footer class="sheet-footer">
-                    <p id="customizationHint" class="customization-hint" aria-live="polite" tabindex="-1">Personnalisez votre repas.</p>
+                    <p id="customizationHint" class="customization-hint" aria-live="polite" tabindex="-1" data-i18n="modal.default_hint">Personnalisez votre repas.</p>
                     <div class="product-action-row">
                         <div class="quantity-control">
                             <button type="button" id="modalQtyMinus" onclick="updateModalQty(-1)" aria-label="Diminuer la quantité">−</button>
-                            <output id="modalQtyDisplay" aria-label="Quantité">1</output>
+                            <output id="modalQtyDisplay" aria-label="Quantité" data-i18n-aria="modal.quantity">1</output>
                             <button type="button" onclick="updateModalQty(1)" aria-label="Augmenter la quantité">+</button>
                         </div>
                         <button type="button" class="primary-button add-to-cart-button" id="btnModalAddToCart" onclick="addToCartFromModal()">
-                            <span id="addToCartLabel">Ajouter au panier</span>
+                            <span id="addToCartLabel" data-i18n="modal.add_to_cart">Ajouter au panier</span>
                             <strong id="modalTotalPriceDisplay" aria-live="polite" aria-atomic="true">0 Dh</strong>
                         </button>
                     </div>
@@ -297,10 +297,10 @@
             <section class="modal-panel cart-sheet" tabindex="-1">
                 <header class="sheet-heading">
                     <div>
-                        <p class="step-label">Votre sélection</p>
-                        <h2 id="cartDrawerTitle">Mon panier</h2>
+                        <p class="step-label" data-i18n="cart.step">Votre sélection</p>
+                        <h2 id="cartDrawerTitle" data-i18n="cart.title">Mon panier</h2>
                     </div>
-                    <button type="button" class="icon-button" onclick="closeCart()" aria-label="Fermer le panier">
+                    <button type="button" class="icon-button" onclick="closeCart()" aria-label="Fermer le panier" data-i18n-aria="cart.close_aria">
                         <i data-feather="x" aria-hidden="true">
                         </i>
                     </button>
@@ -310,16 +310,16 @@
                 </div>
                 <footer class="sheet-footer">
                     <div class="total-row">
-                        <span>Sous-total</span>
+                        <span data-i18n="cart.subtotal">Sous-total</span>
                         <strong id="cartFinalTotal">0 Dh</strong>
                     </div>
-                    <p class="help-text">Les frais de livraison s’ajoutent selon votre quartier.</p>
+                    <p class="help-text" data-i18n="cart.fee_notice">Les frais de livraison s’ajoutent selon votre quartier.</p>
                     <button type="button" class="primary-button full-width" id="btnGoToCheckout" onclick="openCheckoutModal()">
-                        Passer commande
+                        <span data-i18n="cart.checkout">Passer commande</span>
                         <i data-feather="arrow-right" aria-hidden="true">
                         </i>
                     </button>
-                    <button type="button" class="text-button full-width" onclick="closeCart()">Ajouter d’autres envies</button>
+                    <button type="button" class="text-button full-width" onclick="closeCart()" data-i18n="cart.add_more">Ajouter d’autres envies</button>
                 </footer>
             </section>
         </div>
@@ -329,8 +329,8 @@
             <section class="modal-panel checkout-sheet" tabindex="-1">
                 <header class="sheet-heading">
                     <div>
-                        <p class="step-label">1 / 3 · Coordonnées</p>
-                        <h2 id="nameModalTitle">On prépare pour qui ?</h2>
+                        <p class="step-label" data-i18n="checkout.step">1 / 3 · Coordonnées</p>
+                        <h2 id="nameModalTitle" data-i18n="checkout.title">On prépare pour qui ?</h2>
                     </div>
                     <button class="icon-button" type="button" onclick="closeModalAnimation('nameModal')" aria-label="Fermer les coordonnées">
                         <i data-feather="x" aria-hidden="true">
@@ -339,39 +339,39 @@
                 </header>
                 <form class="checkout-form" onsubmit="event.preventDefault();nextCheckoutStep()" novalidate>
                     <div class="sheet-scroll form-fields">
-                        <p class="help-text">Un nom et un numéro pour vous joindre au sujet de la commande.</p>
+                        <p class="help-text" data-i18n="checkout.help">Un nom et un numéro pour vous joindre au sujet de la commande.</p>
                         <div class="field">
                             <label for="customerName">
-                                Votre nom
-                                <span>obligatoire</span>
+                                <span data-i18n="checkout.name_label">Votre nom</span>
+                                <span data-i18n="modal.required">obligatoire</span>
                             </label>
-                            <input id="customerName" name="name" type="text" autocomplete="name" placeholder="Ex. Amine Bennani" required minlength="2" aria-describedby="nameError">
-                            <p id="nameError" class="field-error hidden" role="alert">Indiquez un nom d’au moins 2 caractères.</p>
+                            <input id="customerName" name="name" type="text" autocomplete="name" placeholder="Ex. Amine Bennani" required minlength="2" aria-describedby="nameError" data-i18n-placeholder="checkout.name_placeholder">
+                            <p id="nameError" class="field-error hidden" role="alert" data-i18n="checkout.name_error">Indiquez un nom d’au moins 2 caractères.</p>
                         </div>
                         <div class="field">
                             <label for="customerPhone">
-                                Téléphone
-                                <span>obligatoire</span>
+                                <span data-i18n="checkout.phone_label">Téléphone</span>
+                                <span data-i18n="modal.required">obligatoire</span>
                             </label>
-                            <input id="customerPhone" name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Ex. 0612345678" required aria-describedby="phoneError">
-                            <p id="phoneError" class="field-error hidden" role="alert">Indiquez un numéro marocain valide, par exemple 0612345678 ou +212612345678.</p>
+                            <input id="customerPhone" name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Ex. 0612345678" required aria-describedby="phoneError" data-i18n-placeholder="checkout.phone_placeholder">
+                            <p id="phoneError" class="field-error hidden" role="alert" data-i18n="checkout.phone_error">Indiquez un numéro marocain valide, par exemple 0612345678 ou +212612345678.</p>
                         </div>
                         <div class="field">
                             <label for="customerNote">
-                                Une précision ?
-                                <span>facultatif</span>
+                                <span data-i18n="checkout.note_label">Une précision ?</span>
+                                <span data-i18n="modal.optional">facultatif</span>
                             </label>
-                            <textarea id="customerNote" name="note" rows="3" placeholder="Sans oignon, adresse précise, sonnette…"></textarea>
-                            <p class="help-text">Pour une allergie, contactez aussi le restaurant.</p>
+                            <textarea id="customerNote" name="note" rows="3" placeholder="Sans oignon, adresse précise, sonnette…" data-i18n-placeholder="checkout.note_placeholder"></textarea>
+                            <p class="help-text" data-i18n="checkout.allergy_notice">Pour une allergie, contactez aussi le restaurant.</p>
                         </div>
                     </div>
                     <footer class="sheet-footer">
                         <button class="primary-button full-width" type="submit">
-                            Choisir la réception
+                            <span data-i18n="checkout.btn_next">Choisir la réception</span>
                             <i data-feather="arrow-right" aria-hidden="true">
                             </i>
                         </button>
-                        <button class="text-button full-width" type="button" onclick="switchModal('nameModal','cartModal')">Retour au panier</button>
+                        <button class="text-button full-width" type="button" onclick="switchModal('nameModal','cartModal')" data-i18n="checkout.back_cart">Retour au panier</button>
                     </footer>
                 </form>
             </section>
@@ -382,8 +382,8 @@
             <section class="modal-panel checkout-sheet" tabindex="-1">
                 <header class="sheet-heading">
                     <div>
-                        <p class="step-label">2 / 3 · Réception</p>
-                        <h2 id="serviceModalTitle">Comment vous régaler ?</h2>
+                        <p class="step-label" data-i18n="service.step">2 / 3 · Réception</p>
+                        <h2 id="serviceModalTitle" data-i18n="service.title">Comment vous régaler ?</h2>
                     </div>
                     <button class="icon-button" type="button" onclick="closeModalAnimation('serviceModal')" aria-label="Fermer le choix de réception">
                         <i data-feather="x" aria-hidden="true">
@@ -395,8 +395,8 @@
                         <i data-feather="truck" aria-hidden="true">
                         </i>
                         <span>
-                            <strong>Livraison</strong>
-                            <small>À Fès, dès 4 Dh selon votre quartier</small>
+                            <strong data-i18n="service.delivery">Livraison</strong>
+                            <small data-i18n="service.delivery_sub">À Fès, dès 4 Dh selon votre quartier</small>
                         </span>
                         <i data-feather="chevron-right" aria-hidden="true">
                         </i>
@@ -405,8 +405,8 @@
                         <i data-feather="shopping-bag" aria-hidden="true">
                         </i>
                         <span>
-                            <strong>À emporter</strong>
-                            <small>Récupérez votre repas au comptoir</small>
+                            <strong data-i18n="service.takeaway">À emporter</strong>
+                            <small data-i18n="service.takeaway_sub">Récupérez votre repas au comptoir</small>
                         </span>
                         <i data-feather="chevron-right" aria-hidden="true">
                         </i>
@@ -415,15 +415,15 @@
                         <i data-feather="coffee" aria-hidden="true">
                         </i>
                         <span>
-                            <strong id="serviceSurPlaceTitle">Sur place</strong>
-                            <small id="serviceSurPlaceSubtitle">On se retrouve au restaurant</small>
+                            <strong id="serviceSurPlaceTitle" data-i18n="service.dinein">Sur place</strong>
+                            <small id="serviceSurPlaceSubtitle" data-i18n="service.dinein_sub">On se retrouve au restaurant</small>
                         </span>
                         <i data-feather="chevron-right" aria-hidden="true">
                         </i>
                     </button>
                 </div>
                 <footer class="sheet-footer">
-                    <button class="text-button full-width" type="button" onclick="switchModal('serviceModal','nameModal')">Retour aux coordonnées</button>
+                    <button class="text-button full-width" type="button" onclick="switchModal('serviceModal','nameModal')" data-i18n="service.back_coords">Retour aux coordonnées</button>
                 </footer>
             </section>
         </div>
@@ -433,8 +433,8 @@
             <section class="modal-panel checkout-sheet" tabindex="-1">
                 <header class="sheet-heading">
                     <div>
-                        <p class="step-label">2 / 3 · Livraison</p>
-                        <h2 id="zoneModalTitle">Adresse de livraison à Fès</h2>
+                        <p class="step-label" data-i18n="delivery.step">2 / 3 · Livraison</p>
+                        <h2 id="zoneModalTitle" data-i18n="delivery.modal_title">Adresse de livraison à Fès</h2>
                     </div>
                     <button class="icon-button" type="button" onclick="closeModalAnimation('deliveryZoneModal')" aria-label="Fermer la livraison">
                         <i data-feather="x" aria-hidden="true">
@@ -442,24 +442,24 @@
                     </button>
                 </header>
                 <div class="sheet-scroll form-fields">
-                    <p class="help-text">Partagez votre position GPS en 1 clic ou saisissez votre adresse ci-dessous. Le restaurant confirmera avec vous par téléphone.</p>
+                    <p class="help-text" data-i18n="delivery.modal_sub">Partagez votre position GPS en 1 clic ou saisissez votre adresse ci-dessous. Le restaurant confirmera avec vous par téléphone.</p>
                     <button type="button" id="btnGpsLocation" class="secondary-button full-width" onclick="detectGpsLocation()" style="margin-bottom: 12px; gap: 8px;">
                         <i data-feather="map-pin" aria-hidden="true"></i>
-                        <span id="gpsButtonLabel">📍 Utiliser ma position GPS</span>
+                        <span id="gpsButtonLabel" data-i18n="delivery.gps_btn">📍 Utiliser ma position GPS</span>
                     </button>
                     <p id="gpsStatusHint" class="help-text" aria-live="polite" style="display: none; margin-bottom: 12px;"></p>
                     <div class="field">
                         <label for="customerAddress">
-                            Adresse exacte de livraison
-                            <span>confirmée par téléphone</span>
+                            <span data-i18n="delivery.address_label">Adresse exacte de livraison</span>
+                            <span data-i18n="delivery.address_sub">confirmée par téléphone</span>
                         </label>
-                        <textarea id="customerAddress" name="address" rows="3" placeholder="Quartier, rue, N° d'immeuble, résidence, étage, repère…"></textarea>
+                        <textarea id="customerAddress" name="address" rows="3" placeholder="Quartier, rue, N° d'immeuble, résidence, étage, repère…" data-i18n-placeholder="delivery.address_placeholder"></textarea>
                     </div>
                 </div>
                 <footer class="sheet-footer">
-                    <p id="zoneHint" class="help-text" aria-live="polite">Précisez votre adresse pour la livraison.</p>
-                    <button class="primary-button full-width" type="button" id="btnConfirmZone" onclick="confirmDeliveryZone()" disabled>Confirmer l'adresse</button>
-                    <button class="text-button full-width" type="button" onclick="switchModal('deliveryZoneModal','serviceModal')">Changer le mode de réception</button>
+                    <p id="zoneHint" class="help-text" aria-live="polite" data-i18n="delivery.zone_hint">Précisez votre adresse pour la livraison.</p>
+                    <button class="primary-button full-width" type="button" id="btnConfirmZone" onclick="confirmDeliveryZone()" disabled data-i18n="delivery.confirm_btn">Confirmer l'adresse</button>
+                    <button class="text-button full-width" type="button" onclick="switchModal('deliveryZoneModal','serviceModal')" data-i18n="delivery.change_service">Changer le mode de réception</button>
                 </footer>
             </section>
         </div>
@@ -469,8 +469,8 @@
             <section class="modal-panel checkout-sheet" tabindex="-1">
                 <header class="sheet-heading">
                     <div>
-                        <p class="step-label">3 / 3 · Confirmation</p>
-                        <h2 id="summaryModalTitle">Tout est bon ?</h2>
+                        <p class="step-label" data-i18n="summary.step">3 / 3 · Confirmation</p>
+                        <h2 id="summaryModalTitle" data-i18n="summary.title">Tout est bon ?</h2>
                     </div>
                     <button class="icon-button" type="button" onclick="closeModalAnimation('summaryModal')" aria-label="Fermer le récapitulatif">
                         <i data-feather="x" aria-hidden="true">
@@ -480,38 +480,38 @@
                 <div class="sheet-scroll summary-content">
                     <div class="summary-detail">
                         <div>
-                            <h3>Pour vous</h3>
+                            <h3 data-i18n="summary.for_you">Pour vous</h3>
                             <strong id="summaryName">
                             </strong>
                             <p id="summaryPhone">
                             </p>
                         </div>
-                        <button class="text-button" type="button" onclick="switchModal('summaryModal','nameModal')">Modifier</button>
+                        <button class="text-button" type="button" onclick="switchModal('summaryModal','nameModal')" data-i18n="summary.edit">Modifier</button>
                     </div>
                     <div class="summary-detail">
                         <div>
-                            <h3>Réception</h3>
+                            <h3 data-i18n="summary.reception">Réception</h3>
                             <strong id="summaryType">
                             </strong>
                             <p id="summaryLocation">
                             </p>
                         </div>
-                        <button class="text-button" type="button" onclick="switchModal('summaryModal','serviceModal')">Modifier</button>
+                        <button class="text-button" type="button" onclick="switchModal('summaryModal','serviceModal')" data-i18n="summary.edit">Modifier</button>
                     </div>
                     <div id="tableInputContainer" class="field hidden" style="margin: 4px 0 10px 0;">
                         <label for="tableNumberInput" style="font-size: 13px;">
-                            Numéro de table
-                            <span>facultatif</span>
+                            <span data-i18n="summary.table_number">Numéro de table</span>
+                            <span data-i18n="modal.optional">facultatif</span>
                         </label>
-                        <input id="tableNumberInput" type="text" placeholder="Ex. 4" style="padding: 8px 12px; font-size: 14px; border-radius: 12px;">
+                        <input id="tableNumberInput" type="text" placeholder="Ex. 4" style="padding: 8px 12px; font-size: 14px; border-radius: 12px;" data-i18n-placeholder="summary.table_placeholder">
                     </div>
                     <section class="summary-order" aria-labelledby="summary-order-title">
-                        <h3 id="summary-order-title">Votre repas</h3>
+                        <h3 id="summary-order-title" data-i18n="summary.your_meal">Votre repas</h3>
                         <div id="summaryItems">
                         </div>
                     </section>
                     <div id="summaryDeliveryFee" class="total-row hidden">
-                        <span>Livraison</span>
+                        <span data-i18n="summary.delivery_fee">Livraison</span>
                         <strong id="deliveryPriceDisplay">0 Dh</strong>
                     </div>
                     <p id="orderSubmissionError" class="field-error hidden" role="alert">
@@ -519,16 +519,16 @@
                 </div>
                 <footer class="sheet-footer">
                     <div class="total-row grand-total">
-                        <span>Total à payer</span>
+                        <span data-i18n="summary.total_to_pay">Total à payer</span>
                         <strong id="summaryTotal">0 Dh</strong>
                     </div>
-                    <p id="confirmationHint" class="help-text">Le restaurant confirmera votre commande.</p>
+                    <p id="confirmationHint" class="help-text" data-i18n="summary.restaurant_confirm">Le restaurant confirmera votre commande.</p>
                     <button class="primary-button full-width" id="btnFinalize" type="button" onclick="finalizeOrder()">
-                        Confirmer la commande
+                        <span data-i18n="summary.finalize">Confirmer la commande</span>
                         <i data-feather="check-circle" aria-hidden="true">
                         </i>
                     </button>
-                    <button class="text-button full-width" type="button" onclick="switchModal('summaryModal','cartModal')">Modifier mon panier</button>
+                    <button class="text-button full-width" type="button" onclick="switchModal('summaryModal','cartModal')" data-i18n="summary.edit_cart">Modifier mon panier</button>
                 </footer>
             </section>
         </div>
@@ -872,7 +872,7 @@
                 section.innerHTML = `
                     <div class="store-category-heading">
                         <h3>${escapeCardText(catName)}</h3>
-                        <span>${catItems.length} ${catItems.length === 1 ? 'plat' : 'plats'}</span>
+                        <span>${catItems.length} ${catItems.length === 1 ? (i18n.getLang() === 'ar' ? 'طبق' : i18n.getLang() === 'en' ? 'item' : 'plat') : (i18n.getLang() === 'ar' ? 'أطباق' : i18n.getLang() === 'en' ? 'items' : 'plats')}</span>
                     </div>
                     <div class="store-product-grid">
                         ${catItems.map(item => createCardHTML(item)).join('')}
@@ -898,7 +898,8 @@
             const name = escapeCardText(item.name);
             const itemId = encodeURIComponent(item.id).replace(/'/g, '%27');
             const featured = variant === 'offer' || variant === 'popular';
-            const badge = variant === 'offer' ? 'Offre du moment' : 'Favori';
+            const badge = variant === 'offer' ? t('badge.offer', 'Offre du moment') : t('badge.popular', 'Favori');
+            const chooseText = menuAvailable(item) ? (variant === 'offer' ? t('modal.composer', 'Composer') : t('modal.choose', 'Choisir')) : t('badge.soldout', 'Rupture de stock');
             return `
                 <article class="menu-card product-card${featured ? ` product-card--${variant}` : ''}">
                     <div class="product-card__media">
@@ -906,13 +907,13 @@
                         ${featured ? `<span class="featured-badge">${badge}</span>` : ''}
                     </div>
                     <div class="product-card__body">
-                        ${item.isPromo && !featured ? '<span class="product-badge">Offre</span>' : ''}<${heading}>${name}</${heading}>
+                        ${item.isPromo && !featured ? `<span class="product-badge">${t('badge.offer', 'Offre')}</span>` : ''}<${heading}>${name}</${heading}>
                         ${variant === 'popular' && item.category ? `<p class="featured-category">${escapeCardText(item.category)}</p>` : ''}
                         <p class="product-card__description">${escapeCardText(item.description || 'Préparé à la commande.')}</p>
                         <div class="product-card__footer">
-                            <div class="product-card__price"><small>À partir de</small><strong>${money(item.price)}</strong></div>
-                            <button type="button" class="product-card__choose" ${menuAvailable(item)?'':'disabled'} onclick="openItemModal(decodeURIComponent('${itemId}'), ${item.isPromo === true})" aria-label="Choisir ${name}">
-                                <span>${menuAvailable(item) ? variant === 'offer' ? 'Composer' : 'Choisir' : 'Rupture de stock'}</span><i data-feather="plus" aria-hidden="true"></i>
+                            <div class="product-card__price"><small>${t('modal.from_price', 'À partir de')}</small><strong>${money(item.price)}</strong></div>
+                            <button type="button" class="product-card__choose" ${menuAvailable(item)?'':'disabled'} onclick="openItemModal(decodeURIComponent('${itemId}'), ${item.isPromo === true})" aria-label="${t('modal.choose', 'Choisir')} ${name}">
+                                <span>${chooseText}</span><i data-feather="plus" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
@@ -1048,7 +1049,7 @@
                     : min > 0 ? `Choisissez au moins ${min} option${min > 1 ? 's' : ''} · ${max} maximum`
                     : `À votre goût · ${max} option${max > 1 ? 's' : ''} maximum`;
                 return `<fieldset class="option-group" id="choice-group-${index}" tabindex="-1" aria-describedby="choice-hint-${index} choice-error-${index}">
-                    <legend><span>${escapeCardText(step.title)}</span><span class="required-label">${min > 0 ? 'Obligatoire' : 'Facultatif'}</span></legend>
+                    <legend><span>${escapeCardText(step.title)}</span><span class="required-label">${min > 0 ? t('modal.required', 'Obligatoire') : t('modal.optional', 'Facultatif')}</span></legend>
                     <p id="choice-hint-${index}" class="option-hint"><span>${instruction}</span><strong id="choice-count-${index}">${selected.length} / ${max}</strong></p>
                     <div class="option-list">${options.map((option, optionIndex) => {
                         const checked = selected.some(selection => selection.optionIndex === optionIndex);
@@ -1136,11 +1137,11 @@
             const valid = validateCustomization();
             const missing = wizardSteps.filter((step, index) => selectionIssue(step, wizardData[index])).length;
             const hint = document.getElementById('customizationHint');
-            hint.textContent = valid ? 'Tout est prêt. Ajoutez votre repas au panier.' : `${missing} choix obligatoire${missing > 1 ? 's' : ''} à compléter avant l’ajout.`;
+            hint.textContent = valid ? t('modal.ready_hint', 'Tout est prêt. Ajoutez votre repas au panier.') : (i18n.getLang() === 'ar' ? `${missing} خيارات إجبارية للإكمال قبل الإضافة.` : i18n.getLang() === 'en' ? `${missing} required choice${missing > 1 ? 's' : ''} to complete before adding.` : `${missing} choix obligatoire${missing > 1 ? 's' : ''} à compléter avant l’ajout.`);
             hint.classList.toggle('is-invalid', !valid);
             document.getElementById('btnModalAddToCart').dataset.ready = String(valid);
             document.getElementById('btnModalAddToCart').setAttribute('aria-describedby', 'customizationHint');
-            document.getElementById('addToCartLabel').textContent = valid ? 'Ajouter au panier' : 'Compléter mes choix';
+            document.getElementById('addToCartLabel').textContent = valid ? t('modal.add_to_cart', 'Ajouter au panier') : t('modal.complete_choices', 'Compléter mes choix');
             return total;
         }
         // Legacy entry points delegate to the same selection and validation flow.
@@ -1178,12 +1179,12 @@
             const container = document.getElementById('cartItemsContainer');
             if (!container) return;
             if (!cart.length) {
-                container.innerHTML = `<div class="empty-state"><i data-feather="shopping-bag" aria-hidden="true"></i><h3>Une petite faim ?</h3><p>Votre panier attend vos envies. Trouvez votre prochain repas dans la carte.</p><button type="button" class="primary-button" onclick="closeCart();document.getElementById('menu-unified').scrollIntoView()">Découvrir la carte</button></div>`;
+                container.innerHTML = `<div class="empty-state"><i data-feather="shopping-bag" aria-hidden="true"></i><h3>${t('cart.empty_title', 'Votre panier est vide')}</h3><p>${t('cart.empty_desc', 'Ajoutez vos tacos, boissons et desserts pour composer votre repas.')}</p><button type="button" class="primary-button" onclick="closeCart();document.getElementById('menu-unified').scrollIntoView()">${t('cart.discover', 'Découvrir la carte')}</button></div>`;
             } else {
                 container.innerHTML = cart.map((item, index) => `<article class="cart-item-card">
                     <div class="cart-item-top"><img src="${escapeCardText(item.imageUrl || 'assets/snack.png')}" alt="" width="68" height="68" onerror="this.onerror=null;this.src='assets/snack.png'"><div><h3>${escapeCardText(item.name)}</h3><strong>${money(item.totalPrice)}</strong></div></div>
                     <div class="cart-customs">${cartOptionsHTML(item)}</div>
-                    <div class="cart-item-actions"><div class="quantity-control"><button type="button" onclick="updateCartItemQty(${index}, -1)" aria-label="Diminuer la quantité de ${escapeCardText(item.name)}">−</button><span aria-label="Quantité">${item.qty}</span><button type="button" onclick="updateCartItemQty(${index}, 1)" aria-label="Augmenter la quantité de ${escapeCardText(item.name)}">+</button></div><button type="button" class="text-button" onclick="removeCartItem(${index})" aria-label="Retirer ${escapeCardText(item.name)}">Retirer</button></div>
+                    <div class="cart-item-actions"><div class="quantity-control"><button type="button" onclick="updateCartItemQty(${index}, -1)" aria-label="Diminuer la quantité de ${escapeCardText(item.name)}">−</button><span aria-label="Quantité">${item.qty}</span><button type="button" onclick="updateCartItemQty(${index}, 1)" aria-label="Augmenter la quantité de ${escapeCardText(item.name)}">+</button></div><button type="button" class="text-button" onclick="removeCartItem(${index})" aria-label="${t('cart.remove', 'Retirer')} ${escapeCardText(item.name)}">${t('cart.remove', 'Retirer')}</button></div>
                 </article>`).join('');
             }
             for (const id of ['navCartCount', 'fabCount']) document.getElementById(id).textContent = totalQty;
@@ -1191,13 +1192,13 @@
             for (const id of ['cartFinalTotal', 'navCartTotal', 'fabTotal', 'desktopCartTotal']) document.getElementById(id).textContent = money(totalPrice);
             document.getElementById('fabCart').classList.toggle('hidden', !cart.length);
             document.body.classList.toggle('has-cart', Boolean(cart.length));
-            document.getElementById('desktopCartPreview').textContent = cart.length ? `${totalQty} article${totalQty > 1 ? 's' : ''} dans votre panier. Encore une envie ?` : 'Choisissez vos plats, on s’occupe du reste.';
+            document.getElementById('desktopCartPreview').textContent = cart.length ? (i18n.getLang() === 'ar' ? `${totalQty} أطباق في سلتك. رغبة أخرى؟` : i18n.getLang() === 'en' ? `${totalQty} item${totalQty > 1 ? 's' : ''} in your cart. Anything else?` : `${totalQty} article${totalQty > 1 ? 's' : ''} dans votre panier. Encore une envie ?`) : t('desktop_basket.sub_empty', 'Choisissez vos plats, on s’occupe du reste.');
             const checkoutButton = document.getElementById('btnGoToCheckout');
             const catalogIssue=invalidCartAmount?'Le montant d’un article ancien est invalide. Retirez-le puis composez-le à nouveau.':cart.length&&stockReady?cartMenuIssue(cart,rawMenuItems,categoryRows,allPromotions):'';
             document.getElementById('cartMenuWarning').hidden=!catalogIssue;
             document.getElementById('cartMenuWarning').textContent=catalogIssue;
             checkoutButton.disabled = !cart.length || !storeAvailable() || !stockReady || !!catalogIssue;
-            checkoutButton.textContent = !storeAvailable() ? 'Le restaurant est fermé' : !stockReady ? 'Vérification de la carte…' : catalogIssue ? 'Vérifier le panier' : 'Passer commande';
+            checkoutButton.textContent = !storeAvailable() ? t('hero.closed_title', 'Le restaurant est fermé') : !stockReady ? (i18n.getLang() === 'ar' ? 'جارٍ التحقق من القائمة…' : i18n.getLang() === 'en' ? 'Checking menu…' : 'Vérification de la carte…') : catalogIssue ? (i18n.getLang() === 'ar' ? 'تحقق من السلة' : i18n.getLang() === 'en' ? 'Check cart' : 'Vérifier le panier') : t('cart.checkout', 'Passer commande');
             refreshIcons();
         };
         window.updateCartItemQty = (index, change) => {
@@ -1355,7 +1356,7 @@
             document.getElementById('summaryName').textContent = checkoutData.name;
             document.getElementById('summaryPhone').textContent = checkoutData.phone;
             document.getElementById('summaryLocation').textContent = checkoutData.location;
-            document.getElementById('summaryType').textContent = type === 'sur_place' ? 'Sur place' : type === 'emporter' ? 'À emporter' : 'Livraison';
+            document.getElementById('summaryType').textContent = type === 'sur_place' ? t('service.dinein', 'Sur place') : type === 'emporter' ? t('service.takeaway', 'À emporter') : t('service.delivery', 'Livraison');
             const tableBox = document.getElementById('tableInputContainer');
             const tableInput = document.getElementById('tableNumberInput');
             if (tableBox) {

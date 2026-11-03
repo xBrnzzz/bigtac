@@ -32,6 +32,12 @@ try {
     check(await page.locator('html').getAttribute('dir') === 'ltr', 'HTML dir is ltr for English');
     check(await page.locator('#currentLangLabel').textContent() === 'EN', 'Current lang code badge displays EN');
     check((await page.locator('a[data-i18n="nav.menu"]').textContent()).trim() === 'Menu', 'Nav menu translated to English');
+    check((await page.locator('#menu-title').textContent()).trim() === 'Our Menu', 'Menu section title translated to English');
+    check((await page.locator('#store-title').textContent()).includes('Big hunger?'), 'Hero title translated to English');
+    check((await page.locator('.intro-cta').textContent()).includes('Order now'), 'Hero CTA translated to English');
+    check((await page.locator('#promotions-title').textContent()).trim() === 'Promotions', 'Promotions title translated to English');
+    check((await page.locator('#popular-title').textContent()).trim() === 'Best Sellers', 'Best Seller title translated to English');
+    check(await page.locator('#menuSearch').getAttribute('placeholder') === 'A taco, a burger…', 'Search placeholder translated to English');
 
     // Test 3: Switch Storefront to Arabic (AR) with RTL
     await page.locator('#btnLang').click();
@@ -41,6 +47,12 @@ try {
     check(await page.locator('html').getAttribute('dir') === 'rtl', 'HTML dir is rtl for Arabic');
     check(await page.locator('#currentLangLabel').textContent() === 'AR', 'Current lang code badge displays AR');
     check((await page.locator('a[data-i18n="nav.menu"]').textContent()).trim() === 'القائمة', 'Nav menu translated to Arabic');
+    check((await page.locator('#menu-title').textContent()).trim() === 'قائمتنا', 'Menu section title translated to Arabic');
+    check((await page.locator('#store-title').textContent()).includes('جيعان ؟'), 'Hero title translated to Arabic');
+    check((await page.locator('.intro-cta').textContent()).includes('اطلب دابا'), 'Hero CTA translated to Arabic');
+    check((await page.locator('#promotions-title').textContent()).trim() === 'العروض الخاصة', 'Promotions title translated to Arabic');
+    check((await page.locator('#popular-title').textContent()).trim() === 'الأكثر طلباً', 'Best Seller title translated to Arabic');
+    check(await page.locator('#menuSearch').getAttribute('placeholder') === 'تاكوس، برغر…', 'Search placeholder translated to Arabic');
 
     // Test 4: Reload preserves language
     await page.reload({ waitUntil: 'domcontentloaded' });

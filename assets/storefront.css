@@ -2445,3 +2445,53 @@ body.has-tracker {
 [dir="rtl"] .restaurant-services {
     flex-direction: row-reverse;
 }
+[dir="rtl"] .product-card__footer {
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .product-card__price {
+    text-align: right;
+}
+[dir="rtl"] .product-detail-heading {
+    flex-direction: row-reverse;
+    text-align: right;
+}
+[dir="rtl"] .product-action-row {
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .service-choice {
+    flex-direction: row-reverse;
+    text-align: right;
+}
+[dir="rtl"] .service-choice i:last-child {
+    transform: rotate(180deg);
+}
+[dir="rtl"] .sheet-heading {
+    flex-direction: row-reverse;
+    text-align: right;
+}
+[dir="rtl"] .total-row {
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .summary-detail {
+    text-align: right;
+}
+[dir="rtl"] .summary-detail button {
+    margin-right: auto;
+    margin-left: 0;
+}
+[dir="rtl"] .field label {
+    text-align: right;
+}
+[dir="rtl"] .store-search input {
+    text-align: right;
+    padding-right: 42px;
+    padding-left: 42px;
+}
+[dir="rtl"] .store-search > i {
+    right: 14px;
+    left: auto;
+}
+[dir="rtl"] .store-search #clearSearchBtn {
+    left: 8px;
+    right: auto;
+}
