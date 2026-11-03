@@ -416,28 +416,31 @@
                 <header class="sheet-heading">
                     <div>
                         <p class="step-label">2 / 3 · Livraison</p>
-                        <h2 id="zoneModalTitle">Votre quartier &amp; adresse à Fès</h2>
+                        <h2 id="zoneModalTitle">Adresse de livraison à Fès</h2>
                     </div>
-                    <button class="icon-button" type="button" onclick="closeModalAnimation('deliveryZoneModal')" aria-label="Fermer les quartiers">
+                    <button class="icon-button" type="button" onclick="closeModalAnimation('deliveryZoneModal')" aria-label="Fermer la livraison">
                         <i data-feather="x" aria-hidden="true">
                         </i>
                     </button>
                 </header>
                 <div class="sheet-scroll form-fields">
-                    <p class="help-text">Choisissez votre quartier puis précisez votre adresse exacte.</p>
-                    <div id="zoneList" class="zone-list" aria-label="Quartiers et frais de livraison">
-                    </div>
-                    <div class="field" style="margin-top: 14px;">
+                    <p class="help-text">Partagez votre position GPS en 1 clic ou saisissez votre adresse exacte ci-dessous.</p>
+                    <button type="button" id="btnGpsLocation" class="secondary-button full-width" onclick="detectGpsLocation()" style="margin-bottom: 12px; gap: 8px;">
+                        <i data-feather="map-pin" aria-hidden="true"></i>
+                        <span id="gpsButtonLabel">📍 Utiliser ma position GPS</span>
+                    </button>
+                    <p id="gpsStatusHint" class="help-text" aria-live="polite" style="display: none; margin-bottom: 12px;"></p>
+                    <div class="field">
                         <label for="customerAddress">
                             Adresse exacte de livraison
                             <span>pour le livreur</span>
                         </label>
-                        <textarea id="customerAddress" name="address" rows="2" placeholder="Rue, N° d'immeuble, résidence, étage, repère…"></textarea>
+                        <textarea id="customerAddress" name="address" rows="3" placeholder="Quartier, rue, N° d'immeuble, résidence, étage, repère…"></textarea>
                     </div>
                 </div>
                 <footer class="sheet-footer">
-                    <p id="zoneHint" class="help-text" aria-live="polite">Choisissez votre quartier pour voir les frais.</p>
-                    <button class="primary-button full-width" type="button" id="btnConfirmZone" onclick="confirmDeliveryZone()" disabled>Confirmer le quartier</button>
+                    <p id="zoneHint" class="help-text" aria-live="polite">Précisez votre adresse pour la livraison.</p>
+                    <button class="primary-button full-width" type="button" id="btnConfirmZone" onclick="confirmDeliveryZone()" disabled>Confirmer l'adresse</button>
                     <button class="text-button full-width" type="button" onclick="switchModal('deliveryZoneModal','serviceModal')">Changer le mode de réception</button>
                 </footer>
             </section>
@@ -1030,7 +1033,6 @@
                             <span class="option-row__name">${escapeCardText(option.name)}</span><span class="option-row__price">${optionPrice(option.price || 0)}</span>
                         </label>`;
                     }).join('')}</div><p id="choice-error-${index}" class="option-error hidden" role="alert"></p>
-                    <button type="button" class="secondary-button choice-next" id="choice-next-${index}" onclick="continueCustomization(${index})" ${selectionIssue(step, selected) ? 'disabled' : ''}>${min === 0 && !selected.length ? 'Passer' : 'Continuer'}${index === wizardSteps.length - 1 ? ' au total' : ''}</button>
                 </fieldset>`;
             }).join('');
         };
@@ -1107,15 +1109,6 @@
             const total = customizationPrice(currentItem, wizardData, modalQty);
             document.getElementById('modalTotalPriceDisplay').textContent = money(total);
             document.getElementById('modalQtyMinus').disabled = modalQty === 1;
-            wizardSteps.forEach((step, index) => {
-                const button = document.getElementById(`choice-next-${index}`);
-                if (!button) return;
-                const selected = wizardData[index] || [];
-                const optional = choiceRules(step).min === 0;
-                button.disabled = Boolean(selectionIssue(step, selected));
-                button.textContent = optional && !selected.length ? 'Passer' : 'Continuer';
-                if (index === wizardSteps.length - 1) button.textContent = optional && !selected.length ? 'Passer au total' : 'Voir le total';
-            });
             const valid = validateCustomization();
             const missing = wizardSteps.filter((step, index) => selectionIssue(step, wizardData[index])).length;
             const hint = document.getElementById('customizationHint');
@@ -1247,8 +1240,9 @@
             checkoutData.type = type;
             if (type === 'livraison') {
                 selectedZoneId = null;
-                document.getElementById('btnConfirmZone').disabled = true;
-                document.getElementById('zoneHint').textContent = 'Choisissez votre quartier pour voir les frais.';
+                const addressInput = document.getElementById('customerAddress');
+                document.getElementById('btnConfirmZone').disabled = !addressInput?.value.trim();
+                document.getElementById('zoneHint').textContent = 'Précisez votre adresse ou utilisez votre position GPS.';
                 renderDeliveryZones();
                 switchModal('serviceModal', 'deliveryZoneModal');
             } else {
@@ -1263,31 +1257,72 @@
                 switchModal('serviceModal', 'summaryModal');
             }
         };
-        function getDeliveryZones() {
-            return (Array.isArray(appConfig.deliveryZones) && appConfig.deliveryZones.length) ? appConfig.deliveryZones : DELIVERY_ZONES;
-        }
-        function renderDeliveryZones() {
-            const zones = getDeliveryZones();
-            document.getElementById('zoneList').innerHTML = zones.map(zone => `<button type="button" class="zone-option" aria-pressed="${selectedZoneId === zone.id}" onclick="selectZone(${zone.id})"><span>${escapeCardText(zone.name)}<strong>${money(zone.price)}</strong></span><small>${escapeCardText(zone.areas)}</small></button>`).join('');
-        }
-        window.selectZone = id => {
-            const zones = getDeliveryZones();
-            const zone = zones.find(value => value.id === id);
-            if (!zone) return;
-            selectedZoneId = id;
-            document.querySelectorAll('.zone-option').forEach((button, index) => button.setAttribute('aria-pressed', String(zones[index]?.id === id)));
-            document.getElementById('btnConfirmZone').disabled = false;
-            document.getElementById('zoneHint').textContent = `Livraison : ${money(zone.price)} pour ${zone.name}.`;
+        window.detectGpsLocation = () => {
+            const btn = document.getElementById('btnGpsLocation');
+            const label = document.getElementById('gpsButtonLabel');
+            const hint = document.getElementById('gpsStatusHint');
+            const addressInput = document.getElementById('customerAddress');
+            if (!navigator.geolocation) {
+                showToast('La géolocalisation GPS n’est pas supportée par votre navigateur.', 'error');
+                return;
+            }
+            if (label) label.textContent = 'Localisation GPS en cours…';
+            if (btn) btn.disabled = true;
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    if (btn) btn.disabled = false;
+                    if (label) label.textContent = '📍 Position GPS trouvée';
+                    const lat = pos.coords.latitude.toFixed(6);
+                    const lng = pos.coords.longitude.toFixed(6);
+                    const mapsUrl = `https://maps.google.com/?q=${lat},${lng}`;
+                    checkoutData.latitude = lat;
+                    checkoutData.longitude = lng;
+                    checkoutData.gpsLink = mapsUrl;
+                    const existing = (addressInput?.value || '').replace(/📍 Position GPS: [^\n]+/g, '').trim();
+                    if (addressInput) {
+                        addressInput.value = existing ? `${existing}\n📍 Position GPS: ${mapsUrl}` : `📍 Position GPS: ${mapsUrl}`;
+                    }
+                    if (hint) {
+                        hint.style.display = 'block';
+                        hint.style.color = 'var(--app-success)';
+                        hint.textContent = `✓ Position GPS détectée (${lat}, ${lng})`;
+                    }
+                    document.getElementById('btnConfirmZone').disabled = false;
+                    refreshIcons();
+                },
+                () => {
+                    if (btn) btn.disabled = false;
+                    if (label) label.textContent = '📍 Réessayer la position GPS';
+                    if (hint) {
+                        hint.style.display = 'block';
+                        hint.style.color = 'var(--app-muted)';
+                        hint.textContent = 'Accès GPS non accordé. Saisissez votre adresse manuellement ci-dessous.';
+                    }
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+            );
         };
+        function renderDeliveryZones() {
+            const input = document.getElementById('customerAddress');
+            if (input && !input.dataset.bound) {
+                input.dataset.bound = 'true';
+                input.addEventListener('input', () => {
+                    const hasVal = Boolean(input.value.trim());
+                    document.getElementById('btnConfirmZone').disabled = !hasVal;
+                });
+            }
+        }
         window.confirmDeliveryZone = () => {
-            const zones = getDeliveryZones();
-            const zone = zones.find(value => value.id === selectedZoneId);
-            if (!zone) return;
             const addressInput = document.getElementById('customerAddress');
             const address = addressInput ? addressInput.value.trim() : '';
-            checkoutData.deliveryPrice = zone.price;
+            if (!address) {
+                showToast('Veuillez préciser votre adresse de livraison.', 'error');
+                return;
+            }
+            const fee = typeof appConfig.deliveryPrice === 'number' ? appConfig.deliveryPrice : 4;
+            checkoutData.deliveryPrice = fee;
             checkoutData.address = address;
-            checkoutData.location = address ? `Livraison: ${zone.name} (${zone.price} Dh) - ${address}` : `Livraison: ${zone.name} (${zone.price} Dh) - ${zone.areas}`;
+            checkoutData.location = `Livraison: ${address}`;
             populateSummary('livraison');
             switchModal('deliveryZoneModal', 'summaryModal');
         };

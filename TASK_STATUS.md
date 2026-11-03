@@ -1,6 +1,20 @@
 # BIGTAC Admin 2.0 status
 
-## Current — Hero Height Expansion on Large Displays (3 November 2026)
+## Current — Streamlined Customization Sheet & 1-Tap GPS Delivery (3 November 2026)
+
+Owner instructed: “ALSO REMOVE THE FIVE TRAJETS OPTIONS LEAVE ONLY THE ADRESSE , AND IS THERE AN AUTOMATIC METHODE TO ENTER THE LOCALISATION USING GPS?” and “in choices and supplement choosing remove the continuer button and voir le total they don't make sense”.
+
+- **Streamlined Product Customization Sheet (`index.html`):**
+  - Removed confusing inline "Continuer" and "Voir le total" step buttons inside choice and supplement groups.
+  - Customers can freely choose options/supplements with instant live price recalculation, and submit directly via the primary sticky bottom action button (`#btnModalAddToCart`).
+  - Updated validation feedback so missing required choices are highlighted cleanly without redundant button clutter.
+- **1-Tap Automatic GPS Delivery & Simplified Address (`index.html`):**
+  - Replaced the 5 manual "Trajet" buttons in `deliveryZoneModal` with an automatic 1-tap **"📍 Utiliser ma position GPS"** button powered by `navigator.geolocation`.
+  - Automatically fetches the customer's high-accuracy latitude and longitude, populates the delivery address with a clickable Google Maps link (`https://maps.google.com/?q={lat},{lng}`), and notes GPS precision for Moroccan delivery drivers.
+  - Retained manual address text input for building/apartment details with transparent flat/configured delivery fee calculation.
+- **Verification:** Updated and passed `tests/storefront.mjs` and `tests/customization-navigation.mjs`. All 350 storefront checks and 116 customization checks passing with zero errors and zero production Firebase requests.
+
+## Previous — Hero Height Expansion on Large Displays (3 November 2026)
 
 Owner instructed: “I MEANT INCRASING THE HEIGHT OF THE HERO”.
 

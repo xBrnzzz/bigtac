@@ -159,7 +159,7 @@ try {
         await fillDetails(page);
         await page.getByRole('button', { name: /^Livraison À Fès/ }).click();
         check(await page.locator('#btnConfirmZone').isDisabled(), `${width}: delivery zone required`);
-        await page.locator('.zone-option').first().click();
+        await page.locator('#customerAddress').fill('Boulevard Hassan II, Imm 4, Fès');
         await page.locator('#btnConfirmZone').click();
         check(await price(page, '#summaryTotal') === 78, `${width}: delivery fee included exactly once`);
         check((await page.locator('#summaryItems').innerText()).includes('Cheddar'), `${width}: summary keeps supplements`);
