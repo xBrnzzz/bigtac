@@ -1,12 +1,22 @@
 # BIGTAC Admin 2.0 status
 
-## Current — Wide Desktop Layout & Featured Grid Scaling (3 November 2026)
+## Current — Full-Width Fluid Desktop Layout Deployment (3 November 2026)
 
-Owner instructed: “WHAT WILL LOOK THE BEST -> OK”. Widened layout constraints to eliminate excessive desktop void and enhanced featured grid proportions:
+Owner instructed: “WHY THE SECTIONS ARE LIMITES IN THE SIDES” and “STILL LOOK THE SAME” (referencing `bigtac.netlify.app` desktop margins).
 
-- **Desktop Container Expansion (`assets/storefront.css`):** Expanded `.app-wrap` from `1280px` to `1440px`, filling wide desktop and 1080p/2K monitors with modern proportions without leaving giant empty margins on the sides.
-- **Featured Grid Sizing (`assets/storefront.css`):** Adjusted `.featured-grid` to `minmax(290px, calc((100% - 18px)/2))`, ensuring carousels and showcase cards scale smoothly on wide screens while maintaining consistent touch and keyboard scrolling rails.
-- **Verification:** 1,511 automated checks passing cleanly across all 7 test suites (320px–1440px).
+- **Root Cause:** Netlify was still serving commit `c8c970a` (`max-width: 1440px;`), leaving empty void margins on 1080p/2K/4K displays. The local full-width `max-width: 100%` change had not yet been committed and pushed to `origin/main`.
+- **Full-Width Fluid Container (`assets/storefront.css`):** Configured `.app-wrap` to `max-width: 100%` with responsive gutter padding (`max(var(--app-gutter), env(safe-area-inset-*))`). Content fills modern desktop screens edge-to-edge naturally without artificial constraints or boxed margins.
+- **Edge-to-Edge Discovery Sections (`assets/storefront.css`):** Verified `.discovery-row` negative gutters (`margin: 0 calc(-1 * var(--app-gutter)) 32px`) ensure Promotions and Best Seller background bands stretch full-bleed across the entire viewport.
+- **Carousel Rail Scaling (`assets/storefront.css`):** Configured `.featured-grid` to `minmax(290px, calc((100% - 18px)/2))` so items scroll smoothly across all viewports (320px–1440px+).
+- **Verification:** 1,511 checks passed with 100% clean results across all 7 test suites:
+  - `test:storefront`: 350 responsive ordering/tracking checks (320px, 375px, 390px, 768px, 1440px)
+  - `test:carousels`: 205 carousel/sticky checks
+  - `test:customization`: 148 customization/style checks
+  - `test:menu`: 195 checks (55 model + 140 browser)
+  - `test:orders`: 248 checks (56 model + 192 browser)
+  - `test:admin`: 265 checks (49 policy + 216 browser)
+  - `test:operations`: 100 checks (42 model + 18 transactions + 32 browser + 8 responsive)
+  - Zero production Firebase requests, zero runtime JavaScript errors.
 
 ## Previous — Client Template Customization, Dynamic Delivery Zones & Admin Login Diagnosis (2 November 2026)
 
