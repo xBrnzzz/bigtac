@@ -1,5 +1,40 @@
 import { profileRole, timestampDate, dateKey } from './admin-model.js';
 
+export function customerPhone(value) {
+    if(typeof value!=='string'||value.length>64||!/^\+?[\d\s().-]+$/.test(value.trim()))return null;
+    let phone=value.replace(/[\s().-]/g,'');
+    if(phone.startsWith('00'))phone='+'+phone.slice(2);
+    if(/^0[567]\d{8}$/.test(phone))return '+212'+phone.slice(1);
+    if(phone.startsWith('212'))phone='+'+phone;
+    if(phone.startsWith('+212')) {
+        phone=phone.replace(/^\+2120(?=[567]\d{8}$)/,'+212');
+        return /^\+212[567]\d{8}$/.test(phone)?phone:null;
+    }
+    // Format validation only: account registration/reachability is not inferred.
+    return /^\+[1-9]\d{7,14}$/.test(phone)?phone:null;
+}
+
+export function deliveryMap(order) {
+    if(order?.type!=='livraison')return null;
+    const addresses=[order.customer?.address,order.address].filter(value=>typeof value==='string'&&value.length<=2000);
+    // Checkout persists its GPS link inside the address, not separate coordinates.
+    for(const address of addresses)for(const link of address.match(/https:\/\/(?:maps\.google\.com|www\.google\.com)\/[^\s]+/g)||[]) {
+        try {
+            const url=new URL(link);
+            if(!['/','/maps','/maps/','/maps/search/'].includes(url.pathname)||url.port||url.username||url.password)continue;
+            const pair=(url.searchParams.get('q')||url.searchParams.get('query')||'').match(/^(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)$/);
+            if(pair&&Math.abs(Number(pair[1]))<=90&&Math.abs(Number(pair[2]))<=180)return {kind:'gps',url:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(`${Number(pair[1])},${Number(pair[2])}`)};
+        } catch { /* Invalid GPS links can still have a usable street address. */ }
+    }
+    for(const address of addresses) {
+        const street=address.split(/\r?\n/).filter(line=>!/https?:\/\/|Position GPS:/i.test(line)).join(', ').trim();
+        if(street.length<6||street.length>1000||!/[\p{L}]/u.test(street)||/[<>\u0000-\u001f]|(?:javascript|data|tel):/i.test(street))continue;
+        if(['non renseignée','non renseigné','adresse non renseignée','sur place','à emporter','undefined'].includes(street.toLowerCase()))continue;
+        return {kind:'address',url:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(street)};
+    }
+    return null;
+}
+
 export const ACTIVE_STATUSES = ['pending', 'confirmed', 'en_livraison'];
 export const HISTORY_STATUSES = ['delivered', 'rejected', 'ready'];
 export const ORDER_LIMIT = 200;

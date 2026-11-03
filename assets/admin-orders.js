@@ -2,8 +2,8 @@ import {db,collection,query,where,getDocs} from '../firebase-config.js';
 import {limit} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import {operationsService} from './operations-service.js';
 import { icon } from './admin-icons.js';
-import { reportingTimezone, timestampDate, dateKey, shiftDay } from './admin-model.js';
-import { ORDER_COLUMNS, ORDER_LIMIT, HISTORY_PAGE, HISTORY_STATUSES, IncomingOrderTracker, textValue, escapeText as e, orderNumber, serviceName, statusName, nextOrderAction, orderAmount, recordedItems, customerNotes, orderAge, orderColumn, filterOrders, timelineEntries } from './admin-orders-model.js';
+import { profileRole, reportingTimezone, timestampDate, dateKey, shiftDay } from './admin-model.js';
+import { ORDER_COLUMNS, ORDER_LIMIT, HISTORY_PAGE, HISTORY_STATUSES, IncomingOrderTracker, textValue, escapeText as e, orderNumber, serviceName, statusName, nextOrderAction, orderAmount, recordedItems, customerNotes, orderAge, orderColumn, filterOrders, timelineEntries, customerPhone, deliveryMap } from './admin-orders-model.js';
 import { watchActiveOrders, watchOrder, fetchOrderHistory, commitOrderTransition, operationMessage } from './admin-orders-service.js';
 
 const queueIcon = id => ({pending:'clock',confirmed:'chef',delivery:'package',history:'check'})[id] || 'note';
@@ -45,6 +45,14 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     const money=order=>e(orderAmount(order.total));
     const knownOrder=id=>selected?.id===id ? selected : active.find(order=>order.id===id)||historyOrders.find(order=>order.id===id);
     const profile=()=>session();
+    const canContact=()=>enabled&&!kitchen&&['admin','manager'].includes(profileRole(profile()));
+    function contactMarkup(order) {
+        if(!canContact())return '';
+        const phone=customerPhone(order.customer?.phone),map=deliveryMap(order);
+        const link=(kind,href,label,glyph,title)=>`<a class="order-contact-link ${kind}" data-order-contact="${kind}" href="${e(href)}" ${kind==='call'?'':'target="_blank" rel="noopener noreferrer"'} title="${e(title)}">${icon(glyph)}<span>${label}</span></a>`;
+        const links=(phone?link('whatsapp','https://wa.me/'+phone.slice(1),'WhatsApp','message','Conversation WhatsApp du client')+link('call','tel:'+phone,'Appeler','phone','Appeler le client'):'')+(map?link('maps',map.url,map.kind==='gps'?'GPS / Maps':'Adresse','pin',map.kind==='gps'?'Coordonnées GPS fournies par le client — position à confirmer':'Rechercher l’adresse dans Google Maps — emplacement à confirmer'):'');
+        return links?`<nav class="order-contact-actions" aria-label="Contacter le client de la commande #${e(orderNumber(order))}">${links}</nav>`:'';
+    }
     function config() { timezone=reportingTimezone(settings()?.reportingTimezone); }
     function clock(date,full=false) { return date ? new Intl.DateTimeFormat('fr-MA',{timeZone:timezone,...(full?{dateStyle:'medium',timeStyle:'short'}:{hour:'2-digit',minute:'2-digit',hourCycle:'h23'})}).format(date) : 'Heure non renseignée'; }
     function table(order) { const value=textValue(order.tableNumber ?? order.table); return value ? `Table ${e(value)}` : ''; }
@@ -62,7 +70,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     function noteMarkup(order) { return customerNotes(order).map(note=>`<div class="order-instructions"><b>${icon('note')}Consigne client</b><p>${e(note)}</p></div>`).join(''); }
     function ageMarkup(order) { const age=orderAge(order,Date.now(),threshold); return `<span class="order-age" data-age-id="${e(order.id)}" data-age-tone="${age.tone}" title="Temps depuis réception">${e(age.label)}${age.tone==='late'?' · repère dépassé':age.tone==='soon'?' · à surveiller':''}</span>`; }
     function cardMarkup(order) {
-        return `<div class="order-card-heading"><button class="order-open" data-open="${e(order.id)}" aria-label="Ouvrir la commande ${e(orderNumber(order))}"><small>Commande</small><strong>#${e(orderNumber(order))}</strong></button><span class="order-status" data-state="${e(order.status)}">${e(statusName(order))}</span></div><div class="order-ticket-time"><span class="order-service" data-service="${e(order.type)}">${icon(serviceIcon(order.type))}${e(serviceName(order.type))}${table(order)?' · '+table(order):''}</span>${ageMarkup(order)}</div><div class="order-ticket-content">${itemMarkup(order)}${noteMarkup(order)}</div><footer class="order-ticket-footer">${!kitchen?`<div class="order-card-total"><span>Total enregistré</span><strong>${money(order)}</strong></div>`:''}${actionMarkup(order)}<button class="order-detail-link" data-open="${e(order.id)}" aria-label="Détails et reçu de la commande ${e(orderNumber(order))}">${icon('arrow')}<span class="sr-only">Détails & reçu</span></button></footer>`;
+        return `<div class="order-card-heading"><button class="order-open" data-open="${e(order.id)}" aria-label="Ouvrir la commande ${e(orderNumber(order))}"><small>Commande</small><strong>#${e(orderNumber(order))}</strong></button><span class="order-status" data-state="${e(order.status)}">${e(statusName(order))}</span></div><div class="order-ticket-time"><span class="order-service" data-service="${e(order.type)}">${icon(serviceIcon(order.type))}${e(serviceName(order.type))}${table(order)?' · '+table(order):''}</span>${ageMarkup(order)}</div><div class="order-ticket-content">${itemMarkup(order)}${noteMarkup(order)}</div><footer class="order-ticket-footer">${!kitchen?`<div class="order-card-total"><span>Total enregistré</span><strong>${money(order)}</strong></div>`:''}${contactMarkup(order)}${actionMarkup(order)}<button class="order-detail-link" data-open="${e(order.id)}" aria-label="Détails et reçu de la commande ${e(orderNumber(order))}">${icon('arrow')}<span class="sr-only">Détails & reçu</span></button></footer>`;
 
     }
     function updateTimers() {
@@ -102,7 +110,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
             rows.forEach((order,index)=>{
                 present.add(order.id);
                 let card=cards.get(order.id); if(!card) {card=document.createElement('article');card.className='order-card';card.dataset.orderId=order.id;cards.set(order.id,card);}
-                const fingerprint=JSON.stringify([order,kitchen,pending.get(order.id),failures.get(order.id),canAct()]);
+                const fingerprint=JSON.stringify([order,kitchen,canContact(),pending.get(order.id),failures.get(order.id),canAct()]);
                 if(card._fingerprint!==fingerprint) {
                     const focused=card.contains(document.activeElement),action=document.activeElement?.dataset.transition;
                     card.innerHTML=cardMarkup(order); card._fingerprint=fingerprint;
@@ -125,7 +133,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     function renderDetail() {
         if(!selected || !profile()) return;
         const focused=document.activeElement,footerFocused=$('order-detail-actions').contains(focused),focusedTransition=focused?.dataset.transition;
-        const order=selected,contact=!kitchen && ['admin','manager'].includes(profile().role);
+        const order=selected,contact=canContact();
         $('order-detail-title').textContent=`Commande #${orderNumber(order)}`;
         const milestones=timelineEntries(order);
         $('order-detail-body').innerHTML=`<div class="order-detail-meta"><span>${e(serviceName(order.type))}${table(order)?` · ${table(order)}`:''}</span><strong>${e(statusName(order))}</strong><span>Reçue ${e(clock(timestampDate(order.createdAt),true))}</span><span>Depuis réception : <b id="order-detail-age">${e(orderAge(order,Date.now(),threshold).label)}</b></span></div>${detailError?`<p class="orders-feedback" role="alert">${e(detailError)}</p>`:''}${detailCached?'<p class="orders-feedback">Détail en cache. Les actions sont suspendues.</p>':''}<section><h3>${icon('chef')}À préparer</h3>${itemMarkup(order,true)}${noteMarkup(order)}</section>${!kitchen?`<section><h3>${icon('package')}Remise de commande</h3><p>${e(textValue(order.customer?.name,'Client'))}</p>${contact&&order.customer?.phone?`<p>Téléphone : ${e(textValue(order.customer.phone))}</p>`:''}${contact&&order.type==='livraison'?`<p>Destination : ${e(textValue(order.location,'Non renseignée'))}</p><p>Livreur : ${e(textValue(order.deliveryGuyName,'Non attribué'))}</p>`:''}<dl class="admin-breakdown"><dt>Total enregistré</dt><dd>${money(order)}</dd><dt>Paiement</dt><dd>Non vérifié</dd></dl></section>`:''}<section><h3>${icon('clock')}Historique enregistré</h3><ul class="order-timeline">${milestones.map(entry=>`<li><span>${e(entry.label)}</span><time>${e(clock(entry.date,true))}</time></li>`).join('')}</ul><p class="orders-muted">Seules les heures enregistrées sont affichées. Aucune durée de cuisson ou preuve d’encaissement n’est déduite.</p></section>`;
@@ -140,8 +148,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
                 try{await assignments.assign({id:order.id,driverId,expected});if(version===epoch)toast('Attribution enregistrée.');}catch(error){if(version===epoch){driverError=error.message;toast(error.message,'error');}}finally{assignmentBusy=false;if(version===epoch&&dialog.open)renderDetail();}
             };
         }
-        const address=textValue(order.customer?.address||order.address);
-        if(contact&&address){const link=document.createElement('a');link.className='admin-button';link.target='_blank';link.rel='noopener';link.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(address);link.textContent='Ouvrir l’adresse dans Maps';$('order-detail-body').append(link);}
+        $('order-detail-body').insertAdjacentHTML('beforeend',contactMarkup(order));
         $('order-detail-actions').innerHTML=`${actionMarkup(order,true)}<button class="admin-button" id="order-print">${icon('printer')}Imprimer ${kitchen?'le bon cuisine':'le reçu'}</button>`;
         if(footerFocused) ($('order-detail-actions').querySelector(`[data-transition="${focusedTransition}"]:not(:disabled)`) || $('order-print')).focus({preventScroll:true});
     }
@@ -246,6 +253,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     $('orders-history-more').onclick=()=>historyPage();
     $('order-detail-close').onclick=()=>dialog.close();dialog.addEventListener('close',()=>{driverRequest++;stopDetail?.();stopDetail=null;selected=null;receipt.replaceChildren();});
     const click=event=>{
+        if(event.target.closest('[data-order-contact]')&&!canContact()){event.preventDefault();render();return;}
         if(event.target.closest('#order-print'))return printSelected();
         const button=event.target.closest('[data-tab],[data-open],[data-transition],[data-retry]');
         if(button?.dataset.tab)return setTab(button.dataset.tab);
@@ -258,7 +266,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     window.addEventListener('offline',()=>{if(enabled)render();});window.addEventListener('online',()=>{if(enabled)render();});
     return {
         start(){if(enabled)return;enabled=true;epoch++;config();active=[];historyOrders=[];historyCursor=null;historyLoaded=false;historyBusy=false;historyError='';hasMore=true;failures.clear();newCount=0;$('orders-notification').hidden=true;tracker=new IncomingOrderTracker();threshold=0;try{const saved=Number(localStorage.getItem(`bigtac.order-age.${profile()?.uid}`));if(Number.isInteger(saved)&&saved>=0&&saved<=240)threshold=saved;}catch{}$('orders-threshold').value=threshold;subscribe();timer=setInterval(updateTimers,30000);},
-        stop(){enabled=false;epoch++;stopLive?.();stopLive=null;stopDetail?.();stopDetail=null;clearInterval(timer);timer=null;if(dialog.open)dialog.close();active=[];historyOrders=[];cards.forEach(card=>card.remove());cards.clear();pending.clear();failures.clear();receipt.replaceChildren();sound=false;$('orders-sound').querySelector('span').textContent='Son désactivé';$('orders-sound').setAttribute('aria-pressed','false');if(audio){audio.close().catch(()=>{});audio=null;}},
+        stop(){enabled=false;epoch++;stopLive?.();stopLive=null;stopDetail?.();stopDetail=null;clearInterval(timer);timer=null;if(dialog.open)dialog.close();$('order-detail-body').replaceChildren();$('order-detail-actions').replaceChildren();active=[];historyOrders=[];cards.forEach(card=>card.remove());cards.clear();pending.clear();failures.clear();receipt.replaceChildren();sound=false;$('orders-sound').querySelector('span').textContent='Son désactivé';$('orders-sound').setAttribute('aria-pressed','false');if(audio){audio.close().catch(()=>{});audio=null;}},
         column:setTab,changeStatus, settingsChanged(){if(enabled){const before=timezone;config();if(before!==timezone&&(historyLoaded||historyBusy))historyPage(true);render();}},
     };
 }

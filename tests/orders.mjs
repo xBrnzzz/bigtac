@@ -22,6 +22,19 @@ async function screenshot(page,name){if(output)await page.screenshot({path:path.
 try {
     for(const width of [320,375,390,768,900,1024,1440]) {
         const {page,context}=await open(width);
+        await page.evaluate(()=>{__adminFixture.data.orders[0].customer.address='12 rue Hassan II, Fès & porte B';__adminFixture.emit();});
+        const contacts=page.locator('[data-order-id="fixture-0"].order-card .order-contact-actions');
+        check(await contacts.locator('a').count()===3,'Authorized ticket has three contact actions');
+        check(await contacts.locator('[data-order-contact=call]').getAttribute('href')==='tel:+212600000000','Phone dialer gets normalized Moroccan number');
+        check(await contacts.locator('[data-order-contact=whatsapp]').getAttribute('href')==='https://wa.me/212600000000','WhatsApp uses digits-only international number');
+        check(await contacts.locator('[data-order-contact=maps]').getAttribute('href')==='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('12 rue Hassan II, Fès & porte B'),'Maps street search is encoded');
+        check(await contacts.locator('a').evaluateAll(links=>links.every(a=>a.getBoundingClientRect().height>=44&&a.scrollWidth<=a.clientWidth)),'Contact actions fit and are touch-friendly');
+        if(width===390){
+            await page.evaluate(()=>document.addEventListener('click',event=>{const a=event.target.closest('[data-order-contact]');if(a){event.preventDefault();window.__contactHref=a.href;}},{once:true}));await contacts.locator('[data-order-contact=call]').click();check(await page.evaluate(()=>__contactHref==='tel:+212600000000')&&await page.locator('#order-detail').isHidden(),'Contact click preserves link and does not open ticket/transition');
+            await page.evaluate(()=>{const o=__adminFixture.data.orders[0];o.customer.phone='bad';o.customer.address='📍 Position GPS: https://maps.google.com/?q=34.033,-5';__adminFixture.emit();});check(await contacts.locator('a').count()===1&&(await contacts.innerText()).includes('GPS / Maps'),'Invalid phone hidden; GPS remains distinctly labelled');
+            await page.evaluate(()=>{const o=__adminFixture.data.orders[0];o.customer.address='';__adminFixture.emit();});check(await page.locator('[data-order-id="fixture-0"].order-card .order-contact-actions').count()===0,'No empty contact row/links when all data unavailable');
+            await page.evaluate(()=>{const o=__adminFixture.data.orders[0];o.customer.phone='0600000000';o.customer.address='12 rue Hassan II, Fès & porte B';__adminFixture.emit();});
+        }
         await screenshot(page,`orders-${width}`);
         check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`No page overflow ${width}`);
         check(await page.locator('#view-orders').evaluate(el=>el.scrollWidth<=el.clientWidth),`Orders fit ${width}`);
@@ -37,6 +50,7 @@ try {
         if([390,768,1440].includes(width))await screenshot(page,`order-detail-${width}`);
         await page.keyboard.press('Escape');check(await page.locator('#order-detail').isHidden(),'Detail supports keyboard dismissal');
         await page.locator('#orders-mode-kitchen').click();
+        check(await page.locator('#view-orders [data-order-contact]').count()===0,'Kitchen DOM contains no customer contact links');
         check(await page.locator('#list-confirmed .order-card').count()===4,'Kitchen focuses preparation queue');
         check(await page.locator('#col-pending').isHidden(),'Kitchen hides acceptance queue');
         if([390,768,1440].includes(width))await screenshot(page,`kitchen-${width}`);
@@ -198,18 +212,22 @@ try {
             await context.close();continue;
         }
         const {page,context}=await open(390,role);
+        check(role==='manager'?await page.locator('#view-orders [data-order-contact]').count()>0:await page.locator('#view-orders [data-order-contact]').count()===0,'Ticket contact actions follow manager/cashier boundary');
         await page.locator('[data-open="fixture-0"]').first().click();
         const details=await page.locator('#order-detail-body').innerText();
         check(role==='manager'?details.includes('0600000000'):!details.includes('0600000000'),'Contact disclosure follows current staff role');
+        check(await page.locator('#order-detail [data-order-contact]').count()===(role==='manager'?2:0),'Drawer follows the same contact boundary');
         await page.keyboard.press('Escape');await page.locator('#orders-mode-kitchen').click();
         await page.locator('[data-open="fixture-1"]').first().click();
         check(await page.locator('#order-detail-body').innerText().then(text=>!text.includes('0600000000')&&!text.includes('Youssef')),'Kitchen detail hides unnecessary personal data');
         await page.keyboard.press('Escape');
         await page.locator('#orders-mode-service').click();await page.evaluate(()=>showOrderCol('pending'));
+        await page.locator('[data-open="fixture-0"]').first().click();
         await page.evaluate(()=>{__adminFixture.writeDelay=150;__adminFixture.beforeCommit=()=>{__adminFixture.data.users[0].disabled=true;__adminFixture.emit();};});
         check(await page.evaluate(()=>setStatus('fixture-0','confirmed'))===false,'Permission loss during transaction cancels pending update');
         check(await page.evaluate(()=>__adminFixture.writes.length===0),'Revoked profile produces no status write');
         check(await page.locator('#admin-access').isVisible(),'Revocation returns to access gate');
+        check(await page.locator('[data-order-contact]').count()===0&&!((await page.locator('#order-detail-body').textContent()).includes('0600000000')),'Revocation clears private links and stale drawer contact data');
         await context.close();
     }
     check(productionRequests===0,'No production Firebase requests');check(errors.length===0,`No browser errors: ${errors.join('; ')}`);

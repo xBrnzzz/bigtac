@@ -10,6 +10,10 @@
 
 ## 1. Executive Summary & Purpose
 
+**3 November — Orders customer actions:** Admin/manager Service tickets and their drawer now provide validated WhatsApp, phone and delivery Maps links. Kitchen/cashier views omit the links, and stopping Orders clears stale drawer contact data. Morocco 05/06/07, +212 and 00212 numbers normalize to international format; unavailable data produces no empty links. Maps uses explicit customer/top-level address fields, never delivery-zone labels. The current checkout persists GPS as a Google Maps URL embedded in address text; validated coordinate pairs are labelled GPS, while street addresses remain address searches. Assigned-driver actions and Firebase contracts are unchanged.
+
+Verified: Orders 94 model + 243 browser checks, 178 Admin visual checks, Operations 42 model + 18 service + 32 browser + 8 responsive checks, and 33 focused contact-layout checks. Actual local renders at 320/390/768/1440px: `C:/Users/pc/.codex/visualizations/2026/11/03/bigtac-order-contact/final/`. Tests use in-memory Firebase fixtures; actual device handlers, number reachability, GPS ground truth and production authorization were not certified. The owner requested commit/push; `main` is connected to Netlify automatic deployment.
+
 This handoff is for incoming Codex or Antigravity instances. It encapsulates the current technical state, recently completed features, architecture, design rules, testing protocol, and immediate next steps so work can continue seamlessly without re-auditing or regressing existing functionality.
 
 **Core Business Model:**

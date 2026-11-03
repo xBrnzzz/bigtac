@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { transitionIssue, orderAge, filterOrders, IncomingOrderTracker, recordedItems, customerNotes, timelineEntries, nextOrderAction, statusName, orderAmount } from '../assets/admin-orders-model.js';
+import { transitionIssue, orderAge, filterOrders, IncomingOrderTracker, recordedItems, customerNotes, timelineEntries, nextOrderAction, statusName, orderAmount, customerPhone, deliveryMap } from '../assets/admin-orders-model.js';
 let checks=0;
 const eq=(actual,expected,message)=>{assert.deepEqual(actual,expected,message);checks++;};
 const now=Date.parse('2026-10-26T12:00:00Z');
@@ -41,4 +41,18 @@ eq(tracker.receive([{...order,id:'cached',createdAt:new Date(now+1000)}],{cached
 eq(tracker.receive([{...order,id:'old',createdAt:new Date(now-1000)}]),[],'Backfilled old order does not alert');
 eq(tracker.receive([{...order,id:'preparing',status:'confirmed',createdAt:new Date(now+1000)}]),[],'Preparation change does not masquerade as new order');
 eq(tracker.receive([{...order,id:'partial',createdAt:new Date(now+1000)}],{partial:true}),[],'Truncated queue never creates false alerts');
+for(const phone of ['0612345678','06 12 34 56 78','06.12.34.56.78','+212612345678','00212612345678','212612345678','+212 (0) 6 12 34 56 78'])eq(customerPhone(phone),'+212612345678','Moroccan phone canonicalized');
+eq(customerPhone('07-12-34-56-78'),'+212712345678','Moroccan 07 canonicalized');
+eq(customerPhone('0522123456'),'+212522123456','Moroccan fixed line canonicalized');
+eq(customerPhone('+33 6 12 34 56 78'),'+33612345678','Explicit international phone retained');
+for(const phone of ['',null,612345678,'060000000','06000000000','+212123456789','+21260000000','+21200612345678','+000000000','1234567890','javascript:0612345678','0612345678 ext 1','+212612345678?text=x','++212612345678'])eq(customerPhone(phone),null,'Malformed/missing phone omitted');
+const destination={type:'livraison',customer:{address:'12 rue Hassan II, Fès & porte B'}};
+eq(deliveryMap(destination),{kind:'address',url:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(destination.customer.address)},'Street address is encoded search');
+eq(deliveryMap({...destination,type:'emporter'}),null,'Pickup has no delivery Maps');
+eq(deliveryMap({...destination,type:'sur_place'}),null,'Dine-in has no delivery Maps');
+eq(deliveryMap({type:'livraison',location:'Zone Centre (10 Dh)'}),null,'Fee/zone label is not an address');
+for(const address of ['',null,{},'Non renseignée','📍 Position GPS: https://maps.google.com/?q=91,181','https://maps.google.com.evil.test/?q=34,-6','<script>alert(1)</script>'])eq(deliveryMap({type:'livraison',customer:{address}}),null,'Invalid destination omitted');
+eq(deliveryMap({type:'livraison',address:'📍 Position GPS: https://maps.google.com/?q=34.033,-5.000'}),{kind:'gps',url:'https://www.google.com/maps/search/?api=1&query=34.033%2C-5'},'Existing embedded GPS contract gives coordinate pin');
+eq(deliveryMap({type:'livraison',address:'12 rue Exemple\n📍 Position GPS: https://maps.google.com/?q=null,null'})?.kind,'address','Invalid GPS falls back to explicit street');
+eq(deliveryMap({type:'livraison',customer:{address:'Non renseignée'},address:'12 rue Exemple'})?.kind,'address','Usable legacy address fallback');
 console.log(`${checks} orders model checks passed`);
