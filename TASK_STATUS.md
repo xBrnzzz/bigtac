@@ -1,6 +1,14 @@
 # BIGTAC Admin 2.0 status
 
-## Current — Client Template Customization, Dynamic Delivery Zones & Admin Login Diagnosis (2 November 2026)
+## Current — Wide Desktop Layout & Featured Grid Scaling (3 November 2026)
+
+Owner instructed: “WHAT WILL LOOK THE BEST -> OK”. Widened layout constraints to eliminate excessive desktop void and enhanced featured grid proportions:
+
+- **Desktop Container Expansion (`assets/storefront.css`):** Expanded `.app-wrap` from `1280px` to `1440px`, filling wide desktop and 1080p/2K monitors with modern proportions without leaving giant empty margins on the sides.
+- **Featured Grid Sizing (`assets/storefront.css`):** Adjusted `.featured-grid` to `minmax(290px, calc((100% - 18px)/2))`, ensuring carousels and showcase cards scale smoothly on wide screens while maintaining consistent touch and keyboard scrolling rails.
+- **Verification:** 1,511 automated checks passing cleanly across all 7 test suites (320px–1440px).
+
+## Previous — Client Template Customization, Dynamic Delivery Zones & Admin Login Diagnosis (2 November 2026)
 
 Owner instructed: “PUSH AND COMMIT AFTER”. Implemented client template reusability enhancements and admin login diagnostic feedback across `index.html` and `admin.html`:
 
