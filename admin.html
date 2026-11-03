@@ -142,6 +142,7 @@
     <link rel="stylesheet" href="assets/admin-approved.css">
     <link rel="stylesheet" href="assets/admin-polish.css">
     <link rel="stylesheet" href="assets/admin-elevation.css">
+    <script type="module" src="assets/i18n.js"></script>
 </head>
 
 <body class="bg-slate-100 text-slate-800 antialiased h-screen overflow-hidden flex flex-col md:flex-row">
@@ -153,28 +154,48 @@
 
     <!-- LOGIN OVERLAY MODAL -->
     <div id="login-section" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm p-8 rounded-3xl shadow-2xl border border-slate-100">
+        <div class="bg-white w-full max-w-sm p-8 rounded-3xl shadow-2xl border border-slate-100 relative">
+            <!-- Language Selector on Login Modal -->
+            <div class="flex justify-end mb-2">
+                <div class="lang-selector relative" id="loginLangSelector">
+                    <button type="button" id="btnLoginLang" class="lang-toggle-btn" onclick="toggleLangMenu('loginLangDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Langue / Language / اللغة">
+                        <span class="lang-globe" aria-hidden="true">🌐</span>
+                        <span class="lang-current current-lang-code">FR</span>
+                    </button>
+                    <div id="loginLangDropdown" class="lang-menu hidden" role="menu">
+                        <button type="button" class="lang-option" data-lang-btn="fr" onclick="setAppLanguage('fr')" role="menuitem">
+                            <span class="lang-flag">🇫🇷</span> <span>Français</span>
+                        </button>
+                        <button type="button" class="lang-option" data-lang-btn="en" onclick="setAppLanguage('en')" role="menuitem">
+                            <span class="lang-flag">🇬🇧</span> <span>English</span>
+                        </button>
+                        <button type="button" class="lang-option" data-lang-btn="ar" onclick="setAppLanguage('ar')" role="menuitem">
+                            <span class="lang-flag">🇲🇦</span> <span>العربية</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
             <div class="text-center mb-8">
                 <div class="w-20 h-20 mx-auto mb-4 rounded-2xl overflow-hidden p-1 shadow-md bg-stone-900 flex items-center justify-center">
                     <img src="assets/logo.png" alt="BIGTAC" class="w-full h-full object-contain" onerror="this.src='assets/snack.png'">
                 </div>
-                <h2 class="text-2xl font-black text-slate-900 tracking-tight">BIGTAC Studio</h2>
-                <p class="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider">Connexion Administration</p>
+                <h2 class="text-2xl font-black text-slate-900 tracking-tight" data-i18n="admin.login_title">BIGTAC Studio</h2>
+                <p class="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider" data-i18n="admin.login_subtitle">Connexion Administration</p>
             </div>
             
             <form id="login-form" class="space-y-4">
                 <div>
-                    <label for="email" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
+                    <label for="email" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5" data-i18n="admin.email">Email</label>
                     <input type="email" id="email" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-semibold text-sm transition" placeholder="admin@bigtac.ma" required autocomplete="email">
                 </div>
                 <div>
-                    <label for="password" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Mot de passe</label>
+                    <label for="password" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5" data-i18n="admin.password">Mot de passe</label>
                     <input type="password" id="password" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-semibold text-sm transition" placeholder="••••••••" required autocomplete="current-password">
                 </div>
                 <button type="submit" id="btn-login-submit" class="w-full py-4 bg-brand-500 hover:bg-brand-600 text-white rounded-xl font-black text-sm shadow-lg shadow-brand-500/25 transition transform active:scale-95 flex items-center justify-center gap-2">
-                    <span>Se Connecter</span>
+                    <span data-i18n="admin.login_btn">Se Connecter</span>
                 </button>
-                <p id="login-error" class="text-red-500 text-xs font-bold text-center hidden bg-red-50 py-2.5 px-3 rounded-xl border border-red-100 leading-relaxed">
+                <p id="login-error" class="text-red-500 text-xs font-bold text-center hidden bg-red-50 py-2.5 px-3 rounded-xl border border-red-100 leading-relaxed" data-i18n="admin.login_error">
                     Email ou mot de passe incorrect.
                 </p>
             </form>
@@ -282,24 +303,43 @@
                 <div class="flex items-center gap-3">
                     <img src="assets/logo.png" alt="BIGTAC" class="h-9 w-9 object-contain rounded-xl bg-black p-0.5" onerror="this.src='assets/snack.png'">
                     <div>
-                        <h1 class="font-black text-base leading-none text-slate-900">BIGTAC Livraison</h1>
-                        <p class="text-xs text-brand-600 font-bold mt-0.5" id="driver-name-display">Livreur</p>
+                        <h1 class="font-black text-base leading-none text-slate-900" data-i18n="driver.header_title">BIGTAC Livraison</h1>
+                        <p class="text-xs text-brand-600 font-bold mt-0.5" id="driver-name-display" data-i18n="driver.header_subtitle">Livreur</p>
                     </div>
                 </div>
-                <button onclick="signOut(auth)" class="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition" aria-label="Déconnexion livreur">
-                    <i data-feather="log-out" class="w-5 h-5"></i>
-                </button>
+                <div class="flex items-center gap-2">
+                    <div class="lang-selector relative" id="driverLangSelector">
+                        <button type="button" id="btnDriverLang" class="lang-toggle-btn" onclick="toggleLangMenu('driverLangDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Langue / Language / اللغة">
+                            <span class="lang-globe" aria-hidden="true">🌐</span>
+                            <span class="lang-current current-lang-code">FR</span>
+                        </button>
+                        <div id="driverLangDropdown" class="lang-menu hidden" role="menu">
+                            <button type="button" class="lang-option" data-lang-btn="fr" onclick="setAppLanguage('fr')" role="menuitem">
+                                <span class="lang-flag">🇫🇷</span> <span>Français</span>
+                            </button>
+                            <button type="button" class="lang-option" data-lang-btn="en" onclick="setAppLanguage('en')" role="menuitem">
+                                <span class="lang-flag">🇬🇧</span> <span>English</span>
+                            </button>
+                            <button type="button" class="lang-option" data-lang-btn="ar" onclick="setAppLanguage('ar')" role="menuitem">
+                                <span class="lang-flag">🇲🇦</span> <span>العربية</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="signOut(auth)" class="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition" aria-label="Déconnexion livreur" data-i18n-aria="driver.logout_aria">
+                        <i data-feather="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Content Area -->
             <div class="flex-1 overflow-hidden pb-20">
                 <div id="driver-tab-available" class="h-full overflow-y-auto p-4 space-y-4">
-                    <h2 class="text-lg font-black text-slate-900 mb-2">Courses Disponibles à Récupérer</h2>
+                    <h2 class="text-lg font-black text-slate-900 mb-2" data-i18n="driver.heading_available">Courses Disponibles à Récupérer</h2>
                     <div id="available-runs-list" class="space-y-3"></div>
                 </div>
 
                 <div id="driver-tab-deliveries" class="h-full overflow-y-auto p-4 space-y-4 hidden">
-                    <h2 class="text-lg font-black text-slate-900 mb-2">Mes Courses en Cours</h2>
+                    <h2 class="text-lg font-black text-slate-900 mb-2" data-i18n="driver.heading_deliveries">Mes Courses en Cours</h2>
                     <div id="my-deliveries-list" class="space-y-3"></div>
                 </div>
             </div>
@@ -308,11 +348,11 @@
             <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex items-center justify-around px-3 py-2 shadow-2xl z-50">
                 <button onclick="switchDriverTab('available')" id="driver-nav-available" class="flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-brand-600 bg-brand-50 font-bold transition">
                     <i data-feather="map-pin" class="w-5 h-5"></i>
-                    <span class="text-xs font-black">Disponibles</span>
+                    <span class="text-xs font-black" data-i18n="driver.tab_available">Disponibles</span>
                 </button>
                 <button onclick="switchDriverTab('deliveries')" id="driver-nav-deliveries" class="flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-slate-400 hover:bg-slate-50 font-bold transition">
                     <i data-feather="truck" class="w-5 h-5"></i>
-                    <span class="text-xs font-black">Mes Courses</span>
+                    <span class="text-xs font-black" data-i18n="driver.tab_deliveries">Mes Courses</span>
                 </button>
             </nav>
         </div>
@@ -426,7 +466,10 @@
 
         import {limit} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import {staffAdministration} from "./assets/staff-service.js";
+        import { i18n } from './assets/i18n.js';
 
+        // Initialize multi-language
+        i18n.init();
 
         // Expose auth to window for event handlers
         window.auth = auth;

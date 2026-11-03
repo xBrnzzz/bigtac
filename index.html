@@ -10,7 +10,7 @@
         <link rel="apple-touch-icon" href="assets/logo.png">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Cairo:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com">
         </script>
         <script>tailwind.config = { darkMode: 'class' };</script>
@@ -19,7 +19,7 @@
         <link rel="stylesheet" href="assets/storefront.css">
     </head>
     <body>
-        <a class="skip-link" href="#menu-unified">Aller à la carte</a>
+        <a class="skip-link" href="#menu-unified" data-i18n="nav.skip">Aller à la carte</a>
         <div data-app-content id="app-shell">
             <header class="store-header">
                 <div class="store-header__inner app-wrap">
@@ -31,19 +31,37 @@
                         </span>
                     </a>
                     <nav class="store-nav" aria-label="Navigation principale">
-                        <a href="#menu-unified">La carte</a>
-                        <a href="#promotions">Les offres</a>
-                        <a href="#locations">Infos pratiques</a>
+                        <a href="#menu-unified" data-i18n="nav.menu">La carte</a>
+                        <a href="#promotions" data-i18n="nav.offers">Les offres</a>
+                        <a href="#locations" data-i18n="nav.info">Infos pratiques</a>
                     </nav>
                     <div class="store-actions">
-                        <button type="button" id="btnDarkMode" class="icon-button" onclick="toggleDarkMode()" aria-label="Changer le thème">
+                        <!-- Multi-Language Selector (FR / EN / AR) -->
+                        <div class="lang-selector" id="langSelector">
+                            <button type="button" id="btnLang" class="lang-toggle-btn" onclick="toggleLangMenu('langDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Choisir la langue" data-i18n-aria="nav.lang">
+                                <span class="lang-globe" aria-hidden="true">🌐</span>
+                                <span id="currentLangLabel" class="lang-current current-lang-code">FR</span>
+                            </button>
+                            <div id="langDropdown" class="lang-menu hidden" role="menu">
+                                <button type="button" class="lang-option" data-lang-btn="fr" onclick="setAppLanguage('fr')" role="menuitem">
+                                    <span class="lang-flag">🇫🇷</span> <span>Français</span>
+                                </button>
+                                <button type="button" class="lang-option" data-lang-btn="en" onclick="setAppLanguage('en')" role="menuitem">
+                                    <span class="lang-flag">🇬🇧</span> <span>English</span>
+                                </button>
+                                <button type="button" class="lang-option" data-lang-btn="ar" onclick="setAppLanguage('ar')" role="menuitem">
+                                    <span class="lang-flag">🇲🇦</span> <span>العربية</span>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" id="btnDarkMode" class="icon-button" onclick="toggleDarkMode()" aria-label="Changer le thème" data-i18n-aria="nav.theme">
                             <i data-feather="moon" aria-hidden="true">
                             </i>
                         </button>
-                        <button type="button" id="btnNavCart" class="header-cart" onclick="openCart()" aria-label="Ouvrir le panier">
+                        <button type="button" id="btnNavCart" class="header-cart" onclick="openCart()" aria-label="Ouvrir le panier" data-i18n-aria="nav.cart">
                             <i data-feather="shopping-bag" aria-hidden="true">
                             </i>
-                            <span class="cart-label">Panier</span>
+                            <span class="cart-label" data-i18n="nav.cart">Panier</span>
                             <span id="navCartCount" class="count-badge hidden">0</span>
                             <span id="navCartTotal" class="cart-label">0 Dh</span>
                         </button>
@@ -424,7 +442,7 @@
                     </button>
                 </header>
                 <div class="sheet-scroll form-fields">
-                    <p class="help-text">Partagez votre position GPS en 1 clic ou saisissez votre adresse exacte ci-dessous.</p>
+                    <p class="help-text">Partagez votre position GPS en 1 clic ou saisissez votre adresse ci-dessous. Le restaurant confirmera avec vous par téléphone.</p>
                     <button type="button" id="btnGpsLocation" class="secondary-button full-width" onclick="detectGpsLocation()" style="margin-bottom: 12px; gap: 8px;">
                         <i data-feather="map-pin" aria-hidden="true"></i>
                         <span id="gpsButtonLabel">📍 Utiliser ma position GPS</span>
@@ -433,7 +451,7 @@
                     <div class="field">
                         <label for="customerAddress">
                             Adresse exacte de livraison
-                            <span>pour le livreur</span>
+                            <span>confirmée par téléphone</span>
                         </label>
                         <textarea id="customerAddress" name="address" rows="3" placeholder="Quartier, rue, N° d'immeuble, résidence, étage, repère…"></textarea>
                     </div>
@@ -523,6 +541,7 @@
         import { buildCustomizationSteps, choiceRules, selectionIssue, customizationPrice, cartSelections, cartChoiceSelections, optionSnapshot, moneyCents } from './assets/customization.js';
         import {promotionState,orderingAvailable,safeURL} from './assets/operations-model.js';
         import { setupCarousel } from './assets/carousels.js';
+        import { i18n, t } from './assets/i18n.js';
 
         // --- CONFIG & CONSTANTS ---
         const WHATSAPP_NUMBERS = {
@@ -698,6 +717,11 @@
 
         // --- APPLICATION INITIALIZATION ---
         async function init() {
+            i18n.init();
+            window.addEventListener('bigtac:langchange', () => {
+                applyLiveCatalog();
+                updateCartUI();
+            });
             updateCartUI();
 
             // Real-time store configuration
@@ -754,7 +778,7 @@
             allCategories=categoryRows.filter(row=>row.isVisible!==false).map(row=>row.name);
             categoryImages=Object.fromEntries(categoryRows.map(row=>[row.name,row.image||'']));
             const controls=document.getElementById('categoryFilters');
-            controls.innerHTML='<button type="button" onclick="filterSection(\'all\')" class="filter-btn-pill active" data-cat="all" aria-pressed="true">Tout voir</button>'+allCategories.map(name=>`<button type="button" onclick="filterSection(decodeURIComponent('${encodeURIComponent(name).replace(/'/g,'%27')}'))" class="filter-btn-pill" data-cat="${escapeCardText(name)}" aria-pressed="false">${escapeCardText(name)}</button>`).join('');
+            controls.innerHTML=`<button type="button" onclick="filterSection('all')" class="filter-btn-pill active" data-cat="all" aria-pressed="true">${t('filter.all', 'Tout voir')}</button>`+allCategories.map(name=>`<button type="button" onclick="filterSection(decodeURIComponent('${encodeURIComponent(name).replace(/'/g,'%27')}'))" class="filter-btn-pill" data-cat="${escapeCardText(name)}" aria-pressed="false">${escapeCardText(name)}</button>`).join('');
             if(activeCategory!=='all'&&!allCategories.includes(activeCategory))activeCategory='all';
             renderMenuSections(allItems);renderPopular(allItems);applyMenuFilters();
             document.getElementById('menuContent').setAttribute('aria-busy','false');

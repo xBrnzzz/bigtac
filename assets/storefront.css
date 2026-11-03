@@ -2154,18 +2154,23 @@ body.has-tracker {
         font-size:14px;
         gap:6px
     }
-    .store-brand span {
-        font-size:19px
+    .store-header__inner {
+        flex-wrap: nowrap;
+    }
+    .store-brand {
+        min-width: 0;
+        flex-shrink: 1;
     }
     .store-brand small {
-        font-size:11px
-    }
-    .store-brand img {
-        width:38px;
-        height:38px
+        display: none;
     }
     .store-actions {
-        gap:5px
+        gap:4px;
+        flex-shrink: 0;
+    }
+    .lang-toggle-btn {
+        padding: 0 6px;
+        gap: 3px;
     }
     .header-cart {
         padding:9px 11px;
@@ -2336,3 +2341,107 @@ body.has-tracker {
 /* Live catalog stock feedback; ordering layout and visual direction are retained. */
 .product-card__choose:disabled { opacity:.65; cursor:not-allowed; }
 .cart-menu-warning { margin:8px 20px; padding:12px; border-radius:12px; background:#fff4df; color:#7a440c; font-size:14px; }
+
+/* Multi-Language Switcher (FR / EN / AR) */
+.lang-selector {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+.lang-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: var(--app-soft);
+    color: var(--app-ink);
+    border: 1px solid var(--app-line);
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.lang-toggle-btn:hover {
+    background: var(--app-line);
+    border-color: var(--app-accent);
+}
+.lang-globe {
+    font-size: 14px;
+    line-height: 1;
+}
+.lang-current {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+}
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 140px;
+    background: var(--app-card);
+    border: 1px solid var(--app-line);
+    border-radius: 14px;
+    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.22);
+    padding: 6px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.lang-menu.hidden {
+    display: none !important;
+}
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: var(--app-ink);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    transition: background 0.15s ease;
+}
+.lang-option:hover {
+    background: var(--app-tint);
+    color: var(--app-accent);
+}
+.lang-option.active {
+    background: var(--app-tint);
+    color: var(--app-accent);
+    font-weight: 700;
+}
+.lang-flag {
+    font-size: 15px;
+}
+
+/* RTL Layout Enhancements for Arabic */
+[dir="rtl"] {
+    text-align: right;
+    font-family: 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+[dir="rtl"] .store-nav {
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .lang-menu {
+    right: auto;
+    left: 0;
+}
+[dir="rtl"] .lang-option {
+    text-align: right;
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .restaurant-services {
+    flex-direction: row-reverse;
+}

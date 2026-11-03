@@ -368,3 +368,93 @@ html,body { margin:0; height:100%; }
 }
 @media(max-width:389px) { #admin-store-status { display:none; } }
 @media(prefers-reduced-motion:reduce) { .admin-body *, .admin-body *::before, .admin-body *::after { scroll-behavior:auto!important; animation:none!important; transition:none!important; } #views-container .order-card:hover,.admin-attention-row:hover,.admin-quick-actions .admin-button:hover,.admin-next-order:hover { transform:none; } }
+
+/* Admin & Driver Language Switcher */
+.lang-selector {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+.lang-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 10px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.lang-toggle-btn:hover {
+    background: #e2e8f0;
+    border-color: #ea580c;
+}
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 135px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+    padding: 4px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.lang-menu.hidden {
+    display: none !important;
+}
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: #1e293b;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    transition: background 0.15s ease;
+}
+.lang-option:hover {
+    background: #fff7ed;
+    color: #ea580c;
+}
+.lang-option.active {
+    background: #fff7ed;
+    color: #ea580c;
+    font-weight: 700;
+}
+.lang-flag {
+    font-size: 14px;
+}
+
+/* RTL for Admin and Driver */
+[dir="rtl"] .admin-sidebar {
+    border-right: none;
+    border-left: 1px solid var(--admin-line);
+}
+[dir="rtl"] .admin-top-actions {
+    flex-direction: row-reverse;
+}
+[dir="rtl"] .lang-menu {
+    right: auto;
+    left: 0;
+}
+[dir="rtl"] .lang-option {
+    text-align: right;
+    flex-direction: row-reverse;
+}
+

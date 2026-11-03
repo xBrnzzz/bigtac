@@ -9,7 +9,8 @@
     "test:storefront": "node tests/storefront.mjs",
     "test:carousels": "node tests/carousels.mjs",
     "test:customization": "node tests/customization-navigation.mjs",
-    "test:operations": "node tests/operations-model.mjs && node tests/operations-service.mjs && node tests/operations.mjs && node tests/operations-responsive.mjs"
+    "test:operations": "node tests/operations-model.mjs && node tests/operations-service.mjs && node tests/operations.mjs && node tests/operations-responsive.mjs",
+    "test:i18n": "node tests/i18n.mjs"
   },
   "dependencies": {
     "playwright": "^1.64.1"
