@@ -54,16 +54,16 @@ export function choiceRules(step) {
     return { options, min, max, radio,invalid };
 }
 
-export function selectionIssue(step, selections = []) {
-    if(!Array.isArray(selections))return 'Les groupes de choix ont changé. Composez ce produit à nouveau.';
+export function selectionIssue(step, selections = [], translate = (_key, fallback) => fallback) {
+    if(!Array.isArray(selections))return translate('choice.changed', 'Les groupes de choix ont changé. Composez ce produit à nouveau.');
     const { options, min, max,invalid } = choiceRules(step);
-    if(invalid)return 'Ce groupe est mal configuré. Contactez le restaurant.';
-    if (min > Math.min(options.length, max)) return 'Ce choix est indisponible. Choisissez un autre plat ou contactez le restaurant.';
-    if (selections.length < min) return `Choisissez ${min === 1 ? 'au moins une option' : `au moins ${min} options`} pour continuer.`;
-    if (selections.length > max) return `Choisissez au maximum ${max} option${max > 1 ? 's' : ''}.`;
+    if(invalid)return translate('choice.invalid', 'Ce groupe est mal configuré. Contactez le restaurant.');
+    if (min > Math.min(options.length, max)) return translate('choice.unavailable', 'Ce choix est indisponible. Choisissez un autre plat ou contactez le restaurant.');
+    if (selections.length < min) return translate(min===1?'choice.minimum_one':'choice.minimum', `Choisissez ${min === 1 ? 'au moins une option' : `au moins ${min} options`} pour continuer.`, {min});
+    if (selections.length > max) return translate(max===1?'choice.maximum_one':'choice.maximum', `Choisissez au maximum ${max} option${max > 1 ? 's' : ''}.`, {max});
     const indexes=selections.map(selection=>options.findIndex(option=>optionMatches(option,selection)));
-    if(indexes.some(index=>index<0))return 'Une option a changé ou n’est plus disponible. Recommencez ce choix.';
-    if(new Set(indexes).size!==indexes.length)return 'Choisissez chaque option une seule fois.';
+    if(indexes.some(index=>index<0))return translate('choice.option_changed', 'Une option a changé ou n’est plus disponible. Recommencez ce choix.');
+    if(new Set(indexes).size!==indexes.length)return translate('choice.duplicate', 'Choisissez chaque option une seule fois.');
     return '';
 }
 

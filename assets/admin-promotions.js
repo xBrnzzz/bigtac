@@ -9,7 +9,12 @@ export function createPromotions({session,toast,upload,settings}){
     const service=operationsService(session),$=id=>document.getElementById(id);let stop=null,timer=null,rows=[],expected=null,groups=[],extras=[],busy=false,blocked=true,epoch=0;
     const feedback=document.createElement('p');feedback.id='promo-feedback';feedback.setAttribute('role','status');$('promotions-list').before(feedback);
     const schedule=document.createElement('div');schedule.className='space-y-3';schedule.innerHTML='<p>Dates facultatives · fuseau du restaurant</p><label>Début<input id="promo-start" type="datetime-local" class="w-full p-3 border rounded-xl"></label><label>Fin<input id="promo-end" type="datetime-local" class="w-full p-3 border rounded-xl"></label><p id="promo-edit-error" role="alert"></p>';$('promo-form').append(schedule);
-    const explain=document.createElement('p');explain.textContent='Remises en pourcentage/montant : modèles locaux uniquement, non activés. Validation serveur des prix requise.';$('promotions-list').after(explain);
+    const explain=document.createElement('p');explain.textContent='Les offres utilisent un prix fixe. Les réductions en pourcentage ne sont pas disponibles.';$('promotions-list').after(explain);
+    let baseline=null;
+    const editorValue=()=>JSON.stringify([...$('promo-form').querySelectorAll('input,select,textarea')].map(field=>field.type==='file'?[...field.files].map(file=>[file.name,file.size,file.lastModified]):field.type==='checkbox'?field.checked:field.value));
+    const isDirty=()=>!$('promo-editor').classList.contains('hidden')&&baseline!==null&&editorValue()!==baseline;
+    const canLeave=()=>!busy&&(!isDirty()||confirm('Quitter sans enregistrer les modifications ?'));
+    window.addEventListener('beforeunload',event=>{if(isDirty()){event.preventDefault();event.returnValue='';}});
     const allowed=()=>['admin','manager'].includes(session()?.role);
     const zone=()=>validZone(settings()?.reportingTimezone)?settings().reportingTimezone:'Africa/Casablanca';
     function render(){
@@ -28,11 +33,13 @@ export function createPromotions({session,toast,upload,settings}){
     window.addPromoSupplementRow=()=>{extras.push({name:'',price:0});draw();};
     async function open(id){
         if(!allowed()||blocked){toast('Rechargez les offres avant de modifier.','error');return;}
+        if(!canLeave())return;
         const version=++epoch;$('promo-form').reset();expected=null;groups=[];extras=[];draw();$('edit-promo-id').value=id||'';$('promo-edit-error').textContent='';$('promo-image-preview').replaceChildren();$('promo-editor').classList.remove('hidden');$('promo-editor').lastElementChild.classList.remove('translate-x-full');$('btn-save-promo').disabled=!!id;
+        baseline=editorValue();
         if(id)try{const snap=await getDoc(doc(db,'promotions',id));if(version!==epoch||!allowed())return;if(!snap.exists()||snap.metadata?.fromCache)throw Error('Offre introuvable ou non confirmée.');expected={...snap.data(),id};for(const [field,key]of [['promo-name','name'],['promo-price','price'],['promo-desc','description'],['promo-image-url','imageUrl']])$(field).value=expected[key]??'';$('promo-visible').checked=expected.isVisible!==false;$('promo-start').value=localInput(expected.startsAt,zone());$('promo-end').value=localInput(expected.endsAt,zone());groups=copy(expected.mandatoryChoices||[]);extras=copy(expected.supplements||[]);if(expected.imageUrl){const image=document.createElement('img');image.src=expected.imageUrl;image.alt='';image.className='w-full h-full object-cover';$('promo-image-preview').replaceChildren(image);}draw();}catch(error){$('promo-edit-error').textContent=error.message;return;}
-        if(version===epoch)$('btn-save-promo').disabled=false;
+        if(version===epoch){baseline=editorValue();$('promo-editor-title').textContent=id?'Modifier la promotion':'Nouvelle Promo';$('btn-save-promo').disabled=false;}
     }
-    function close(force=false){if(busy&&!force)return;++epoch;$('promo-editor').classList.add('hidden');expected=null;}
+    function close(force=false){if(!force&&!canLeave())return false;++epoch;$('promo-editor').classList.add('hidden');expected=null;baseline=null;return true;}
     async function save(){
         if(busy||blocked||!allowed())return;busy=true;$('btn-save-promo').disabled=true;const version=epoch,actor=session();
         try{
@@ -40,10 +47,10 @@ export function createPromotions({session,toast,upload,settings}){
             if(version!==epoch||session()?.uid!==actor.uid||session()?.epoch!==actor.epoch)throw Error('Votre session a changé.');
             const patch={name:$('promo-name').value.trim(),price:$('promo-price').value,description:$('promo-desc').value.trim(),imageUrl,isVisible:$('promo-visible').checked,mandatoryChoices:copy(groups),supplements:copy(extras),startsAt:localInstant($('promo-start').value,zone()),endsAt:localInstant($('promo-end').value,zone())};
             const issues=offerIssues(patch);if(issues.length)throw Error(issues.join(' '));patch.price=Number(patch.price);patch.mandatoryChoices.forEach(g=>{g.min=Number(g.min);g.max=Number(g.max);g.options.forEach(o=>o.price=Number(o.price));});patch.supplements.forEach(o=>o.price=Number(o.price));
-            await service.offer({id:expected?.id||newId(),patch,expected});toast('Offre enregistrée.');busy=false;close();
+            await service.offer({id:expected?.id||newId(),patch,expected});toast('Offre enregistrée.');busy=false;close(true);
         }catch(error){$('promo-edit-error').textContent=error.message;toast(error.message,'error');}finally{busy=false;$('btn-save-promo').disabled=false;render();}
     }
     $('promotions-list').addEventListener('click',async event=>{const b=event.target.closest('[data-promo-action]');if(!b||busy||blocked||!allowed())return;const p=rows.find(row=>row.id===b.dataset.id);if(!p)return;if(b.dataset.promoAction==='edit')return open(p.id);if(b.dataset.promoAction==='delete'&&!confirm('Supprimer cette offre ? Les commandes passées restent inchangées.'))return;busy=true;render();try{if(b.dataset.promoAction==='duplicate'){const patch=copy(p);delete patch.id;patch.name+=' (copie)';patch.isVisible=false;await service.offer({id:newId(),patch});}else await service.offer({id:p.id,expected:p,remove:b.dataset.promoAction==='delete',patch:{isVisible:p.isVisible===false}});toast('Offre mise à jour.');}catch(error){toast(error.message,'error');}finally{busy=false;render();}});
     function start(){if(stop)return;blocked=true;feedback.textContent='Chargement…';stop=onSnapshot(query(collection(db,'promotions'),limit(301)),{includeMetadataChanges:true},snap=>{blocked=!!(snap.metadata?.fromCache||snap.metadata?.hasPendingWrites)||snap.docs.length>300;rows=snap.docs.slice(0,300).map(d=>({...d.data(),id:d.id}));feedback.textContent=blocked?'Offres non confirmées ou liste partielle. Édition indisponible.':'Offres synchronisées.';render();},()=>{blocked=true;feedback.innerHTML='Lecture impossible. <button class="admin-button" id="promo-retry">Réessayer</button>';$('promo-retry').onclick=()=>{stop?.();stop=null;start();};render();});timer=setInterval(render,30000);}
-    return {start,stop(){++epoch;stop?.();stop=null;clearInterval(timer);blocked=true;close(true);},open,save,close};
+    return {start,stop(){++epoch;stop?.();stop=null;clearInterval(timer);blocked=true;close(true);},open,save,close,canLeave};
 }

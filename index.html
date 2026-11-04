@@ -144,7 +144,7 @@
                                 <div class="loading-state" role="status">
                                     <span class="loading-dot">
                                     </span>
-                                    La carte arrive…
+                                    <span data-i18n="menu.loading">La carte arrive…</span>
                                 </div>
                                 <div class="store-product-grid skeleton-grid" aria-hidden="true">
                                     <div class="skeleton-card">
@@ -258,7 +258,7 @@
             <section class="modal-panel product-sheet" tabindex="-1">
                 <div id="modalHeader" class="product-sheet__image">
                     <img id="modalItemImage" src="assets/snack.png" alt="" width="640" height="400" onerror="this.onerror=null;this.src='assets/snack.png'">
-                    <button type="button" class="icon-button modal-close" onclick="closeAddItemModal()" aria-label="Fermer le plat">
+                    <button type="button" class="icon-button modal-close" onclick="closeAddItemModal()" aria-label="Fermer le plat" data-i18n-aria="modal.close_item">
                         <i data-feather="x" aria-hidden="true">
                         </i>
                     </button>
@@ -279,9 +279,9 @@
                     <p id="customizationHint" class="customization-hint" aria-live="polite" tabindex="-1" data-i18n="modal.default_hint">Personnalisez votre repas.</p>
                     <div class="product-action-row">
                         <div class="quantity-control">
-                            <button type="button" id="modalQtyMinus" onclick="updateModalQty(-1)" aria-label="Diminuer la quantité">−</button>
+                            <button type="button" id="modalQtyMinus" onclick="updateModalQty(-1)" aria-label="Diminuer la quantité" data-i18n-aria="modal.decrease">−</button>
                             <output id="modalQtyDisplay" aria-label="Quantité" data-i18n-aria="modal.quantity">1</output>
-                            <button type="button" onclick="updateModalQty(1)" aria-label="Augmenter la quantité">+</button>
+                            <button type="button" onclick="updateModalQty(1)" aria-label="Augmenter la quantité" data-i18n-aria="modal.increase">+</button>
                         </div>
                         <button type="button" class="primary-button add-to-cart-button" id="btnModalAddToCart" onclick="addToCartFromModal()">
                             <span id="addToCartLabel" data-i18n="modal.add_to_cart">Ajouter au panier</span>
@@ -339,7 +339,7 @@
                 </header>
                 <form class="checkout-form" onsubmit="event.preventDefault();nextCheckoutStep()" novalidate>
                     <div class="sheet-scroll form-fields">
-                        <p class="help-text" data-i18n="checkout.help">Un nom et un numéro pour vous joindre au sujet de la commande.</p>
+                        <p class="help-text" data-i18n="checkout.sub">Un nom et un numéro pour vous joindre au sujet de la commande.</p>
                         <div class="field">
                             <label for="customerName">
                                 <span data-i18n="checkout.name_label">Votre nom</span>
@@ -362,7 +362,7 @@
                                 <span data-i18n="modal.optional">facultatif</span>
                             </label>
                             <textarea id="customerNote" name="note" rows="3" placeholder="Sans oignon, adresse précise, sonnette…" data-i18n-placeholder="checkout.note_placeholder"></textarea>
-                            <p class="help-text" data-i18n="checkout.allergy_notice">Pour une allergie, contactez aussi le restaurant.</p>
+                            <p class="help-text" data-i18n="checkout.note_allergy">Pour une allergie, contactez aussi le restaurant.</p>
                         </div>
                     </div>
                     <footer class="sheet-footer">
@@ -371,7 +371,7 @@
                             <i data-feather="arrow-right" aria-hidden="true">
                             </i>
                         </button>
-                        <button class="text-button full-width" type="button" onclick="switchModal('nameModal','cartModal')" data-i18n="checkout.back_cart">Retour au panier</button>
+                        <button class="text-button full-width" type="button" onclick="switchModal('nameModal','cartModal')" data-i18n="checkout.btn_back_cart">Retour au panier</button>
                     </footer>
                 </form>
             </section>
@@ -511,7 +511,7 @@
                         </div>
                     </section>
                     <div id="summaryDeliveryFee" class="total-row hidden">
-                        <span data-i18n="summary.delivery_fee">Livraison</span>
+                        <span data-i18n="summary.delivery">Livraison</span>
                         <strong id="deliveryPriceDisplay">0 Dh</strong>
                     </div>
                     <p id="orderSubmissionError" class="field-error hidden" role="alert">
@@ -522,7 +522,7 @@
                         <span data-i18n="summary.total_to_pay">Total à payer</span>
                         <strong id="summaryTotal">0 Dh</strong>
                     </div>
-                    <p id="confirmationHint" class="help-text" data-i18n="summary.restaurant_confirm">Le restaurant confirmera votre commande.</p>
+                    <p id="confirmationHint" class="help-text" data-i18n="summary.hint">Le restaurant confirmera votre commande.</p>
                     <button class="primary-button full-width" id="btnFinalize" type="button" onclick="finalizeOrder()">
                         <span data-i18n="summary.finalize">Confirmer la commande</span>
                         <i data-feather="check-circle" aria-hidden="true">
@@ -626,8 +626,8 @@
         }
         applyTheme();
 
-        const money = value => `${new Intl.NumberFormat('fr-MA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value) || 0)} Dh`;
-        const optionPrice = value => Number(value) === 0 ? 'Compris' : `${Number(value) > 0 ? '+' : '−'}${money(Math.abs(Number(value)))}`;
+        const money = value => `${new Intl.NumberFormat({fr:'fr-MA',en:'en-GB',ar:'ar-MA'}[i18n.getLang()], { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value) || 0)} Dh`;
+        const optionPrice = value => Number(value) === 0 ? t('modal.included') : `${Number(value) > 0 ? '+' : '−'}${money(Math.abs(Number(value)))}`;
         const refreshIcons = () => { if (window.feather) feather.replace(); };
         let toastTimer;
         window.showToast = (message, type = 'success', action = null) => {
@@ -721,6 +721,10 @@
             window.addEventListener('bigtac:langchange', () => {
                 applyLiveCatalog();
                 updateCartUI();
+                applyRestaurantConfig();
+                if(currentItem&&!document.getElementById('addItemModal').classList.contains('hidden')){renderSimpleView();recalcModalDisplayTotal();}
+                if(!document.getElementById('summaryModal').classList.contains('hidden'))populateSummary(checkoutData.type,false);
+                initOrderTracker();
             });
             updateCartUI();
 
@@ -732,12 +736,12 @@
                     const banner = document.getElementById('closedBanner');
                     if (banner) banner.classList.toggle('hidden', appConfig.isOpen !== false);
                     const status = document.getElementById('storeStatus');
-                    status.textContent = appConfig.isOpen === false ? 'Fermé pour le moment' : 'Commandes ouvertes';
+                    status.textContent = appConfig.isOpen === false ? t('hero.status_closed') : t('hero.status_open');
                     status.classList.toggle('is-open', appConfig.isOpen !== false);
                     status.classList.toggle('is-closed', appConfig.isOpen === false);
                     applyRestaurantConfig();updateCartUI();
                 }else{configReady=false;applyRestaurantConfig();updateCartUI();}
-            }, () => { configReady=false;document.getElementById('storeStatus').textContent = 'Horaires à confirmer';updateCartUI(); });
+            }, () => { configReady=false;document.getElementById('storeStatus').textContent = t('hero.unconfirmed');updateCartUI(); });
 
             // Fetch categories, items, and promotions concurrently
             try {
@@ -759,14 +763,14 @@
         const profileDefaults={description:document.querySelector('.restaurant-intro__copy>p').textContent,logoUrl:document.querySelector('.store-brand img').getAttribute('src'),address:document.querySelector('#locations>div>p').textContent,map:document.querySelector('#locations>div>a').href,hours:document.getElementById('restaurant-hours').textContent,instagram:document.querySelector('.app-footer>a:last-child').href};
         function storeAvailable(){return configReady&&modes.some(mode=>orderingAvailable(appConfig,mode));}
         function applyRestaurantConfig(){
-            const open=storeAvailable(),status=document.getElementById('storeStatus');status.textContent=open?'Commandes ouvertes':'Commandes indisponibles';status.classList.toggle('is-open',open);status.classList.toggle('is-closed',!open);document.getElementById('closedBanner').classList.toggle('hidden',open);
+            const open=storeAvailable(),status=document.getElementById('storeStatus');status.textContent=open?t('hero.status_open'):t('hero.unavailable');status.classList.toggle('is-open',open);status.classList.toggle('is-closed',!open);document.getElementById('closedBanner').classList.toggle('hidden',open);
             document.querySelectorAll('.service-choice').forEach((button,index)=>{button.disabled=!configReady||!orderingAvailable(appConfig,modes[index]);button.setAttribute('aria-disabled',String(button.disabled));});
-            if(appConfig.restaurantName){const brand=document.querySelector('.store-brand>span');brand.firstChild.textContent=appConfig.restaurantName;document.querySelector('.store-brand').setAttribute('aria-label',appConfig.restaurantName+', accueil');document.querySelector('#store-title span').textContent=appConfig.restaurantName+' !';document.querySelector('.app-footer>a').textContent=appConfig.restaurantName;}
-            document.querySelector('.restaurant-intro__copy>p').textContent=appConfig.description||profileDefaults.description;
+            if(appConfig.restaurantName){const brand=document.querySelector('.store-brand>span');brand.firstChild.textContent=appConfig.restaurantName;document.querySelector('.store-brand').setAttribute('aria-label',appConfig.restaurantName+', '+t('common.home'));document.querySelector('#store-title span').textContent=appConfig.restaurantName+' !';document.querySelector('.app-footer>a').textContent=appConfig.restaurantName;}
+            document.querySelector('.restaurant-intro__copy>p').textContent=appConfig.description||t('hero.subtitle',profileDefaults.description);
             document.querySelector('.store-brand img').src=appConfig.logoUrl&&safeURL(appConfig.logoUrl)?appConfig.logoUrl:profileDefaults.logoUrl;
             document.querySelector('#locations>div>p').textContent=appConfig.address||profileDefaults.address;document.querySelector('#locations>div>a').href=appConfig.address?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(appConfig.address):profileDefaults.map;
             document.querySelector('.app-footer>a:last-child').href=appConfig.instagramUrl&&safeURL(appConfig.instagramUrl)?appConfig.instagramUrl:profileDefaults.instagram;
-            if(Array.isArray(appConfig.openingHours)&&appConfig.openingHours.length===7)document.getElementById('restaurant-hours').textContent=appConfig.openingHours.map((h,i)=>['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'][i]+': '+(h.closed?'fermé':h.start+'–'+h.end)).join(' · ');else document.getElementById('restaurant-hours').textContent=profileDefaults.hours;
+            if(Array.isArray(appConfig.openingHours)&&appConfig.openingHours.length===7)document.getElementById('restaurant-hours').textContent=appConfig.openingHours.map((h,i)=>new Intl.DateTimeFormat(i18n.getLang(),{weekday:'short',timeZone:'UTC'}).format(new Date(Date.UTC(2026,0,5+i)))+': '+(h.closed?t('location.closed'):h.start+'–'+h.end)).join(' · ');else document.getElementById('restaurant-hours').textContent=t('location.hours_val',profileDefaults.hours);
             document.getElementById('btnFinalize').disabled=orderSubmitting||!storeAvailable()||!!checkoutData.type&&!orderingAvailable(appConfig,checkoutData.type);
         }
 
@@ -784,14 +788,14 @@
             document.getElementById('menuContent').setAttribute('aria-busy','false');
             if(currentItem&&!currentItem.isPromo&&!document.getElementById('addItemModal').classList.contains('hidden')) {
                 const fresh=allItems.find(item=>item.id===currentItem.id);
-                if(!fresh||!menuAvailable(fresh)||menuFingerprint(fresh)!==menuFingerprint(currentItem)) {closeAddItemModal();showToast('Ce produit vient de changer. Ouvrez-le à nouveau pour vérifier vos choix.','error');}
+                if(!fresh||!menuAvailable(fresh)||menuFingerprint(fresh)!==menuFingerprint(currentItem)) {closeAddItemModal();showToast(t('menu.product_changed'),'error');}
             }
             updateCartUI();
         }
         function catalogError() {
             stockReady=false;
             document.getElementById('menuContent').setAttribute('aria-busy','false');
-            document.getElementById('menuContent').innerHTML='<div class="empty-state" role="alert"><h3>La carte se fait attendre</h3><p>Vérifiez votre connexion, puis réessayez.</p><button type="button" class="secondary-button" onclick="retryMenu()">Réessayer</button></div>';
+            document.getElementById('menuContent').innerHTML=`<div class="empty-state" role="alert"><h3 data-i18n="menu.error_title">${t('menu.error_title')}</h3><p data-i18n="menu.error_help">${t('menu.error_help')}</p><button type="button" class="secondary-button" onclick="retryMenu()" data-i18n="common.retry">${t('common.retry')}</button></div>`;
             updateCartUI();
         }
         function fetchCategories() {
@@ -823,7 +827,7 @@
             container.innerHTML=allPromotions.map(p=>createCardHTML(p,'h3','offer')).join('');setupCarousel(container);
             if(currentItem?.isPromo&&!document.getElementById('addItemModal').classList.contains('hidden')){
                 const fresh=allPromotions.find(p=>p.id===currentItem.id);
-                if(!fresh||menuFingerprint(fresh)!==menuFingerprint(currentItem)){closeAddItemModal();showToast('Cette offre a changé ou n’est plus disponible.','error');}
+                if(!fresh||menuFingerprint(fresh)!==menuFingerprint(currentItem)){closeAddItemModal();showToast(t('menu.offer_changed'),'error');}
             }
             applyLiveCatalog();
         }
@@ -882,7 +886,7 @@
             }
 
             if (!hasContent) {
-                container.innerHTML = '<div class="empty-state"><i data-feather="coffee" aria-hidden="true"></i><h3>La carte revient bientôt</h3><p>Le restaurant prépare sa carte. Réessayez dans un instant.</p><button class="secondary-button" type="button" onclick="retryMenu()">Actualiser la carte</button></div>';
+                container.innerHTML = `<div class="empty-state"><i data-feather="coffee" aria-hidden="true"></i><h3 data-i18n="menu.empty_title">${t('menu.empty_title')}</h3><p data-i18n="menu.empty_help">${t('menu.empty_help')}</p><button class="secondary-button" type="button" onclick="retryMenu()" data-i18n="menu.refresh">${t('menu.refresh')}</button></div>`;
             }
 
             if (window.feather) feather.replace();
@@ -909,7 +913,7 @@
                     <div class="product-card__body">
                         ${item.isPromo && !featured ? `<span class="product-badge">${t('badge.offer', 'Offre')}</span>` : ''}<${heading}>${name}</${heading}>
                         ${variant === 'popular' && item.category ? `<p class="featured-category">${escapeCardText(item.category)}</p>` : ''}
-                        <p class="product-card__description">${escapeCardText(item.description || 'Préparé à la commande.')}</p>
+                        <p class="product-card__description">${escapeCardText(item.description || t('modal.prepared'))}</p>
                         <div class="product-card__footer">
                             <div class="product-card__price"><small>${t('modal.from_price', 'À partir de')}</small><strong>${money(item.price)}</strong></div>
                             <button type="button" class="product-card__choose" ${menuAvailable(item)?'':'disabled'} onclick="openItemModal(decodeURIComponent('${itemId}'), ${item.isPromo === true})" aria-label="${t('modal.choose', 'Choisir')} ${name}">
@@ -960,7 +964,7 @@
                 button.setAttribute('aria-pressed', String(active));
             });
             document.getElementById('noSearchResults').classList.toggle('hidden', count > 0 || (!term && activeCategory === 'all'));
-            document.getElementById('searchResultsHint').textContent = term ? `${count} plat${count > 1 ? 's' : ''} trouvé${count > 1 ? 's' : ''}` : '';
+            document.getElementById('searchResultsHint').textContent = term ? t(count===1?'search.result_one':'search.results', '', {count}) : '';
             clearBtn.classList.toggle('hidden', !searchInput.value);
         }
         window.filterSection = category => {
@@ -1002,7 +1006,7 @@
             const incomplete = wizardSteps.findIndex((step, stepIndex) => stepIndex <= index && selectionIssue(step, wizardData[stepIndex]));
             if (incomplete >= 0) {
                 if (reveal) {
-                    showChoiceError(incomplete, selectionIssue(wizardSteps[incomplete], wizardData[incomplete]));
+                    showChoiceError(incomplete, selectionIssue(wizardSteps[incomplete], wizardData[incomplete], t));
                     scrollCustomizationGroup(incomplete, focus);
                 }
                 return;
@@ -1021,16 +1025,16 @@
         window.openItemModal = (id, isPromo = false) => {
             cancelCustomizationAdvance();
             currentItem = (isPromo ? allPromotions : allItems).find(item => item.id === id);
-            if (!currentItem || !menuAvailable(currentItem)) return showToast('Ce produit est en rupture de stock.','error');
-            try{moneyCents(currentItem.price);[...(currentItem.mandatoryChoices||[]).flatMap(group=>group.options||[]),...(currentItem.supplements||[])].filter(menuAvailable).forEach(option=>moneyCents(option.price||0));}catch{return showToast('Le prix de cette configuration doit être vérifié par le restaurant.','error');}
+            if (!currentItem || !menuAvailable(currentItem)) return showToast(t('menu.soldout'),'error');
+            try{moneyCents(currentItem.price);[...(currentItem.mandatoryChoices||[]).flatMap(group=>group.options||[]),...(currentItem.supplements||[])].filter(menuAvailable).forEach(option=>moneyCents(option.price||0));}catch{return showToast(t('menu.price_check'),'error');}
             modalQty = 1;
             wizardData = {};
             Object.keys(selectionErrors).forEach(key => delete selectionErrors[key]);
             wizardSteps = buildCustomizationSteps(currentItem);
             document.getElementById('modalQtyDisplay').textContent = '1';
             document.getElementById('modalItemName').textContent = currentItem.name;
-            document.getElementById('modalItemBasePrice').textContent = `Dès ${money(currentItem.price)}`;
-            document.getElementById('modalItemDesc').textContent = currentItem.description || 'Personnalisez votre repas à votre goût.';
+            document.getElementById('modalItemBasePrice').textContent = t('modal.starting', '', {price:money(currentItem.price)});
+            document.getElementById('modalItemDesc').textContent = currentItem.description || t('modal.personalize');
             const image = document.getElementById('modalItemImage');
             image.src = currentItem.imageUrl || categoryImages[currentItem.category] || 'assets/snack.png';
             image.alt = currentItem.name;
@@ -1045,17 +1049,17 @@
             document.getElementById('wizardContainer').innerHTML = wizardSteps.map((step, index) => {
                 const { options, min, max, radio } = choiceRules(step);
                 const selected = wizardData[index] || [];
-                const instruction = min === max && min > 0 ? `Choisissez ${min} option${min > 1 ? 's' : ''}`
-                    : min > 0 ? `Choisissez au moins ${min} option${min > 1 ? 's' : ''} · ${max} maximum`
-                    : `À votre goût · ${max} option${max > 1 ? 's' : ''} maximum`;
+                const instruction = min === max && min > 0 ? t(min===1?'modal.choose_exact_one':'modal.choose_exact', '', {count:min})
+                    : min > 0 ? t(min===1?'modal.choose_range_one':'modal.choose_range', '', {min,max})
+                    : t(max===1?'modal.choose_optional_one':'modal.choose_optional', '', {max});
                 return `<fieldset class="option-group" id="choice-group-${index}" tabindex="-1" aria-describedby="choice-hint-${index} choice-error-${index}">
-                    <legend><span>${escapeCardText(step.title)}</span><span class="required-label">${min > 0 ? t('modal.required', 'Obligatoire') : t('modal.optional', 'Facultatif')}</span></legend>
-                    <p id="choice-hint-${index}" class="option-hint"><span>${instruction}</span><strong id="choice-count-${index}">${selected.length} / ${max}</strong></p>
+                    <legend><span>${escapeCardText(step.type==='supplements'?t('modal.supplements_title'):step.title)}</span><span class="required-label">${min > 0 ? t('modal.required', 'Obligatoire') : t('modal.optional', 'Facultatif')}</span></legend>
+                    <p id="choice-hint-${index}" class="option-hint"><span>${instruction}</span><strong id="choice-count-${index}" dir="ltr">${selected.length} / ${max}</strong></p>
                     <div class="option-list">${options.map((option, optionIndex) => {
                         const checked = selected.some(selection => selection.optionIndex === optionIndex);
                         return `<label class="option-row" for="choice-${index}-${optionIndex}">
                             <input id="choice-${index}-${optionIndex}" type="${radio && min > 0 ? 'radio' : 'checkbox'}" name="choice_${index}" value="${optionIndex}" ${checked ? 'checked' : ''} onchange="selectCustomizationOption(${index}, ${optionIndex}, this)" aria-describedby="choice-error-${index}">
-                            <span class="option-row__name">${escapeCardText(option.name)}</span><span class="option-row__price">${optionPrice(option.price || 0)}</span>
+                            <span class="option-row__name">${escapeCardText(option.name)}</span><span class="option-row__price" dir="ltr">${optionPrice(option.price || 0)}</span>
                         </label>`;
                     }).join('')}</div><p id="choice-error-${index}" class="option-error hidden" role="alert"></p>
                 </fieldset>`;
@@ -1088,7 +1092,7 @@
             else next = selections.filter(value => value.optionIndex !== optionIndex);
             if (next.length > max) {
                 input.checked = false;
-                selectionErrors[index] = `Vous pouvez choisir ${max} option${max > 1 ? 's' : ''} au maximum. Retirez-en une pour changer.`;
+                selectionErrors[index] = t(max===1?'modal.maximum_error_one':'modal.maximum_error', '', {max});
                 showChoiceError(index, selectionErrors[index]);
                 return;
             }
@@ -1114,7 +1118,7 @@
         function validateCustomization(reveal = false) {
             let firstInvalid = -1;
             wizardSteps.forEach((step, index) => {
-                const issue = selectionIssue(step, wizardData[index]);
+                const issue = selectionIssue(step, wizardData[index], t);
                 if (issue && firstInvalid < 0) firstInvalid = index;
                 if (reveal) showChoiceError(index, issue);
             });
@@ -1135,7 +1139,7 @@
             document.getElementById('modalTotalPriceDisplay').textContent = money(total);
             document.getElementById('modalQtyMinus').disabled = modalQty === 1;
             const valid = validateCustomization();
-            const missing = wizardSteps.filter((step, index) => selectionIssue(step, wizardData[index])).length;
+            const missing = wizardSteps.filter((step, index) => selectionIssue(step, wizardData[index], t)).length;
             const hint = document.getElementById('customizationHint');
             hint.textContent = valid ? t('modal.ready_hint', 'Tout est prêt. Ajoutez votre repas au panier.') : (i18n.getLang() === 'ar' ? `${missing} خيارات إجبارية للإكمال قبل الإضافة.` : i18n.getLang() === 'en' ? `${missing} required choice${missing > 1 ? 's' : ''} to complete before adding.` : `${missing} choix obligatoire${missing > 1 ? 's' : ''} à compléter avant l’ajout.`);
             hint.classList.toggle('is-invalid', !valid);
@@ -1150,7 +1154,7 @@
         window.handleWizardAction = () => addToCartFromModal();
 
         window.addToCartFromModal = () => {
-            if(currentItem?.isPromo&&promotionState(currentItem)!=='active'){showToast('Cette offre n’est plus disponible.','error');return;}
+            if(currentItem?.isPromo&&promotionState(currentItem)!=='active'){showToast(t('menu.offer_unavailable'),'error');return;}
             if (!currentItem || !menuAvailable(currentItem) || !stockReady || !validateCustomization(true)) return;
             const { selectedOptions, supplements } = cartSelections(wizardSteps, wizardData);
             cart.push({
@@ -1163,13 +1167,13 @@
             localStorage.setItem('bigtacCart', JSON.stringify(cart));
             updateCartUI();
             closeAddItemModal();
-            showToast(`${currentItem.name} ajouté au panier.`, 'success', { label: 'Voir', run: () => openCart() });
+            showToast(t('cart.added', '', {name:currentItem.name}), 'success', { label: t('common.view'), run: () => openCart() });
         };
 
         function cartOptionsHTML(item) {
             const choices = (item.selectedOptions || []).map(option => escapeCardText(option.name)).join(' · ');
             const extras = (item.supplements || []).map(option => `${escapeCardText(option.name)}${Number(option.price) ? ` (${optionPrice(option.price)})` : ''}`).join(' · ');
-            return `${choices ? `<p><b>Choix :</b> ${choices}</p>` : ''}${extras ? `<p><b>Suppléments :</b> ${extras}</p>` : ''}`;
+            return `${choices ? `<p><b>${t('cart.choices')}</b> ${choices}</p>` : ''}${extras ? `<p><b>${t('cart.extras')}</b> ${extras}</p>` : ''}`;
         }
         window.updateCartUI = () => {
             window.cart = cart;
@@ -1184,7 +1188,7 @@
                 container.innerHTML = cart.map((item, index) => `<article class="cart-item-card">
                     <div class="cart-item-top"><img src="${escapeCardText(item.imageUrl || 'assets/snack.png')}" alt="" width="68" height="68" onerror="this.onerror=null;this.src='assets/snack.png'"><div><h3>${escapeCardText(item.name)}</h3><strong>${money(item.totalPrice)}</strong></div></div>
                     <div class="cart-customs">${cartOptionsHTML(item)}</div>
-                    <div class="cart-item-actions"><div class="quantity-control"><button type="button" onclick="updateCartItemQty(${index}, -1)" aria-label="Diminuer la quantité de ${escapeCardText(item.name)}">−</button><span aria-label="Quantité">${item.qty}</span><button type="button" onclick="updateCartItemQty(${index}, 1)" aria-label="Augmenter la quantité de ${escapeCardText(item.name)}">+</button></div><button type="button" class="text-button" onclick="removeCartItem(${index})" aria-label="${t('cart.remove', 'Retirer')} ${escapeCardText(item.name)}">${t('cart.remove', 'Retirer')}</button></div>
+                    <div class="cart-item-actions"><div class="quantity-control"><button type="button" onclick="updateCartItemQty(${index}, -1)" aria-label="${escapeCardText(t('cart.decrease', '', {name:item.name}))}">−</button><span aria-label="${t('modal.quantity')}">${item.qty}</span><button type="button" onclick="updateCartItemQty(${index}, 1)" aria-label="${escapeCardText(t('cart.increase', '', {name:item.name}))}">+</button></div><button type="button" class="text-button" onclick="removeCartItem(${index})" aria-label="${t('cart.remove', 'Retirer')} ${escapeCardText(item.name)}">${t('cart.remove', 'Retirer')}</button></div>
                 </article>`).join('');
             }
             for (const id of ['navCartCount', 'fabCount']) document.getElementById(id).textContent = totalQty;
@@ -1194,7 +1198,7 @@
             document.body.classList.toggle('has-cart', Boolean(cart.length));
             document.getElementById('desktopCartPreview').textContent = cart.length ? (i18n.getLang() === 'ar' ? `${totalQty} أطباق في سلتك. رغبة أخرى؟` : i18n.getLang() === 'en' ? `${totalQty} item${totalQty > 1 ? 's' : ''} in your cart. Anything else?` : `${totalQty} article${totalQty > 1 ? 's' : ''} dans votre panier. Encore une envie ?`) : t('desktop_basket.sub_empty', 'Choisissez vos plats, on s’occupe du reste.');
             const checkoutButton = document.getElementById('btnGoToCheckout');
-            const catalogIssue=invalidCartAmount?'Le montant d’un article ancien est invalide. Retirez-le puis composez-le à nouveau.':cart.length&&stockReady?cartMenuIssue(cart,rawMenuItems,categoryRows,allPromotions):'';
+            const catalogIssue=invalidCartAmount?t('cart.old_amount'):cart.length&&stockReady?cartMenuIssue(cart,rawMenuItems,categoryRows,allPromotions,t):'';
             document.getElementById('cartMenuWarning').hidden=!catalogIssue;
             document.getElementById('cartMenuWarning').textContent=catalogIssue;
             checkoutButton.disabled = !cart.length || !storeAvailable() || !stockReady || !!catalogIssue;
@@ -1205,8 +1209,8 @@
             const item = cart[index];
             if (!item) return;
             if (item.qty + change <= 0) return removeCartItem(index);
-            let unitPrice;try{unitPrice=moneyCents(item.totalPrice)/item.qty;}catch{showToast('Ce montant est invalide. Retirez cet article puis composez-le à nouveau.','error');return;}
-            if(!Number.isSafeInteger(unitPrice)){showToast('Ce panier ancien doit être recomposé avant de modifier la quantité.','error');return;}
+            let unitPrice;try{unitPrice=moneyCents(item.totalPrice)/item.qty;}catch{showToast(t('cart.invalid_amount'),'error');return;}
+            if(!Number.isSafeInteger(unitPrice)){showToast(t('cart.old_quantity'),'error');return;}
             item.qty += change;
             item.totalPrice = unitPrice * item.qty/100;
             localStorage.setItem('bigtacCart', JSON.stringify(cart));
@@ -1217,7 +1221,7 @@
             if (!removed) return;
             localStorage.setItem('bigtacCart', JSON.stringify(cart));
             updateCartUI();
-            showToast(`${removed.name} retiré.`, 'success', { label: 'Annuler', run: () => {
+            showToast(t('cart.removed', '', {name:removed.name}), 'success', { label: t('common.undo'), run: () => {
                 cart.splice(Math.min(index, cart.length), 0, removed);
                 localStorage.setItem('bigtacCart', JSON.stringify(cart));
                 updateCartUI();
@@ -1228,13 +1232,13 @@
 
         function verifyCartMenu(mode=null) {
             allPromotions=rawPromotions.filter(p=>promotionState(p)==='active');
-            if(!storeAvailable()||mode&&(!modes.includes(mode)||!orderingAvailable(appConfig,mode))){showToast('Ce mode de commande n’est plus disponible. Choisissez un autre mode.','error');return false;}
-            const issue=!stockReady?'La carte doit être vérifiée avant de commander. Actualisez-la.':cartMenuIssue(cart,rawMenuItems,categoryRows,allPromotions);
+            if(!storeAvailable()||mode&&(!modes.includes(mode)||!orderingAvailable(appConfig,mode))){showToast(t('service.unavailable'),'error');return false;}
+            const issue=!stockReady?t('cart.verify'):cartMenuIssue(cart,rawMenuItems,categoryRows,allPromotions,t);
             if(issue){showToast(issue,'error');return false;}return true;
         }
         window.openCheckoutModal = () => {
             if(!verifyCartMenu())return;
-            if (!cart.length) return showToast('Choisissez un plat avant de passer commande.', 'error');
+            if (!cart.length) return showToast(t('cart.empty_checkout'), 'error');
             switchModal('cartModal', 'nameModal');
         };
         window.nextCheckoutStep = () => {
@@ -1261,13 +1265,13 @@
             });
         }
         window.selectService = type => {
-            if(!modes.includes(type)||!storeAvailable()||!orderingAvailable(appConfig,type)){showToast('Service indisponible. Choisissez un autre mode.','error');return;}
+            if(!modes.includes(type)||!storeAvailable()||!orderingAvailable(appConfig,type)){showToast(t('service.unavailable'),'error');return;}
             checkoutData.type = type;
             if (type === 'livraison') {
                 selectedZoneId = null;
                 const addressInput = document.getElementById('customerAddress');
                 document.getElementById('btnConfirmZone').disabled = !addressInput?.value.trim();
-                document.getElementById('zoneHint').textContent = 'Précisez votre adresse ou utilisez votre position GPS.';
+                document.getElementById('zoneHint').textContent = t('delivery.zone_hint');
                 renderDeliveryZones();
                 switchModal('serviceModal', 'deliveryZoneModal');
             } else {
@@ -1288,15 +1292,15 @@
             const hint = document.getElementById('gpsStatusHint');
             const addressInput = document.getElementById('customerAddress');
             if (!navigator.geolocation) {
-                showToast('La géolocalisation GPS n’est pas supportée par votre navigateur.', 'error');
+                showToast(t('delivery.gps_unsupported'), 'error');
                 return;
             }
-            if (label) label.textContent = 'Localisation GPS en cours…';
+            if (label) label.textContent = t('delivery.gps_locating');
             if (btn) btn.disabled = true;
             navigator.geolocation.getCurrentPosition(
                 pos => {
                     if (btn) btn.disabled = false;
-                    if (label) label.textContent = '📍 Position GPS trouvée';
+                    if (label) label.textContent = t('delivery.gps_success');
                     const lat = pos.coords.latitude.toFixed(6);
                     const lng = pos.coords.longitude.toFixed(6);
                     const mapsUrl = `https://maps.google.com/?q=${lat},${lng}`;
@@ -1310,18 +1314,18 @@
                     if (hint) {
                         hint.style.display = 'block';
                         hint.style.color = 'var(--app-success)';
-                        hint.textContent = `✓ Position GPS détectée (${lat}, ${lng})`;
+                        hint.textContent = t('delivery.gps_coordinates', '', {lat,lng});
                     }
                     document.getElementById('btnConfirmZone').disabled = false;
                     refreshIcons();
                 },
                 () => {
                     if (btn) btn.disabled = false;
-                    if (label) label.textContent = '📍 Réessayer la position GPS';
+                    if (label) label.textContent = t('delivery.gps_retry');
                     if (hint) {
                         hint.style.display = 'block';
                         hint.style.color = 'var(--app-muted)';
-                        hint.textContent = 'Accès GPS non accordé. Saisissez votre adresse manuellement ci-dessous.';
+                        hint.textContent = t('delivery.gps_denied');
                     }
                 },
                 { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
@@ -1341,7 +1345,7 @@
             const addressInput = document.getElementById('customerAddress');
             const address = addressInput ? addressInput.value.trim() : '';
             if (!address) {
-                showToast('Veuillez préciser votre adresse de livraison.', 'error');
+                showToast(t('delivery.address_error'), 'error');
                 return;
             }
             const fee = typeof appConfig.deliveryPrice === 'number' ? appConfig.deliveryPrice : 4;
@@ -1351,11 +1355,16 @@
             populateSummary('livraison');
             switchModal('deliveryZoneModal', 'summaryModal');
         };
-        function populateSummary(type) {
+        function summaryLocationText(){
+            if(checkoutData.type==='livraison')return `${t('service.delivery')}: ${checkoutData.address}`;
+            if(checkoutData.type==='emporter')return `${t('service.takeaway')} · ${appConfig.restaurantName||'BIGTAC'}`;
+            return `${t('service.dinein')} · ${checkoutData.tableNumber?t('summary.table_number')+' '+checkoutData.tableNumber:appConfig.address||'Rue Abdelkrim Benjelloun'}`;
+        }
+        function populateSummary(type, resetError=true) {
             document.getElementById('btnFinalize').disabled=orderSubmitting||!storeAvailable()||!orderingAvailable(appConfig,type);
             document.getElementById('summaryName').textContent = checkoutData.name;
             document.getElementById('summaryPhone').textContent = checkoutData.phone;
-            document.getElementById('summaryLocation').textContent = checkoutData.location;
+            document.getElementById('summaryLocation').textContent = summaryLocationText();
             document.getElementById('summaryType').textContent = type === 'sur_place' ? t('service.dinein', 'Sur place') : type === 'emporter' ? t('service.takeaway', 'À emporter') : t('service.delivery', 'Livraison');
             const tableBox = document.getElementById('tableInputContainer');
             const tableInput = document.getElementById('tableNumberInput');
@@ -1370,8 +1379,8 @@
             document.getElementById('summaryDeliveryFee').classList.toggle('hidden', type !== 'livraison');
             document.getElementById('deliveryPriceDisplay').textContent = money(checkoutData.deliveryPrice);
             document.getElementById('summaryTotal').textContent = money(total);
-            document.getElementById('orderSubmissionError').classList.add('hidden');
-            document.getElementById('confirmationHint').textContent = appConfig.whatsappMode ? 'Votre demande sera ouverte dans WhatsApp. Envoyez le message pour commander.' : 'Le restaurant confirmera votre commande.';
+            if(resetError)document.getElementById('orderSubmissionError').classList.add('hidden');
+            document.getElementById('confirmationHint').textContent = appConfig.whatsappMode ? t('summary.whatsapp_hint') : t('summary.hint');
         }
         document.getElementById('tableNumberInput')?.addEventListener('input', event => {
             const val = event.target.value.trim().replace(/^table\s*/i, '');
@@ -1385,7 +1394,7 @@
             if(orderSubmitting)return;
             if(!verifyCartMenu(checkoutData.type))return;
             if (!appConfig.isOpen) {
-                showToast("Le restaurant est actuellement fermé", "error");
+                showToast(t('hero.closed_title'), "error");
                 return;
             }
 
@@ -1396,7 +1405,7 @@
             const btn = document.getElementById('btnFinalize');
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = `<i data-feather="loader" class="w-5 h-5 animate-spin"></i> Traitement...`;
+                btn.innerHTML = `<i data-feather="loader" class="w-5 h-5 animate-spin" aria-hidden="true"></i> ${t('order.processing')}`;
                 if (window.feather) feather.replace();
             }
 
@@ -1438,7 +1447,7 @@
                 orderSubmitting=false;
                 if (btn) {
                     btn.disabled = false;
-                    btn.innerText = "Confirmer la Commande";
+                    btn.innerHTML = `<span data-i18n="summary.finalize">${t('summary.finalize')}</span>`;
                 }
                 return;
             }
@@ -1483,18 +1492,19 @@
                 updateCartUI();
                 closeModalAnimation('summaryModal');
 
-                showToast(`Commande #${shortId} envoyée en cuisine ! 🎉`, 'success');
+                showToast(t('order.sent', '', {id:shortId}), 'success');
             } catch (error) {
                 console.error("Order error:", error);
                 const submissionError = document.getElementById('orderSubmissionError');
-                submissionError.textContent = 'La commande n’a pas pu être envoyée. Votre panier est conservé. Réessayez.';
+                submissionError.dataset.i18n='order.error';
+                submissionError.textContent = t('order.error');
                 submissionError.classList.remove('hidden');
-                showToast("Erreur de connexion. Veuillez réessayer.", "error");
+                showToast(t('order.connection_error'), "error");
             } finally {
                 orderSubmitting=false;
                 if (btn) {
                     btn.disabled = !storeAvailable()||!orderingAvailable(appConfig,checkoutData.type);
-                    btn.innerText = "Confirmer la Commande";
+                    btn.innerHTML = `<span data-i18n="summary.finalize">${t('summary.finalize')}</span>`;
                 }
             }
         };
@@ -1520,14 +1530,14 @@
                     const data = snapshot.data();
                     const isPickup = data.type === 'emporter' || data.type === 'sur_place';
                     const states = {
-                        pending: ['Le restaurant va confirmer votre commande.', 'clock', 20],
-                        confirmed: ['Votre repas est en préparation en cuisine.', 'coffee', 50],
-                        en_livraison: [isPickup ? 'Votre repas est prêt au comptoir !' : 'Votre commande est en route avec le livreur.', isPickup ? 'shopping-bag' : 'truck', 75],
-                        ready: ['Votre repas est prêt au comptoir.', 'check-circle', 100],
-                        delivered: ['Commande terminée. Bon appétit !', 'check-circle', 100],
-                        rejected: ['Le restaurant a annulé la commande. Contactez-le pour en savoir plus.', 'alert-circle', 100]
+                        pending: [t('tracker.pending'), 'clock', 20],
+                        confirmed: [t('tracker.confirmed'), 'coffee', 50],
+                        en_livraison: [isPickup ? t('tracker.pickup') : t('tracker.delivery'), isPickup ? 'shopping-bag' : 'truck', 75],
+                        ready: [t('tracker.pickup'), 'check-circle', 100],
+                        delivered: [t('tracker.delivered'), 'check-circle', 100],
+                        rejected: [t('tracker.rejected'), 'alert-circle', 100]
                     };
-                    const [message, symbol, progress] = states[data.status] || ['Le suivi de votre commande sera actualisé ici.', 'clock', 0];
+                    const [message, symbol, progress] = states[data.status] || [t('tracker.unknown'), 'clock', 0];
                     tracker.classList.remove('hidden');
                     document.body.classList.add('has-tracker');
                     tracker.dataset.status = data.status;
@@ -1541,16 +1551,16 @@
                     if (data.status !== trackerLastStatus) {
                         trackerLastStatus = data.status;
                         const brand = appConfig.restaurantName || 'BIGTAC';
-                        if (data.status === 'confirmed') triggerSafeNotification(brand, 'Votre commande est en cuisine !');
-                        else if (data.status === 'en_livraison') triggerSafeNotification(brand, isPickup ? 'Votre repas est prêt au comptoir !' : 'Votre livreur est en route !');
-                        else if (data.status === 'ready' || data.status === 'delivered') triggerSafeNotification(brand, 'Commande terminée. Bon appétit !');
+                        if (data.status === 'confirmed') triggerSafeNotification(brand, t('tracker.confirmed'));
+                        else if (data.status === 'en_livraison') triggerSafeNotification(brand, isPickup ? t('tracker.pickup') : t('tracker.delivery'));
+                        else if (data.status === 'ready' || data.status === 'delivered') triggerSafeNotification(brand, t('tracker.delivered'));
                     }
                 },
                 error: error => {
                     console.error('Tracker listener error:', error);
                     tracker.classList.remove('hidden');
                     document.body.classList.add('has-tracker');
-                    status.textContent = 'Suivi momentanément indisponible. Réessayez ou contactez le restaurant.';
+                    status.textContent = t('tracker.error');
                     document.getElementById('trackerRetry').classList.remove('hidden');
                 }
             });

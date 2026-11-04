@@ -1,7 +1,8 @@
 /* Focused control polish over the approved admin design. */
 .menu-product-main,.menu-product-visual,.menu-product-bottom{display:contents}
-@media(min-width:768px){.menu-product-visual>.menu-select{grid-column:1}.menu-product-image{grid-column:2}}
-@media(min-width:1200px){.menu-product-main>.menu-row-actions{grid-column:6;grid-row:1}.menu-product-bottom>.menu-price{grid-column:4;grid-row:1}.menu-product-bottom>.menu-stock{grid-column:5;grid-row:1}}
+@media(min-width:768px){.menu-product-visual>.menu-select{grid-column:1;grid-row:1}.menu-product-image{grid-column:2;grid-row:1}.menu-product-info{grid-column:3;grid-row:1}.menu-product-main>.menu-row-actions{grid-column:6;grid-row:1}.menu-product-bottom>.menu-price{grid-column:4;grid-row:1}.menu-product-bottom>.menu-stock{grid-column:5;grid-row:1}}
+@media(min-width:768px) and (max-width:1199px){.menu-product{grid-template-columns:20px 44px minmax(110px,1fr) 56px 112px 76px;gap:8px}.menu-product-image{width:44px;height:44px}}
+.admin-team-unavailable{padding:12px 18px;background:white;border-radius:16px}.admin-team-unavailable>summary{min-height:44px;align-content:center;cursor:pointer;font-weight:650}.admin-team-unavailable[open]>summary{margin-bottom:12px}
 .admin-button,.admin-icon-button,.order-detail-link,.menu-row-actions summary{align-items:center;justify-content:center}
 .admin-button>.admin-glyph,.admin-icon-button>.admin-glyph,.order-detail-link>.admin-glyph{display:block;flex:0 0 auto;vertical-align:initial}
 .order-ticket-footer .order-reject{position:relative;display:flex;align-items:center;justify-content:center;gap:0;flex:0 0 44px;width:44px;height:44px;padding:0;line-height:1;border-radius:11px}

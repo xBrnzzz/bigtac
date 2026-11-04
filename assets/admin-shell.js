@@ -39,7 +39,7 @@ export function mountAdminShell() {
     views.setAttribute('role', 'main'); views.tabIndex = -1;
     document.body.className = 'admin-body';
     const settings = document.createElement('section'); settings.id = 'view-settings'; settings.className = 'admin-page hidden';
-    settings.innerHTML = `<div class="admin-page-heading"><h2>Paramètres opérationnels</h2><p>Les contrôles existants du restaurant. Les réglages de marque arrivent dans une phase ultérieure.</p></div><div class="admin-panel admin-settings-panel"><div class="admin-setting-row"><div><label for="toggle-store">Restaurant ouvert</label><p>La fermeture annule aussi les commandes en attente. Une confirmation est demandée avant toute fermeture.</p></div><input id="toggle-store" type="checkbox" disabled></div><div class="admin-setting-row"><div><label for="toggle-whatsapp">Commandes WhatsApp</label><p>Utiliser le parcours WhatsApp existant.</p></div><input id="toggle-whatsapp" type="checkbox" disabled></div><p id="admin-settings-feedback" role="status">Chargement des réglages…</p><button class="admin-button" id="admin-settings-retry" hidden>Réessayer</button></div>`;
+    settings.innerHTML = `<div class="admin-page-heading"><h2>Paramètres opérationnels</h2><p>Gérez l’ouverture, les commandes et les informations du restaurant.</p></div><div class="admin-panel admin-settings-panel"><div class="admin-setting-row"><div><label for="toggle-store">Restaurant ouvert</label><p>La fermeture annule aussi les commandes en attente. Une confirmation est demandée avant toute fermeture.</p></div><input id="toggle-store" type="checkbox" disabled></div><div class="admin-setting-row"><div><label for="toggle-whatsapp">Commandes WhatsApp</label><p>Utiliser le parcours WhatsApp existant.</p></div><input id="toggle-whatsapp" type="checkbox" disabled></div><p id="admin-settings-feedback" role="status">Chargement des réglages…</p><button class="admin-button" id="admin-settings-retry" hidden>Réessayer</button></div>`;
     views.append(settings);
     // Reuse the shared visual system without replacing legacy business handlers.
     for(const [id,glyph] of [['view-promotions','tag'],['view-drivers','users'],['view-driver','truck'],['view-settings','sliders']]) {
@@ -52,7 +52,7 @@ export function mountAdminShell() {
     new MutationObserver(()=>teamTable.querySelectorAll('tbody tr').forEach(row=>{
         row.setAttribute('role','row');
         [...row.cells].forEach((cell,index)=>{cell.dataset.label=teamLabels()[index];cell.setAttribute('role','cell');});
-        row.querySelectorAll('button:not([aria-label])').forEach(button=>button.setAttribute('aria-label',button.title||'Supprimer ce compte'));
+        row.querySelectorAll('button:not([aria-label])').forEach(button=>button.setAttribute('aria-label',button.title||button.textContent.trim()||'Action'));
     })).observe(teamTable.querySelector('tbody'),{childList:true});
     const gate = document.createElement('section'); gate.id = 'admin-access'; gate.className = 'admin-access'; gate.hidden = true;
     gate.innerHTML = `<div class="admin-panel"><img src="assets/logo.png" width="48" height="48" alt="BIGTAC"><h1>Accès au restaurant indisponible</h1><p id="admin-access-message" role="alert"></p><button id="admin-access-retry" class="admin-button primary">Réessayer</button><button id="admin-access-logout" class="admin-button">Se déconnecter</button></div>`;

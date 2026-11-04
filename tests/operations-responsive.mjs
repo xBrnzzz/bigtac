@@ -19,6 +19,7 @@ try{
             const form=document.getElementById('promo-form');
             return document.documentElement.scrollWidth<=innerWidth&&form.scrollWidth<=form.clientWidth+1;
         }),`Promotion editor overflow at ${width}`);checks++;
+        page.once('dialog',dialog=>dialog.accept());
         await page.evaluate(()=>{closePromoEditor();switchView('settings');});
         await page.locator('#restaurant-profile-form').waitFor({state:'visible'});
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Settings overflow at ${width}`);checks++;

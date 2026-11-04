@@ -99,36 +99,36 @@ export function imageIssue(file) {
     if(file.size>5*1024*1024) return 'L’image doit faire moins de 5 Mo.';
     return '';
 }
-export function cartMenuIssue(cart,items,categories,promotions=[]) {
+export function cartMenuIssue(cart,items,categories,promotions=[],translate=(_key,fallback)=>fallback) {
     for(const row of cart) {
-        if(row.totalPrice!==undefined){try{moneyCents(row.totalPrice);}catch{return `Le montant de ${row.name} est invalide. Retirez cet article puis composez-le à nouveau.`;}}
-        if(row.qty!==undefined&&(!Number.isSafeInteger(row.qty)||row.qty<1))return `La quantité de ${row.name} est invalide. Retirez cet article puis composez-le à nouveau.`;
+        if(row.totalPrice!==undefined){try{moneyCents(row.totalPrice);}catch{return translate('cart.invalid_item_amount', `Le montant de ${row.name} est invalide. Retirez cet article puis composez-le à nouveau.`, {name:row.name});}}
+        if(row.qty!==undefined&&(!Number.isSafeInteger(row.qty)||row.qty<1))return translate('cart.invalid_item_quantity', `La quantité de ${row.name} est invalide. Retirez cet article puis composez-le à nouveau.`, {name:row.name});
         if(row.isPromo || !items.some(item=>item.id===row.id)&&promotions.some(item=>item.id===row.id)) {
             const promo=promotions.find(item=>item.id===row.id);
-            if(!promo||promo.isVisible===false||!available(promo))return `${row.name} n’est plus disponible. Retirez cette offre du panier.`;
-            if(Number(row.unitBasePrice)!==Number(promo.price))return `Le prix de ${row.name} a changé. Composez cette offre à nouveau.`;
+            if(!promo||promo.isVisible===false||!available(promo))return translate('cart.offer_unavailable', `${row.name} n’est plus disponible. Retirez cette offre du panier.`, {name:row.name});
+            if(Number(row.unitBasePrice)!==Number(promo.price))return translate('cart.offer_price', `Le prix de ${row.name} a changé. Composez cette offre à nouveau.`, {name:row.name});
             const possible=[...(promo.mandatoryChoices||[]).flatMap(group=>group.options||[]),...(promo.supplements||[])];
-            if([...(row.selectedOptions||[]),...(row.supplements||[])].some(option=>!possible.some(current=>available(current)&&optionMatches(current,option))))return `Les options de ${row.name} ont changé. Composez cette offre à nouveau.`;
+            if([...(row.selectedOptions||[]),...(row.supplements||[])].some(option=>!possible.some(current=>available(current)&&optionMatches(current,option))))return translate('cart.offer_options', `Les options de ${row.name} ont changé. Composez cette offre à nouveau.`, {name:row.name});
             const promoSteps=buildCustomizationSteps(promo).filter(step=>step.type==='choice');
             for(const step of promoSteps){
-                if(selectionIssue(step,recordedChoices(step,promoSteps,row)))return `Les choix de ${row.name} ont changé. Composez cette offre à nouveau.`;
+                if(selectionIssue(step,recordedChoices(step,promoSteps,row)))return translate('cart.offer_choices', `Les choix de ${row.name} ont changé. Composez cette offre à nouveau.`, {name:row.name});
             }
-            if(selectionIssue({type:'supplements',data:promo.supplements||[]},row.supplements||[]))return `Les suppléments de ${row.name} ont changé. Composez cette offre à nouveau.`;
+            if(selectionIssue({type:'supplements',data:promo.supplements||[]},row.supplements||[]))return translate('cart.offer_extras', `Les suppléments de ${row.name} ont changé. Composez cette offre à nouveau.`, {name:row.name});
             continue; // Promotions retain their independent pricing/configuration.
         }
         const product=items.find(item=>item.id===row.id);
-        if(!product || !listed(product,categories) || !available(product)) return `${row.name} n’est plus disponible. Retirez ce produit du panier pour continuer.`;
+        if(!product || !listed(product,categories) || !available(product)) return translate('cart.product_unavailable', `${row.name} n’est plus disponible. Retirez ce produit du panier pour continuer.`, {name:row.name});
         const options=[...(product.mandatoryChoices||[]).flatMap(group=>group.options||[]),...(product.supplements||[])];
         for(const selection of [...(row.selectedOptions||[]),...(row.supplements||[])]) {
-            if(!options.some(option=>available(option)&&optionMatches(option,selection))) return `Les choix de ${row.name} ont changé. Retirez-le puis composez-le à nouveau.`;
+            if(!options.some(option=>available(option)&&optionMatches(option,selection))) return translate('cart.product_choices', `Les choix de ${row.name} ont changé. Retirez-le puis composez-le à nouveau.`, {name:row.name});
         }
-        if(Number(row.unitBasePrice)!==Number(product.price))return `Le prix de ${row.name} a changé. Retirez-le puis composez-le à nouveau.`;
+        if(Number(row.unitBasePrice)!==Number(product.price))return translate('cart.product_price', `Le prix de ${row.name} a changé. Retirez-le puis composez-le à nouveau.`, {name:row.name});
         const steps=buildCustomizationSteps(product).filter(step=>step.type==='choice');
         for(const step of steps) {
             const choices=recordedChoices(step,steps,row);
-            if(selectionIssue(step,choices))return `Les choix de ${row.name} ont changé. Retirez-le puis composez-le à nouveau.`;
+            if(selectionIssue(step,choices))return translate('cart.product_choices', `Les choix de ${row.name} ont changé. Retirez-le puis composez-le à nouveau.`, {name:row.name});
         }
-        if(selectionIssue({type:'supplements',data:product.supplements||[]},row.supplements||[]))return `Les suppléments de ${row.name} ont changé. Retirez-le puis composez-le à nouveau.`;
+        if(selectionIssue({type:'supplements',data:product.supplements||[]},row.supplements||[]))return translate('cart.product_extras', `Les suppléments de ${row.name} ont changé. Retirez-le puis composez-le à nouveau.`, {name:row.name});
     }
     return '';
 }

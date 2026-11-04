@@ -5,6 +5,101 @@
 
 const translations = {
     fr: {
+        "search.result_one": "{count} plat trouvé",
+        "modal.choose_exact_one": "Choisissez une option",
+        "modal.choose_range_one": "Choisissez au moins une option · {max} maximum",
+        "modal.choose_optional_one": "À votre goût · une option maximum",
+        "modal.maximum_error_one": "Vous pouvez choisir une seule option. Retirez-la pour changer.",
+        "choice.minimum_one": "Choisissez au moins une option pour continuer.",
+        "choice.maximum_one": "Choisissez au maximum une option.",
+        'cart.close_aria': 'Fermer le panier',
+        'summary.table_placeholder': 'Ex. 4',
+        // Ordering feedback and recovery states.
+        "search.no_result": "Aucun plat trouvé",
+        "search.no_result_sub": "Essayez un autre nom ou retrouvez toute la carte.",
+        "search.view_all": "Voir toute la carte",
+        "search.results": "{count} plats trouvés",
+        "checkout.name_error": "Indiquez un nom d’au moins 2 caractères.",
+        "checkout.phone_error": "Indiquez un numéro marocain valide, par exemple 0612345678 ou +212612345678.",
+        "menu.loading": "La carte arrive…",
+        "menu.empty_title": "La carte revient bientôt",
+        "menu.empty_help": "Le restaurant prépare sa carte. Réessayez dans un instant.",
+        "menu.refresh": "Actualiser la carte",
+        "menu.error_title": "La carte se fait attendre",
+        "menu.error_help": "Vérifiez votre connexion, puis réessayez.",
+        "common.retry": "Réessayer",
+        "common.view": "Voir",
+        "common.undo": "Annuler",
+        "common.home": "accueil",
+        "hero.unavailable": "Commandes indisponibles",
+        "hero.unconfirmed": "Horaires à confirmer",
+        "modal.prepared": "Préparé à la commande.",
+        "modal.personalize": "Personnalisez votre repas à votre goût.",
+        "modal.included": "Compris",
+        "modal.starting": "Dès {price}",
+        "modal.choose_exact": "Choisissez {count} options",
+        "modal.choose_range": "Choisissez au moins {min} options · {max} maximum",
+        "modal.choose_optional": "À votre goût · {max} options maximum",
+        "modal.maximum_error": "Vous pouvez choisir {max} options au maximum. Retirez-en une pour changer.",
+        "modal.decrease": "Diminuer la quantité",
+        "modal.increase": "Augmenter la quantité",
+        "modal.close_item": "Fermer le plat",
+        "choice.changed": "Les groupes de choix ont changé. Composez ce produit à nouveau.",
+        "choice.invalid": "Ce groupe est mal configuré. Contactez le restaurant.",
+        "choice.unavailable": "Ce choix est indisponible. Choisissez un autre plat ou contactez le restaurant.",
+        "choice.minimum": "Choisissez au moins {min} options pour continuer.",
+        "choice.maximum": "Choisissez au maximum {max} options.",
+        "choice.option_changed": "Une option a changé ou n’est plus disponible. Recommencez ce choix.",
+        "choice.duplicate": "Choisissez chaque option une seule fois.",
+        "cart.choices": "Choix :",
+        "cart.extras": "Suppléments :",
+        "cart.decrease": "Diminuer la quantité de {name}",
+        "cart.increase": "Augmenter la quantité de {name}",
+        "cart.added": "{name} ajouté au panier.",
+        "cart.removed": "{name} retiré.",
+        "cart.invalid_amount": "Ce montant est invalide. Retirez cet article puis composez-le à nouveau.",
+        "cart.old_amount": "Le montant d’un article ancien est invalide. Retirez-le puis composez-le à nouveau.",
+        "cart.old_quantity": "Ce panier ancien doit être recomposé avant de modifier la quantité.",
+        "cart.empty_checkout": "Choisissez un plat avant de passer commande.",
+        "cart.verify": "La carte doit être vérifiée avant de commander. Actualisez-la.",
+        "cart.invalid_item_amount": "Le montant de {name} est invalide. Retirez cet article puis composez-le à nouveau.",
+        "cart.invalid_item_quantity": "La quantité de {name} est invalide. Retirez cet article puis composez-le à nouveau.",
+        "cart.offer_unavailable": "{name} n’est plus disponible. Retirez cette offre du panier.",
+        "cart.offer_price": "Le prix de {name} a changé. Composez cette offre à nouveau.",
+        "cart.offer_options": "Les options de {name} ont changé. Composez cette offre à nouveau.",
+        "cart.offer_choices": "Les choix de {name} ont changé. Composez cette offre à nouveau.",
+        "cart.offer_extras": "Les suppléments de {name} ont changé. Composez cette offre à nouveau.",
+        "cart.product_unavailable": "{name} n’est plus disponible. Retirez ce produit du panier pour continuer.",
+        "cart.product_choices": "Les choix de {name} ont changé. Retirez-le puis composez-le à nouveau.",
+        "cart.product_price": "Le prix de {name} a changé. Retirez-le puis composez-le à nouveau.",
+        "cart.product_extras": "Les suppléments de {name} ont changé. Retirez-le puis composez-le à nouveau.",
+        "menu.product_changed": "Ce produit vient de changer. Ouvrez-le à nouveau pour vérifier vos choix.",
+        "menu.offer_changed": "Cette offre a changé ou n’est plus disponible.",
+        "menu.price_check": "Le prix de cette configuration doit être vérifié par le restaurant.",
+        "menu.soldout": "Ce produit est en rupture de stock.",
+        "menu.offer_unavailable": "Cette offre n’est plus disponible.",
+        "service.unavailable": "Ce mode de commande n’est plus disponible. Choisissez un autre mode.",
+        "delivery.zone_hint": "Précisez votre adresse ou utilisez votre position GPS.",
+        "delivery.gps_unsupported": "La géolocalisation GPS n’est pas supportée par votre navigateur.",
+        "delivery.gps_retry": "📍 Réessayer la position GPS",
+        "delivery.gps_denied": "Accès GPS non accordé. Saisissez votre adresse manuellement ci-dessous.",
+        "delivery.gps_coordinates": "✓ Position GPS détectée ({lat}, {lng})",
+        "delivery.address_error": "Veuillez préciser votre adresse de livraison.",
+        "summary.whatsapp_hint": "Votre demande sera ouverte dans WhatsApp. Envoyez le message pour commander.",
+        "order.processing": "Traitement…",
+        "order.sent": "Commande #{id} envoyée au restaurant !",
+        "order.error": "La commande n’a pas pu être envoyée. Votre panier est conservé. Réessayez.",
+        "order.connection_error": "Erreur de connexion. Veuillez réessayer.",
+        "tracker.pending": "Le restaurant va confirmer votre commande.",
+        "tracker.confirmed": "Votre repas est en préparation en cuisine.",
+        "tracker.pickup": "Votre repas est prêt au comptoir.",
+        "tracker.delivery": "Votre commande est en route avec le livreur.",
+        "tracker.delivered": "Commande terminée. Bon appétit !",
+        "tracker.rejected": "Le restaurant a annulé la commande. Contactez-le pour en savoir plus.",
+        "tracker.unknown": "Le suivi de votre commande sera actualisé ici.",
+        "tracker.error": "Suivi momentanément indisponible. Réessayez ou contactez le restaurant.",
+        "location.closed": "fermé",
+
         // Navigation & Header
         'nav.skip': 'Aller à la carte',
         'nav.menu': 'La carte',
@@ -203,6 +298,101 @@ const translations = {
     },
 
     en: {
+        "search.result_one": "{count} dish found",
+        "modal.choose_exact_one": "Choose one option",
+        "modal.choose_range_one": "Choose at least one option · maximum {max}",
+        "modal.choose_optional_one": "Your choice · up to one option",
+        "modal.maximum_error_one": "Choose one option only. Remove it to change your selection.",
+        "choice.minimum_one": "Choose at least one option to continue.",
+        "choice.maximum_one": "Choose no more than one option.",
+        'cart.close_aria': 'Close cart',
+        'summary.table_placeholder': 'E.g. 4',
+        // Ordering feedback and recovery states.
+        "search.no_result": "No dishes found",
+        "search.no_result_sub": "Try another name or browse the full menu.",
+        "search.view_all": "View the full menu",
+        "search.results": "{count} dishes found",
+        "checkout.name_error": "Enter a name with at least 2 characters.",
+        "checkout.phone_error": "Enter a valid Moroccan number, such as 0612345678 or +212612345678.",
+        "menu.loading": "Loading the menu…",
+        "menu.empty_title": "The menu will be back soon",
+        "menu.empty_help": "The restaurant is preparing its menu. Try again shortly.",
+        "menu.refresh": "Refresh the menu",
+        "menu.error_title": "The menu could not load",
+        "menu.error_help": "Check your connection, then try again.",
+        "common.retry": "Try again",
+        "common.view": "View",
+        "common.undo": "Undo",
+        "common.home": "home",
+        "hero.unavailable": "Ordering unavailable",
+        "hero.unconfirmed": "Opening hours unconfirmed",
+        "modal.prepared": "Prepared to order.",
+        "modal.personalize": "Make your meal your own.",
+        "modal.included": "Included",
+        "modal.starting": "From {price}",
+        "modal.choose_exact": "Choose {count} options",
+        "modal.choose_range": "Choose at least {min} options · maximum {max}",
+        "modal.choose_optional": "Your choice · up to {max} options",
+        "modal.maximum_error": "Choose up to {max} options. Remove one to change your selection.",
+        "modal.decrease": "Decrease quantity",
+        "modal.increase": "Increase quantity",
+        "modal.close_item": "Close dish",
+        "choice.changed": "The choice groups have changed. Customize this dish again.",
+        "choice.invalid": "This choice group is unavailable. Contact the restaurant.",
+        "choice.unavailable": "This choice is unavailable. Choose another dish or contact the restaurant.",
+        "choice.minimum": "Choose at least {min} options to continue.",
+        "choice.maximum": "Choose no more than {max} options.",
+        "choice.option_changed": "An option has changed or is unavailable. Make this selection again.",
+        "choice.duplicate": "Choose each option only once.",
+        "cart.choices": "Choices:",
+        "cart.extras": "Extras:",
+        "cart.decrease": "Decrease quantity of {name}",
+        "cart.increase": "Increase quantity of {name}",
+        "cart.added": "{name} added to your cart.",
+        "cart.removed": "{name} removed.",
+        "cart.invalid_amount": "This amount is invalid. Remove this item and customize it again.",
+        "cart.old_amount": "An older item has an invalid amount. Remove it and customize it again.",
+        "cart.old_quantity": "Rebuild this saved cart before changing quantities.",
+        "cart.empty_checkout": "Choose a dish before checking out.",
+        "cart.verify": "Refresh the menu before ordering.",
+        "cart.invalid_item_amount": "The amount for {name} is invalid. Remove it and customize it again.",
+        "cart.invalid_item_quantity": "The quantity for {name} is invalid. Remove it and customize it again.",
+        "cart.offer_unavailable": "{name} is unavailable. Remove this offer from your cart.",
+        "cart.offer_price": "The price of {name} changed. Customize this offer again.",
+        "cart.offer_options": "Options for {name} changed. Customize this offer again.",
+        "cart.offer_choices": "Choices for {name} changed. Customize this offer again.",
+        "cart.offer_extras": "Extras for {name} changed. Customize this offer again.",
+        "cart.product_unavailable": "{name} is unavailable. Remove this item to continue.",
+        "cart.product_choices": "Choices for {name} changed. Remove it and customize it again.",
+        "cart.product_price": "The price of {name} changed. Remove it and customize it again.",
+        "cart.product_extras": "Extras for {name} changed. Remove it and customize it again.",
+        "menu.product_changed": "This dish changed. Open it again to check your choices.",
+        "menu.offer_changed": "This offer changed or is no longer available.",
+        "menu.price_check": "The restaurant needs to check the price of these choices.",
+        "menu.soldout": "This dish is out of stock.",
+        "menu.offer_unavailable": "This offer is no longer available.",
+        "service.unavailable": "This ordering method is unavailable. Choose another method.",
+        "delivery.zone_hint": "Enter your address or use your GPS location.",
+        "delivery.gps_unsupported": "Your browser does not support GPS location.",
+        "delivery.gps_retry": "📍 Retry GPS location",
+        "delivery.gps_denied": "GPS access was not granted. Enter your address below.",
+        "delivery.gps_coordinates": "✓ GPS location found ({lat}, {lng})",
+        "delivery.address_error": "Enter your delivery address.",
+        "summary.whatsapp_hint": "Your request will open in WhatsApp. Send the message to order.",
+        "order.processing": "Processing…",
+        "order.sent": "Order #{id} sent to the restaurant!",
+        "order.error": "Your order could not be sent. Your cart is saved. Try again.",
+        "order.connection_error": "Connection error. Please try again.",
+        "tracker.pending": "The restaurant will confirm your order.",
+        "tracker.confirmed": "Your meal is being prepared in the kitchen.",
+        "tracker.pickup": "Your meal is ready at the counter.",
+        "tracker.delivery": "Your order is on its way with the driver.",
+        "tracker.delivered": "Order completed. Enjoy your meal!",
+        "tracker.rejected": "The restaurant cancelled your order. Contact them for details.",
+        "tracker.unknown": "Order updates will appear here.",
+        "tracker.error": "Tracking is temporarily unavailable. Try again or contact the restaurant.",
+        "location.closed": "closed",
+
         // Navigation & Header
         'nav.skip': 'Skip to menu',
         'nav.menu': 'Menu',
@@ -401,6 +591,101 @@ const translations = {
     },
 
     ar: {
+        "search.result_one": "عدد الأطباق الموجودة: {count}",
+        "modal.choose_exact_one": "اختر خياراً واحداً",
+        "modal.choose_range_one": "اختر خياراً واحداً على الأقل · الحد الأقصى {max}",
+        "modal.choose_optional_one": "حسب ذوقك · خيار واحد كحد أقصى",
+        "modal.maximum_error_one": "يمكنك اختيار خيار واحد فقط. أزله لتغيير اختيارك.",
+        "choice.minimum_one": "اختر خياراً واحداً على الأقل للمتابعة.",
+        "choice.maximum_one": "اختر خياراً واحداً كحد أقصى.",
+        'cart.close_aria': 'إغلاق السلة',
+        'summary.table_placeholder': 'مثلاً 4',
+        // Ordering feedback and recovery states.
+        "search.no_result": "لم نعثر على أي طبق",
+        "search.no_result_sub": "جرّب اسماً آخر أو تصفّح القائمة كاملة.",
+        "search.view_all": "عرض القائمة كاملة",
+        "search.results": "عدد الأطباق الموجودة: {count}",
+        "checkout.name_error": "أدخل اسماً من حرفين على الأقل.",
+        "checkout.phone_error": "أدخل رقماً مغربياً صحيحاً، مثل 0612345678 أو ‎+212612345678.",
+        "menu.loading": "جارٍ تحميل القائمة…",
+        "menu.empty_title": "القائمة ستكون متاحة قريباً",
+        "menu.empty_help": "المطعم يجهّز القائمة. حاول مجدداً بعد قليل.",
+        "menu.refresh": "تحديث القائمة",
+        "menu.error_title": "تعذّر تحميل القائمة",
+        "menu.error_help": "تحقّق من اتصالك ثم حاول مجدداً.",
+        "common.retry": "حاول مجدداً",
+        "common.view": "عرض",
+        "common.undo": "تراجع",
+        "common.home": "الرئيسية",
+        "hero.unavailable": "الطلبات غير متاحة",
+        "hero.unconfirmed": "ساعات العمل غير مؤكدة",
+        "modal.prepared": "يُحضّر عند الطلب.",
+        "modal.personalize": "خصّص وجبتك حسب ذوقك.",
+        "modal.included": "مشمول",
+        "modal.starting": "ابتداءً من {price}",
+        "modal.choose_exact": "اختر {count} من الخيارات",
+        "modal.choose_range": "اختر {min} على الأقل · الحد الأقصى {max}",
+        "modal.choose_optional": "حسب ذوقك · حتى {max} من الخيارات",
+        "modal.maximum_error": "يمكنك اختيار {max} كحد أقصى. أزل خياراً لتغيير اختيارك.",
+        "modal.decrease": "تقليل الكمية",
+        "modal.increase": "زيادة الكمية",
+        "modal.close_item": "إغلاق الطبق",
+        "choice.changed": "تغيّرت مجموعات الخيارات. خصّص هذا الطبق من جديد.",
+        "choice.invalid": "مجموعة الخيارات هذه غير متاحة. تواصل مع المطعم.",
+        "choice.unavailable": "هذا الخيار غير متاح. اختر طبقاً آخر أو تواصل مع المطعم.",
+        "choice.minimum": "اختر {min} على الأقل للمتابعة.",
+        "choice.maximum": "اختر {max} كحد أقصى.",
+        "choice.option_changed": "تغيّر أحد الخيارات أو أصبح غير متاح. اختر مجدداً.",
+        "choice.duplicate": "اختر كل خيار مرة واحدة فقط.",
+        "cart.choices": "الخيارات:",
+        "cart.extras": "الإضافات:",
+        "cart.decrease": "تقليل كمية {name}",
+        "cart.increase": "زيادة كمية {name}",
+        "cart.added": "تمت إضافة {name} إلى السلة.",
+        "cart.removed": "تمت إزالة {name}.",
+        "cart.invalid_amount": "هذا المبلغ غير صحيح. أزل هذا المنتج وخصّصه من جديد.",
+        "cart.old_amount": "مبلغ أحد المنتجات المحفوظة غير صحيح. أزله وخصّصه من جديد.",
+        "cart.old_quantity": "أعد تكوين هذه السلة المحفوظة قبل تغيير الكمية.",
+        "cart.empty_checkout": "اختر طبقاً قبل إتمام الطلب.",
+        "cart.verify": "حدّث القائمة قبل تقديم الطلب.",
+        "cart.invalid_item_amount": "مبلغ {name} غير صحيح. أزله وخصّصه من جديد.",
+        "cart.invalid_item_quantity": "كمية {name} غير صحيحة. أزله وخصّصه من جديد.",
+        "cart.offer_unavailable": "{name} لم يعد متاحاً. أزل هذا العرض من السلة.",
+        "cart.offer_price": "تغيّر سعر {name}. خصّص هذا العرض من جديد.",
+        "cart.offer_options": "تغيّرت خيارات {name}. خصّص هذا العرض من جديد.",
+        "cart.offer_choices": "تغيّرت اختيارات {name}. خصّص هذا العرض من جديد.",
+        "cart.offer_extras": "تغيّرت إضافات {name}. خصّص هذا العرض من جديد.",
+        "cart.product_unavailable": "{name} لم يعد متاحاً. أزل هذا المنتج للمتابعة.",
+        "cart.product_choices": "تغيّرت اختيارات {name}. أزله وخصّصه من جديد.",
+        "cart.product_price": "تغيّر سعر {name}. أزله وخصّصه من جديد.",
+        "cart.product_extras": "تغيّرت إضافات {name}. أزله وخصّصه من جديد.",
+        "menu.product_changed": "تغيّر هذا الطبق. افتحه مجدداً للتحقّق من اختياراتك.",
+        "menu.offer_changed": "تغيّر هذا العرض أو أصبح غير متاح.",
+        "menu.price_check": "يحتاج المطعم إلى التحقّق من سعر هذه الخيارات.",
+        "menu.soldout": "هذا الطبق غير متوفر حالياً.",
+        "menu.offer_unavailable": "هذا العرض لم يعد متاحاً.",
+        "service.unavailable": "طريقة الطلب هذه غير متاحة. اختر طريقة أخرى.",
+        "delivery.zone_hint": "أدخل عنوانك أو استخدم موقعك عبر GPS.",
+        "delivery.gps_unsupported": "متصفّحك لا يدعم تحديد الموقع عبر GPS.",
+        "delivery.gps_retry": "📍 إعادة تحديد الموقع عبر GPS",
+        "delivery.gps_denied": "لم يُسمح بالوصول إلى الموقع. أدخل عنوانك أدناه.",
+        "delivery.gps_coordinates": "✓ تم تحديد الموقع ({lat}، {lng})",
+        "delivery.address_error": "أدخل عنوان التوصيل.",
+        "summary.whatsapp_hint": "سيُفتح طلبك في واتساب. أرسل الرسالة لتأكيد الطلب.",
+        "order.processing": "جارٍ الإرسال…",
+        "order.sent": "تم إرسال الطلب #{id} إلى المطعم!",
+        "order.error": "تعذّر إرسال طلبك. تم الاحتفاظ بسلتك. حاول مجدداً.",
+        "order.connection_error": "خطأ في الاتصال. حاول مجدداً.",
+        "tracker.pending": "سيؤكّد المطعم طلبك.",
+        "tracker.confirmed": "وجبتك قيد التحضير في المطبخ.",
+        "tracker.pickup": "وجبتك جاهزة عند الشباك.",
+        "tracker.delivery": "طلبك في الطريق مع الموصّل.",
+        "tracker.delivered": "اكتمل الطلب. بالصحة والراحة!",
+        "tracker.rejected": "ألغى المطعم الطلب. تواصل معه لمعرفة التفاصيل.",
+        "tracker.unknown": "ستظهر تحديثات طلبك هنا.",
+        "tracker.error": "تتبّع الطلب غير متاح مؤقتاً. حاول مجدداً أو تواصل مع المطعم.",
+        "location.closed": "مغلق",
+
         // Navigation & Header
         'nav.skip': 'تخطي إلى القائمة',
         'nav.menu': 'القائمة',
@@ -620,14 +905,14 @@ export const i18n = {
     /**
      * Get translation for a given key
      */
-    t(key, fallback = '') {
+    t(key, fallback = '', values = {}) {
         const lang = this.getLang();
         const dict = translations[lang] || translations.fr;
         if (dict && dict[key] !== undefined) {
-            return dict[key];
+            return dict[key].replace(/\{(\w+)\}/g, (match, name) => values[name] ?? match);
         }
         if (translations.fr && translations.fr[key] !== undefined) {
-            return translations.fr[key];
+            return translations.fr[key].replace(/\{(\w+)\}/g, (match, name) => values[name] ?? match);
         }
         return fallback || key;
     },
@@ -656,10 +941,10 @@ export const i18n = {
         // Update all text nodes with data-i18n
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
-            const translation = this.t(key);
+            const textTarget = el.querySelector('[data-i18n-text]') || el;
+            const translation = this.t(key, textTarget.textContent.trim());
             if (translation) {
                 // If element has a designated child target, update only that
-                const textTarget = el.querySelector('[data-i18n-text]') || el;
                 // If it contains direct child icons or svg, only update the text node
                 if (el.querySelector('svg, i[data-feather]')) {
                     let updated = false;
@@ -687,21 +972,21 @@ export const i18n = {
         // Update placeholders
         document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
             const key = el.getAttribute('data-i18n-placeholder');
-            const translation = this.t(key);
+            const translation = this.t(key, el.getAttribute("placeholder") || '');
             if (translation) el.setAttribute('placeholder', translation);
         });
 
         // Update ARIA labels
         document.querySelectorAll('[data-i18n-aria]').forEach(el => {
             const key = el.getAttribute('data-i18n-aria');
-            const translation = this.t(key);
+            const translation = this.t(key, el.getAttribute("aria-label") || '');
             if (translation) el.setAttribute('aria-label', translation);
         });
 
         // Update titles
         document.querySelectorAll('[data-i18n-title]').forEach(el => {
             const key = el.getAttribute('data-i18n-title');
-            const translation = this.t(key);
+            const translation = this.t(key, el.getAttribute("title") || '');
             if (translation) el.setAttribute('title', translation);
         });
 
@@ -764,6 +1049,6 @@ if (typeof window !== 'undefined') {
     });
 }
 
-export const t = (key, fallback) => i18n.t(key, fallback);
+export const t = (key, fallback, values) => i18n.t(key, fallback, values);
 export { translations };
 export default i18n;
