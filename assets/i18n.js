@@ -120,6 +120,7 @@ const translations = {
         'hero.dinein': 'Sur place',
         'hero.table_order': '🪑 Commande à la Table',
         'hero.cta': 'Commander maintenant',
+        'hero.cta_closed': 'Voir la carte',
         'hero.closed_title': 'Le restaurant est fermé.',
         'hero.closed_desc': 'Vous pouvez parcourir la carte. Les commandes reprendront à l’ouverture.',
 
@@ -413,6 +414,7 @@ const translations = {
         'hero.dinein': 'Dine-in',
         'hero.table_order': '🪑 Order to Table',
         'hero.cta': 'Order now',
+        'hero.cta_closed': 'Browse the menu',
         'hero.closed_title': 'The restaurant is closed.',
         'hero.closed_desc': 'You can explore our menu. Orders will resume as soon as we open.',
 
@@ -706,6 +708,7 @@ const translations = {
         'hero.dinein': 'بعين المكان',
         'hero.table_order': '🪑 الطلب إلى الطاولة',
         'hero.cta': 'اطلب دابا',
+        'hero.cta_closed': 'شوف المينيو',
         'hero.closed_title': 'المطعم مغلق حالياً.',
         'hero.closed_desc': 'يمكنك تصفح القائمة بكل حرية. سنستقبل طلباتكم فور الافتتاح.',
 

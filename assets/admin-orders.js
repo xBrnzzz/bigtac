@@ -222,7 +222,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
             const incoming=tracker.receive(active,{cached:snapshot.cached,pending:snapshot.pending,partial});
             if(incoming.length){newCount+=incoming.length;$('orders-notification').hidden=false;$('orders-notification').querySelector('span').textContent=`${newCount} nouvelle(s) commande(s) à accepter`;if(sound)playAlert();}
             render();
-        },error=>{if(version===epoch&&enabled){loading=false;activeError=operationMessage(error);active=[];render();}});
+        },error=>{if(version===epoch&&enabled){loading=false;activeError='Impossible de charger les commandes. Utilisez Actualiser pour réessayer.';active=[];render();}});
     }
     async function playAlert() {
         if(!audio || audio.state!=='running' || !sound)return;
