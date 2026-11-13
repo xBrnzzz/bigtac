@@ -36,6 +36,10 @@ export function createOverview(container, navigate) {
     page.querySelector('.admin-freshness').remove();
     const dashboardGrid=page.querySelector('.admin-overview-grid');
     for(const panel of ['hourly','attention','products','recent','actions','trend','services'])dashboardGrid.append(page.querySelector(`[data-panel="${panel}"]`));
+    const attention=page.querySelector('[data-panel=attention]'),phone=matchMedia('(max-width:767px)');
+    const arrangeAttention=()=>phone.matches?page.insertBefore(attention,page.querySelector('.admin-kpis')):dashboardGrid.append(attention);
+    phone.addEventListener('change',arrangeAttention);
+    arrangeAttention();
     let config = {}, timezone = reportingTimezone(), orders = null, active = null, error = '', lastGood = null, cached = false;
     let historyCached=false, activeCached=false;
     let subscriptions = [], timer = null, currentWindow = null, enabled = false;

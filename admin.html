@@ -240,7 +240,7 @@
 
                 <!-- Employee cards retain the existing table hooks and column semantics. -->
                 <section class="admin-team-accounts" aria-labelledby="team-accounts-title">
-                    <div class="admin-team-heading">
+                    <div class="admin-team-heading"><p class="admin-team-readonly">Consultation des comptes · modification indisponible.</p>
                         <h3 id="team-accounts-title" class="font-extrabold text-slate-700 text-sm">Liste des Comptes</h3>
                     </div>
                     <div class="admin-team-table-wrap">
@@ -375,27 +375,27 @@
                     <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200/80 space-y-4">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label class="text-[10px] font-black text-slate-400 uppercase">Titre Promo *</label>
+                                <label for="promo-name">Nom de la promotion *</label>
                                 <input type="text" id="promo-name" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold" required placeholder="Ex: Menu Duo Tacos">
                             </div>
                             <div>
-                                <label class="text-[10px] font-black text-slate-400 uppercase">Prix Spécial (DH) *</label>
+                                <label for="promo-price">Prix (DH) *</label>
                                 <input type="number" id="promo-price" step="0.5" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-red-600" required placeholder="Ex: 49">
                             </div>
                         </div>
 
                         <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase">Description</label>
+                            <label for="promo-desc">Description</label>
                             <textarea id="promo-desc" rows="2" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="2 Tacos + 2 Boissons + Frites"></textarea>
                         </div>
 
                         <div class="flex items-center gap-2 pt-1">
                             <input type="checkbox" id="promo-visible" class="w-4 h-4 text-brand-500 rounded" checked>
-                            <label for="promo-visible" class="text-xs font-bold text-slate-700">Promotion Active & Visible</label>
+                            <label for="promo-visible" class="text-xs font-bold text-slate-700">Publié sur la carte</label>
                         </div>
 
                         <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase">Image</label>
+                            <label for="promo-image-file">Image</label>
                             <div class="flex gap-4 items-center mt-1">
                                 <div id="promo-image-preview" class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
                                     <i data-feather="image" class="text-slate-300"></i>
@@ -408,11 +408,11 @@
 
                     <!-- Variants for Promos -->
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
-                        <div class="flex border-b border-slate-100">
-                            <button type="button" onclick="switchPromoTab('choices')" id="promo-tab-choices" class="flex-1 py-3.5 text-xs font-black uppercase text-brand-600 border-b-2 border-brand-500 bg-brand-50/50 transition">
-                                Variantes
+                        <div class="promo-editor-tabs" role="group" aria-label="Options de la promotion">
+                            <button type="button" onclick="switchPromoTab('choices')" aria-pressed="true" id="promo-tab-choices" class="flex-1 py-3.5 text-xs font-black uppercase text-brand-600 border-b-2 border-brand-500 bg-brand-50/50 transition">
+                                Choix
                             </button>
-                            <button type="button" onclick="switchPromoTab('supplements')" id="promo-tab-supplements" class="flex-1 py-3.5 text-xs font-black uppercase text-slate-400 hover:bg-slate-50 transition border-b-2 border-transparent">
+                            <button type="button" onclick="switchPromoTab('supplements')" aria-pressed="false" id="promo-tab-supplements" class="flex-1 py-3.5 text-xs font-black uppercase text-slate-400 hover:bg-slate-50 transition border-b-2 border-transparent">
                                 Suppléments
                             </button>
                         </div>
@@ -436,9 +436,10 @@
                 </form>
             </div>
 
-            <div class="p-5 border-t border-slate-100 bg-white shrink-0">
-                <button onclick="savePromo()" id="btn-save-promo" class="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black text-sm shadow-lg shadow-red-600/25 transition">
-                    Sauvegarder la Promotion
+            <div class="promo-editor-footer p-5 border-t border-slate-100 bg-white shrink-0">
+                <button type="button" class="admin-button" onclick="closePromoEditor()">Annuler</button>
+                <button type="button" onclick="savePromo()" id="btn-save-promo" class="admin-button primary">
+                    Enregistrer la promotion
                 </button>
             </div>
         </div>
@@ -807,7 +808,7 @@
         window.closePromoEditor=()=>promotionsWorkspace.close();
         window.savePromo=()=>promotionsWorkspace.save();
         window.deletePromo=()=>showToast('Utilisez Supprimer dans la liste des offres.','error');
-        window.switchPromoTab=tab=>{document.getElementById('promo-panel-choices').classList.toggle('hidden',tab!=='choices');document.getElementById('promo-panel-supplements').classList.toggle('hidden',tab!=='supplements');};
+        window.switchPromoTab=tab=>{for(const name of ['choices','supplements'])document.getElementById('promo-tab-'+name).setAttribute('aria-pressed',String(tab===name));document.getElementById('promo-panel-choices').classList.toggle('hidden',tab!=='choices');document.getElementById('promo-panel-supplements').classList.toggle('hidden',tab!=='supplements');};
 
         // Staff administration fails closed until a trusted service is verified.
         const staffForm=document.getElementById('user-form');
@@ -821,7 +822,7 @@
                 const snap=await getDocs(query(collection(db,'users'),limit(201)));if(version!==workVersion||!authorized('drivers'))return;
                 if(snap.metadata?.fromCache||snap.docs.length>200)throw Error('Liste non confirmée ou partielle.');
                 const labels=document.querySelectorAll('#view-drivers th');if(labels.length>=5){labels[2].textContent='État';labels[3].textContent='Accès';}
-                body.innerHTML=snap.docs.map(d=>{const u=d.data(),role=profileRole(u);return `<tr class="admin-employee-card" role="row"><td class="admin-employee-identity" headers="team-column-user" role="cell"><strong>${escapeOrderText(String(u.name||'Sans nom'))}</strong><p>${escapeOrderText(String(u.role||'Non renseigné'))}</p></td><td class="admin-employee-email" headers="team-column-email" role="cell"><span class="admin-employee-label">Email</span><span>${escapeOrderText(String(u.email||''))}</span></td><td class="admin-employee-status" headers="team-column-state" role="cell"><span class="admin-employee-label">État</span><span class="admin-employee-state${role?'':' is-unrecognized'}">${role?'Actif':'Accès désactivé ou profil invalide'}</span></td><td class="admin-employee-access" headers="team-column-access" role="cell"><span class="admin-employee-label">Accès</span><span>${role?'Profil reconnu':'Refusé'}</span></td><td class="admin-employee-action" headers="team-column-action" role="cell"><button class="admin-button" disabled>Modification indisponible</button></td></tr>`;}).join('')||'<tr class="admin-team-message"><td colspan="5">Aucun compte enregistré.</td></tr>';
+                body.innerHTML=snap.docs.map(d=>{const u=d.data(),role=profileRole(u);return `<tr class="admin-employee-card" role="row"><td class="admin-employee-identity" headers="team-column-user" role="cell"><strong>${escapeOrderText(String(u.name||'Sans nom'))}</strong><p>${escapeOrderText(String(u.role||'Non renseigné'))}</p></td><td class="admin-employee-email" headers="team-column-email" role="cell"><span class="admin-employee-label">Email</span><span>${escapeOrderText(String(u.email||''))}</span></td><td class="admin-employee-status" headers="team-column-state" role="cell"><span class="admin-employee-label">État</span><span class="admin-employee-state${role?'':' is-unrecognized'}">${role?'Actif':'Accès désactivé ou profil invalide'}</span></td><td class="admin-employee-access" headers="team-column-access" role="cell"><span class="admin-employee-label">Accès</span><span>${role?'Profil reconnu':'Refusé'}</span></td><td class="admin-employee-action" headers="team-column-action" role="cell"><span class="sr-only">Modification indisponible</span></td></tr>`;}).join('')||'<tr class="admin-team-message"><td colspan="5">Aucun compte enregistré.</td></tr>';
             }catch(error){body.innerHTML='<tr class="admin-team-message"><td colspan="5">Lecture impossible. Rechargez Équipe pour réessayer.</td></tr>';}
         }
         window.deleteDriver=async()=>{try{await staffAdministration.remove();}catch(error){showToast(error.message,'error');return false;}};

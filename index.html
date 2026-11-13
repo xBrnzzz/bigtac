@@ -764,6 +764,9 @@
         function storeAvailable(){return configReady&&modes.some(mode=>orderingAvailable(appConfig,mode));}
         function applyRestaurantConfig(){
             const open=storeAvailable(),status=document.getElementById('storeStatus');status.textContent=open?t('hero.status_open'):t('hero.unavailable');status.classList.toggle('is-open',open);status.classList.toggle('is-closed',!open);document.getElementById('closedBanner').classList.toggle('hidden',open);
+            const heroAction = document.querySelector('.intro-cta span');
+            heroAction.dataset.i18n = open ? 'hero.cta' : 'hero.cta_closed';
+            heroAction.textContent = t(heroAction.dataset.i18n);
             document.querySelectorAll('.service-choice').forEach((button,index)=>{button.disabled=!configReady||!orderingAvailable(appConfig,modes[index]);button.setAttribute('aria-disabled',String(button.disabled));});
             if(appConfig.restaurantName){const brand=document.querySelector('.store-brand>span');brand.firstChild.textContent=appConfig.restaurantName;document.querySelector('.store-brand').setAttribute('aria-label',appConfig.restaurantName+', '+t('common.home'));document.querySelector('#store-title span').textContent=appConfig.restaurantName+' !';document.querySelector('.app-footer>a').textContent=appConfig.restaurantName;}
             document.querySelector('.restaurant-intro__copy>p').textContent=appConfig.description||t('hero.subtitle',profileDefaults.description);
@@ -1076,6 +1079,7 @@
                 error.textContent = message;
                 error.classList.toggle('hidden', !message);
             }
+            document.getElementById('customizationHint').classList.toggle('is-invalid', Boolean(document.querySelector('#addItemModal .has-error')));
         }
         window.selectCustomizationOption = (index, optionIndex, input) => {
             cancelCustomizationAdvance();
@@ -1142,7 +1146,7 @@
             const missing = wizardSteps.filter((step, index) => selectionIssue(step, wizardData[index], t)).length;
             const hint = document.getElementById('customizationHint');
             hint.textContent = valid ? t('modal.ready_hint', 'Tout est prêt. Ajoutez votre repas au panier.') : (i18n.getLang() === 'ar' ? `${missing} خيارات إجبارية للإكمال قبل الإضافة.` : i18n.getLang() === 'en' ? `${missing} required choice${missing > 1 ? 's' : ''} to complete before adding.` : `${missing} choix obligatoire${missing > 1 ? 's' : ''} à compléter avant l’ajout.`);
-            hint.classList.toggle('is-invalid', !valid);
+            hint.classList.toggle('is-invalid', Boolean(document.querySelector('#addItemModal .has-error')));
             document.getElementById('btnModalAddToCart').dataset.ready = String(valid);
             document.getElementById('btnModalAddToCart').setAttribute('aria-describedby', 'customizationHint');
             document.getElementById('addToCartLabel').textContent = valid ? t('modal.add_to_cart', 'Ajouter au panier') : t('modal.complete_choices', 'Compléter mes choix');
