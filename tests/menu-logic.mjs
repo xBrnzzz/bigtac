@@ -15,15 +15,41 @@ try{
     for(const width of [320,390,768,1440]){
         const {page:p,context}=await open(admin.url+'/admin.html#menu',width);await p.locator('.menu-product').first().waitFor();
         const history=await p.evaluate(()=>JSON.stringify(__adminFixture.data.orders));
-        await p.locator('[data-product=tacos] [data-menu-action=edit]').click();await act(p,'editor-tab').filter({hasText:'Choix'}).click();
+        await p.locator('[data-product=tacos] [data-menu-action=edit]').click();
+        check(await p.locator('#input-desc').evaluate(e=>{const c=getComputedStyle(e).backgroundColor.match(/\d+/g).map(Number);return c[0]>=220&&c[0]<250&&Math.max(...c.slice(0,3))-Math.min(...c.slice(0,3))<8;}),'Description has a quiet gray input surface');
+        await act(p,'editor-tab').filter({hasText:'Choix'}).click();
         await p.locator('#menu-choice-template').selectOption('sizes');await act(p,'add-choice').click();
         check(await p.locator('#item-editor .menu-option-row').count()===3,'Template adds three draft options');
+        check(await p.locator('#item-editor [data-group-field=title]').evaluate(e=>e===document.activeElement),'Adding a group focuses its name');
+        await p.locator('#item-editor .menu-group-config .menu-field>span').first().click();
+        check(await p.locator('#item-editor [data-group-field=title]').evaluate(e=>e===document.activeElement),'Clicking the group label focuses its input');
+        await p.locator('#item-editor .menu-rule-details>summary').click();
+        await p.locator('#item-editor [data-group-required]').uncheck();
+        check(await p.locator('#item-editor [data-selection-preset]').inputValue()==='custom'&&await p.locator('#item-editor [data-rule-summary]').innerText()==='Un choix facultatif','Optional single-choice rule is not labelled exactly one required choice');
+        await p.locator('#item-editor [data-selection-preset]').selectOption('one');
+        await p.locator('#item-editor .menu-rule-details>summary').click();
         await p.locator('#item-editor [data-selection-preset]').selectOption('upto');
         check(await p.locator('#item-editor [data-group-field=min]').inputValue()==='0'&&await p.locator('#item-editor [data-group-field=max]').inputValue()==='2','Preset maps to legacy min/max');
+        await p.locator('#item-editor .menu-rule-details>summary').click();
         await p.locator('#item-editor [data-group-required]').check();check(await p.locator('#item-editor [data-group-field=min]').inputValue()==='1','Required toggle updates canonical minimum');
         await p.locator('#item-editor [data-group-field=min]').fill('3');check(await p.locator('#item-editor [data-group-error]').isVisible(),'Invalid group feedback is inline');await p.locator('#item-editor [data-group-field=min]').fill('1');
+        await act(p,'add-option').click();
+        check(await p.locator('#item-editor [data-option-field=name]').last().evaluate(e=>e===document.activeElement),'Adding an option focuses the new name');
+        await p.locator('#item-editor [data-option-field=name]').last().fill('Spécial');
+        await p.locator('#item-editor .menu-option-row .menu-option-actions>summary').last().click();
+        await act(p,'option-remove').last().click();
+        check(await p.locator('#item-editor .menu-option-row').count()===3,'Option menu removes only the selected draft option');
+        await p.locator('#item-editor .menu-option-row .menu-option-actions>summary').first().click();
+        const popup=await p.locator('#item-editor .menu-option-actions[open]>div').evaluate(e=>{
+            const r=e.getBoundingClientRect(),b=e.closest('.menu-dialog-body').getBoundingClientRect();
+            return {fits:r.top>=b.top-1&&r.bottom<=b.bottom+1,top:r.top,bottom:r.bottom,containerTop:b.top,containerBottom:b.bottom,placement:e.parentElement.dataset.placement};
+        });
+        check(popup.fits,`Option actions fit inside the ${width}px editor: ${JSON.stringify(popup)}`);
+        await p.keyboard.press('Escape');check(await p.locator('#item-editor').isVisible()&&!await p.locator('#item-editor .menu-option-actions[open]').count(),'Escape closes row actions without closing the editor');
+        await p.locator('#item-editor .menu-option-row .menu-option-actions>summary').first().click();
         await act(p,'option-duplicate').first().click();check(await p.locator('#item-editor .menu-option-row').count()===4,'Option duplicated');
         check(await p.locator('#item-editor [data-option-field=name]').nth(1).inputValue()==='M (copie)','Duplicate gets a distinct editable name');
+        await p.locator('#item-editor .menu-option-row .menu-option-actions>summary').first().click();
         await act(p,'option-down').first().click();check(await p.locator('#item-editor [data-option-field=name]').first().inputValue()==='M (copie)','Move Down reorders draft options');
         check(await p.locator('#item-editor').evaluate(el=>el.scrollWidth<=el.clientWidth)&&await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`New controls fit ${width}px`);
         p.once('dialog',dialog=>dialog.dismiss());await p.keyboard.press('Escape');check(await p.locator('#item-editor').isVisible(),'Unsaved changes remain protected');
@@ -33,8 +59,8 @@ try{
     }
     {
         const {page:p,context}=await open(admin.url+'/admin.html#menu',390);await p.locator('.menu-product').first().waitFor();await p.locator('[data-menu-action=groups]').click();await p.locator('#menu-groups-dialog [data-menu-action=new-group]').click();
-        await p.locator('#menu-group-template').selectOption('sauces');p.once('dialog',dialog=>dialog.accept());await p.locator('#menu-group-editor [data-menu-action=group-template]').click();
-        await p.locator('#menu-group-editor [data-selection-preset]').selectOption('atleast');await p.locator('#menu-group-editor [data-group-field=min]').fill('2');
+        await p.locator('#menu-group-editor .menu-template-details>summary').click();await p.locator('#menu-group-template').selectOption('sauces');p.once('dialog',dialog=>dialog.accept());await p.locator('#menu-group-editor [data-menu-action=group-template]').click();
+        await p.locator('#menu-group-editor [data-selection-preset]').selectOption('atleast');await p.locator('#menu-group-editor .menu-rule-details>summary').click();await p.locator('#menu-group-editor [data-group-field=min]').fill('2');
         await p.locator('#menu-group-editor [data-menu-action=save-group]').click();await p.locator('#menu-group-editor').waitFor({state:'hidden'});
         check(await p.evaluate(()=>__adminFixture.data.modifierGroups[0].min===2&&__adminFixture.data.modifierGroups[0].max===0),'Shared group uses same preset contract');await p.keyboard.press('Escape');
         await p.locator('[data-product=tacos] [data-menu-action=edit]').click();await p.locator('#input-price').fill('0.001');await act(p,'editor-tab').filter({hasText:'Aperçu'}).click();
