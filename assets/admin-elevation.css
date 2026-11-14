@@ -125,3 +125,21 @@
     .admin-body :where(button,input,select,textarea,summary,dialog,.admin-panel,.order-card,.menu-product) {border-color:ButtonText!important}
     .admin-body :where(button,a,summary,input,select,textarea):focus-visible {outline-color:Highlight!important}
 }
+
+/* White layers: one raised parent per content group, with shallower controls. */
+.admin-body :is(.admin-sidebar,.admin-topbar,.admin-workspace,#view-driver) {background:var(--admin-surface)!important}
+.admin-body #views-container {box-shadow:0 0 20px rgba(40,40,40,.035)}
+.admin-body .admin-panel-head h3 {font-size:16px;letter-spacing:-.035em}
+.admin-body .admin-kpi dt {font-size:12px;font-weight:650;color:var(--admin-text)}
+.admin-body :is(.menu-product-info p,.order-options,.admin-attention-row span,.admin-attention-total span) {font-size:12px}
+.admin-body .menu-product-info h4 {font-size:16px;letter-spacing:-.02em}
+.admin-body :is(.order-card,#driver-tab-available>div,#driver-tab-deliveries>div) {box-shadow:var(--shadow-ticket)!important}
+.admin-body :is(.menu-product-main,.menu-product-bottom,.admin-employee-card,#promotions-list>div) {background:white!important}
+.admin-body .admin-settings-panel .admin-setting-row {max-width:760px}
+.admin-body :is(.orders-search input,.menu-search input,.menu-approved-filters>summary) {background:white!important;box-shadow:var(--shadow-control)!important}
+.admin-body :is(.admin-panel,.menu-dialog,.order-detail,.admin-more,#promo-editor,[class~=bg-white]) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]),select,textarea) {background:white!important;box-shadow:var(--shadow-control)!important}
+.admin-body :is(.admin-panel,.menu-dialog,.order-detail,.admin-more,#promo-editor) :is(input,select,textarea)[aria-invalid=true] {background:var(--admin-red-bg)!important}
+.admin-body .orders-mode {background:white;box-shadow:var(--shadow-control)}
+@media(min-width:1000px) {
+ .admin-body :is(.admin-page-heading h2,.orders-heading h2,.menu-heading h2) {font-size:32px;letter-spacing:-.045em}
+}
