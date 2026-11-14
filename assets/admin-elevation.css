@@ -129,15 +129,17 @@
 /* White layers: one raised parent per content group, with shallower controls. */
 .admin-body :is(.admin-sidebar,.admin-topbar,.admin-workspace,#view-driver) {background:var(--admin-surface)!important}
 .admin-body #views-container {box-shadow:0 0 20px rgba(40,40,40,.035)}
-.admin-body .admin-panel-head h3 {font-size:16px;letter-spacing:-.035em}
+.admin-body .admin-panel-head h3 {font-size:17px;letter-spacing:-.025em;line-height:1.4}
 .admin-body .admin-kpi dt {font-size:12px;font-weight:650;color:var(--admin-text)}
-.admin-body :is(.menu-product-info p,.order-options,.admin-attention-row span,.admin-attention-total span) {font-size:12px}
+.admin-body :is(.menu-product-info p,.admin-attention-row span,.admin-attention-total span) {font-size:13px;line-height:1.5}
+.admin-body .order-options {font-size:13px;line-height:1.45}
 .admin-body .menu-product-info h4 {font-size:16px;letter-spacing:-.02em}
 .admin-body :is(.order-card,#driver-tab-available>div,#driver-tab-deliveries>div) {box-shadow:var(--shadow-ticket)!important}
 .admin-body :is(.menu-product-main,.menu-product-bottom,.admin-employee-card,#promotions-list>div) {background:white!important}
 .admin-body .admin-settings-panel .admin-setting-row {max-width:760px}
-.admin-body :is(.orders-search input,.menu-search input,.menu-approved-filters>summary) {background:white!important;box-shadow:var(--shadow-control)!important}
-.admin-body :is(.admin-panel,.menu-dialog,.order-detail,.admin-more,#promo-editor,[class~=bg-white]) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]),select,textarea) {background:white!important;box-shadow:var(--shadow-control)!important}
+.admin-body :is(.orders-search input,.menu-search input) {background:var(--admin-field-surface)!important;box-shadow:none!important}
+.admin-body .menu-approved-filters>summary {background:white!important;box-shadow:var(--shadow-control)!important}
+.admin-body :is(.admin-panel,.menu-dialog,.order-detail,.admin-more,#promo-editor,[class~=bg-white]) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]),select,textarea) {background:var(--admin-field-surface)!important;box-shadow:none!important}
 .admin-body :is(.admin-panel,.menu-dialog,.order-detail,.admin-more,#promo-editor) :is(input,select,textarea)[aria-invalid=true] {background:var(--admin-red-bg)!important}
 .admin-body .orders-mode {background:white;box-shadow:var(--shadow-control)}
 
@@ -166,6 +168,12 @@
 .admin-body .admin-settings-panel .admin-setting-row {max-width:none;align-items:center}
 .admin-body .settings-save {padding:0 4px 12px}
 .admin-body .settings-save>.settings-section-help {max-width:68ch;margin-bottom:12px}
+.admin-body :is(.admin-subtle,.admin-kpi small,.admin-page-heading>#overview-window) {font-size:12px;line-height:1.5}
+.admin-body :is(.admin-page-heading>p,.menu-heading p,.orders-heading p) {font-size:13px;line-height:1.55}
+.admin-body .admin-location h1 {font-size:13px;font-weight:750}
+.admin-body .admin-nav-group {font-size:12px;font-weight:650}
+#login-section :is(.lang-toggle-btn,.lang-option) {background:white;color:var(--admin-text);min-height:44px}
+#login-section .lang-current {color:var(--admin-text)}
 @media(max-width:1000px) {
  .admin-body .settings-section {grid-template-columns:minmax(0,1fr);gap:22px}
 }

@@ -12,6 +12,10 @@ try{
   await context.route(/firestore\.googleapis\.com|identitytoolkit\.googleapis\.com|gstatic\.com\/firebasejs/,route=>{production++;return route.abort();});
   const page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));
   await page.goto(store.url);await page.locator('#menuContent .product-card').first().waitFor();
+  check(await page.evaluate(()=>{
+   const label=document.querySelector('label[for=customerName]');
+   return parseFloat(getComputedStyle(label.firstElementChild).fontSize)>parseFloat(getComputedStyle(label.lastElementChild).fontSize);
+  }),`${width}: checkout field title is larger than its supporting status`);
   check(await page.evaluate(()=>document.querySelector('.store-brand').getBoundingClientRect().right<=document.querySelector('.store-actions').getBoundingClientRect().left),`${width}: brand and header actions have separate space`);
   await page.locator('#menuContent').getByRole('button',{name:'Choisir Tacos Poulet',exact:true}).click();
   check(!await page.locator('#customizationHint').evaluate(e=>e.classList.contains('is-invalid')),`${width}: missing choices start as guidance`);

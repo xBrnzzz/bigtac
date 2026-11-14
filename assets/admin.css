@@ -5,8 +5,8 @@
     --admin-surface:#ffffff;       /* cards, panels */
     --admin-frame:#ffffff;         /* white navigation frame */
     --admin-raised:#ffffff;        /* hover/raised surfaces */
-    --admin-field-surface:#ffffff;
-    --admin-field-hover:#eeefed;
+    --admin-field-surface:#f2f3f5;
+    --admin-field-hover:#e9ebef;
     --admin-neutral-control:#ffffff;
     --admin-neutral-hover:#ececeb;
     --admin-section-surface:#ffffff;
@@ -54,7 +54,7 @@
 * { box-sizing:border-box; }
 [hidden], .admin-app[hidden], .admin-access[hidden] { display:none!important; }
 html,body { margin:0; height:100%; }
-.admin-body { font:14px/1.5 var(--font); color:var(--admin-text); background:var(--admin-ground); -webkit-tap-highlight-color:transparent; }
+.admin-body { font:14px/1.6 var(--font); color:var(--admin-text); background:var(--admin-ground); -webkit-tap-highlight-color:transparent; }
 .admin-body button,.admin-body a,.admin-body input,.admin-body select { touch-action:manipulation; }
 .admin-body :is(button,a,input,select,textarea):focus-visible { outline:2px solid var(--admin-accent); outline-offset:3px; }
 .admin-body :is(button,a) { -webkit-tap-highlight-color:transparent; }

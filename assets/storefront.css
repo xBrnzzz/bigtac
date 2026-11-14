@@ -1363,7 +1363,7 @@ strong {
 .step-label {
     font-size:12px;
     color:var(--app-muted);
-    font-weight:500;
+    font-weight:600;
     margin-bottom:5px
 }
 .cart-items {
@@ -1446,7 +1446,7 @@ strong {
 }
 .help-text {
     color:var(--app-muted);
-    font-size:12px;
+    font-size:13px;
     line-height:1.5
 }
 .sheet-footer>.help-text {
@@ -1478,9 +1478,14 @@ strong {
     margin-bottom:8px
 }
 .field label span {
-    font-size:11px;
-    font-weight:400;
+    font-size:12px;
+    font-weight:500;
     color:var(--app-muted)
+}
+.field label>span:first-child {
+    font-size:14px;
+    font-weight:600;
+    color:var(--app-ink)
 }
 .field input,.field textarea {
     display:block;
@@ -2511,6 +2516,7 @@ body.has-tracker {
 
 /* RTL Layout Enhancements for Arabic */
 [dir="rtl"] {
+    --app-heading:'Cairo',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     text-align: right;
     font-family: 'Cairo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
