@@ -33,12 +33,25 @@ try{
   await page.evaluate(()=>switchView('settings'));
   check(!await page.locator('#view-overview').isVisible(),`${width}: hidden Overview cannot overlay another view`);
   check(await page.locator('#restaurant-profile-form').evaluate(e=>e.scrollWidth<=e.clientWidth+1),`${width}: grouped settings form fits`);
+  check(await page.locator('.settings-section-heading h3').count()===3,`${width}: settings identity, contact and service fields have separate headings`);
+  await page.evaluate(()=>switchView('promotions'));
+  check(await page.locator('#promotions-list [data-promo-action]').evaluateAll(buttons=>buttons.every(b=>b.getAttribute('aria-label')&&b.querySelector('svg')&&b.querySelector('span').classList.contains('sr-only'))),`${width}: promotion icon actions retain accessible names`);
   await page.evaluate(()=>switchView('menu'));await page.locator('[data-menu-action=edit]').first().click();
   for(const name of ['Publication','Aperçu','Informations']){
    await page.locator('#item-editor [data-menu-action=editor-tab]').filter({hasText:name}).click();
    check(await page.locator('#item-editor .menu-editor-tabs [aria-pressed=true]').evaluate(e=>{const r=e.getBoundingClientRect(),p=e.parentElement.getBoundingClientRect();return r.left>=p.left-1&&r.right<=p.right+1;}),`${width}: active ${name} tab is visible`);
   }
-  await page.keyboard.press('Escape');await page.evaluate(()=>switchView('orders'));await page.locator('#list-pending .order-card').first().waitFor();
+  await page.keyboard.press('Escape');
+  check(await page.locator('.menu-list-surface').evaluate(e=>parseFloat(getComputedStyle(e).borderTopLeftRadius)>0),`${width}: catalogue has a rounded shared surface`);
+  await page.evaluate(()=>switchView('orders'));await page.locator('#list-pending .order-card').first().waitFor();
+  if(width>=1100)check(await page.evaluate(()=>{
+   const cards=[...document.querySelectorAll('#list-pending .order-card')].slice(0,2).map(e=>e.getBoundingClientRect());
+   const cooking=document.querySelector('#list-confirmed .order-card').getBoundingClientRect();
+   return Math.abs(cards[0].left-cards[1].left)<1&&cards[1].top>=cards[0].bottom&&cooking.left>=cards[0].right;
+  }),`${width}: Toutes sorts statuses vertically within the existing grid`);
+  await page.evaluate(()=>showOrderCol('pending'));
+  check(await page.locator('#col-pending').evaluate(e=>getComputedStyle(e).display==='contents'),`${width}: individual status tab retains its existing grid`);
+  await page.evaluate(()=>showOrderCol('all'));
   check(await page.locator('#list-pending .order-card').first().evaluate(e=>e.querySelector('.order-actions').getBoundingClientRect().top<e.querySelector('.order-contact-actions').getBoundingClientRect().top),`${width}: workflow action precedes contact actions`);
   if(width===320)check(await page.locator('#list-pending .primary').first().evaluate(e=>e.getBoundingClientRect().bottom<=document.getElementById('admin-bottom-nav').getBoundingClientRect().top), '320: first Accept action is visible above navigation');
   check(await page.locator('#list-pending .order-contact-actions').first().locator('a').count()===2,`${width}: authorized contact links remain available`);

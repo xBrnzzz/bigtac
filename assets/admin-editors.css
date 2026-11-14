@@ -5,7 +5,7 @@
     width:calc(100% - 48px);max-width:1040px;height:calc(100dvh - 48px);
     max-height:calc(100dvh - 48px);inset:24px 0;margin:0 auto;
     border:0;border-radius:24px;background:#fff;overflow:hidden;
-    box-shadow:0 0 32px rgba(51,51,51,.12)!important;
+    box-shadow:var(--shadow-floating)!important;
     color:var(--admin-text);font-family:var(--font);
 }
 #item-editor::backdrop {background:rgba(250,251,252,.88)}
@@ -50,7 +50,7 @@
 #item-editor .menu-field-pair {gap:18px}
 .admin-body #item-editor :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),select,textarea),
 .admin-body #promo-form :is(input:not([type=checkbox]):not([type=hidden]):not([type=file]),select,textarea) {
-    background:var(--admin-field-surface)!important;box-shadow:var(--shadow-control)!important;
+    background:var(--admin-field-surface)!important;box-shadow:inset 0 0 8px rgba(35,35,35,.045),0 0 10px rgba(35,35,35,.13)!important;
     min-height:48px;border:0;border-radius:10px;padding:12px 14px;font:500 14px/1.5 var(--font);margin-top:0;
 }
 .admin-body :is(#item-editor,#promo-form) :is(input,select,textarea):focus-visible {background:white!important}

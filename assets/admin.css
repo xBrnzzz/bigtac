@@ -20,11 +20,11 @@
     --admin-sidebar-hover:#f3f3f1;
     --admin-nav-active:#cb450d;
     /* White surfaces separate through centered, neutral-gray ambient elevation. */
-    --shadow-ticket:0 0 13px rgba(41,41,41,.118);
-    --shadow-control:0 0 7px rgba(40,40,40,.07);
-    --shadow-card:0 0 16px rgba(40,40,40,.09);
-    --shadow-hover:0 0 18px rgba(40,40,40,.12);
-    --shadow-floating:0 0 30px rgba(40,40,40,.15);
+    --shadow-ticket:0 0 18px rgba(35,35,35,.15);
+    --shadow-control:0 0 7px rgba(35,35,35,.11);
+    --shadow-card:0 0 20px rgba(35,35,35,.13);
+    --shadow-hover:0 0 20px rgba(35,35,35,.16);
+    --shadow-floating:0 0 36px rgba(35,35,35,.20);
     --admin-shadow:var(--shadow-card);
     --admin-card-shadow:var(--admin-shadow);
     --admin-card-hover:var(--shadow-hover);
