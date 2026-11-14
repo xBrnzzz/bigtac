@@ -142,6 +142,7 @@
     <link rel="stylesheet" href="assets/admin-approved.css">
     <link rel="stylesheet" href="assets/admin-polish.css">
     <link rel="stylesheet" href="assets/admin-elevation.css">
+    <link rel="stylesheet" href="assets/admin-editors.css">
     <script type="module" src="assets/i18n.js"></script>
 </head>
 
@@ -359,88 +360,57 @@
 
     </div>
 
-    <!-- PROMOTIONS EDITOR SLIDE-OUT PANEL -->
+    <!-- Page-like promotion editor, full-screen on mobile. -->
     <div id="promo-editor" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="promo-editor-title">
-        <div class="absolute inset-0 bg-slate-950/50 backdrop-blur-sm transition-opacity" onclick="closePromoEditor()"></div>
-        <div class="absolute inset-y-0 right-0 w-full max-w-2xl bg-white shadow-2xl transform transition-transform translate-x-full flex flex-col h-full z-10 border-l border-slate-200">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
-                <h3 class="text-xl font-black text-slate-900" id="promo-editor-title">Nouvelle Promo</h3>
-                <button onclick="closePromoEditor()" class="p-2 hover:bg-slate-100 rounded-full transition"><i data-feather="x"></i></button>
+        <div class="absolute inset-0" onclick="closePromoEditor()"></div>
+        <div class="absolute flex flex-col z-10">
+            <div class="flex justify-between items-center shrink-0">
+                <div><p class="editor-context">BIGTAC / Promotions</p><h3 id="promo-editor-title">Nouvelle promotion</h3></div>
+                <button type="button" onclick="closePromoEditor()" aria-label="Fermer" class="editor-close"><i data-feather="x"></i><span>Fermer</span></button>
             </div>
-            
-            <div class="flex-1 overflow-y-auto bg-slate-50 p-6">
-                <form id="promo-form" class="space-y-5">
+            <div class="flex-1 overflow-y-auto min-h-0">
+                <nav class="menu-editor-tabs promo-section-tabs" aria-label="Sections de la promotion">
+                    <button type="button" id="promo-tab-basic" onclick="switchPromoTab('basic')" aria-pressed="true"><i data-feather="file-text"></i>Informations</button>
+                    <button type="button" id="promo-tab-choices" onclick="switchPromoTab('choices')" aria-pressed="false"><i data-feather="sliders"></i>Choix</button>
+                    <button type="button" id="promo-tab-supplements" onclick="switchPromoTab('supplements')" aria-pressed="false"><i data-feather="plus"></i>Suppléments</button>
+                    <button type="button" id="promo-tab-publish" onclick="switchPromoTab('publish')" aria-pressed="false"><i data-feather="check-circle"></i>Publication</button>
+                </nav>
+                <p id="promo-edit-error" class="menu-inline-error" role="alert" tabindex="-1" hidden></p>
+                <form id="promo-form" novalidate>
                     <input type="hidden" id="edit-promo-id">
-
-                    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200/80 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="promo-name">Nom de la promotion *</label>
-                                <input type="text" id="promo-name" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold" required placeholder="Ex: Menu Duo Tacos">
+                    <section class="editor-info" data-promo-panel="basic">
+                        <h4>Informations de la promotion</h4><p class="editor-section-help">Présentez votre offre et son prix sur la carte.</p>
+                        <div class="editor-basics"><div class="editor-details">
+                            <div class="promo-identity-fields">
+                                <div><label for="promo-name">Nom de la promotion *</label><input type="text" id="promo-name" name="promotion-name" class="w-full" required autocomplete="off" placeholder="Ex. Menu Duo Tacos"></div>
+                                <div><label for="promo-price">Prix (DH) *</label><input type="number" id="promo-price" name="promotion-price" class="w-full" step="0.01" min="0" inputmode="decimal" required placeholder="Ex. 49"></div>
                             </div>
-                            <div>
-                                <label for="promo-price">Prix (DH) *</label>
-                                <input type="number" id="promo-price" step="0.5" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-mono font-bold text-red-600" required placeholder="Ex: 49">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="promo-desc">Description</label>
-                            <textarea id="promo-desc" rows="2" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="2 Tacos + 2 Boissons + Frites"></textarea>
-                        </div>
-
-                        <div class="flex items-center gap-2 pt-1">
-                            <input type="checkbox" id="promo-visible" class="w-4 h-4 text-brand-500 rounded" checked>
-                            <label for="promo-visible" class="text-xs font-bold text-slate-700">Publié sur la carte</label>
-                        </div>
-
-                        <div>
-                            <label for="promo-image-file">Image</label>
-                            <div class="flex gap-4 items-center mt-1">
-                                <div id="promo-image-preview" class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
-                                    <i data-feather="image" class="text-slate-300"></i>
-                                </div>
-                                <input type="file" id="promo-image-file" accept="image/*" class="text-xs text-slate-500 w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-600">
+                            <div><label for="promo-desc">Description</label><textarea id="promo-desc" name="promotion-description" class="w-full" rows="3" placeholder="2 tacos, 2 boissons et frites"></textarea></div>
+                        </div><aside class="editor-media">
+                            <h4>Photo de la promotion</h4><p class="editor-section-help">Le visuel présenté avec votre offre.</p>
+                            <div class="promo-image-editor">
+                                <label id="promo-photo-frame" class="editor-image-frame" for="promo-image-file" aria-label="Ajouter la photo de la promotion"><span class="editor-image-placeholder"><i data-feather="image"></i><span>Ajoutez votre photo</span></span><span id="promo-image-preview"></span></label>
+                                <div class="editor-photo-control"><input type="file" id="promo-image-file" class="editor-file-input" accept="image/jpeg,image/png,image/webp" aria-describedby="promo-photo-filename promo-photo-help"><label class="editor-photo-button" id="promo-photo-button" for="promo-image-file">Ajouter une photo</label></div>
                                 <input type="hidden" id="promo-image-url">
+                                <p id="promo-photo-filename" class="editor-photo-filename">Aucun fichier sélectionné</p><p id="promo-photo-help" class="editor-photo-help">JPG, PNG ou WebP · 5 Mo maximum</p>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Variants for Promos -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
-                        <div class="promo-editor-tabs" role="group" aria-label="Options de la promotion">
-                            <button type="button" onclick="switchPromoTab('choices')" aria-pressed="true" id="promo-tab-choices" class="flex-1 py-3.5 text-xs font-black uppercase text-brand-600 border-b-2 border-brand-500 bg-brand-50/50 transition">
-                                Choix
-                            </button>
-                            <button type="button" onclick="switchPromoTab('supplements')" aria-pressed="false" id="promo-tab-supplements" class="flex-1 py-3.5 text-xs font-black uppercase text-slate-400 hover:bg-slate-50 transition border-b-2 border-transparent">
-                                Suppléments
-                            </button>
-                        </div>
-                        <div class="p-5">
-                            <div id="promo-panel-choices" class="space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs text-slate-400 font-semibold">Ex: Choix des boissons incluses</span>
-                                    <button type="button" onclick="addPromoChoiceGroup()" class="text-xs bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-xl font-bold">+ Groupe</button>
-                                </div>
-                                <div id="promo-container-choices" class="space-y-3"></div>
-                            </div>
-                            <div id="promo-panel-supplements" class="hidden space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs text-slate-400 font-semibold">Suppléments payants optionnels</span>
-                                    <button type="button" onclick="addPromoSupplementRow()" class="text-xs bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-xl font-bold">+ Option</button>
-                                </div>
-                                <div id="promo-container-supplements" class="space-y-2"></div>
-                            </div>
-                        </div>
-                    </div>
+                        </aside></div>
+                    </section>
+                    <section id="promo-panel-choices" data-promo-panel="choices" hidden>
+                        <h4>Choix du client</h4><p class="editor-section-help">Les options incluses dans votre offre.</p>
+                        <div class="editor-section-actions"><span>Ex. Choix des boissons incluses</span><button type="button" onclick="addPromoChoiceGroup()" class="admin-button">+ Groupe</button></div>
+                        <div id="promo-container-choices"></div>
+                    </section>
+                    <section id="promo-panel-supplements" data-promo-panel="supplements" hidden>
+                        <h4>Suppléments payants</h4><p class="editor-section-help">Les options facultatives ajoutées au prix de l’offre.</p>
+                        <div class="editor-section-actions"><span>Suppléments payants optionnels</span><button type="button" onclick="addPromoSupplementRow()" class="admin-button">+ Option</button></div>
+                        <div id="promo-container-supplements"></div>
+                    </section>
                 </form>
             </div>
-
-            <div class="promo-editor-footer p-5 border-t border-slate-100 bg-white shrink-0">
-                <button type="button" class="admin-button" onclick="closePromoEditor()">Annuler</button>
-                <button type="button" onclick="savePromo()" id="btn-save-promo" class="admin-button primary">
-                    Enregistrer la promotion
-                </button>
+            <div class="promo-editor-footer shrink-0">
+                <p>Enregistrer pour appliquer.</p><button type="button" class="admin-button" onclick="closePromoEditor()">Annuler</button>
+                <button type="button" onclick="savePromo()" id="btn-save-promo" class="admin-button primary">Enregistrer la promotion</button>
             </div>
         </div>
     </div>
@@ -487,7 +457,6 @@
         let workVersion = 0;
         let settingsData = { _unavailable: true };
         let overviewStarted = false;
-        let previewsReady = false;
         let currentView = null;
         const shell = mountAdminShell();
         const overview = createOverview(document.getElementById('views-container'), view => window.switchView(view));
@@ -660,21 +629,6 @@
             const requested = location.hash.slice(1);
             switchView(mayView(role, requested) ? requested : roleViews[role][0]);
 
-            if (!previewsReady) {
-            const setupPreview = (fileId, imgId) => {
-                const el = document.getElementById(fileId);
-                if (el) {
-                    el.addEventListener('change', function () {
-                        if (this.files[0]) {
-                            document.getElementById(imgId).innerHTML = `<img src="${URL.createObjectURL(this.files[0])}" class="w-full h-full object-cover">`;
-                        }
-                    });
-                }
-            };
-            setupPreview('promo-image-file', 'promo-image-preview');
-            previewsReady = true;
-            }
-
             if (window.feather) feather.replace();
         }
 
@@ -808,7 +762,7 @@
         window.closePromoEditor=()=>promotionsWorkspace.close();
         window.savePromo=()=>promotionsWorkspace.save();
         window.deletePromo=()=>showToast('Utilisez Supprimer dans la liste des offres.','error');
-        window.switchPromoTab=tab=>{for(const name of ['choices','supplements'])document.getElementById('promo-tab-'+name).setAttribute('aria-pressed',String(tab===name));document.getElementById('promo-panel-choices').classList.toggle('hidden',tab!=='choices');document.getElementById('promo-panel-supplements').classList.toggle('hidden',tab!=='supplements');};
+        window.switchPromoTab=tab=>promotionsWorkspace.switchSection(tab);
 
         // Staff administration fails closed until a trusted service is verified.
         const staffForm=document.getElementById('user-form');
