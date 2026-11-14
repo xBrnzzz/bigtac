@@ -23,14 +23,12 @@
 #promotions-list .promo-actions .admin-button svg{margin:0;display:block}
 #promotions-list .promo-actions [data-promo-action]:not([data-promo-action=delete]){background:transparent;color:#414752;border-color:#dce0e7}
 #promotions-list .promo-actions [data-promo-action]:not([data-promo-action=delete]):hover{background:#f4f5f7;border-color:#b7bec9}
-.admin-quick-actions .admin-button:nth-child(n){background:white;color:var(--admin-text);border:1px solid var(--admin-border);box-shadow:none;min-height:56px;white-space:normal;line-height:1.5;font-size:12px;font-weight:650;gap:10px;justify-content:flex-start;transform:none}
+.admin-quick-actions .admin-button:nth-child(n){display:grid;grid-template-columns:20px minmax(0,1fr);width:100%;background:white;color:var(--admin-text);border:1px solid var(--admin-border);box-shadow:none;min-height:56px;white-space:normal;line-height:1.5;font-size:13px;font-weight:650;gap:10px;justify-content:flex-start;transform:none}
 .admin-quick-actions .admin-button:nth-child(n):hover{background:#f8f9fb;border-color:#bdc4ce;box-shadow:none;transform:none}
 .admin-quick-actions .admin-button svg{width:17px;height:17px;color:var(--admin-muted);flex:none}
-.admin-quick-actions .admin-action-label{min-width:0;word-break:normal;overflow-wrap:normal}
+.admin-quick-actions .admin-action-label{min-width:0;white-space:normal;line-height:1.45;word-break:normal;overflow-wrap:anywhere}
 .menu-badge{align-items:center;line-height:1.5}.order-status{align-items:center;line-height:1.5}
 @media(max-width:767px){
- .admin-quick-actions .admin-button:nth-child(n){display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:18px minmax(36px,auto);justify-items:start;align-content:center;gap:6px;min-height:84px;padding:10px 12px}
- .admin-quick-actions .admin-action-label{align-self:start}
  .order-ticket-footer .order-reject,.order-ticket-footer .order-detail-link{height:46px;min-height:46px}
  .menu-heading>.admin-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:104px;padding:10px 13px;min-height:44px}
  .menu-heading>.admin-button:after{display:none}.menu-add-label{font-size:0;line-height:1.5}.menu-add-label:after{content:'Ajouter';font-size:12px;font-weight:700}

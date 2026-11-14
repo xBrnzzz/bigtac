@@ -34,6 +34,19 @@ try{
   check(await page.evaluate(()=>__fixture.orders.length===0),`${width}: presentation checks create no orders`);
 
   await page.goto(admin.url+'/admin.html?orders=rich&menu=rich');await page.waitForFunction(()=>window.switchView&&!document.getElementById('admin-app').hidden);
+  const quickPanel=page.locator('.admin-panel[data-panel=actions]');
+  await quickPanel.evaluate(panel=>{
+   panel.style.maxWidth='360px';
+   panel.querySelectorAll('.admin-action-label').forEach(label=>label.style.fontSize='20px');
+  });
+  check(await quickPanel.locator('.admin-quick-actions .admin-button').evaluateAll(buttons=>buttons.length===4&&buttons.every(button=>{
+   const label=button.querySelector('.admin-action-label'),r=button.getBoundingClientRect(),text=label.getBoundingClientRect();
+   return r.height>=44&&label.scrollWidth<=label.clientWidth+1&&label.scrollHeight<=label.clientHeight+1&&text.right<=r.right+1&&text.bottom<=r.bottom+1;
+  })),`${width}: quick-action labels fit a narrow panel with enlarged text`);
+  await quickPanel.evaluate(panel=>{
+   panel.style.removeProperty('max-width');
+   panel.querySelectorAll('.admin-action-label').forEach(label=>label.style.removeProperty('font-size'));
+  });
   await page.evaluate(()=>switchView('settings'));
   check(!await page.locator('#view-overview').isVisible(),`${width}: hidden Overview cannot overlay another view`);
   check(await page.locator('#restaurant-profile-form').evaluate(e=>e.scrollWidth<=e.clientWidth+1),`${width}: grouped settings form fits`);
