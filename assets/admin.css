@@ -1,29 +1,30 @@
 :root {
     color-scheme: light;
     /* ── BIGTAC Admin Design System v2 ── */
-    --admin-ground:#f4f5f7;       /* page/workspace bg */
+    --admin-ground:#ffffff;       /* page/workspace bg */
     --admin-surface:#ffffff;       /* cards, panels */
-    --admin-frame:#fafafb;         /* sidebar + topbar frame */
-    --admin-raised:#f0f2f5;        /* hover/raised surfaces */
-    --admin-field-surface:#f1f3f6;
-    --admin-field-hover:#e9edf2;
-    --admin-neutral-control:#f0f2f5;
-    --admin-neutral-hover:#e6eaf0;
-    --admin-section-surface:#fafbfc;
-    --admin-sidebar:#fafafb;       /* light sidebar (NOT dark) */
-    --admin-text:#24262c;          /* primary ink */
-    --admin-muted:#626773;         /* secondary text */
+    --admin-frame:#ffffff;         /* white navigation frame */
+    --admin-raised:#ffffff;        /* hover/raised surfaces */
+    --admin-field-surface:#ffffff;
+    --admin-field-hover:#eeefed;
+    --admin-neutral-control:#ffffff;
+    --admin-neutral-hover:#ececeb;
+    --admin-section-surface:#ffffff;
+    --admin-sidebar:#ffffff;
+    --admin-text:#232427;          /* primary ink */
+    --admin-muted:#5d6065;         /* secondary text */
     --admin-border:#e6e8ed;        /* hairline borders */
     /* sidebar (light frame) */
-    --admin-sidebar-text:#24262c;
-    --admin-sidebar-muted:#626773;
-    --admin-sidebar-hover:#eeeef1;
+    --admin-sidebar-text:#232427;
+    --admin-sidebar-muted:#5d6065;
+    --admin-sidebar-hover:#f3f3f1;
     --admin-nav-active:#cb450d;
-    /* Shared ambient elevation: neutral, centered, single layer. */
-    --shadow-control:0 0 6px rgba(25,30,40,.04);
-    --shadow-card:0 0 12px rgba(25,30,40,.07);
-    --shadow-hover:0 0 15px rgba(25,30,40,.10);
-    --shadow-floating:0 0 22px rgba(25,30,40,.12);
+    /* White surfaces separate through centered, neutral-gray ambient elevation. */
+    --shadow-ticket:0 0 13px rgba(41,41,41,.118);
+    --shadow-control:0 0 7px rgba(40,40,40,.07);
+    --shadow-card:0 0 16px rgba(40,40,40,.09);
+    --shadow-hover:0 0 18px rgba(40,40,40,.12);
+    --shadow-floating:0 0 30px rgba(40,40,40,.15);
     --admin-shadow:var(--shadow-card);
     --admin-card-shadow:var(--admin-shadow);
     --admin-card-hover:var(--shadow-hover);
@@ -71,14 +72,14 @@ html,body { margin:0; height:100%; }
 /* ── Nav ── */
 .admin-nav-group { margin:22px 12px 8px; font-size:11px; font-weight:600; color:var(--admin-muted); }
 .admin-sidebar .admin-nav-group { color:var(--admin-sidebar-muted); margin-top:20px; }
-.admin-nav-link { display:flex; gap:12px; align-items:center; min-height:46px; padding:10px 13px; margin:2px 0; border-radius:12px; color:#626773; text-decoration:none; font-size:13px; font-weight:600; border:0; background:none; cursor:pointer; }
+.admin-nav-link { display:flex; gap:12px; align-items:center; min-height:46px; padding:10px 13px; margin:2px 0; border-radius:12px; color:#5d6065; text-decoration:none; font-size:13px; font-weight:600; border:0; background:none; cursor:pointer; }
 .admin-nav-link svg,.admin-text-button svg,.admin-topbar svg { width:18px; height:18px; flex:none; stroke-width:1.8; }
-.admin-nav-link:hover,.admin-text-button:hover { background:#eeeef1; color:var(--admin-text); }
+.admin-nav-link:hover,.admin-text-button:hover { background:#f3f3f1; color:var(--admin-text); }
 .admin-nav-link[aria-current] { background:var(--admin-active); color:var(--admin-orange-ink); font-weight:800; }
 .admin-nav-link[aria-current]::after { display:none; }
-.admin-sidebar .admin-nav-link { color:#626773; min-height:46px; padding:10px 13px; margin:3px 0; }
+.admin-sidebar .admin-nav-link { color:#5d6065; min-height:46px; padding:10px 13px; margin:3px 0; }
 .admin-sidebar .admin-nav-link svg { color:inherit; width:18px; height:18px; }
-.admin-sidebar .admin-nav-link:hover,.admin-sidebar .admin-text-button:hover { background:#eeeef1; color:var(--admin-text); }
+.admin-sidebar .admin-nav-link:hover,.admin-sidebar .admin-text-button:hover { background:#f3f3f1; color:var(--admin-text); }
 .admin-sidebar .admin-nav-link[aria-current] { color:var(--admin-orange-ink); background:var(--admin-active); }
 .admin-sidebar #admin-desktop-nav .admin-nav-link svg { color:inherit; }
 .admin-sidebar .admin-nav-link[aria-current]::after { display:none; }
@@ -168,7 +169,7 @@ html,body { margin:0; height:100%; }
 .admin-kpi[data-metric=orders] { --metric-ink:var(--admin-accent); }
 .admin-kpi[data-metric=completed] { --metric-ink:var(--admin-positive); }
 .admin-kpi[data-metric=pending] { --metric-ink:var(--admin-blue); }
-.admin-kpi[data-metric=value] { --metric-ink:#24262c; }
+.admin-kpi[data-metric=value] { --metric-ink:#232427; }
 .admin-kpi dt { color:var(--admin-muted); font-size:11px; font-weight:600; margin:0 0 8px; }
 .admin-metric-icon { display:none; }
 .admin-metric-icon svg { width:25px; height:25px; }
