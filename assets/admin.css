@@ -10,7 +10,7 @@
     --admin-neutral-control:#ffffff;
     --admin-neutral-hover:#ececeb;
     --admin-section-surface:#ffffff;
-    --admin-sidebar:#ffffff;
+    --admin-sidebar:#f2e8da;
     --admin-text:#232427;          /* primary ink */
     --admin-muted:#5d6065;         /* secondary text */
     --admin-border:#e6e8ed;        /* hairline borders */
@@ -60,7 +60,7 @@ html,body { margin:0; height:100%; }
 .admin-body :is(button,a) { -webkit-tap-highlight-color:transparent; }
 /* ── App shell ── */
 .admin-app { height:100dvh; display:grid; grid-template-columns:216px minmax(0,1fr); }
-.admin-sidebar { padding:28px 12px 16px; display:flex; flex-direction:column; min-height:0; overflow:auto; background:var(--admin-frame); color:var(--admin-sidebar-text); border-right:1px solid var(--admin-border); }
+.admin-sidebar { padding:28px 12px 16px; display:flex; flex-direction:column; min-height:0; overflow:auto; background:var(--admin-sidebar); color:var(--admin-sidebar-text); border-right:1px solid var(--admin-border); }
 /* ── Brand ── */
 .admin-brand { display:flex; gap:11px; align-items:center; color:var(--admin-text); text-decoration:none; margin-bottom:4px; padding:0 8px; }
 .admin-brand img { border-radius:50%; object-fit:contain; }

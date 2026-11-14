@@ -127,7 +127,7 @@
 }
 
 /* White layers: one raised parent per content group, with shallower controls. */
-.admin-body :is(.admin-sidebar,.admin-topbar,.admin-workspace,#view-driver) {background:var(--admin-surface)!important}
+.admin-body :is(.admin-topbar,.admin-workspace,#view-driver) {background:var(--admin-surface)!important}
 .admin-body #views-container {box-shadow:0 0 20px rgba(40,40,40,.035)}
 .admin-body .admin-panel-head h3 {font-size:17px;letter-spacing:-.025em;line-height:1.4}
 .admin-body .admin-kpi dt {font-size:12px;font-weight:650;color:var(--admin-text)}
