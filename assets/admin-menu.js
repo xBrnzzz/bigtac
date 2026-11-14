@@ -29,7 +29,10 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
     categoriesPane.innerHTML='<p>Catégories</p>';
     categoriesPane.append(root.querySelector('#menu-categories-list'),root.querySelector('[data-menu-action="categories"]'));
     const productsPane=document.createElement('div');productsPane.className='menu-approved-products';
-    for(const selector of ['#menu-feedback','#menu-bulk','.menu-list-heading','#items-grid'])productsPane.append(root.querySelector(selector));
+    for(const selector of ['#menu-feedback','#menu-bulk'])productsPane.append(root.querySelector(selector));
+    const productSurface=document.createElement('div');productSurface.className='menu-list-surface';
+    productSurface.append(root.querySelector('.menu-list-heading'),root.querySelector('#items-grid'));
+    productsPane.append(productSurface);
     layout.append(categoriesPane,productsPane);root.append(layout);
     const filters=document.createElement('details');filters.className='menu-approved-filters';filters.innerHTML='<summary aria-label="Filtres du menu">'+icon('filter')+'<span>Filtres</span></summary>';
     const filterBody=document.createElement('div');filterBody.append(root.querySelector('.menu-tools .menu-field'),root.querySelector('[data-menu-action="refresh"]'));filters.append(filterBody);root.querySelector('.menu-tools').append(filters);

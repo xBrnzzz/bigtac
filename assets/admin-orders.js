@@ -116,6 +116,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
                     card.innerHTML=cardMarkup(order); card._fingerprint=fingerprint;
                     if(focused) (card.querySelector(`[data-transition="${action}"]:not(:disabled)`) || card.querySelector('[data-open]'))?.focus({preventScroll:true});
                 }
+                card.style.setProperty('--queue-row',String(index+1));
                 if(list.children[index]!==card) list.insertBefore(card,list.children[index]||null);
             });
             if(!rows.length) {
