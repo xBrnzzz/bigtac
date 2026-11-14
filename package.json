@@ -12,7 +12,8 @@
     "test:operations": "node tests/operations-model.mjs && node tests/operations-service.mjs && node tests/operations.mjs && node tests/operations-responsive.mjs",
     "test:i18n": "node tests/i18n.mjs",
     "test:ui-refinement": "node tests/ui-refinement.mjs",
-    "test:visual-refinement": "node tests/visual-refinement.mjs"
+    "test:visual-refinement": "node tests/visual-refinement.mjs",
+    "test:editors": "node tests/editor-experience.mjs"
   },
   "dependencies": {
     "playwright": "^1.64.1"
