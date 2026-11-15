@@ -83,8 +83,7 @@
 #promo-edit-error {margin-bottom:18px}
 .admin-body #item-editor .menu-image-editor button {align-self:flex-start;background:transparent!important;padding:0;min-height:44px;font-size:12px;box-shadow:none!important;color:var(--admin-muted)}
 #item-editor #menu-upload-progress:empty {display:none}
-.admin-body #item-editor :is(.menu-choice-group,.menu-shared-attach,.menu-check),
-.admin-body #promo-container-choices>section {background:white;box-shadow:var(--shadow-control)!important;border:0;border-radius:14px;padding:20px}
+.admin-body #item-editor :is(.menu-choice-group,.menu-shared-attach,.menu-check) {background:white;box-shadow:var(--shadow-control)!important;border:0;border-radius:14px;padding:20px}
 .admin-body #item-editor .menu-option-row {background:white;box-shadow:var(--shadow-control)!important}
 #item-editor .menu-check {min-height:64px;padding:18px;font-weight:600}
 #item-editor .menu-customer-preview {margin-top:20px}
@@ -149,9 +148,6 @@
  #promo-editor .promo-editor-footer {display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px}
  #promo-editor .promo-editor-footer>p {grid-column:1/-1;font-size:11px}
  #promo-editor .promo-editor-footer .admin-button,#promo-editor .promo-editor-footer #btn-save-promo {padding:10px 12px;font-size:12px;white-space:normal}
- .admin-body #item-editor .menu-choice-group,.admin-body #promo-container-choices>section {padding:14px}
- #promo-form #promo-container-choices>section>label:nth-child(-n+2) {grid-column:1/-1}
- #promo-form #promo-container-choices>section>.admin-button {grid-column:1/-1}
  .admin-body #item-editor :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),select,textarea),.admin-body #promo-form :is(input:not([type=checkbox]):not([type=hidden]):not([type=file]),select,textarea) {font-size:16px;padding:12px;min-width:0}
 }
 @media(max-height:540px) and (min-width:768px) {
@@ -160,8 +156,16 @@
 }
 
 /* Modifier editing follows the group, its rule, then its editable option list. */
-.admin-body :is(#item-editor,#menu-group-editor) .menu-choice-group {padding:20px;margin:22px 0 28px;background:white;box-shadow:var(--shadow-card)!important;overflow:visible}
-:is(#item-editor,#menu-group-editor) .menu-choice-group>legend {color:var(--admin-text);font-size:14px;font-weight:750;padding:0 6px}
+.admin-body :is(#item-editor,#menu-group-editor,#promo-form) .menu-choice-group {min-width:0;padding:20px;margin:16px 0;background:white;border-radius:14px;box-shadow:var(--shadow-card)!important;overflow:visible}
+.menu-choice-group>legend {color:var(--admin-text);font-size:14px;font-weight:750;padding:0 6px}
+#promo-form .menu-choice-group {margin:0}
+#promo-panel-choices .editor-section-actions {margin:12px 0 0}
+#promo-form .menu-choice-group label {display:grid;gap:6px;align-content:end;min-width:0}
+#promo-form .menu-choice-group :is(input,select) {width:100%;min-width:0}
+#promo-form .menu-rule-fields+.menu-help {color:var(--admin-muted)}
+.promo-choice-option {display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:end;gap:8px}
+#promo-form [data-pedit=option-remove],#promo-form [data-pedit=remove] {display:grid;place-items:center;width:44px;min-height:44px;padding:0;color:var(--admin-negative);box-shadow:none!important}
+#promo-form [data-pedit=option] {min-height:44px}
 .menu-group-config,.menu-rule-fields {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
 .admin-body :is(#item-editor,#menu-group-editor) .menu-group-config .menu-field {margin:0}
 .menu-rule-summary {display:flex;align-items:center;min-height:44px;padding-right:100px;font-size:13px;font-weight:600;color:var(--admin-muted);margin:8px 0 0;line-height:1.5}
@@ -208,8 +212,19 @@
  .menu-option-row>.menu-option-actions {grid-column:2;grid-row:2;justify-self:end}
 }
 @media(max-width:767px){
- .admin-body :is(#item-editor,#menu-group-editor) .menu-choice-group {padding:14px;margin:18px 0 24px}
- .menu-group-config {grid-template-columns:minmax(0,1fr);gap:14px}
+ .admin-body :is(#item-editor,#promo-editor) .menu-editor-tabs {gap:16px;margin-bottom:8px;padding-block:4px 6px}
+ .admin-body #item-editor>header,.admin-body #promo-editor>div:last-child>div:first-child {min-height:62px;padding-block:8px}
+ .admin-body :is(#item-editor,#menu-group-editor,#promo-form) .menu-choice-group {padding:10px 12px 12px;margin:10px 0 16px}
+ .menu-group-config {grid-template-columns:minmax(0,1fr);gap:8px}
+ .menu-rule-details {margin-bottom:4px}
+ .admin-body :is(#item-editor,#menu-group-editor) .menu-option-row {grid-template-columns:minmax(0,1fr) 76px 44px;gap:4px 8px;padding:4px 0}
+ .menu-option-row>.menu-option-actions {grid-column:3;grid-row:1}
+ .menu-option-row .menu-field:nth-child(2)>span {white-space:nowrap;font-size:11px!important}
+ .menu-option-row .menu-option-check {grid-column:1/-1}
+ .menu-group-options {gap:4px}
+ .menu-group-footer {margin-top:8px}
+ .promo-choice-option .promo-option-fields {grid-template-columns:minmax(0,1fr) 76px;gap:8px}
+ #promo-panel-choices .editor-section-help {margin-bottom:8px}
  .menu-group-create {flex-direction:column;align-items:stretch;gap:12px}
  .menu-rule-fields {gap:14px 12px}
  .menu-rule-fields>.menu-field:first-child,.menu-rule-fields>.menu-option-check {grid-column:1/-1}

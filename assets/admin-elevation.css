@@ -165,7 +165,10 @@
 .admin-body .settings-profile .settings-modes {margin-top:24px}
 .admin-body .admin-settings-panel .admin-setting-row label {font-size:14px;font-weight:750}
 .admin-body .admin-setting-row p {font-size:13px;line-height:1.65}
-.admin-body .admin-settings-panel .admin-setting-row {max-width:none;align-items:center}
+.admin-body .admin-settings-panel .admin-setting-row {max-width:560px;align-items:start;padding-block:10px}
+.admin-body .admin-settings-panel .admin-setting-row label {display:inline-block;line-height:1.5}
+.admin-body .admin-settings-panel .admin-setting-row input {margin-top:2px;flex:none}
+.admin-body #admin-settings-feedback {font-size:12px;color:var(--admin-muted)}
 .admin-body .settings-save {padding:0 4px 12px}
 .admin-body .settings-save>.settings-section-help {max-width:68ch;margin-bottom:12px}
 .admin-body :is(.admin-subtle,.admin-kpi small,.admin-page-heading>#overview-window) {font-size:12px;line-height:1.5}
@@ -180,9 +183,29 @@
 @media(max-width:767px) {
  .admin-body .menu-list-surface {background:transparent;box-shadow:none}
  .admin-body .menu-list-surface .menu-products {padding:0}
+ .admin-body .menu-products {gap:10px}
+ .admin-body .menu-product {display:grid;grid-template-columns:44px 42px minmax(0,1fr) 44px 44px;gap:0 4px;padding:6px 8px;border-radius:14px}
+ .admin-body :is(.menu-product-main,.menu-product-visual,.menu-product-bottom) {display:contents}
+ .admin-body .menu-product .menu-select {position:static;grid-area:1/1;margin:0;align-self:center}
+ .admin-body .menu-product-image {grid-area:1/2;width:42px;height:44px;align-self:center}
+ .admin-body .menu-product-info {grid-area:1/3/2/-1;padding-inline-start:4px}
+ .admin-body .menu-product-info>p {margin-block:1px 3px}
+ .admin-body .menu-price {grid-area:2/1/3/3;align-self:center;padding-inline-start:4px}
+ .admin-body .menu-product .menu-stock {grid-area:2/3;max-width:100%;justify-self:start;gap:4px;padding-inline:6px}
+ .admin-body .menu-product .menu-row-actions {grid-area:2/4/3/-1}
+ .admin-body .menu-row-actions :is(summary,.admin-button) {box-shadow:none!important}
+ .admin-body .orders-workspace {padding-top:12px;gap:6px}
+ .admin-body .orders-heading {min-height:48px;align-items:center}
+ .admin-body .orders-toolbar {padding-bottom:46px;gap:4px}
+ .admin-body .orders-metadata {margin-top:-46px;min-height:44px;padding-right:96px;gap:0 8px;align-content:center}
+ .admin-body .orders-utilities button {width:44px;box-shadow:none!important}
  .admin-body .settings-section {padding:20px;gap:20px}
  .admin-body .settings-section .settings-fields {gap:18px}
  .admin-body .settings-field input {font-size:16px}
+}
+@media(max-width:350px) {
+ .admin-body .menu-product .menu-stock>svg {display:none}
+ .admin-body .menu-product .menu-stock>span {overflow-wrap:anywhere}
 }
 @media(min-width:1000px) {
  .admin-body :is(.admin-page-heading h2,.orders-heading h2,.menu-heading h2) {font-size:32px;letter-spacing:-.045em}

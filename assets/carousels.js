@@ -4,6 +4,7 @@ const instances = new WeakMap();
 export function setupCarousel(track) {
     instances.get(track)?.destroy();
     const section = track.closest('[data-carousel]');
+    const paged = section.classList.contains('menu-feature--offers');
     const abort = new AbortController();
     const listen = (target, event, callback, options = {}) => target.addEventListener(event, callback, { ...options, signal: abort.signal });
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -11,6 +12,7 @@ export function setupCarousel(track) {
     let visible = false, hovered = false, focused = section.contains(document.activeElement);
     let userPaused = false, manualUntil = 0;
     let pointer = null, suppressClick = false, clickTimer = 0;
+    let nextPage = 0, transitionStart = 0, pageFrom = 0, pageTo = 0;
     const limit = () => Math.max(0, track.scrollWidth - track.clientWidth);
     const canScroll = () => track.children.length > 1 && limit() > 2;
     const eligible = () => canScroll() && visible && !document.hidden && !reduced.matches && !userPaused && !hovered && !focused && !pointer && performance.now() >= manualUntil && !document.body.classList.contains('modal-open');
@@ -18,6 +20,11 @@ export function setupCarousel(track) {
     function stop() {
         cancelAnimationFrame(frame);
         frame = lastTime = 0;
+        if (transitionStart) {
+            track.scrollLeft = position = pageTo;
+        }
+        nextPage = transitionStart = 0;
+        track.classList.remove('is-advancing');
     }
     function tick(time) {
         frame = 0;
@@ -27,9 +34,31 @@ export function setupCarousel(track) {
         const maximum = limit();
         if (position >= maximum - .5) direction = -1;
         if (position <= .5) direction = 1;
-        // Gentle bidirectional loop; no teleport, duplicate cards or duplicate actions.
-        position = Math.max(0, Math.min(maximum, position + direction * elapsed * .048));
-        track.scrollLeft = position;
+        if (paged) {
+            // Offers need a reading pause with the complete card in view.
+            if (!nextPage) nextPage = time + 6000;
+            if (time >= nextPage) {
+                if (!transitionStart) {
+                    transitionStart = time;
+                    pageFrom = track.scrollLeft;
+                    const step = track.firstElementChild.getBoundingClientRect().width + (parseFloat(getComputedStyle(track).columnGap) || 0);
+                    pageTo = Math.max(0, Math.min(maximum, (Math.round(pageFrom / step) + direction) * step));
+                    track.classList.add('is-advancing');
+                }
+                const progress = Math.min(1, (time - transitionStart) / 450);
+                position = pageFrom + (pageTo - pageFrom) * (progress * progress * (3 - 2 * progress));
+                track.scrollLeft = position;
+                if (progress === 1) {
+                    transitionStart = 0;
+                    nextPage = time + 6000;
+                    track.classList.remove('is-advancing');
+                }
+            }
+        } else {
+            // Gentle bidirectional loop; original cards and ordering actions only.
+            position = Math.max(0, Math.min(maximum, position + direction * elapsed * .048));
+            track.scrollLeft = position;
+        }
         frame = requestAnimationFrame(tick);
     }
     function update() {

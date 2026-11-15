@@ -2,7 +2,7 @@ import {db,doc,getDoc,collection,query,onSnapshot} from '../firebase-config.js';
 import {limit} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import {operationsService} from './operations-service.js';
 import {offerIssues,promotionState,stateLabels,localInstant,localInput,validZone,cents} from './operations-model.js';
-import {copy,newId,imageIssue,groupIssues} from './menu-model.js';
+import {copy,newId,imageIssue,groupIssues,selectionPresets,selectionPreset,selectionSummary,applySelectionPreset} from './menu-model.js';
 import {icon} from './admin-icons.js';
 const e=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function createPromotions({session,toast,upload,settings}){
@@ -11,7 +11,7 @@ export function createPromotions({session,toast,upload,settings}){
     const schedule=document.createElement('section');schedule.className='promo-schedule';schedule.dataset.promoPanel='publish';schedule.hidden=true;schedule.innerHTML='<h4>Publication et calendrier</h4><p>Choisissez la visibilité et les dates de votre offre.</p><label class="editor-publication"><input type="checkbox" id="promo-visible" checked><span>Publié sur la carte</span></label><p>Dates facultatives · fuseau du restaurant</p><label>Début<input id="promo-start" name="promotion-start" type="datetime-local" class="w-full p-3 border rounded-xl"></label><label>Fin<input id="promo-end" name="promotion-end" type="datetime-local" class="w-full p-3 border rounded-xl"></label>';$('promo-form').append(schedule);
     const explain=document.createElement('p');explain.textContent='Les offres utilisent un prix fixe. Les réductions en pourcentage ne sont pas disponibles.';$('promotions-list').after(explain);
     let baseline=null;
-    const editorValue=()=>JSON.stringify([...$('promo-form').querySelectorAll('input,select,textarea')].map(field=>field.type==='file'?[...field.files].map(file=>[file.name,file.size,file.lastModified]):field.type==='checkbox'?field.checked:field.value));
+    const editorValue=()=>JSON.stringify([...$('promo-form').querySelectorAll('input,select:not([data-preset]),textarea')].map(field=>field.type==='file'?[...field.files].map(file=>[file.name,file.size,file.lastModified]):field.type==='checkbox'?field.checked:field.value));
     const isDirty=()=>!$('promo-editor').classList.contains('hidden')&&baseline!==null&&editorValue()!==baseline;
     const canLeave=()=>!busy&&(!isDirty()||confirm('Quitter sans enregistrer les modifications ?'));
     window.addEventListener('beforeunload',event=>{if(isDirty()){event.preventDefault();event.returnValue='';}});
@@ -46,7 +46,10 @@ export function createPromotions({session,toast,upload,settings}){
         const index=groups.findIndex(group=>groupIssues(group).length);
         const container=index>=0?$('promo-container-choices').children[index]:$('promo-container-supplements');
         const fields=[...container.querySelectorAll('input,select')];
-        return fields.find(el=>!el.checkValidity()||el.type==='text'&&!el.value.trim())||fields[0]||null;
+        const field=fields.find(el=>!el.checkValidity()||el.type==='text'&&!el.value.trim())||fields[0]||null;
+        const details=field?.closest('details');
+        if(details)details.open=true;
+        return field;
     }
     let previewURL=null;
     function photoState(){
@@ -72,13 +75,67 @@ export function createPromotions({session,toast,upload,settings}){
     }
     function draw(){
         const option=(o,path)=>`<div class="promo-option-fields"><label>Option<input aria-label="Nom de l’option" class="p-2 border rounded-xl min-w-0" data-pfield="${path}.name" value="${e(o.name)}"></label><label>Prix + DH<input aria-label="Prix de l’option" class="p-2 border rounded-xl w-24" type="number" min="0" step="0.01" data-pfield="${path}.price" value="${e(o.price)}"></label></div>`;
-        $('promo-container-choices').innerHTML=groups.map((g,i)=>`<section class="border rounded-xl p-3 space-y-2"><label>Nom du groupe<input aria-label="Titre du groupe" class="p-2 border rounded-xl w-full" data-pfield="g.${i}.title" value="${e(g.title)}"></label><label>Sélection<select aria-label="Type de choix" data-pfield="g.${i}.type"><option value="radio" ${g.type==='radio'?'selected':''}>Choix unique</option><option value="checkbox" ${g.type==='checkbox'?'selected':''}>Choix multiples</option></select></label><label>Minimum <input class="w-16 border" type="number" min="0" data-pfield="g.${i}.min" value="${e(g.min)}"></label><label>Maximum (0 = illimité) <input class="w-16 border" type="number" min="0" data-pfield="g.${i}.max" value="${e(g.max)}"></label>${(g.options||[]).map((o,j)=>`<div>${option(o,`g.${i}.options.${j}`)}<button type="button" data-pedit="option-remove" data-i="${i}" data-j="${j}">Retirer cette option</button></div>`).join('')}<button type="button" class="admin-button" data-pedit="option" data-i="${i}">Ajouter une option</button><button type="button" class="admin-button" data-pedit="remove" data-i="${i}">Retirer le groupe</button></section>`).join('');
+        $('promo-container-choices').innerHTML=groups.map((g,i)=>`<fieldset class="menu-choice-group" data-promo-group="${i}">
+            <legend>Groupe ${i+1}</legend>
+            <div class="menu-group-config">
+                <label>Nom du groupe<input data-pfield="g.${i}.title" value="${e(g.title)}"></label>
+                <label>Règle de sélection<select data-preset="${i}">${selectionPresets.map(([key,label])=>`<option value="${key}">${label}</option>`).join('')}</select></label>
+            </div>
+            <p class="menu-rule-summary" data-rule-summary></p>
+            <details class="menu-rule-details"><summary>Ajuster</summary><div class="menu-rule-fields">
+                <label>Type de choix<select data-pfield="g.${i}.type"><option value="radio" ${g.type==='radio'?'selected':''}>Choix unique</option><option value="checkbox" ${g.type==='checkbox'?'selected':''}>Choix multiple</option></select></label>
+                <label>Minimum requis<input type="number" min="0" data-pfield="g.${i}.min" value="${e(g.min)}"></label>
+                <label>Maximum<input type="number" min="0" data-pfield="g.${i}.max" value="${e(g.max)}"></label>
+            </div><p class="menu-help">Minimum 0 : facultatif. Maximum 0 : toutes les options, pour un choix multiple.</p></details>
+            <div class="menu-group-options">${(g.options||[]).map((o,j)=>`<div class="promo-choice-option">${option(o,`g.${i}.options.${j}`)}<button type="button" class="admin-button" aria-label="Retirer l’option ${e(o.name||j+1)}" data-pedit="option-remove" data-i="${i}" data-j="${j}">${icon('trash')}</button></div>`).join('')}</div>
+            <div class="menu-group-footer"><button type="button" class="admin-button" data-pedit="option" data-i="${i}">Ajouter une option</button><button type="button" class="admin-button" aria-label="Retirer le groupe ${i+1}" data-pedit="remove" data-i="${i}">${icon('trash')}</button></div>
+        </fieldset>`).join('');
+        groups.forEach((group,i)=>updateRule($('promo-container-choices').children[i],group));
         $('promo-container-supplements').innerHTML=extras.map((o,i)=>`<div>${option(o,`s.${i}`)}<button type="button" data-pedit="extra-remove" data-i="${i}">Retirer</button></div>`).join('');
     }
-    $('promo-editor').addEventListener('input',event=>{const path=event.target.dataset.pfield?.split('.');if(!path)return;let target=path.shift()==='g'?groups:extras;const key=path.pop();for(const part of path)target=target[part];target[key]=['min','max','price'].includes(key)?event.target.value:event.target.value;});
-    $('promo-editor').addEventListener('change',event=>{if(event.target.dataset.pfield?.endsWith('.type')){const g=groups[Number(event.target.dataset.pfield.split('.')[1])];g.type=event.target.value;if(g.type==='radio')g.max=1;draw();}});
-    $('promo-editor').addEventListener('click',event=>{const b=event.target.closest('[data-pedit]');if(!b)return;const i=Number(b.dataset.i);if(b.dataset.pedit==='option')groups[i].options.push({name:'',price:0});if(b.dataset.pedit==='remove')groups.splice(i,1);if(b.dataset.pedit==='option-remove')groups[i].options.splice(Number(b.dataset.j),1);if(b.dataset.pedit==='extra-remove')extras.splice(i,1);draw();});
-    window.addPromoChoiceGroup=()=>{groups.push({title:'',type:'radio',min:1,max:1,options:[{name:'',price:0}]});draw();switchSection('choices');};
+    function updateRule(panel,group){
+        panel.querySelector('[data-preset]').value=group.type==='radio'&&Number(group.min??1)===0?'custom':selectionPreset(group);
+        panel.querySelector('[data-rule-summary]').textContent=selectionSummary(group);
+    }
+    $('promo-editor').addEventListener('input',({target:field})=>{
+        const path=field.dataset.pfield?.split('.');if(!path)return;
+        let target=path.shift()==='g'?groups:extras;
+        const key=path.pop();for(const part of path)target=target[part];target[key]=field.value;
+        const panel=field.closest('[data-promo-group]');
+        if(panel&&['type','min','max'].includes(key)){
+            if(key==='type'&&target.type==='radio'){
+                target.max=1;
+                panel.querySelector('[data-pfield$=".max"]').value=1;
+            }
+            updateRule(panel,target);
+        }
+    });
+    $('promo-editor').addEventListener('change',({target:field})=>{
+        if(!field.matches('[data-preset]'))return;
+        const panel=field.closest('[data-promo-group]'),group=groups[Number(field.dataset.preset)];
+        if(field.value==='custom'){panel.querySelector('details').open=true;return;}
+        Object.assign(group,applySelectionPreset(group,field.value));
+        for(const key of ['type','min','max'])panel.querySelector(`[data-pfield$=".${key}"]`).value=group[key];
+        updateRule(panel,group);
+        panel.querySelector('details').open=group.type!=='radio';
+    });
+    $('promo-editor').addEventListener('click',event=>{
+        const b=event.target.closest('[data-pedit]');if(!b)return;
+        const i=Number(b.dataset.i),action=b.dataset.pedit;
+        if(action==='option')groups[i].options.push({name:'',price:0});
+        if(action==='remove')groups.splice(i,1);
+        if(action==='option-remove')groups[i].options.splice(Number(b.dataset.j),1);
+        if(action==='extra-remove')extras.splice(i,1);
+        draw();
+        if(action==='option')$('promo-container-choices').querySelector(`[data-pfield="g.${i}.options.${groups[i].options.length-1}.name"]`)?.focus();
+    });
+    window.addPromoChoiceGroup=()=>{
+        const index=groups.length;
+        groups.push({title:'',type:'radio',min:1,max:1,options:[{name:'',price:0}]});
+        draw();
+        if($('promo-panel-choices').hidden)switchSection('choices');
+        $('promo-container-choices').querySelector(`[data-pfield="g.${index}.title"]`)?.focus();
+    };
     window.addPromoSupplementRow=()=>{extras.push({name:'',price:0});draw();switchSection('supplements');};
     async function open(id){
         if(!allowed()||blocked){toast('Rechargez les offres avant de modifier.','error');return;}

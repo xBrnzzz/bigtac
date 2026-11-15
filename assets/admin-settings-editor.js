@@ -5,7 +5,7 @@ const e=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt
 export function createSettingsEditor({session,upload,toast}){
     const service=operationsService(session),root=document.createElement('form');root.id='restaurant-profile-form';root.className='settings-profile';
     const servicePanel=document.querySelector('.admin-settings-panel');
-    servicePanel.insertAdjacentHTML('afterbegin','<h3>Service en cours</h3><p class="settings-section-help">Disponibilité du restaurant et réception des commandes.</p>');
+    servicePanel.insertAdjacentHTML('afterbegin','<h3>Service en cours</h3>');
     servicePanel.after(root);
     const fields=[['restaurantName','Nom du restaurant'],['description','Description'],['phone','Téléphone'],['whatsappNumber','WhatsApp'],['email','E-mail'],['address','Adresse'],['logoUrl','Adresse du logo'],['instagramUrl','Lien Instagram'],['facebookUrl','Lien Facebook']];
     let latest=null,expected=null,dirty=false,busy=false,confirmed=false;

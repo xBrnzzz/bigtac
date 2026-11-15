@@ -69,6 +69,15 @@ try{
   await page.locator('#promo-name').fill('Menu duo');await page.locator('#promo-price').fill('-1');await page.locator('#btn-save-promo').click();
   check(await page.locator('#promo-price').getAttribute('aria-invalid')==='true',`${width}: promotion marks an invalid price`);
   await page.locator('#promo-price').fill('80');
+  if(width===320){
+   await page.locator('#promo-tab-choices').click();
+   const preset=page.locator('#promo-form [data-preset]').first();
+   await preset.selectOption('upto');
+   const group=page.locator('#promo-container-choices fieldset').first();
+   check(await group.locator('details').evaluate(el=>el.open),'A promotion preset exposes its editable limit');
+   await group.locator('[data-pfield$=".max"]').fill('1');
+   check(await group.locator('[data-rule-summary]').innerText()==='Jusqu’à 1 choix','The promotion rule summary follows the configured limit');
+  }
   for(const tab of ['choices','supplements']){
    await page.locator('#promo-tab-'+tab).click();
    check(await page.locator('#promo-editor .overflow-y-auto').evaluate(e=>e.scrollWidth<=e.clientWidth+1),`${width}/${tab}: populated promotion content fits`);
@@ -80,6 +89,10 @@ try{
   await page.locator('#promo-end').fill('2030-01-31T13:00');
   await page.locator('#promo-tab-basic').click();await page.locator('#promo-name').fill('Menu duo modifié');await page.locator('#btn-save-promo').click();await page.locator('#promo-editor').waitFor({state:'hidden'});
   check(await page.evaluate(()=>__adminFixture.data.promotions[0].mandatoryChoices[0].options.length===2&&__adminFixture.data.promotions[0].supplements[0].price===5),`${width}: promotion save preserves options`);
+  if(width===320)check(await page.evaluate(()=>{
+   const rule=__adminFixture.data.promotions[0].mandatoryChoices[0];
+   return rule.type==='checkbox'&&rule.min===0&&rule.max===1;
+  }),'Promotion presets persist through the normal save flow');
   await page.evaluate(()=>openPromoEditor());
   check(await page.locator('#promo-image-preview img').count()===0,`${width}: new promotion clears the prior photo`);
   check(await page.locator('#promo-image-url').inputValue()==='',`${width}: new promotion does not inherit the prior photo URL`);

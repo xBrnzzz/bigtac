@@ -29,7 +29,7 @@ async function reset(page, selector, position = 0) {
 }
 
 try {
-    for (const width of [320, 390, 768, 1440]) {
+    for (const width of [320, 390, 768, 1366, 1440]) {
         const { context, page } = await open(width);
         for (const [section, track] of [['#promotions', '#promotionsGrid'], ['#popular', '#popularGrid']]) {
             await page.locator(track).scrollIntoViewIfNeeded();
@@ -63,9 +63,10 @@ try {
         await page.mouse.move(button.x + button.width / 2, button.y + button.height / 2);
         await page.mouse.down();
         await page.mouse.move(button.x + button.width / 2 - 90, button.y + button.height / 2, { steps: 12 });
+        const draggedOffer = await left(page, '#promotionsGrid');
         await page.mouse.up();
         check(!(await page.locator('#addItemModal').isVisible()), `${width}: dragging an offer action does not trigger a click`);
-        check(await left(page, '#promotionsGrid') > 40, `${width}: mouse dragging scrolls offers`);
+        check(draggedOffer > 40, `${width}: mouse dragging scrolls offers before settling to a complete card`);
         check(await page.evaluate(() => window.cart.length === 0), `${width}: dragging never adds an order item`);
 
         // Real browser touch events exercise native horizontal swipe behaviour.
@@ -92,9 +93,20 @@ try {
             await page.waitForTimeout(80); // Flush native intersection/scroll delivery.
             await page.clock.runFor(6300);
             const initial = await left(page, track);
-            await page.clock.runFor(1000);
+            await page.clock.runFor(section === '#promotions' ? 7000 : 1000);
             const advanced = await left(page, track);
-            check(advanced - initial >= 30 && advanced - initial <= 65, `${width}/${track}: autoplay advances at a brisk pace (~48px/s)`);
+            if (section === '#promotions') {
+                check(advanced > initial + 30, `${width}/${track}: autoplay advances to the next complete offer`);
+                check(await page.locator(track).evaluate(el => {
+                    const rail = el.getBoundingClientRect();
+                    return [...el.children].some(card => {
+                        const r = card.getBoundingClientRect();
+                        return r.width >= el.clientWidth - 10 && r.left >= rail.left - 1 && r.right <= rail.right + 1;
+                    });
+                }), `${width}: a complete full-width promotion is visible between advances`);
+                await page.clock.runFor(1000);
+                check(Math.abs(await left(page, track) - advanced) <= 1, `${width}: promotion holds still for reading`);
+            } else check(advanced - initial >= 30 && advanced - initial <= 65, `${width}/${track}: autoplay advances at a brisk pace (~48px/s)`);
             await page.locator(section).hover();
             const hovered = await left(page, track);
             await page.clock.runFor(1000);
@@ -117,14 +129,14 @@ try {
             const maximum = await page.locator(track).evaluate(el => el.scrollWidth - el.clientWidth);
             await reset(page, track, maximum - 2);
             await page.waitForTimeout(60);
-            await page.clock.runFor(8500);
+            await page.clock.runFor(section === '#promotions' ? 14000 : 8500);
             check(await left(page, track) < maximum - 10, `${width}/${track}: automatic loop reverses smoothly at the end`);
             await reset(page, track, 30);
             await page.waitForTimeout(60);
             const manual = await left(page, track);
             await page.clock.runFor(1000);
             check(Math.abs(await left(page, track) - manual) <= 1, `${width}/${track}: manual scrolling pauses autoplay`);
-            await page.clock.runFor(7000);
+            await page.clock.runFor(section === '#promotions' ? 14000 : 7000);
             check(Math.abs(await left(page, track) - manual) > 5, `${width}/${track}: autoplay resumes after the interaction cooldown`);
             await page.emulateMedia({ reducedMotion: 'reduce' });
             const reduced = await left(page, track);
@@ -190,6 +202,22 @@ try {
         }
         console.log(`PASS carousel and sticky-menu interactions: ${width}px`);
     }
+    const interrupted = await open(390);
+    await interrupted.page.emulateMedia({ reducedMotion: 'no-preference' });
+    await interrupted.page.locator('#promotionsGrid').scrollIntoViewIfNeeded();
+    await interrupted.page.mouse.move(0, 0);
+    await interrupted.page.waitForTimeout(80);
+    await interrupted.page.clock.runFor(6250);
+    check(await interrupted.page.locator('#promotionsGrid').evaluate(el => el.classList.contains('is-advancing')), 'Pause regression reaches the middle of an offer transition');
+    await interrupted.page.locator('#promotionsGrid').focus();
+    check(await interrupted.page.locator('#promotionsGrid').evaluate(el => {
+        const rail = el.getBoundingClientRect();
+        return !el.classList.contains('is-advancing') && [...el.children].some(card => {
+            const r = card.getBoundingClientRect();
+            return r.left >= rail.left - 1 && r.right <= rail.right + 1;
+        });
+    }), 'Focusing during a transition settles the complete offer instead of freezing a cropped card');
+    await interrupted.context.close();
     check(productionRequests === 0, 'No production Firebase requests');
     assert.deepEqual(errors, []); passed++;
     console.log(`PASS: ${passed} carousel/sticky checks, zero production Firebase requests.`);
