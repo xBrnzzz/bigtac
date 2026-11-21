@@ -44,6 +44,66 @@ if(parameters.get('orders')==='rich') {
         ...(i%4===3?{deliveredAt:timestamp(now-i*4*60000+60000)}:{})
     }));
 }
+// Opt-in dashboard rehearsal. These tickets exist only in this fixture's memory.
+if (parameters.get('orders') === 'analysis' && !parameters.has('empty')) {
+    const {dateKey, shiftDay} = await import('/assets/admin-model.js');
+    const zone = data.settings[0].reportingTimezone;
+    const today = dateKey(new Date(now), zone);
+    const hourClock = new Intl.DateTimeFormat('en-GB', {timeZone:zone, hour:'2-digit', hourCycle:'h23'});
+    const sides = [['Frites cheddar',15], ['Nuggets',20], ['Tenders',25], ['Oignons croustillants',30]];
+    const minute = 60000;
+    data.orders = [];
+
+    function addTicket(created, type, status) {
+        const index = data.orders.length;
+        const tacos = index % 5 < 3;
+        const qty = index % 4 === 0 ? 2 : 1;
+        const items = [{name:tacos ? 'Tacos poulet' : 'Burger maison', qty, price:qty * (tacos ? 45 : 55), options:[]}];
+        if (index % 3 !== 0) {
+            const side = sides[index % 4];
+            const sideQty = index % 7 === 0 ? 2 : 1;
+            items.push({name:side[0], qty:sideQty, price:side[1] * sideQty, options:[]});
+        }
+        const fee = type === 'livraison' ? 10 : 0;
+        data.orders.push({
+            id:'analysis-' + index, shortId:String(2000 + index), createdAt:timestamp(created), type, status, items,
+            total:items.reduce((sum,item) => sum + item.price, fee),
+            customer:{name:'Client démo', phone:'', address:'', note:''},
+            location:type === 'livraison' ? 'Zone démo (10 Dh)' : '',
+            tableNumber:type === 'sur_place' ? String(1 + index % 8) : '',
+            ...(status === 'confirmed' || status === 'en_livraison' || status === 'delivered' ? {confirmedAt:timestamp(created + 2 * minute)} : {}),
+            ...(status === 'delivered' ? {deliveredAt:timestamp(created + (20 + index % 15) * minute)} : {})
+        });
+    }
+
+    for (let age = 62; age >= 0; age--) {
+        const day = shiftDay(today, -age);
+        const noonUTC = new Date(day + 'T12:00:00Z');
+        // Lunch and dinner fall after the local clock changes on Moroccan transition days.
+        const offsetHours = Number(hourClock.format(noonUTC)) - 12;
+        const weekday = noonUTC.getUTCDay();
+        const busyEvening = [0,5,6].includes(weekday);
+        const waves = [
+            {hour:12, count:10 + weekday % 4, services:['emporter','sur_place','emporter','livraison']},
+            {hour:18, count:(busyEvening ? 23 : 13) + weekday % 3, services:['livraison','emporter','livraison','sur_place','livraison']}
+        ];
+        for (const wave of waves) {
+            const start = +noonUTC + (wave.hour - 12 - offsetHours) * 3600000;
+            for (let i = 0; i < wave.count; i++) {
+                const created = start + (Math.floor(i * 174 / wave.count) + weekday) * minute;
+                if (created > now - 35 * minute) continue;
+                const type = wave.services[(i + weekday) % wave.services.length];
+                const rejected = (i + weekday) % (type === 'livraison' ? 11 : 17) === 0;
+                addTicket(created, type, rejected ? 'rejected' : 'delivered');
+            }
+        }
+    }
+    addTicket(now - 23 * minute, 'livraison', 'en_livraison');
+    addTicket(now - 12 * minute, 'sur_place', 'confirmed');
+    addTicket(now - 7 * minute, 'emporter', 'confirmed');
+    addTicket(now - 4 * minute, 'livraison', 'pending');
+    addTicket(now - minute, 'emporter', 'pending');
+}
 if (parameters.has('disabled')) profile.disabled = true;
 if (parameters.has('missing')) data.users = [];
 if (parameters.has('config-missing')) data.settings = [];

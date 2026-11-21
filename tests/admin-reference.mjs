@@ -51,7 +51,9 @@ try {
                 check(await page.locator('.admin-recent-table tbody tr').count()===4,'Four real loaded orders shown');
                 const first=await page.locator('.admin-recent-table tbody tr').first().innerText();
                 check(first.includes('#1040')&&first.includes('105,00'),'Recent order uses recorded ID and line total');
-                check(await page.locator('#overview-products').innerText().then(text=>text.includes('Burger maison')),'Ranking uses actual fixture product names');
+                await page.locator('#overview-analysis-button').click();
+                check(await page.locator('#analysis-products').innerText().then(text=>text.includes('Burger maison')),'Analysis ranks actual fixture products');
+                await page.locator('#overview-live-button').click();
                 await page.locator('#view-overview').evaluate(el=>el.scrollTop=el.scrollHeight);
                 await page.screenshot({path:path.join(output,`${prefix}-reference-overview-lower-${width}.png`),animations:'disabled'});
                 await page.locator('#view-overview').evaluate(el=>el.scrollTop=0);

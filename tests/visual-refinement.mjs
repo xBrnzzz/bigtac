@@ -61,15 +61,20 @@ try{
   await page.keyboard.press('Escape');
   check(await page.locator('.menu-list-surface').evaluate(e=>parseFloat(getComputedStyle(e).borderTopLeftRadius)>0),`${width}: catalogue has a rounded shared surface`);
   await page.evaluate(()=>switchView('orders'));await page.locator('#list-pending .order-card').first().waitFor();
-  if(width>=1100)check(await page.evaluate(()=>{
-   const cards=[...document.querySelectorAll('#list-pending .order-card')].slice(0,2).map(e=>e.getBoundingClientRect());
-   const cooking=document.querySelector('#list-confirmed .order-card').getBoundingClientRect();
-   return Math.abs(cards[0].left-cards[1].left)<1&&cards[1].top>=cards[0].bottom&&cooking.left>=cards[0].right;
-  }),`${width}: Toutes sorts statuses vertically within the existing grid`);
-  await page.evaluate(()=>showOrderCol('pending'));
-  check(await page.locator('#col-pending').evaluate(e=>getComputedStyle(e).display==='contents'),`${width}: individual status tab retains its existing grid`);
-  await page.evaluate(()=>showOrderCol('all'));
-  check(await page.locator('#list-pending .order-card').first().evaluate(e=>e.querySelector('.order-actions').getBoundingClientRect().top<e.querySelector('.order-contact-actions').getBoundingClientRect().top),`${width}: workflow action precedes contact actions`);
+  check(await page.locator('.orders-tabs button').evaluateAll(buttons=>
+   buttons.map(button=>button.dataset.tab).join(',')==='pending,confirmed,delivery,history'
+  ),`${width}: Orders offers only the four queues`);
+  check(await page.locator('#mtab-pending').getAttribute('aria-pressed')==='true',`${width}: Orders opens on En attente`);
+  await page.locator('#mtab-confirmed').click();
+  check(await page.locator('#list-confirmed .order-card').first().isVisible()&&!await page.locator('#list-pending .order-card').first().isVisible(),`${width}: changing queues shows only the selected status`);
+  await page.locator('#mtab-pending').click();
+  check(await page.locator('#list-pending .order-card').first().evaluate(card=>{
+   const action=card.querySelector('.order-actions .primary').getBoundingClientRect();
+   return action.height>=44 && [...card.querySelectorAll('.order-contact-link')].every(link=>{
+    const contact=link.getBoundingClientRect();
+    return contact.height>=44 && action.width>contact.width && action.top>=contact.bottom-1;
+   });
+  }),`${width}: primary transition is prominent and clear of contact targets`);
   if(width===320)check(await page.locator('#list-pending .primary').first().evaluate(e=>e.getBoundingClientRect().bottom<=document.getElementById('admin-bottom-nav').getBoundingClientRect().top), '320: first Accept action is visible above navigation');
   check(await page.locator('#list-pending .order-contact-actions').first().locator('a').count()===2,`${width}: authorized contact links remain available`);
   await page.evaluate(()=>{__adminFixture.failOrders=true;__adminFixture.emit();});

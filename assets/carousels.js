@@ -1,115 +1,63 @@
-// Native scrolling, original cards only: ordering handlers are never cloned.
+import { t } from './i18n.js';
+
 const instances = new WeakMap();
 
 export function setupCarousel(track) {
     instances.get(track)?.destroy();
     const section = track.closest('[data-carousel]');
-    const paged = section.classList.contains('menu-feature--offers');
     const abort = new AbortController();
-    const listen = (target, event, callback, options = {}) => target.addEventListener(event, callback, { ...options, signal: abort.signal });
+    const listen = (target, event, callback, options = {}) =>
+        target.addEventListener(event, callback, { ...options, signal: abort.signal });
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    let frame = 0, resumeTimer = 0, lastTime = 0, direction = 1, position = 0;
-    let visible = false, hovered = false, focused = section.contains(document.activeElement);
-    let userPaused = false, manualUntil = 0;
     let pointer = null, suppressClick = false, clickTimer = 0;
-    let nextPage = 0, transitionStart = 0, pageFrom = 0, pageTo = 0;
     const limit = () => Math.max(0, track.scrollWidth - track.clientWidth);
-    const canScroll = () => track.children.length > 1 && limit() > 2;
-    const eligible = () => canScroll() && visible && !document.hidden && !reduced.matches && !userPaused && !hovered && !focused && !pointer && performance.now() >= manualUntil && !document.body.classList.contains('modal-open');
-
-    function stop() {
-        cancelAnimationFrame(frame);
-        frame = lastTime = 0;
-        if (transitionStart) {
-            track.scrollLeft = position = pageTo;
-        }
-        nextPage = transitionStart = 0;
-        track.classList.remove('is-advancing');
+    const sign = () => getComputedStyle(track).direction === 'rtl' ? -1 : 1;
+    const controls = document.createElement('div');
+    controls.className = 'browse-arrows';
+    for (const [label, arrow, amount] of [['discovery.prev', '←', -1], ['discovery.next', '→', 1]]) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.setAttribute('aria-controls', track.id);
+        button.setAttribute('data-i18n-aria', label);
+        button.setAttribute('aria-label', t(label));
+        const icon = document.createElement('span');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = arrow;
+        button.append(icon);
+        listen(button, 'click', () => move(amount));
+        controls.append(button);
     }
-    function tick(time) {
-        frame = 0;
-        if (!eligible()) { lastTime = 0; return; }
-        const elapsed = lastTime ? Math.min(time - lastTime, 64) : 0;
-        lastTime = time;
-        const maximum = limit();
-        if (position >= maximum - .5) direction = -1;
-        if (position <= .5) direction = 1;
-        if (paged) {
-            // Offers need a reading pause with the complete card in view.
-            if (!nextPage) nextPage = time + 6000;
-            if (time >= nextPage) {
-                if (!transitionStart) {
-                    transitionStart = time;
-                    pageFrom = track.scrollLeft;
-                    const step = track.firstElementChild.getBoundingClientRect().width + (parseFloat(getComputedStyle(track).columnGap) || 0);
-                    pageTo = Math.max(0, Math.min(maximum, (Math.round(pageFrom / step) + direction) * step));
-                    track.classList.add('is-advancing');
-                }
-                const progress = Math.min(1, (time - transitionStart) / 450);
-                position = pageFrom + (pageTo - pageFrom) * (progress * progress * (3 - 2 * progress));
-                track.scrollLeft = position;
-                if (progress === 1) {
-                    transitionStart = 0;
-                    nextPage = time + 6000;
-                    track.classList.remove('is-advancing');
-                }
-            }
-        } else {
-            // Gentle bidirectional loop; original cards and ordering actions only.
-            position = Math.max(0, Math.min(maximum, position + direction * elapsed * .048));
-            track.scrollLeft = position;
-        }
-        frame = requestAnimationFrame(tick);
-    }
+    section.querySelector('.section-heading').append(controls);
     function update() {
-        const scrollable = canScroll();
+        const scrollable = track.children.length > 1 && limit() > 2;
         track.tabIndex = scrollable ? 0 : -1;
-        if (!eligible()) stop();
-        else if (!frame) { position = track.scrollLeft; frame = requestAnimationFrame(tick); }
-    }
-    function manualPause() {
-        manualUntil = performance.now() + 6000;
-        clearTimeout(resumeTimer);
-        resumeTimer = setTimeout(update, 6020);
-        stop();
+        controls.hidden = !scrollable;
     }
     function move(amount) {
-        manualPause();
         const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
-        const step = (track.firstElementChild?.getBoundingClientRect().width || track.clientWidth) + gap;
+        const step = track.firstElementChild.getBoundingClientRect().width + gap;
         const maximum = limit();
-        const index = amount > 0 ? Math.floor((track.scrollLeft + 1) / step) + 1 : Math.ceil((track.scrollLeft - 1) / step) - 1;
-        const target = amount > 0 && track.scrollLeft >= maximum - 1 ? 0
-            : amount < 0 && track.scrollLeft <= 1 ? maximum
+        const position = sign() * track.scrollLeft;
+        const index = amount > 0 ? Math.floor((position + 1) / step) + 1 : Math.ceil((position - 1) / step) - 1;
+        const target = amount > 0 && position >= maximum - 1 ? 0
+            : amount < 0 && position <= 1 ? maximum
             : Math.max(0, Math.min(maximum, index * step));
-        track.scrollTo({ left: target, behavior: reduced.matches ? 'instant' : 'smooth' });
+        track.scrollTo({ left: sign() * target, behavior: reduced.matches ? 'instant' : 'smooth' });
     }
-    listen(section, 'pointerenter', event => { if (event.pointerType === 'mouse') { hovered = true; update(); } });
-    listen(section, 'pointerleave', event => { if (event.pointerType === 'mouse') { hovered = false; update(); } });
-    listen(section, 'focusin', () => { focused = true; update(); });
-    listen(section, 'focusout', event => { focused = section.contains(event.relatedTarget); update(); });
-    listen(track, 'wheel', manualPause, { passive: true });
-    listen(track, 'scroll', () => {
-        // Distinguish our own subpixel drift from an actual user scroll, even
-        // when the user takes over immediately after an animation frame.
-        if (Math.abs(track.scrollLeft - position) > 1) manualPause();
-    }, { passive: true });
     listen(track, 'keydown', event => {
-        if (event.target !== track) return;
-        if (event.key === ' ') {
-            event.preventDefault(); userPaused = !userPaused; update();
-        } else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-            event.preventDefault(); move(event.key === 'ArrowRight' ? 1 : -1);
+        if (event.target !== track || controls.hidden) return;
+        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+            event.preventDefault();
+            move((event.key === 'ArrowRight' ? 1 : -1) * sign());
         } else if (event.key === 'Home' || event.key === 'End') {
-            event.preventDefault(); manualPause();
-            track.scrollTo({ left: event.key === 'Home' ? 0 : limit(), behavior: 'instant' });
+            event.preventDefault();
+            track.scrollTo({ left: event.key === 'Home' ? 0 : sign() * limit(), behavior: 'instant' });
         }
     });
     listen(track, 'dragstart', event => event.preventDefault());
     listen(track, 'pointerdown', event => {
         if (event.button !== 0) return;
         pointer = { id: event.pointerId, x: event.clientX, left: track.scrollLeft, mouse: event.pointerType === 'mouse', dragged: false };
-        manualPause();
     });
     listen(track, 'pointermove', event => {
         if (!pointer?.mouse || pointer.id !== event.pointerId) return;
@@ -132,7 +80,6 @@ export function setupCarousel(track) {
         if (track.hasPointerCapture(event.pointerId)) track.releasePointerCapture(event.pointerId);
         clearTimeout(clickTimer);
         clickTimer = setTimeout(() => { suppressClick = false; }, 0);
-        manualPause();
     };
     listen(window, 'pointerup', endPointer);
     listen(window, 'pointercancel', endPointer);
@@ -141,21 +88,16 @@ export function setupCarousel(track) {
             event.preventDefault(); event.stopImmediatePropagation();
         }
     }, { capture: true });
-    listen(reduced, 'change', update);
-    listen(document, 'visibilitychange', update);
-    const intersection = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; update(); }, { threshold: .05 });
-    intersection.observe(track);
     const resize = new ResizeObserver(update);
     resize.observe(track);
-    const modal = new MutationObserver(update);
-    modal.observe(document.body, { attributes: true, attributeFilter: ['class'] });
     track.setAttribute('role', 'region');
-    track.setAttribute('aria-roledescription', 'carrousel');
     track.setAttribute('aria-labelledby', section.getAttribute('aria-labelledby'));
     track.setAttribute('aria-describedby', 'carouselHelp');
     const instance = { destroy() {
-        stop(); clearTimeout(resumeTimer); clearTimeout(clickTimer);
-        abort.abort(); intersection.disconnect(); resize.disconnect(); modal.disconnect();
+        clearTimeout(clickTimer);
+        abort.abort();
+        resize.disconnect();
+        controls.remove();
         track.classList.remove('is-dragging');
     } };
     instances.set(track, instance);

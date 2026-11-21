@@ -1,9 +1,4 @@
-/* One shared elevation policy, including preserved legacy admin components.
-   Transparent borders retain existing geometry. Functional indicators are below.
-   !important is confined to this policy to supersede CDN/legacy surface rules. */
-.admin-body :where(*) {border-color:transparent!important}
-.admin-body :where(*)::before,.admin-body :where(*)::after {border-color:transparent!important}
-
+/* Component surfaces and compatibility rules for the admin views. */
 /* Controls are always shallower than their containing cards. */
 .admin-body :where(button,summary,input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea,.admin-button,.admin-icon-button,.order-detail-link,.menu-stock) {
     box-shadow:var(--shadow-control)!important;

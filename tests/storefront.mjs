@@ -76,9 +76,21 @@ try {
         }), `${width}: hero, offers, favourites and full menu follow the approved hierarchy`);
         check(await page.locator('#menuSearch').evaluate(el => el.closest('section').id === 'menu-unified'), `${width}: search belongs only to the full menu`);
         check(await page.locator('button:visible').evaluateAll(buttons => buttons.every(button => button.getBoundingClientRect().height >= 44)), `${width}: visible buttons have 44px tap targets`);
-        check(await page.locator('.restaurant-intro h1').evaluate(el => el.getBoundingClientRect().height <= parseFloat(getComputedStyle(el).lineHeight) * 2 + 1), `${width}: hero headline fits at most two lines`);
-        const heroHeight = await page.locator('#hero').evaluate(el => el.getBoundingClientRect().height);
-        check(heroHeight >= (width < 768 ? 300 : 420) && heroHeight <= (width < 768 ? 400 : 500), `${width}: responsive campaign hero height`);
+        check(await page.locator('#hero').evaluate(el => {
+            const hero = el.getBoundingClientRect();
+            const header = document.querySelector('.store-header').getBoundingClientRect();
+            const title = el.querySelector('h1').getBoundingClientRect();
+            return Math.abs(hero.top - header.bottom) <= 2 && Math.abs(hero.bottom - innerHeight) <= 2
+                && title.top >= header.bottom - 1 && title.bottom <= hero.bottom
+                && title.left >= hero.left - 1 && title.right <= hero.right + 1;
+        }), `${width}: hero fills the opening screen and the headline fits below the header`);
+        if (width <= 700) {
+            check(await page.locator('#hero').evaluate(el => {
+                const photo = el.querySelector('img').getBoundingClientRect();
+                const headline = el.querySelector('h1').getBoundingClientRect();
+                return photo.height > 0 && photo.bottom <= headline.top + 1;
+            }), `${width}: the hero photograph leaves a clear backdrop for the mobile headline`);
+        }
         check(await page.locator('.intro-cta').evaluate(el => {
             const bounds = el.getBoundingClientRect();
             return bounds.height >= 44 && bounds.width > 0 && bounds.bottom <= innerHeight && getComputedStyle(el).visibility === 'visible';
@@ -98,12 +110,18 @@ try {
         check(await page.locator('#modalItemName').innerText() === 'Tacos Poulet', `${width}: featured favourite opens its original item`);
         check(await page.locator('.option-group').count() === 3, `${width}: featured favourite retains choices and supplements`);
         await closeProduct(page);
-        await page.locator('#categoryFilters').getByRole('button', { name: 'Burgers', exact: true }).click();
+        const categories=page.locator('#categoryFilters');
+        const burgers=categories.getByRole('button', { name: 'Burgers', exact: true });
+        check(await categories.locator('[data-cat=all], [aria-pressed=true]').count()===0, `${width}: category toolbar starts unfiltered and offers real categories only`);
+        await burgers.click();
         check(await page.locator('#menuContent .section-block:not(.hidden)').count() === 1, `${width}: category browsing`);
         check(await page.locator('#categoryFilters [aria-pressed=true]').innerText() === 'Burgers', `${width}: accessible category state`);
         check(await page.locator('#promotions').isVisible() && await page.locator('#popular').isVisible(), `${width}: menu filters leave featured sections visible`);
         check(await page.locator('#menuContent .product-card:visible').first().evaluate(el => el.getBoundingClientRect().top >= document.getElementById('stickyFilterBar').getBoundingClientRect().bottom), `${width}: category navigation reveals products below the sticky chips`);
         if (width < 768) check(await page.locator('#categoryFilters').evaluate(el => el.scrollWidth > el.clientWidth), `${width}: category chips scroll horizontally`);
+        await burgers.click();
+        check(await categories.locator('[aria-pressed=true]').count()===0 && await page.locator('#menuContent .section-block:not(.hidden)').count()>1, `${width}: clicking the active category restores the full menu`);
+        await burgers.click();
         await page.locator('#menuSearch').fill('aucun-plat-123');
         check(await page.locator('#noSearchResults').isVisible(), `${width}: useful empty search state`);
         check(await page.locator('#promotions').isVisible() && await page.locator('#popular').isVisible(), `${width}: empty search cannot hide offers or favourites`);
@@ -246,6 +264,15 @@ try {
     check(await page.locator('#menuContent').getAttribute('aria-busy') === 'true', 'Loading state is announced');
     await snap(page, 'state-loading');
     await page.locator('#menuContent .product-card').first().waitFor();
+    await page.locator('#promotionsGrid .product-card__choose').first().waitFor();
+    await page.evaluate(() => window.setAppLanguage('en'));
+    const translatedOffer = page.locator('#promotionsGrid .product-card').first();
+    check(
+        (await translatedOffer.locator('.product-card__choose').innerText()).includes('Customize')
+            && (await translatedOffer.locator('.product-card__price').innerText()).includes('From'),
+        'Changing language updates the offer action and price label'
+    );
+    await page.evaluate(() => window.setAppLanguage('fr'));
     await loaded(page, 'empty');
     await page.getByRole('heading', { name: 'La carte revient bientôt' }).waitFor();
     await snap(page, 'state-empty');
@@ -318,7 +345,10 @@ try {
     check(await short.page.locator('.intro-cta').evaluate(el => el.getBoundingClientRect().bottom <= innerHeight), 'Hero ordering action fits a short 320×420 viewport');
     await snap(short.page, '320-short-hero');
     await short.page.setViewportSize({ width: 320, height: 568 });
-    await loaded(short.page);
+    await short.page.goto(new URL('/?table=4', url).href, { waitUntil: 'domcontentloaded' });
+    await short.page.locator('#menuContent .product-card').first().waitFor();
+    check(await short.page.locator('#tableNotice').isVisible() && await short.page.locator('#tableNoticeNumber').innerText() === '4', 'Table QR displays the matching table in the hero');
+    check(await short.page.locator('.intro-cta').evaluate(el => el.getBoundingClientRect().bottom <= innerHeight), 'The table notice and ordering action fit on a small phone');
     await short.page.locator('#promotions .product-card__choose').first().click();
     check(await short.page.locator('#modalItemName').innerText() === 'Menu Tacos', 'Promotion opens its own customization');
     await short.page.locator('#choice-0-1').check();
@@ -327,7 +357,9 @@ try {
     await snap(short.page, '320-short-product');
     await short.page.locator('#btnModalAddToCart').click();
     check(await short.page.evaluate(() => window.cart[0].id === 'promo' && window.cart[0].totalPrice === 45), 'Promotion is added with the correct price');
-    await short.page.locator('#btnNavCart').click();
+    await short.page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+    check(await short.page.locator('#footer-instagram').evaluate(el => el.getBoundingClientRect().bottom <= document.getElementById('fabCart').getBoundingClientRect().top), 'Final footer links remain reachable above the mobile cart');
+    await short.page.locator('#fabCart').click();
     await short.page.locator('#btnGoToCheckout').click();
     await short.page.setViewportSize({ width: 320, height: 420 });
     await short.page.locator('#customerNote').fill('Une note sur un petit écran');

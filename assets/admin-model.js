@@ -57,7 +57,7 @@ export function summarizeOrders(orders, activeOrders, now, timezone) {
     for (const order of recorded) {
         if (!Array.isArray(order.items) || !order.items.length) { invalidQuantities++; continue; }
         for (const item of order.items) {
-        const quantity = Number(item.qty);
+        const quantity = Number(item?.qty);
         if (!Number.isInteger(quantity) || quantity < 1) { invalidQuantities++; continue; }
         const name = typeof item.name === 'string' && item.name.trim() ? item.name : 'Produit sans nom';
         const key = item.id || name;

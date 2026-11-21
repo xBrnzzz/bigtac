@@ -17,6 +17,9 @@
         <script src="https://unpkg.com/feather-icons">
         </script>
         <link rel="stylesheet" href="assets/storefront.css">
+        <link rel="stylesheet" href="assets/storefront-hero.css">
+        <link rel="stylesheet" href="assets/storefront-discovery.css">
+        <link rel="stylesheet" href="assets/storefront-footer.css">
     </head>
     <body>
         <a class="skip-link" href="#menu-unified" data-i18n="nav.skip">Aller à la carte</a>
@@ -32,7 +35,7 @@
                     </a>
                     <nav class="store-nav" aria-label="Navigation principale">
                         <a href="#menu-unified" data-i18n="nav.menu">La carte</a>
-                        <a href="#promotions" data-i18n="nav.offers">Les offres</a>
+                        <a href="#promotions" data-i18n="nav.offers" hidden>Les offres</a>
                         <a href="#locations" data-i18n="nav.info">Infos pratiques</a>
                     </nav>
                     <div class="store-actions">
@@ -71,14 +74,8 @@
             <main class="app-wrap store-main">
                 <section id="hero" class="restaurant-intro" aria-labelledby="store-title">
                     <div class="restaurant-intro__copy">
-                        <span class="store-status" id="storeStatus" data-i18n="hero.status_loading">Disponibilité en cours…</span>
-                        <h1 id="store-title"><span data-i18n="hero.title_lead">Grosse faim ?</span> <span translate="no">BIGTAC !</span></h1>
+                        <h1 id="store-title"><span class="hero-lead" data-i18n="hero.title_lead">Grosse faim ?</span> <span class="hero-name" id="hero-brand" translate="no">BIGTAC</span></h1>
                         <p data-i18n="hero.subtitle">Votre tacos, à votre façon.</p>
-                        <div class="restaurant-services">
-                            <span data-i18n="hero.delivery_fee">Livraison dès 4 Dh</span>
-                            <span data-i18n="hero.takeaway">À emporter</span>
-                            <span data-i18n="hero.dinein">Sur place</span>
-                        </div>
                         <div id="tableNotice" class="restaurant-services hidden" style="margin-top: 10px;">
                             <span style="background: var(--app-accent); color: var(--app-on-accent); font-weight: 700; border: none;"><span data-i18n="hero.table_order">🪑 Commande à la Table</span> <b id="tableNoticeNumber"></b></span>
                         </div>
@@ -88,7 +85,15 @@
                             </i>
                         </a>
                     </div>
-                    <img src="assets/tacos-campaign.jpg" alt="Tacos français grillés et frites, visuel illustratif" width="1536" height="1024" fetchpriority="high">
+                    <img src="assets/tacos-campaign.jpg" alt="Tacos français grillé, servi avec des frites" data-i18n-alt="hero.photo" width="1536" height="1024" fetchpriority="high">
+                    <div class="hero-service-line">
+                        <span class="store-status" id="storeStatus" data-i18n="hero.status_loading">Disponibilité en cours…</span>
+                        <div class="restaurant-services">
+                            <span data-mode="livraison" data-i18n="service.delivery">Livraison</span>
+                            <span data-mode="emporter" data-i18n="hero.takeaway">À emporter</span>
+                            <span data-mode="sur_place" data-i18n="hero.dinein">Sur place</span>
+                        </div>
+                    </div>
                 </section>
                 <div id="closedBanner" class="notice notice-warning hidden" role="status">
                     <i data-feather="clock" aria-hidden="true">
@@ -98,12 +103,11 @@
                         <span data-i18n="hero.closed_desc">Vous pouvez parcourir la carte. Les commandes reprendront à l’ouverture.</span>
                     </p>
                 </div>
-                <p id="carouselHelp" class="sr-only">Carrousel : utilisez les flèches gauche et droite pour naviguer, ou Espace pour suspendre et reprendre le défilement.</p>
+                <p id="carouselHelp" class="sr-only" data-i18n="discovery.help">Utilisez les flèches gauche et droite pour parcourir les plats.</p>
                 <div class="discovery-row">
                     <section id="promotions" class="menu-feature menu-feature--offers hidden" aria-labelledby="promotions-title" data-carousel>
                         <div class="section-heading">
                             <h2 id="promotions-title" data-i18n="sections.promotions">Promotions</h2>
-                            <p data-i18n="sections.promotions_sub">À composer selon vos envies.</p>
                         </div>
                         <div id="promotionsGrid" class="featured-grid">
                         </div>
@@ -111,7 +115,6 @@
                     <section id="popular" class="menu-feature menu-feature--popular hidden" aria-labelledby="popular-title" data-carousel>
                         <div class="section-heading">
                             <h2 id="popular-title" data-i18n="sections.bestseller">Best Seller</h2>
-                            <p data-i18n="sections.bestseller_sub">La sélection BIGTAC, à votre façon.</p>
                         </div>
                         <div id="popularGrid" class="featured-grid">
                         </div>
@@ -183,39 +186,38 @@
                         </aside>
                     </div>
                 </section>
-                <section id="locations" class="restaurant-info" aria-labelledby="info-title">
-                    <div>
-                        <h2 id="info-title" data-i18n="location.title">On se retrouve à Fès</h2>
-                        <p>
-                            2XQV+VJ5, Rue Abdelkrim Benjelloun,
-                            <br>
-                            Fès 30050, Maroc
-                        </p>
-                        <a href="https://maps.app.goo.gl/MpyAC424WpXYfEAw8" target="_blank" rel="noopener noreferrer">
-                            <span data-i18n="location.itinerary">Ouvrir l’itinéraire</span>
-                            <i data-feather="external-link" aria-hidden="true">
-                            </i>
-                        </a>
+            </main>
+            <footer id="locations" class="restaurant-footer" aria-labelledby="info-title">
+                <div class="restaurant-footer__inner">
+                    <div class="restaurant-footer__info">
+                        <section class="restaurant-footer__visit">
+                            <h2 id="info-title" data-i18n="location.title">On se retrouve à Fès</h2>
+                            <address id="footer-address">2XQV+VJ5, Rue Abdelkrim Benjelloun, Fès 30050, Maroc</address>
+                            <a id="footer-directions" class="footer-directions" href="https://maps.app.goo.gl/MpyAC424WpXYfEAw8" target="_blank" rel="noopener noreferrer">
+                                <i data-feather="map-pin" aria-hidden="true"></i><span data-i18n="location.itinerary">Ouvrir l’itinéraire</span>
+                            </a>
+                        </section>
+                        <section class="restaurant-footer__hours">
+                            <h3 data-i18n="location.hours_title">Les horaires</h3>
+                            <p id="restaurant-hours" data-i18n="location.hours_val">7j / 7, de 12:00 à 02:00</p>
+                            <dl id="footer-week" hidden></dl>
+                        </section>
+                        <section class="restaurant-footer__contact">
+                            <h3 data-i18n="location.question">Une question sur votre commande ?</h3>
+                            <div class="footer-contact-links">
+                                <button type="button" onclick="contactWhatsApp()"><i data-feather="message-circle" aria-hidden="true"></i><span data-i18n="location.whatsapp">WhatsApp</span></button>
+                                <button type="button" onclick="contactCall()"><i data-feather="phone" aria-hidden="true"></i><span data-i18n="location.call">Appeler</span></button>
+                            </div>
+                        </section>
                     </div>
-                    <div>
-                        <h3 data-i18n="location.hours_title">Les horaires</h3>
-                        <p id="restaurant-hours" data-i18n="location.hours_val">7j / 7, de 12:00 à 02:00</p>
-                        <p data-i18n="location.question">Une question sur votre commande ?</p>
-                        <div class="contact-actions">
-                            <button type="button" class="secondary-button" onclick="contactWhatsApp()" data-i18n="location.whatsapp">WhatsApp</button>
-                            <button type="button" class="secondary-button" onclick="contactCall()" data-i18n="location.call">Appeler</button>
+                    <div class="restaurant-footer__sign">
+                        <a id="footer-brand" class="footer-wordmark" href="#hero" translate="no">BIGTAC</a>
+                        <div class="footer-links">
+                            <a href="#menu-unified"><span data-i18n="nav.menu">La carte</span><i data-feather="arrow-up" aria-hidden="true"></i></a>
+                            <a id="footer-instagram" href="https://www.instagram.com/thebigtac_01/" target="_blank" rel="noopener noreferrer">Instagram<i data-feather="arrow-up-right" aria-hidden="true"></i></a>
                         </div>
                     </div>
-                </section>
-            </main>
-            <footer class="app-footer app-wrap">
-                <a href="#hero" translate="no">BIGTAC</a>
-                <span data-i18n="footer.desc">Tacos &amp; grill à Fès</span>
-                <a href="https://www.instagram.com/thebigtac_01/" target="_blank" rel="noopener noreferrer">
-                    Instagram
-                    <i data-feather="external-link" aria-hidden="true">
-                    </i>
-                </a>
+                </div>
             </footer>
         </div>
         <button data-app-content type="button" id="fabCart" class="mobile-cart-bar hidden" onclick="openCart()">
@@ -718,8 +720,13 @@
         // --- APPLICATION INITIALIZATION ---
         async function init() {
             i18n.init();
+            document.getElementById('categoryFilters').addEventListener('focusin', event => {
+                if (event.target.matches('button:focus-visible')) {
+                    event.target.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
+                }
+            });
             window.addEventListener('bigtac:langchange', () => {
-                applyLiveCatalog();
+                renderLivePromotions();
                 updateCartUI();
                 applyRestaurantConfig();
                 if(currentItem&&!document.getElementById('addItemModal').classList.contains('hidden')){renderSimpleView();recalcModalDisplayTotal();}
@@ -760,20 +767,44 @@
         }
 
         const modes=['livraison','emporter','sur_place'];
-        const profileDefaults={description:document.querySelector('.restaurant-intro__copy>p').textContent,logoUrl:document.querySelector('.store-brand img').getAttribute('src'),address:document.querySelector('#locations>div>p').textContent,map:document.querySelector('#locations>div>a').href,hours:document.getElementById('restaurant-hours').textContent,instagram:document.querySelector('.app-footer>a:last-child').href};
+        const profileDefaults={description:document.querySelector('.restaurant-intro__copy>p').textContent,logoUrl:document.querySelector('.store-brand img').getAttribute('src'),address:document.getElementById('footer-address').textContent,map:document.getElementById('footer-directions').href,hours:document.getElementById('restaurant-hours').textContent,instagram:document.getElementById('footer-instagram').href};
         function storeAvailable(){return configReady&&modes.some(mode=>orderingAvailable(appConfig,mode));}
         function applyRestaurantConfig(){
             const open=storeAvailable(),status=document.getElementById('storeStatus');status.textContent=open?t('hero.status_open'):t('hero.unavailable');status.classList.toggle('is-open',open);status.classList.toggle('is-closed',!open);document.getElementById('closedBanner').classList.toggle('hidden',open);
+            const heroBrand = document.getElementById('hero-brand');
+            heroBrand.textContent = appConfig.restaurantName || 'BIGTAC';
+            heroBrand.toggleAttribute('data-custom', heroBrand.textContent.toUpperCase() !== 'BIGTAC');
+            document.querySelectorAll('.hero-service-line [data-mode]').forEach(label => {
+                label.hidden = appConfig.orderingModes?.[label.dataset.mode] === false;
+            });
             const heroAction = document.querySelector('.intro-cta span');
             heroAction.dataset.i18n = open ? 'hero.cta' : 'hero.cta_closed';
             heroAction.textContent = t(heroAction.dataset.i18n);
             document.querySelectorAll('.service-choice').forEach((button,index)=>{button.disabled=!configReady||!orderingAvailable(appConfig,modes[index]);button.setAttribute('aria-disabled',String(button.disabled));});
-            if(appConfig.restaurantName){const brand=document.querySelector('.store-brand>span');brand.firstChild.textContent=appConfig.restaurantName;document.querySelector('.store-brand').setAttribute('aria-label',appConfig.restaurantName+', '+t('common.home'));document.querySelector('#store-title span').textContent=appConfig.restaurantName+' !';document.querySelector('.app-footer>a').textContent=appConfig.restaurantName;}
+            if(appConfig.restaurantName){const brand=document.querySelector('.store-brand>span');brand.firstChild.textContent=appConfig.restaurantName;document.querySelector('.store-brand').setAttribute('aria-label',appConfig.restaurantName+', '+t('common.home'));}
             document.querySelector('.restaurant-intro__copy>p').textContent=appConfig.description||t('hero.subtitle',profileDefaults.description);
             document.querySelector('.store-brand img').src=appConfig.logoUrl&&safeURL(appConfig.logoUrl)?appConfig.logoUrl:profileDefaults.logoUrl;
-            document.querySelector('#locations>div>p').textContent=appConfig.address||profileDefaults.address;document.querySelector('#locations>div>a').href=appConfig.address?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(appConfig.address):profileDefaults.map;
-            document.querySelector('.app-footer>a:last-child').href=appConfig.instagramUrl&&safeURL(appConfig.instagramUrl)?appConfig.instagramUrl:profileDefaults.instagram;
-            if(Array.isArray(appConfig.openingHours)&&appConfig.openingHours.length===7)document.getElementById('restaurant-hours').textContent=appConfig.openingHours.map((h,i)=>new Intl.DateTimeFormat(i18n.getLang(),{weekday:'short',timeZone:'UTC'}).format(new Date(Date.UTC(2026,0,5+i)))+': '+(h.closed?t('location.closed'):h.start+'–'+h.end)).join(' · ');else document.getElementById('restaurant-hours').textContent=t('location.hours_val',profileDefaults.hours);
+            document.getElementById('footer-brand').textContent=appConfig.restaurantName || 'BIGTAC';
+            document.getElementById('footer-address').textContent=appConfig.address||profileDefaults.address;document.getElementById('footer-directions').href=appConfig.address?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(appConfig.address):profileDefaults.map;
+            document.getElementById('footer-instagram').href=appConfig.instagramUrl&&safeURL(appConfig.instagramUrl)?appConfig.instagramUrl:profileDefaults.instagram;
+            const weeklyHours = document.getElementById('footer-week');
+            const hoursSummary = document.getElementById('restaurant-hours');
+            const hasSchedule = Array.isArray(appConfig.openingHours) && appConfig.openingHours.length === 7
+                && appConfig.openingHours.every(hours => hours && (hours.closed || (hours.start && hours.end)));
+            hoursSummary.hidden = hasSchedule;
+            weeklyHours.hidden = !hasSchedule;
+            weeklyHours.replaceChildren();
+            if (hasSchedule) {
+                const weekdays = new Intl.DateTimeFormat(i18n.getLang(), {weekday:'short', timeZone:'UTC'});
+                appConfig.openingHours.forEach((hours, index) => {
+                    const day = document.createElement('dt');
+                    const time = document.createElement('dd');
+                    day.textContent = weekdays.format(new Date(Date.UTC(2026, 0, 5 + index)));
+                    time.textContent = hours.closed ? t('location.closed') : hours.start + '–' + hours.end;
+                    time.dir = hours.closed ? 'auto' : 'ltr';
+                    weeklyHours.append(day, time);
+                });
+            } else hoursSummary.textContent = t('location.hours_val', profileDefaults.hours);
             document.getElementById('btnFinalize').disabled=orderSubmitting||!storeAvailable()||!!checkoutData.type&&!orderingAvailable(appConfig,checkoutData.type);
         }
 
@@ -785,8 +816,8 @@
             allCategories=categoryRows.filter(row=>row.isVisible!==false).map(row=>row.name);
             categoryImages=Object.fromEntries(categoryRows.map(row=>[row.name,row.image||'']));
             const controls=document.getElementById('categoryFilters');
-            controls.innerHTML=`<button type="button" onclick="filterSection('all')" class="filter-btn-pill active" data-cat="all" aria-pressed="true">${t('filter.all', 'Tout voir')}</button>`+allCategories.map(name=>`<button type="button" onclick="filterSection(decodeURIComponent('${encodeURIComponent(name).replace(/'/g,'%27')}'))" class="filter-btn-pill" data-cat="${escapeCardText(name)}" aria-pressed="false">${escapeCardText(name)}</button>`).join('');
-            if(activeCategory!=='all'&&!allCategories.includes(activeCategory))activeCategory='all';
+            controls.innerHTML=allCategories.map(name=>`<button type="button" onclick="filterSection(decodeURIComponent('${encodeURIComponent(name).replace(/'/g,'%27')}'))" class="filter-btn-pill" data-cat="${escapeCardText(name)}" aria-pressed="false">${escapeCardText(name)}</button>`).join('');
+            if(!allCategories.includes(activeCategory))activeCategory=null;
             renderMenuSections(allItems);renderPopular(allItems);applyMenuFilters();
             document.getElementById('menuContent').setAttribute('aria-busy','false');
             if(currentItem&&!currentItem.isPromo&&!document.getElementById('addItemModal').classList.contains('hidden')) {
@@ -826,6 +857,7 @@
         function renderLivePromotions(){
             allPromotions=rawPromotions.filter(p=>promotionState(p)==='active');
             const container=document.getElementById('promotionsGrid');
+            document.querySelector('.store-nav a[href="#promotions"]').hidden = !allPromotions.length;
             document.getElementById('promotions').classList.toggle('hidden',!allPromotions.length);
             container.innerHTML=allPromotions.map(p=>createCardHTML(p,'h3','offer')).join('');setupCarousel(container);
             if(currentItem?.isPromo&&!document.getElementById('addItemModal').classList.contains('hidden')){
@@ -905,21 +937,20 @@
             const name = escapeCardText(item.name);
             const itemId = encodeURIComponent(item.id).replace(/'/g, '%27');
             const featured = variant === 'offer' || variant === 'popular';
-            const badge = variant === 'offer' ? t('badge.offer', 'Offre du moment') : t('badge.popular', 'Favori');
             const chooseText = menuAvailable(item) ? (variant === 'offer' ? t('modal.composer', 'Composer') : t('modal.choose', 'Choisir')) : t('badge.soldout', 'Rupture de stock');
             return `
                 <article class="menu-card product-card${featured ? ` product-card--${variant}` : ''}">
                     <div class="product-card__media">
                         <img src="${escapeCardText(item.imageUrl || fallbackImg)}" alt="${name}" width="640" height="480" loading="lazy" onerror="this.onerror=null; this.src=decodeURIComponent('${encodeURIComponent(fallbackImg).replace(/'/g, '%27')}')">
-                        ${featured ? `<span class="featured-badge">${badge}</span>` : ''}
                     </div>
                     <div class="product-card__body">
-                        ${item.isPromo && !featured ? `<span class="product-badge">${t('badge.offer', 'Offre')}</span>` : ''}<${heading}>${name}</${heading}>
+                        ${item.isPromo && !featured ? `<span class="product-badge">${t('badge.offer', 'Offre')}</span>` : ''}
                         ${variant === 'popular' && item.category ? `<p class="featured-category">${escapeCardText(item.category)}</p>` : ''}
-                        <p class="product-card__description">${escapeCardText(item.description || t('modal.prepared'))}</p>
+                        <${heading}>${name}</${heading}>
+                        ${!featured || item.description ? `<p class="product-card__description">${escapeCardText(item.description || t('modal.prepared'))}</p>` : ''}
                         <div class="product-card__footer">
                             <div class="product-card__price"><small>${t('modal.from_price', 'À partir de')}</small><strong>${money(item.price)}</strong></div>
-                            <button type="button" class="product-card__choose" ${menuAvailable(item)?'':'disabled'} onclick="openItemModal(decodeURIComponent('${itemId}'), ${item.isPromo === true})" aria-label="${t('modal.choose', 'Choisir')} ${name}">
+                            <button type="button" class="product-card__choose" ${menuAvailable(item)?'':'disabled'} onclick="openItemModal(decodeURIComponent('${itemId}'), ${item.isPromo === true})" aria-label="${chooseText} ${name}">
                                 <span>${chooseText}</span><i data-feather="plus" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -944,7 +975,7 @@
             setupCarousel(popContainer);
         }
 
-        let activeCategory = 'all';
+        let activeCategory = null;
         const searchInput = document.getElementById('menuSearch');
         const clearBtn = document.getElementById('clearSearchBtn');
         const searchable = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -954,7 +985,7 @@
             document.querySelectorAll('#menuContent .section-block').forEach(section => {
                 let sectionCount = 0;
                 section.querySelectorAll('.product-card').forEach(card => {
-                    const matches = (!term || searchable(card.textContent).includes(term)) && (activeCategory === 'all' || section.id === `section-${activeCategory}`);
+                    const matches = (!term || searchable(card.textContent).includes(term)) && (activeCategory === null || section.id === `section-${activeCategory}`);
                     card.classList.toggle('hidden', !matches);
                     if (matches) sectionCount++;
                 });
@@ -966,20 +997,20 @@
                 button.classList.toggle('active', active);
                 button.setAttribute('aria-pressed', String(active));
             });
-            document.getElementById('noSearchResults').classList.toggle('hidden', count > 0 || (!term && activeCategory === 'all'));
+            document.getElementById('noSearchResults').classList.toggle('hidden', count > 0 || (!term && activeCategory === null));
             document.getElementById('searchResultsHint').textContent = term ? t(count===1?'search.result_one':'search.results', '', {count}) : '';
             clearBtn.classList.toggle('hidden', !searchInput.value);
         }
         window.filterSection = category => {
-            activeCategory = category;
+            activeCategory = activeCategory === category ? null : category;
             searchInput.value = '';
             applyMenuFilters();
             document.getElementById('menuContent').scrollIntoView({ block: 'start', behavior: 'instant' });
         };
-        searchInput.addEventListener('input', () => { activeCategory = 'all'; applyMenuFilters(); });
+        searchInput.addEventListener('input', () => { activeCategory = null; applyMenuFilters(); });
         window.clearSearch = () => {
             searchInput.value = '';
-            activeCategory = 'all';
+            activeCategory = null;
             applyMenuFilters();
             searchInput.focus();
         };
