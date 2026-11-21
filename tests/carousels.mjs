@@ -9,7 +9,7 @@ const browser = await chromium.launch();
 let passed = 0, productionRequests = 0;
 const errors = [];
 const check = (value, message) => { assert.ok(value, message); passed++; };
-const many = `items.forEach(item => item.isPopular = true); promotions.push(...Array.from({length:3}, (_,i) => ({...promotions[0], id:'promo-'+i, name:'Menu Démo '+i})));`;
+const many = `items.forEach(item => item.isPopular = true); promotions.push(...Array.from({length:4}, (_,i) => ({...promotions[0], id:'promo-'+i, name:'Menu Démo '+i})));`;
 async function open(width, density = 'many') {
     const context = await browser.newContext({ viewport: { width, height: 900 }, hasTouch: true, reducedMotion: 'reduce' });
     await context.route(/firestore\.googleapis\.com|identitytoolkit\.googleapis\.com|gstatic\.com\/firebasejs/, route => { productionRequests++; return route.abort(); });
@@ -28,11 +28,18 @@ async function reset(page, selector, position = 0) {
 }
 
 try {
-    for (const width of [320, 390, 768, 1366, 1440]) {
+    for (const [width, fullCards] of [[320, 1], [390, 1], [768, 2], [1366, 3], [1440, 3], [1920, 4]]) {
         const { context, page } = await open(width);
         for (const [section, track] of [['#promotions', '#promotionsGrid'], ['#popular', '#popularGrid']]) {
             await page.locator(track).scrollIntoViewIfNeeded();
             check(await page.locator(track).evaluate(el => el.scrollWidth > el.clientWidth), `${width}/${track}: multiple cards form a horizontal rail`);
+            check(await page.locator(track).evaluate((el, count) => {
+                const track = el.getBoundingClientRect();
+                const cards = [...el.children].map(card => card.getBoundingClientRect());
+                const fullyVisible = cards.filter(card => card.left >= track.left - 1 && card.right <= track.right + 1);
+                return fullyVisible.length === count && (count > 1 || track.right - cards[1].left >= 20);
+            }, fullCards), `${width}/${track}: ${fullCards} complete cards fit with a next-card preview on phones`);
+            check(await page.locator(track).evaluate(el => el.clientWidth >= innerWidth * .88), `${width}/${track}: the rail uses the viewport width`);
             await page.locator(track).focus();
             await page.keyboard.press('ArrowRight');
             check(await left(page, track) > 20, `${width}/${track}: next navigation works with reduced motion`);
@@ -69,17 +76,20 @@ try {
         check(await page.evaluate(() => window.cart.length === 0), `${width}: dragging never adds an order item`);
 
         // Real browser touch events exercise native horizontal swipe behaviour.
-        await reset(page, '#popularGrid');
-        await page.locator('#popularGrid').scrollIntoViewIfNeeded();
-        const box = await page.locator('#popularGrid').boundingBox();
         const cdp = await context.newCDPSession(page);
-        const x = box.x + box.width - 30, y = box.y + 85;
-        await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
-        for (let i = 1; i <= 10; i++) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x - i * 12, y }] });
-        await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-        await page.waitForTimeout(100);
-        check(await left(page, '#popularGrid') > 20, `${width}: native touch swipe scrolls favourites`);
-        check(!(await page.locator('#addItemModal').isVisible()), `${width}: touch swipe cannot activate a product`);
+        for (const track of ['#promotionsGrid', '#popularGrid']) {
+            await reset(page, track);
+            await page.locator(track).scrollIntoViewIfNeeded();
+            const box = await page.locator(track).boundingBox();
+            const x = box.x + box.width - 24;
+            const y = box.y + box.height / 2;
+            await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
+            for (let i = 1; i <= 12; i++) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x - i * 20, y }] });
+            await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+            await page.waitForTimeout(100);
+            check(await left(page, track) > 20, `${width}/${track}: native touch swipe scrolls the rail`);
+            check(!(await page.locator('#addItemModal').isVisible()), `${width}/${track}: touch swipe cannot activate a product`);
+        }
         await cdp.detach();
 
         for (const [section, track] of [['#promotions', '#promotionsGrid'], ['#popular', '#popularGrid']]) {
@@ -98,7 +108,7 @@ try {
             await page.locator(section).getByRole('button', { name: 'Précédent', exact: true }).click();
             check(await left(page, track) <= 1, `${width}/${track}: visible Previous button returns`);
         }
-        check(await page.locator('#promotionsGrid .product-card').count() === 4 && await page.locator('#popularGrid .product-card').count() === 5, `${width}: manual browsing never duplicates product cards`);
+        check(await page.locator('#promotionsGrid .product-card').count() === 5 && await page.locator('#popularGrid .product-card').count() === 5, `${width}: manual browsing shows every configured card without duplicates`);
         await reset(page, '#promotionsGrid');
         await offerButton.click();
         check(await page.locator('#modalItemName').innerText() === 'Menu Tacos', `${width}: an intentional click still opens the original offer`);
