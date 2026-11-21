@@ -44,10 +44,21 @@ try {
         const settle = () => page.waitForTimeout(reduced ? 320 : 800);
         check((await page.locator('#promotions-title').textContent()).trim() === 'Promotions', 'Promotion label is updated');
         check((await page.locator('#popular-title').textContent()).trim() === 'Best Seller', 'Best Seller label is updated');
-        const colours = await page.locator('#popularGrid .product-card').first().evaluate(el => ({ background: getComputedStyle(el).backgroundColor, text: getComputedStyle(el).color }));
-        check(colours.background === (dark ? 'rgb(41, 38, 32)' : 'rgb(58, 58, 48)'), `${prefix}: historical light card surface/current dark surface`);
-        check(colours.text === (dark ? 'rgb(246, 247, 246)' : 'rgb(255, 250, 244)'), `${prefix}: readable light text, unchanged dark text`);
-        check(await page.locator('#popular .section-heading p').evaluate(el => getComputedStyle(el).color) === (dark ? 'rgb(204, 192, 177)' : 'rgb(107, 98, 88)'), `${prefix}: section caption retains its readable neutral colour`);
+        const readable = await page.locator('#popularGrid .product-card').first().evaluate(card => {
+            const luminance = colour => {
+                const linear = colour.match(/[\d.]+/g).slice(0, 3).map(value => Number(value) / 255)
+                    .map(value => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4);
+                return .2126 * linear[0] + .7152 * linear[1] + .0722 * linear[2];
+            };
+            const background = luminance(getComputedStyle(card).backgroundColor);
+            return ['h3', '.featured-category', '.product-card__price strong'].every(selector => {
+                const element = card.querySelector(selector);
+                const foreground = luminance(getComputedStyle(element).color);
+                const contrast = (Math.max(background, foreground) + .05) / (Math.min(background, foreground) + .05);
+                return element.checkVisibility() && contrast >= 4.5;
+            });
+        });
+        check(readable, `${prefix}: best seller name, category and price are visible with readable contrast`);
         await page.locator('#popular').scrollIntoViewIfNeeded();
         await capture(page, prefix + '-best-seller');
         await choose(page);

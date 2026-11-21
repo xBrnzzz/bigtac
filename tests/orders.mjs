@@ -14,7 +14,7 @@ async function open(width,role='admin') {
     await context.route(/(firestore\.googleapis\.com|identitytoolkit\.googleapis\.com|gstatic\.com\/firebasejs)/,route=>{productionRequests++;return route.abort();});
     const page=await context.newPage();page.setDefaultTimeout(12000);page.setDefaultNavigationTimeout(45000);page.on('pageerror',error=>errors.push(error.message));
     if(width===1440)await page.clock.install();
-    await page.goto(`${url}/admin.html?orders=rich&role=${role}#orders`,{waitUntil:'domcontentloaded'});
+    await page.goto(`${url}/admin.html?orders=rich&role=${role}#orders`,{waitUntil:'commit'});
     await page.locator('#list-pending .order-card').first().waitFor();await page.waitForFunction(()=>document.getElementById('orders-connection').textContent==='Synchronisé en direct');
     return {page,context};
 }

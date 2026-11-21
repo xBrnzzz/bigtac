@@ -9,7 +9,6 @@ export function createPromotions({session,toast,upload,settings}){
     const service=operationsService(session),$=id=>document.getElementById(id);let stop=null,timer=null,rows=[],expected=null,groups=[],extras=[],busy=false,blocked=true,epoch=0;
     const feedback=document.createElement('p');feedback.id='promo-feedback';feedback.setAttribute('role','status');$('promotions-list').before(feedback);
     const schedule=document.createElement('section');schedule.className='promo-schedule';schedule.dataset.promoPanel='publish';schedule.hidden=true;schedule.innerHTML='<h4>Publication et calendrier</h4><p>Choisissez la visibilité et les dates de votre offre.</p><label class="editor-publication"><input type="checkbox" id="promo-visible" checked><span>Publié sur la carte</span></label><p>Dates facultatives · fuseau du restaurant</p><label>Début<input id="promo-start" name="promotion-start" type="datetime-local" class="w-full p-3 border rounded-xl"></label><label>Fin<input id="promo-end" name="promotion-end" type="datetime-local" class="w-full p-3 border rounded-xl"></label>';$('promo-form').append(schedule);
-    const explain=document.createElement('p');explain.textContent='Les offres utilisent un prix fixe. Les réductions en pourcentage ne sont pas disponibles.';$('promotions-list').after(explain);
     let baseline=null;
     const editorValue=()=>JSON.stringify([...$('promo-form').querySelectorAll('input,select:not([data-preset]),textarea')].map(field=>field.type==='file'?[...field.files].map(file=>[file.name,file.size,file.lastModified]):field.type==='checkbox'?field.checked:field.value));
     const isDirty=()=>!$('promo-editor').classList.contains('hidden')&&baseline!==null&&editorValue()!==baseline;
@@ -52,7 +51,14 @@ export function createPromotions({session,toast,upload,settings}){
         return field;
     }
     let previewURL=null;
+    function updatePhotoCaption(){
+        const caption=$('promo-photo-caption'),name=$('promo-name').value.trim(),price=$('promo-price').value;
+        caption.hidden=!name&&!price;
+        caption.querySelector('strong').textContent=name;
+        caption.querySelector('span').textContent=price?`${price} DH`:'';
+    }
     function photoState(){
+        updatePhotoCaption();
         const selected=$('promo-image-file').files[0],hasPhoto=!!(selected||$('promo-image-url').value);
         if(!selected){
             if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;$('promo-image-preview').replaceChildren();
@@ -68,10 +74,28 @@ export function createPromotions({session,toast,upload,settings}){
         clearError();if(previewURL)URL.revokeObjectURL(previewURL);previewURL=URL.createObjectURL(file);
         const image=document.createElement('img');image.src=previewURL;image.alt='Aperçu de la promotion';$('promo-image-preview').replaceChildren(image);photoState();
     });
-    $('promo-form').addEventListener('input',event=>{if(event.target.hasAttribute('aria-invalid'))clearError();});
+    $('promo-form').addEventListener('input',event=>{
+        if(event.target.hasAttribute('aria-invalid'))clearError();
+        if(event.target.matches('#promo-name,#promo-price'))updatePhotoCaption();
+    });
     function render(){
-        const labels=rows.map(p=>`<div class="bg-white p-4 rounded-3xl border shadow-sm flex flex-wrap items-center gap-3.5"><img src="${e(p.imageUrl||'assets/tacos-campaign.jpg')}" alt="" width="64" height="64" class="w-16 h-16 rounded-2xl object-cover"><div class="flex-1 min-w-0"><h4 class="font-extrabold truncate">${e(p.name)}</h4><p>${e(p.price)} DH · ${stateLabels[promotionState(p)]}</p><p>${p.startsAt?'Début : '+e(localInput(p.startsAt,zone())):''} ${p.endsAt?'Fin : '+e(localInput(p.endsAt,zone())):''}</p></div><div class="promo-actions">${[['edit','Modifier'],['duplicate','Copier'],['toggle',p.isVisible===false?'Activer':'Désactiver'],['delete','Supprimer']].map(([action,label])=>`<button class="admin-button${action==='edit'?' promo-edit-primary':''}" data-promo-action="${action}" data-id="${e(p.id)}" aria-label="${e(label)}" title="${e(label)}" ${busy||blocked?'disabled':''}>${icon(({edit:'edit',duplicate:'copy',toggle:p.isVisible===false?'check':'off',delete:'trash'})[action])}<span class="sr-only">${label}</span></button>`).join('')}</div></div>`).join('');
-        $('promotions-list').innerHTML=labels||'<p>Aucune offre enregistrée.</p>';
+        const labels=rows.map(p=>{
+            const state=promotionState(p);
+            const dateText=value=>e(localInput(value,zone()).replace('T',' · '));
+            const actions=[['edit','Modifier','edit'],['duplicate','Copier','copy'],['toggle',p.isVisible===false?'Activer':'Désactiver',p.isVisible===false?'check':'off'],['delete','Supprimer','trash']];
+            return `<article class="promo-entry">
+                <div class="promo-art">${p.imageUrl?`<img src="${e(p.imageUrl)}" alt="" loading="lazy">`:icon('image')}</div>
+                <div class="promo-entry-body">
+                    <span class="promo-entry-state" data-state="${e(state)}">${e(stateLabels[state])}</span>
+                    <h3>${e(p.name)}</h3>
+                    ${p.description?`<p class="promo-entry-description">${e(p.description)}</p>`:''}
+                    ${p.startsAt||p.endsAt?`<p class="promo-entry-schedule">${icon('clock')}<span>${[p.startsAt?'Début : '+dateText(p.startsAt):'',p.endsAt?'Fin : '+dateText(p.endsAt):''].filter(Boolean).join(' / ')}</span></p>`:''}
+                </div>
+                <strong class="promo-entry-price">${e(p.price)} <small>DH</small></strong>
+                <div class="promo-actions">${actions.map(([action,label,glyph])=>`<button type="button" class="admin-button" data-promo-action="${action}" data-id="${e(p.id)}" aria-label="${e(label)}" title="${e(label)}" ${busy||blocked?'disabled':''}>${icon(glyph)}<span class="sr-only">${label}</span></button>`).join('')}</div>
+            </article>`;
+        });
+        $('promotions-list').innerHTML=labels.join('')||(blocked?'':'<div class="menu-empty"><h3>Aucune offre enregistrée.</h3></div>');
     }
     function draw(){
         const option=(o,path)=>`<div class="promo-option-fields"><label>Option<input aria-label="Nom de l’option" class="p-2 border rounded-xl min-w-0" data-pfield="${path}.name" value="${e(o.name)}"></label><label>Prix + DH<input aria-label="Prix de l’option" class="p-2 border rounded-xl w-24" type="number" min="0" step="0.01" data-pfield="${path}.price" value="${e(o.price)}"></label></div>`;

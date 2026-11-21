@@ -1,40 +1,37 @@
 :root {
     color-scheme: light;
-    /* ── BIGTAC Admin Design System v2 ── */
-    --admin-ground:#ffffff;       /* page/workspace bg */
-    --admin-surface:#ffffff;       /* cards, panels */
-    --admin-frame:#ffffff;         /* white navigation frame */
-    --admin-raised:#ffffff;        /* hover/raised surfaces */
-    --admin-field-surface:#f2f3f5;
-    --admin-field-hover:#e9ebef;
-    --admin-neutral-control:#ffffff;
-    --admin-neutral-hover:#ececeb;
-    --admin-section-surface:#ffffff;
-    --admin-sidebar:#f2e8da;
-    --admin-text:#232427;          /* primary ink */
-    --admin-muted:#5d6065;         /* secondary text */
-    --admin-border:#e6e8ed;        /* hairline borders */
-    /* sidebar (light frame) */
-    --admin-sidebar-text:#232427;
-    --admin-sidebar-muted:#5d6065;
-    --admin-sidebar-hover:#f3f3f1;
-    --admin-nav-active:#cb450d;
-    /* White surfaces separate through centered, neutral-gray ambient elevation. */
-    --shadow-ticket:0 0 18px rgba(35,35,35,.15);
-    --shadow-control:0 0 6px rgba(35,35,35,.075);
-    --shadow-card:0 0 20px rgba(35,35,35,.13);
-    --shadow-hover:0 0 20px rgba(35,35,35,.16);
-    --shadow-floating:0 0 36px rgba(35,35,35,.20);
+    /* Restaurant operations. White paper, a warm frame and BIGTAC orange. */
+    --admin-ground:#fbf8f3;
+    --admin-surface:#fff;
+    --admin-frame:#f1ebe3;
+    --admin-raised:#f8f2ea;
+    --admin-field-surface:#f4f2ef;
+    --admin-field-hover:#eee8df;
+    --admin-neutral-control:#fff;
+    --admin-neutral-hover:#eee8df;
+    --admin-section-surface:#fff;
+    --admin-sidebar:var(--admin-frame);
+    --admin-text:#2e2822;
+    --admin-muted:#6b6258;
+    --admin-border:#e6ddd2;
+    --admin-sidebar-text:var(--admin-text);
+    --admin-sidebar-muted:var(--admin-muted);
+    --admin-sidebar-hover:#eae0d5;
+    --admin-nav-active:var(--admin-primary);
+    --shadow-ticket:0 2px 5px #2e282210;
+    --shadow-control:none;
+    --shadow-card:0 1px 2px #2e282209;
+    --shadow-hover:0 2px 5px #2e282213;
+    --shadow-floating:0 12px 36px #2e282226;
     --admin-shadow:var(--shadow-card);
     --admin-card-shadow:var(--admin-shadow);
     --admin-card-hover:var(--shadow-hover);
-    /* accent */
-    --admin-accent:#cb450d;
-    --admin-accent-hover:#ae3808;
-    --admin-orange-ink:#b23b0b;
-    --admin-active:#fff0e7;        /* active nav bg */
-    --admin-primary:#cb450d;
-    --admin-primary-hover:#ae3808;
+    --admin-accent:#c84a13;
+    --admin-accent-hover:#a93b0c;
+    --admin-orange-ink:#98380f;
+    --admin-active:#fff0e3;
+    --admin-primary:var(--admin-accent);
+    --admin-primary-hover:var(--admin-accent-hover);
     /* semantic */
     --admin-positive:#217252;  --admin-green-bg:#eaf6ef;  --admin-green-border:#c0dece;
     --admin-blue:#315db5;      --admin-blue-bg:#edf2ff;   --admin-blue-border:#c5d3ef;
@@ -44,8 +41,8 @@
     --admin-teal:#217252;      --admin-teal-bg:#eaf6ef;   --admin-teal-border:#c0dece;
     --admin-purple:#5b45a0;    --admin-purple-bg:#f3f0fb; --admin-purple-border:#cec4e8;
     /* geometry */
-    --admin-radius:18px;
-    --admin-control-radius:11px;
+    --admin-radius:12px;
+    --admin-control-radius:8px;
     --admin-gap:16px;
     /* typography */
     --font:Manrope,system-ui,sans-serif;
@@ -106,7 +103,7 @@ html,body { margin:0; height:100%; }
 .admin-location>span { color:var(--admin-muted); font-size:12px; }
 .admin-location>span:first-child { max-width:140px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; }
 .admin-location h1 { font-size:24px; font-weight:800; line-height:1.25; letter-spacing:-1px; margin:0; }
-#admin-app[data-screen=overview] .admin-location>[data-restaurant-name] { display:none; }
+
 #overview-window { font-size:12px; max-width:340px; color:var(--admin-muted); }
 .admin-body label { font-size:12px; }
 .admin-top-actions { font-size:12px; color:var(--admin-muted); }

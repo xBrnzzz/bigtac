@@ -23,7 +23,6 @@ async function open(width, density = 'many') {
     return { context, page };
 }
 const left = (page, selector) => page.locator(selector).evaluate(el => el.scrollLeft);
-const blur = page => page.evaluate(() => document.activeElement?.blur());
 async function reset(page, selector, position = 0) {
     await page.locator(selector).evaluate((el, value) => { el.scrollLeft = value; el.dispatchEvent(new Event('scroll')); }, position);
 }
@@ -52,7 +51,7 @@ try {
             check(await page.locator(track).evaluate(el => {
                 const step = el.firstElementChild.getBoundingClientRect().width + parseFloat(getComputedStyle(el).columnGap);
                 return Math.abs(el.scrollLeft - Math.min(step, el.scrollWidth - el.clientWidth)) <= 1;
-            }), `${width}/${track}: manual navigation aligns a full card after partial autoplay/dragging`);
+            }), `${width}/${track}: manual navigation aligns a full card after a partial drag`);
         }
 
         // A drag beginning on the ordering action must not open or order a product.
@@ -83,71 +82,23 @@ try {
         check(!(await page.locator('#addItemModal').isVisible()), `${width}: touch swipe cannot activate a product`);
         await cdp.detach();
 
-        // All autoplay checks use virtual time, not long wall-clock waits.
-        await page.emulateMedia({ reducedMotion: 'no-preference' });
         for (const [section, track] of [['#promotions', '#promotionsGrid'], ['#popular', '#popularGrid']]) {
+            await page.emulateMedia({ reducedMotion: 'no-preference' });
             await page.locator(track).scrollIntoViewIfNeeded();
             await page.mouse.move(0, 0);
-            await blur(page);
+            await page.evaluate(() => document.activeElement?.blur());
             await reset(page, track);
-            await page.waitForTimeout(80); // Flush native intersection/scroll delivery.
-            await page.clock.runFor(6300);
-            const initial = await left(page, track);
-            await page.clock.runFor(section === '#promotions' ? 7000 : 1000);
-            const advanced = await left(page, track);
-            if (section === '#promotions') {
-                check(advanced > initial + 30, `${width}/${track}: autoplay advances to the next complete offer`);
-                check(await page.locator(track).evaluate(el => {
-                    const rail = el.getBoundingClientRect();
-                    return [...el.children].some(card => {
-                        const r = card.getBoundingClientRect();
-                        return r.width >= el.clientWidth - 10 && r.left >= rail.left - 1 && r.right <= rail.right + 1;
-                    });
-                }), `${width}: a complete full-width promotion is visible between advances`);
-                await page.clock.runFor(1000);
-                check(Math.abs(await left(page, track) - advanced) <= 1, `${width}: promotion holds still for reading`);
-            } else check(advanced - initial >= 30 && advanced - initial <= 65, `${width}/${track}: autoplay advances at a brisk pace (~48px/s)`);
-            await page.locator(section).hover();
-            const hovered = await left(page, track);
-            await page.clock.runFor(1000);
-            check(Math.abs(await left(page, track) - hovered) <= 1, `${width}/${track}: hover pauses autoplay`);
-            await page.mouse.move(0, 0);
-            await page.locator(track).focus();
-            const focused = await left(page, track);
-            await page.clock.runFor(1000);
-            check(Math.abs(await left(page, track) - focused) <= 1, `${width}/${track}: keyboard focus pauses autoplay`);
-            await blur(page);
-            await page.locator(track).focus();
-            await page.keyboard.press('Space');
-            await blur(page); await page.mouse.move(0, 0);
-            const paused = await left(page, track);
-            await page.clock.runFor(1000);
-            check(Math.abs(await left(page, track) - paused) <= 1, `${width}/${track}: explicit Pause persists without focus`);
-            await page.locator(track).focus();
-            await page.keyboard.press('Space');
-            await blur(page); await page.mouse.move(0, 0);
-            const maximum = await page.locator(track).evaluate(el => el.scrollWidth - el.clientWidth);
-            await reset(page, track, maximum - 2);
-            await page.waitForTimeout(60);
-            await page.clock.runFor(section === '#promotions' ? 14000 : 8500);
-            check(await left(page, track) < maximum - 10, `${width}/${track}: automatic loop reverses smoothly at the end`);
-            await reset(page, track, 30);
-            await page.waitForTimeout(60);
-            const manual = await left(page, track);
-            await page.clock.runFor(1000);
-            check(Math.abs(await left(page, track) - manual) <= 1, `${width}/${track}: manual scrolling pauses autoplay`);
-            await page.clock.runFor(section === '#promotions' ? 14000 : 7000);
-            check(Math.abs(await left(page, track) - manual) > 5, `${width}/${track}: autoplay resumes after the interaction cooldown`);
+            await page.waitForTimeout(120);
+            const readingPosition = await left(page, track);
+            await page.clock.runFor(15000);
+            check(Math.abs(await left(page, track) - readingPosition) < 2, `${width}/${track}: cards stay still while a customer reads`);
             await page.emulateMedia({ reducedMotion: 'reduce' });
-            const reduced = await left(page, track);
-            await page.clock.runFor(1500);
-            check(Math.abs(await left(page, track) - reduced) <= 1, `${width}/${track}: reduced motion stops automatic movement`);
-            await page.emulateMedia({ reducedMotion: 'no-preference' });
+            await page.locator(section).getByRole('button', { name: 'Suivant', exact: true }).click();
+            check(await left(page, track) > 20, `${width}/${track}: visible Next button advances`);
+            await page.locator(section).getByRole('button', { name: 'Précédent', exact: true }).click();
+            check(await left(page, track) <= 1, `${width}/${track}: visible Previous button returns`);
         }
-        check(await page.locator('#promotionsGrid .product-card').count() === 4 && await page.locator('#popularGrid .product-card').count() === 5, `${width}: looping never duplicates product cards`);
-        check(await page.locator('[data-carousel] .section-heading button').count() === 0, `${width}: no visible Pause or arrow buttons are rendered`);
-
-        await page.emulateMedia({ reducedMotion: 'reduce' });
+        check(await page.locator('#promotionsGrid .product-card').count() === 4 && await page.locator('#popularGrid .product-card').count() === 5, `${width}: manual browsing never duplicates product cards`);
         await reset(page, '#promotionsGrid');
         await offerButton.click();
         check(await page.locator('#modalItemName').innerText() === 'Menu Tacos', `${width}: an intentional click still opens the original offer`);
@@ -166,8 +117,13 @@ try {
         }), `${width}: search and categories stick together below the header`);
         check(await page.locator('#categoryFilters').evaluate(el => getComputedStyle(el).scrollbarWidth === 'none'), `${width}: category scrollbar is visually hidden`);
         if (width < 768) {
-            await page.locator('#categoryFilters button').last().focus();
-            check(await page.locator('#categoryFilters').evaluate(el => el.scrollLeft > 0), `${width}: keyboard focus scrolls category chips`);
+            await page.locator('#categoryFilters button').nth(-2).focus();
+            await page.keyboard.press('Tab');
+            check(await page.locator('#categoryFilters').evaluate(el => {
+                const rail = el.getBoundingClientRect();
+                const focused = document.activeElement.getBoundingClientRect();
+                return focused.left >= rail.left - 1 && focused.right <= rail.right + 1;
+            }), `${width}: keyboard focus brings the final category chip into view`);
             check(await page.evaluate(() => document.getElementById('stickyFilterBar').getBoundingClientRect().bottom < document.getElementById('fabCart').getBoundingClientRect().top), `${width}: sticky search cannot cover the mobile cart action`);
         }
         await page.locator('#promotions').scrollIntoViewIfNeeded();
@@ -185,7 +141,7 @@ try {
                 await small.page.locator('#popularGrid').scrollIntoViewIfNeeded();
                 await small.page.clock.runFor(2000);
                 check(await left(small.page, '#popularGrid') === 0 && await left(small.page, '#promotionsGrid') === 0, `${width}: single cards never autoplay even with motion enabled`);
-                check(await small.page.locator('[data-carousel] .section-heading button').count() === 0, `${width}: single items have no carousel buttons`);
+                check(await small.page.locator('[data-carousel] .section-heading button:visible').count() === 0, `${width}: single items have no carousel buttons`);
                 check(await small.page.locator('#promotionsGrid .product-card').count() === 1 && await small.page.locator('#popularGrid .product-card').count() === 1, `${width}: single featured items render without copies`);
             } else check(!(await small.page.locator('#promotions').isVisible()) && !(await small.page.locator('#popular').isVisible()), `${width}: zero featured items leave no empty carousel`);
             await small.context.close();
@@ -196,28 +152,25 @@ try {
             await fitted.page.locator('#popularGrid').scrollIntoViewIfNeeded();
             await fitted.page.clock.runFor(2000);
             check(await fitted.page.locator('#popularGrid .product-card').count() === 2, 'Desktop fixture contains two original favourites');
-            check(await fitted.page.locator('#popular .section-heading button').count() === 0, 'Fully visible cards have no carousel buttons');
+            check(await fitted.page.locator('#popular .section-heading button:visible').count() === 0, 'Fully visible cards have no carousel buttons');
             check(await left(fitted.page, '#popularGrid') === 0, 'Fully visible cards do not autoplay');
             await fitted.context.close();
         }
         console.log(`PASS carousel and sticky-menu interactions: ${width}px`);
     }
-    const interrupted = await open(390);
-    await interrupted.page.emulateMedia({ reducedMotion: 'no-preference' });
-    await interrupted.page.locator('#promotionsGrid').scrollIntoViewIfNeeded();
-    await interrupted.page.mouse.move(0, 0);
-    await interrupted.page.waitForTimeout(80);
-    await interrupted.page.clock.runFor(6250);
-    check(await interrupted.page.locator('#promotionsGrid').evaluate(el => el.classList.contains('is-advancing')), 'Pause regression reaches the middle of an offer transition');
-    await interrupted.page.locator('#promotionsGrid').focus();
-    check(await interrupted.page.locator('#promotionsGrid').evaluate(el => {
-        const rail = el.getBoundingClientRect();
-        return !el.classList.contains('is-advancing') && [...el.children].some(card => {
-            const r = card.getBoundingClientRect();
-            return r.left >= rail.left - 1 && r.right <= rail.right + 1;
-        });
-    }), 'Focusing during a transition settles the complete offer instead of freezing a cropped card');
-    await interrupted.context.close();
+    const rtl = await open(390);
+    await rtl.page.evaluate(() => window.setAppLanguage('en'));
+    check((await rtl.page.locator('#promotionsGrid button span').first().innerText()) === 'Customize', 'English offer action updates immediately');
+    await rtl.page.evaluate(() => window.setAppLanguage('ar'));
+    check((await rtl.page.locator('#promotionsGrid .product-card__price small').first().innerText()) === 'ابتداءً من', 'Arabic offer price label updates immediately');
+    const rtlOffers = rtl.page.locator('#promotionsGrid');
+    await rtl.page.locator('#promotions').getByRole('button', { name: 'التالي', exact: true }).click();
+    check(await left(rtl.page, '#promotionsGrid') < -20, 'Arabic Next advances in reading order');
+    await rtlOffers.focus();
+    await rtl.page.keyboard.press('Home');
+    await rtl.page.keyboard.press('ArrowLeft');
+    check(await left(rtl.page, '#promotionsGrid') < -20, 'Arabic left arrow advances toward the next card');
+    await rtl.context.close();
     check(productionRequests === 0, 'No production Firebase requests');
     assert.deepEqual(errors, []); passed++;
     console.log(`PASS: ${passed} carousel/sticky checks, zero production Firebase requests.`);

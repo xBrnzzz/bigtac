@@ -1,0 +1,187 @@
+/* Restaurant offers use one complete ticket, with the photo and ordering details
+   kept together. Favourites share a ruled menu layout for easy comparison. */
+.store-nav a[hidden] { display: none; }
+.discovery-row .menu-feature {
+    display: block;
+    padding: clamp(28px, 5vw, 72px) max(var(--app-gutter), calc((100% - 1152px) / 2));
+}
+.discovery-row .menu-feature.hidden { display: none; }
+.discovery-row .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 clamp(16px, 2.4vw, 30px);
+}
+.discovery-row .section-heading h2 {
+    max-width: none;
+    margin: 0;
+    font-size: clamp(34px, 5vw, 70px);
+    line-height: 1;
+    letter-spacing: -.025em;
+}
+.browse-arrows { display: flex; gap: 6px; flex-shrink: 0; }
+.browse-arrows[hidden] { display: none; }
+.browse-arrows button {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font-size: 22px;
+}
+.browse-arrows button:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
+[dir=rtl] .browse-arrows button span { transform: scaleX(-1); }
+.discovery-row .featured-grid {
+    padding: 0;
+    min-width: 0;
+    scroll-padding-inline: 0;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+.discovery-row .featured-grid::-webkit-scrollbar { display: none; }
+.discovery-row .featured-grid.is-dragging { scroll-snap-type: none; }
+.discovery-row .featured-grid .product-card { box-shadow: none; }
+.discovery-row .featured-grid .product-card__price strong {
+    font-family: var(--app-heading);
+    font-size: clamp(24px, 3vw, 38px);
+    line-height: 1.05;
+    color: inherit;
+}
+.discovery-row .featured-grid .product-card__price small {
+    margin-bottom: 3px;
+    font-size: 12px;
+}
+.discovery-row .product-card__choose {
+    position: relative;
+    min-height: 44px;
+    border-radius: 6px;
+    padding: 10px 16px;
+    gap: 10px;
+    white-space: normal;
+}
+.discovery-row .featured-grid .product-card__choose span { display: inline; }
+.discovery-row .product-card__choose:disabled svg { display: none; }
+.discovery-row :focus-visible { outline: 3px solid #e77731; outline-offset: -3px; }
+#promotions { background: #2e211c; color: #fff5e6; }
+#promotions .section-heading h2 { color: inherit; }
+#promotionsGrid { grid-auto-columns: 100%; gap: 16px; }
+#promotionsGrid .product-card {
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr);
+    gap: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff0da;
+    color: #322119;
+}
+#promotionsGrid .product-card__media {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    min-height: clamp(220px, 24vw, 325px);
+    max-height: none;
+    border-radius: 0;
+}
+#promotionsGrid .product-card__media img { position: absolute; inset: 0; }
+#promotionsGrid .product-card__body {
+    position: relative;
+    grid-area: 1 / 2;
+    padding: clamp(22px, 4vw, 56px);
+    justify-content: center;
+    border-inline-start: 2px dashed #c79c77;
+}
+#promotionsGrid .product-card__body::before,
+#promotionsGrid .product-card__body::after {
+    content: "";
+    position: absolute;
+    inset-inline-start: -9px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #2e211c;
+    pointer-events: none;
+}
+#promotionsGrid .product-card__body::before { top: -8px; }
+#promotionsGrid .product-card__body::after { bottom: -8px; }
+#promotionsGrid h3 {
+    color: inherit;
+    font-size: clamp(32px, 4vw, 64px);
+    line-height: 1;
+    letter-spacing: -.025em;
+}
+#promotionsGrid .product-card__description {
+    display: block;
+    margin: 10px 0 0;
+    color: #654e42;
+    font-size: 15px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+#promotionsGrid .product-card__footer {
+    margin: 20px 0 0;
+    padding-top: 14px;
+    gap: 12px;
+    border-top: 1px solid #d7bda6;
+}
+#promotionsGrid .product-card__price small { color: #654e42; }
+#promotionsGrid .product-card__choose { background: #b83c09; color: #fff; }
+#promotionsGrid .product-card__choose:hover { background: #913006; }
+#popular { background: var(--app-bg); color: var(--app-ink); }
+#popularGrid {
+    grid-auto-columns: calc((100% - 28px) / 2);
+    gap: 28px;
+}
+#popularGrid .product-card {
+    display: grid;
+    grid-template-columns: clamp(105px, 12vw, 168px) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(12px, 2vw, 26px);
+    padding: 18px 0;
+    max-width: none;
+    border: 0;
+    border-block: 1px solid var(--app-line);
+    border-radius: 0;
+    background: var(--app-bg);
+    color: var(--app-ink);
+}
+#popularGrid .product-card__media {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1;
+    border-radius: 6px;
+}
+#popularGrid .product-card__body { padding: 0; justify-content: center; }
+#popularGrid h3 { margin: 0; font-size: clamp(26px, 2.5vw, 42px); line-height: 1.05; color: inherit; }
+#popularGrid .featured-category { margin: 0 0 5px; font-size: 13px; font-weight: 600; color: var(--app-muted); }
+#popularGrid .product-card__footer {
+    margin: 10px 0 0;
+    padding: 0;
+    gap: 8px;
+}
+#popularGrid .product-card__price strong { font-size: clamp(20px, 2vw, 28px); }
+#popularGrid .product-card__price small { color: var(--app-muted); }
+#popularGrid .product-card__choose {
+    border: 1px solid var(--app-line);
+    background: var(--app-surface);
+    color: var(--app-ink);
+}
+#popularGrid .product-card__choose:hover { border-color: var(--app-accent); }
+@media (max-width: 820px) {
+    #popularGrid { grid-auto-columns: min(510px, calc(100% - 18px)); gap: 12px; }
+    #popularGrid:has(> :only-child) { grid-auto-columns: min(510px, 100%); }
+}
+@media (max-width: 630px) {
+    #promotionsGrid .product-card { display: flex; }
+    #promotionsGrid .product-card__media { height: auto; min-height: 0; aspect-ratio: 2 / 1; }
+    #promotionsGrid .product-card__body { border-inline-start: 0; border-top: 2px dashed #c79c77; padding: 18px; }
+    #promotionsGrid .product-card__body::after { inset: -9px auto auto; inset-inline-end: -8px; }
+    #promotionsGrid .product-card__footer { margin-top: 14px; padding-top: 12px; }
+    #popularGrid .product-card { grid-template-columns: clamp(72px, 23vw, 120px) minmax(0, 1fr); padding: 12px 0; gap: 12px; }
+    #popularGrid .product-card__choose { padding: 8px 10px; gap: 5px; }
+}

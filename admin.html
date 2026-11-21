@@ -143,6 +143,10 @@
     <link rel="stylesheet" href="assets/admin-polish.css">
     <link rel="stylesheet" href="assets/admin-elevation.css">
     <link rel="stylesheet" href="assets/admin-editors.css">
+    <link rel="stylesheet" href="assets/admin-ledger.css">
+    <link rel="stylesheet" href="assets/admin-analysis.css">
+    <link rel="stylesheet" href="assets/admin-catalog.css">
+    <link rel="stylesheet" href="assets/admin-service-floor.css">
     <script type="module" src="assets/i18n.js"></script>
 </head>
 
@@ -155,7 +159,7 @@
 
     <!-- LOGIN OVERLAY MODAL -->
     <div id="login-section" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm p-8 rounded-3xl shadow-2xl border border-slate-100 relative">
+        <div class="login-workspace bg-white w-full max-w-sm p-8 rounded-3xl shadow-2xl border border-slate-100 relative">
             <!-- Language Selector on Login Modal -->
             <div class="flex justify-end mb-2">
                 <div class="lang-selector relative" id="loginLangSelector">
@@ -218,14 +222,14 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h2 class="text-2xl font-black text-slate-900 tracking-tight">Promotions</h2>
-                        <p class="text-xs text-slate-500">Offres en vitrine visibles sur la page d'accueil</p>
+                        <p class="text-xs text-slate-500">Offres à prix fixe de la carte.</p>
                     </div>
-                    <button onclick="openPromoEditor()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2.5 rounded-2xl font-bold text-sm shadow-lg shadow-red-600/20 flex items-center gap-2">
+                    <button onclick="openPromoEditor()" class="admin-button primary">
                         <i data-feather="plus" class="w-4 h-4"></i>
-                        <span>Nouvelle Promo</span>
+                        <span>Nouvelle promotion</span>
                     </button>
                 </div>
-                <div id="promotions-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div id="promotions-list" class="promotion-ledger">
                     <!-- Populated by JS -->
                 </div>
             </div>
@@ -242,7 +246,7 @@
                 <!-- Employee cards retain the existing table hooks and column semantics. -->
                 <section class="admin-team-accounts" aria-labelledby="team-accounts-title">
                     <div class="admin-team-heading"><p class="admin-team-readonly">Consultation des comptes · modification indisponible.</p>
-                        <h3 id="team-accounts-title" class="font-extrabold text-slate-700 text-sm">Liste des Comptes</h3>
+                        <h3 id="team-accounts-title" class="font-extrabold text-slate-700 text-sm">Comptes de l’équipe</h3>
                     </div>
                     <div class="admin-team-table-wrap">
                         <table class="admin-team-list" role="table" aria-labelledby="team-accounts-title">
@@ -250,8 +254,8 @@
                                 <tr>
                                     <th id="team-column-user" scope="col">Utilisateur</th>
                                     <th id="team-column-email" scope="col">Email</th>
-                                    <th id="team-column-state" scope="col">Courses Validées</th>
-                                    <th id="team-column-access" scope="col">Gains Livreur</th>
+                                    <th id="team-column-state" scope="col">État</th>
+                                    <th id="team-column-access" scope="col">Accès</th>
                                     <th id="team-column-action" scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -300,18 +304,18 @@
         <!-- VIEW 5: DEDICATED DELIVERY DRIVER INTERFACE -->
         <div id="view-driver" class="fixed inset-0 hidden flex-col bg-slate-100 z-50">
             <!-- Driver Header -->
-            <div class="bg-white border-b border-slate-200 p-4 flex items-center justify-between shrink-0 shadow-sm">
+            <div class="driver-topbar flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3">
                     <img src="assets/logo.png" alt="BIGTAC" class="h-9 w-9 object-contain rounded-xl bg-black p-0.5" onerror="this.src='assets/snack.png'">
                     <div>
                         <h1 class="font-black text-base leading-none text-slate-900" data-i18n="driver.header_title">BIGTAC Livraison</h1>
-                        <p class="text-xs text-brand-600 font-bold mt-0.5" id="driver-name-display" data-i18n="driver.header_subtitle">Livreur</p>
+                        <p class="text-xs text-brand-600 font-bold mt-0.5" id="driver-name-display">Livreur</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <div class="lang-selector relative" id="driverLangSelector">
                         <button type="button" id="btnDriverLang" class="lang-toggle-btn" onclick="toggleLangMenu('driverLangDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Langue / Language / اللغة">
-                            <span class="lang-globe" aria-hidden="true">🌐</span>
+                            <i data-feather="globe" aria-hidden="true"></i>
                             <span class="lang-current current-lang-code">FR</span>
                         </button>
                         <div id="driverLangDropdown" class="lang-menu hidden" role="menu">
@@ -336,12 +340,12 @@
             <div class="flex-1 overflow-hidden pb-20">
                 <div id="driver-tab-available" class="h-full overflow-y-auto p-4 space-y-4">
                     <h2 class="text-lg font-black text-slate-900 mb-2" data-i18n="driver.heading_available">Courses Disponibles à Récupérer</h2>
-                    <div id="available-runs-list" class="space-y-3"></div>
+                    <div id="available-runs-list"></div>
                 </div>
 
                 <div id="driver-tab-deliveries" class="h-full overflow-y-auto p-4 space-y-4 hidden">
                     <h2 class="text-lg font-black text-slate-900 mb-2" data-i18n="driver.heading_deliveries">Mes Courses en Cours</h2>
-                    <div id="my-deliveries-list" class="space-y-3"></div>
+                    <div id="my-deliveries-list" class="driver-manifest" aria-live="polite"></div>
                 </div>
             </div>
 
@@ -365,7 +369,7 @@
         <div class="absolute inset-0" onclick="closePromoEditor()"></div>
         <div class="absolute flex flex-col z-10">
             <div class="flex justify-between items-center shrink-0">
-                <div><p class="editor-context">BIGTAC / Promotions</p><h3 id="promo-editor-title">Nouvelle promotion</h3></div>
+                <div><p class="editor-context">Promotions</p><h3 id="promo-editor-title">Nouvelle promotion</h3></div>
                 <button type="button" onclick="closePromoEditor()" aria-label="Fermer" class="editor-close"><i data-feather="x"></i><span>Fermer</span></button>
             </div>
             <div class="flex-1 overflow-y-auto min-h-0">
@@ -379,7 +383,7 @@
                 <form id="promo-form" novalidate>
                     <input type="hidden" id="edit-promo-id">
                     <section class="editor-info" data-promo-panel="basic">
-                        <h4>Informations de la promotion</h4><p class="editor-section-help">Présentez votre offre et son prix sur la carte.</p>
+                        <h4>Informations de la promotion</h4>
                         <div class="editor-basics"><div class="editor-details">
                             <div class="promo-identity-fields">
                                 <div><label for="promo-name">Nom de la promotion *</label><input type="text" id="promo-name" name="promotion-name" class="w-full" required autocomplete="off" placeholder="Ex. Menu Duo Tacos"></div>
@@ -387,9 +391,10 @@
                             </div>
                             <div><label for="promo-desc">Description</label><textarea id="promo-desc" name="promotion-description" class="w-full" rows="3" placeholder="2 tacos, 2 boissons et frites"></textarea></div>
                         </div><aside class="editor-media">
-                            <h4>Photo de la promotion</h4><p class="editor-section-help">Le visuel présenté avec votre offre.</p>
+                            <h4>Photo de la promotion</h4>
                             <div class="promo-image-editor">
                                 <label id="promo-photo-frame" class="editor-image-frame" for="promo-image-file" aria-label="Ajouter la photo de la promotion"><span class="editor-image-placeholder"><i data-feather="image"></i><span>Ajoutez votre photo</span></span><span id="promo-image-preview"></span></label>
+                                <div class="catalog-photo-caption" id="promo-photo-caption" hidden><strong></strong><span></span></div>
                                 <div class="editor-photo-control"><input type="file" id="promo-image-file" class="editor-file-input" accept="image/jpeg,image/png,image/webp" aria-describedby="promo-photo-filename promo-photo-help"><label class="editor-photo-button" id="promo-photo-button" for="promo-image-file">Ajouter une photo</label></div>
                                 <input type="hidden" id="promo-image-url">
                                 <p id="promo-photo-filename" class="editor-photo-filename">Aucun fichier sélectionné</p><p id="promo-photo-help" class="editor-photo-help">JPG, PNG ou WebP · 5 Mo maximum</p>
@@ -427,7 +432,7 @@
         import { createMenuWorkspace } from './assets/admin-menu.js';
         import { createOrderWorkspace } from './assets/admin-orders.js';
         import { commitOrderTransition, commitDriverAction, operationMessage } from './assets/admin-orders-service.js';
-        import { escapeText as escapeOrderText, textValue as orderText, orderAmount } from './assets/admin-orders-model.js';
+        import { escapeText as escapeOrderText, textValue as orderText, orderAmount, orderNumber, customerPhone, deliveryMap } from './assets/admin-orders-model.js';
         import { 
             firebaseConfig, auth, db, 
             signInWithEmailAndPassword, onAuthStateChanged, signOut, 
@@ -459,7 +464,7 @@
         let overviewStarted = false;
         let currentView = null;
         const shell = mountAdminShell();
-        const overview = createOverview(document.getElementById('views-container'), view => window.switchView(view));
+        const overview = createOverview(document.getElementById('views-container'), view => window.switchView(view), id => orderWorkspace.focusOrder(id));
         const orderWorkspace = createOrderWorkspace(document.getElementById('view-orders'), {
             session:orderActor,
             settings:()=>settingsData,toast:(...args)=>window.showToast(...args)
@@ -627,7 +632,7 @@
             if (authorized('settings')) initSettings();
             if (version !== sessionVersion || !currentUser) return;
             const requested = location.hash.slice(1);
-            switchView(mayView(role, requested) ? requested : roleViews[role][0]);
+            switchView(mayView(role, requested) ? requested : roleViews[role][0], true);
 
             if (window.feather) feather.replace();
         }
@@ -700,13 +705,13 @@
         }
 
         // One role policy for desktop, mobile and direct route requests.
-        window.switchView=async viewId=>{
+        window.switchView=async (viewId, replaceRoute=false)=>{
             if (!requireView(viewId)) return false;
             if(currentView==='menu'&&viewId!=='menu'&&!menuWorkspace.canLeave())return false;
             if(currentView==='promotions'&&viewId!=='promotions'&&!promotionsWorkspace.canLeave())return false;
             if(viewId!=='menu')menuWorkspace.stop();
             if(viewId!=='promotions')promotionsWorkspace.stop();
-            currentView=viewId; shell.route(viewId);
+            currentView=viewId; shell.route(viewId, replaceRoute);
             if (viewId!=='orders') orderWorkspace.stop();
             if (viewId==='overview') overview.visible();
             if (viewId==='orders') orderWorkspace.start();
@@ -770,13 +775,13 @@
         document.getElementById('user-password').value='';
         const staffNotice=document.createElement('p');staffNotice.className='admin-notice';staffNotice.setAttribute('role','status');staffNotice.textContent='Vous pouvez consulter les comptes existants. Leur création et la modification des accès sont indisponibles pour le moment.';staffForm.before(staffNotice);
         staffForm.addEventListener('submit',async event=>{event.preventDefault();try{await staffAdministration.create();}catch(error){showToast(error.message,'error');}});
+        const teamRoleLabels = new Map([['admin','Administrateur'],['manager','Manager'],['caissier','Caissier'],['livreur','Livreur'],['delivery','Livreur']]);
         async function loadDrivers(){
             if(!authorized('drivers'))return;const version=workVersion,body=document.getElementById('drivers-table-body');body.textContent='Chargement…';
             try{
                 const snap=await getDocs(query(collection(db,'users'),limit(201)));if(version!==workVersion||!authorized('drivers'))return;
                 if(snap.metadata?.fromCache||snap.docs.length>200)throw Error('Liste non confirmée ou partielle.');
-                const labels=document.querySelectorAll('#view-drivers th');if(labels.length>=5){labels[2].textContent='État';labels[3].textContent='Accès';}
-                body.innerHTML=snap.docs.map(d=>{const u=d.data(),role=profileRole(u);return `<tr class="admin-employee-card" role="row"><td class="admin-employee-identity" headers="team-column-user" role="cell"><strong>${escapeOrderText(String(u.name||'Sans nom'))}</strong><p>${escapeOrderText(String(u.role||'Non renseigné'))}</p></td><td class="admin-employee-email" headers="team-column-email" role="cell"><span class="admin-employee-label">Email</span><span>${escapeOrderText(String(u.email||''))}</span></td><td class="admin-employee-status" headers="team-column-state" role="cell"><span class="admin-employee-label">État</span><span class="admin-employee-state${role?'':' is-unrecognized'}">${role?'Actif':'Accès désactivé ou profil invalide'}</span></td><td class="admin-employee-access" headers="team-column-access" role="cell"><span class="admin-employee-label">Accès</span><span>${role?'Profil reconnu':'Refusé'}</span></td><td class="admin-employee-action" headers="team-column-action" role="cell"><span class="sr-only">Modification indisponible</span></td></tr>`;}).join('')||'<tr class="admin-team-message"><td colspan="5">Aucun compte enregistré.</td></tr>';
+                body.innerHTML=snap.docs.map(d=>{const u=d.data(),role=profileRole(u);return `<tr class="admin-employee-card" role="row"><td class="admin-employee-identity" headers="team-column-user" role="cell"><strong>${escapeOrderText(String(u.name||'Sans nom'))}</strong><p>${escapeOrderText(teamRoleLabels.get(u.role) || String(u.role||'Non renseigné'))}</p></td><td class="admin-employee-email" headers="team-column-email" role="cell"><span class="admin-employee-label">Email</span><span>${escapeOrderText(String(u.email||''))}</span></td><td class="admin-employee-status" headers="team-column-state" role="cell"><span class="admin-employee-label">État</span><span class="admin-employee-state${role?'':' is-unrecognized'}">${role?'Actif':'Accès désactivé ou profil invalide'}</span></td><td class="admin-employee-access" headers="team-column-access" role="cell"><span class="admin-employee-label">Accès</span><span>${role?'Profil reconnu':'Refusé'}</span></td><td class="admin-employee-action" headers="team-column-action" role="cell"><span class="sr-only">Modification indisponible</span></td></tr>`;}).join('')||'<tr class="admin-team-message"><td colspan="5">Aucun compte enregistré.</td></tr>';
             }catch(error){body.innerHTML='<tr class="admin-team-message"><td colspan="5">Lecture impossible. Rechargez Équipe pour réessayer.</td></tr>';}
         }
         window.deleteDriver=async()=>{try{await staffAdministration.remove();}catch(error){showToast(error.message,'error');return false;}};
@@ -806,19 +811,12 @@
             btnAvail.setAttribute('aria-pressed', String(tab === 'available'));
             btnDeliv.setAttribute('aria-pressed', String(tab === 'deliveries'));
 
-            if (tab === 'available') {
-                btnAvail.className = 'flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-brand-600 bg-brand-50 font-bold transition';
-                btnDeliv.className = 'flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-slate-400 hover:bg-slate-50 font-bold transition';
-            } else {
-                btnDeliv.className = 'flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-brand-600 bg-brand-50 font-bold transition';
-                btnAvail.className = 'flex-1 flex flex-col items-center gap-1 py-2 rounded-2xl text-slate-400 hover:bg-slate-50 font-bold transition';
-            }
             if (window.feather) feather.replace();
         };
 
         function listenToAvailableRuns() {
             // No read of unassigned order documents until a trusted redacted feed exists.
-            document.getElementById('available-runs-list').innerHTML='<p class="admin-notice">Les courses sont attribuées par un responsable. Retrouvez vos livraisons dans Mes Courses.</p>';
+            document.getElementById('available-runs-list').innerHTML=`<p class="driver-state" data-i18n="driver.assign_help">${escapeOrderText(i18n.t('driver.assign_help'))}</p>`;
         }
         window.claimDelivery = async orderId => {
             if(!orderId || driverPending.has(orderId)) return false;
@@ -841,54 +839,41 @@
                 where('status', '==', 'en_livraison')
             );
 
-            const unsub = onSnapshot(q, snap => {
-                const container = document.getElementById('my-deliveries-list');
-                if (!container) return;
-
-                if (snap.empty) {
-                    container.innerHTML = `<div class="text-center py-12 text-slate-400 italic">Aucune livraison en cours.</div>`;
+            const container=document.getElementById('my-deliveries-list');
+            const version=workVersion;
+            const label=key=>`<span data-i18n="driver.${key}">${escapeOrderText(i18n.t('driver.'+key))}</span>`;
+            container.innerHTML=`<p class="driver-state">${label('loading')}</p>`;
+            const unsub=onSnapshot(q,snap=>{
+                if(version!==workVersion)return;
+                if(snap.empty) {
+                    container.innerHTML=`<p class="driver-state">${label('empty_deliveries')}</p>`;
                     return;
                 }
-
-                container.innerHTML = '';
-                snap.forEach(d => {
-                    const order = { ...d.data(), id: d.id };
-                    const fee = getDeliveryPrice(order.location);
+                const rows=[];
+                snap.forEach(d=>{
+                    const order={...d.data(),id:d.id};
+                    const number=escapeOrderText(orderNumber(order));
+                    const phone=customerPhone(order.customer?.phone),map=deliveryMap(order);
                     const address=orderText(order.customer?.address||order.address);
-                    let rawPhone = orderText(order.customer?.phone);
-                    let cleanPhone = rawPhone.replace(/\D/g, '');
-                    if (cleanPhone.startsWith('0')) cleanPhone = '212' + cleanPhone.substring(1);
-
-                    container.innerHTML += `
-                        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-sm space-y-3">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-black text-slate-900 text-base">${escapeOrderText(orderText(order.customer?.name,'Client'))}</h3>
-                                    <p class="text-xs text-slate-500 mt-0.5">${escapeOrderText(orderText(order.location,'Destination non renseignée'))}</p>
-                                    <span class="text-xs font-black text-emerald-600 mt-1 inline-block">+${fee.toFixed(2)} Dh</span>
-                                </div>
-                                <span class="text-xl font-black text-slate-900 font-mono">${escapeOrderText(orderAmount(order.total))}</span>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
-                                <a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener" class="py-2.5 bg-emerald-50 text-emerald-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
-                                    <i data-feather="message-circle" class="w-4 h-4"></i> WhatsApp
-                                </a>
-                                <a href="tel:${cleanPhone}" class="py-2.5 bg-blue-50 text-blue-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5">
-                                    <i data-feather="phone" class="w-4 h-4"></i> Appeler
-                                </a>
-                            </div>
-
-                            ${address?`<p>${escapeOrderText(address)}</p><a class="admin-button w-full" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}">Ouvrir l’adresse dans Maps</a>`:''}
-                            <button data-driver-action="complete" data-driver-order="${escapeOrderText(order.id)}" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-md transition active:scale-95">
-                                Confirmer la livraison
-                            </button>
+                    rows.push(`<article class="driver-sheet">
+                        <header><h3><span dir="ltr">#${number}</span></h3><span class="driver-state-label">${adminIcon('truck')}${label('assigned')}</span></header>
+                        <div class="driver-stop"><strong>${escapeOrderText(orderText(order.customer?.name,'Client'))}</strong>
+                            <p>${escapeOrderText(orderText(order.location,i18n.t('driver.no_destination')))}</p>
+                            ${address?`<p class="driver-address">${escapeOrderText(address)}</p>`:''}
                         </div>
-                    `;
+                        <dl><div><dt>${label('total')}</dt><dd>${escapeOrderText(orderAmount(order.total))}</dd></div>
+                            <div><dt>${label('fee')}</dt><dd>${escapeOrderText(orderAmount(getDeliveryPrice(order.location)))}</dd></div></dl>
+                        ${phone||map?`<div class="driver-contacts">
+                            ${phone?`<a href="tel:${escapeOrderText(phone)}">${adminIcon('phone')}${label('call')}</a><a href="https://wa.me/${phone.slice(1)}" target="_blank" rel="noopener noreferrer">${adminIcon('message')}WhatsApp</a>`:''}
+                            ${map?`<a href="${escapeOrderText(map.url)}" target="_blank" rel="noopener noreferrer">${adminIcon('pin')}${label('open_gps')}</a>`:''}
+                        </div>`:''}
+                        <button class="driver-complete" data-driver-action="complete" data-driver-order="${escapeOrderText(order.id)}">${label('btn_delivered')}<span class="sr-only"> #${number}</span></button>
+                    </article>`);
                 });
-
+                container.innerHTML=rows.join('');
                 refreshDriverActions();
-                if (window.feather) feather.replace();
+            },()=>{
+                if(version===workVersion)container.innerHTML=`<p class="driver-state" role="alert">${label('read_error')}</p>`;
             });
 
             driverUnsubscribers.push(unsub);

@@ -71,7 +71,7 @@ body {
     font-size:16px;
     line-height:1.5;
     -webkit-font-smoothing:antialiased;
-    padding-bottom:24px
+    padding-bottom:0
 }
 button,input,textarea {
     font:inherit

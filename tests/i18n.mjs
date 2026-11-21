@@ -33,7 +33,7 @@ try {
     check(await page.locator('#currentLangLabel').textContent() === 'EN', 'Current lang code badge displays EN');
     check((await page.locator('a[data-i18n="nav.menu"]').textContent()).trim() === 'Menu', 'Nav menu translated to English');
     check((await page.locator('#menu-title').textContent()).trim() === 'Our Menu', 'Menu section title translated to English');
-    check((await page.locator('#store-title').textContent()).includes('Big hunger?'), 'Hero title translated to English');
+    check((await page.locator('#store-title .hero-lead').textContent()).trim() === 'Hungry?', 'Hero title translated to English');
     check((await page.locator('.intro-cta').textContent()).includes('Order now'), 'Hero CTA translated to English');
     check((await page.locator('#promotions-title').textContent()).trim() === 'Promotions', 'Promotions title translated to English');
     check((await page.locator('#popular-title').textContent()).trim() === 'Best Sellers', 'Best Seller title translated to English');

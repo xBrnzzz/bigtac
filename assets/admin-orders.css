@@ -226,8 +226,4 @@
 
 /* In Toutes, read each status from top to bottom in the existing desktop grid. */
 @media(min-width:1100px) {
- .orders-workspace[data-tab=all][data-kitchen=false] .order-card {grid-row:var(--queue-row)}
- .orders-workspace[data-tab=all][data-kitchen=false] #list-pending .order-card {grid-column:1}
- .orders-workspace[data-tab=all][data-kitchen=false] #list-confirmed .order-card {grid-column:2}
- .orders-workspace[data-tab=all][data-kitchen=false] #list-delivery .order-card {grid-column:3}
 }

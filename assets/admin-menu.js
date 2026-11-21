@@ -15,15 +15,20 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
     const service=createMenuService(session);
     let data={menuItems:[],categories:[],modifierGroups:[]},stops=[],running=false,version=0,loading=true,readError='',blocked=true;
     let sharedReady=false;
-    let search='',category='all',state='all',selected=new Set(),busy=false,draft=null,expected=null,baseline='',file=null,objectURL=null,section='basic';
-    let categoryExpected=null,groupExpected=null,groupDraft=null,groupBaseline='',categoryBaseline='',previewSelections={};
+    let search='',category='all',stock='all',publication='all',selected=new Set(),busy=false,draft=null,expected=null,baseline='',file=null,objectURL=null,section='basic';
+    let categoryExpected=null,groupExpected=null,groupDraft=null,groupBaseline='',categoryBaseline='';
     const dialogs={};
     root.className='menu-workspace hidden';
     root.innerHTML=`<header class="menu-heading"><div><h2>Votre menu</h2><p id="menu-summary">Vos produits, leurs choix et leur disponibilité.</p></div><button class="admin-button primary" data-menu-action="new">${icon('plus')}<span class="menu-add-label">Ajouter un produit</span></button></header>
-        <div class="menu-tools"><label class="menu-search"><span class="sr-only">Rechercher un produit</span>${icon('search')}<input id="menu-admin-search" type="search" name="product-search" placeholder="Nom du produit…" autocomplete="off"></label>${field('Disponibilité','menu-state',`<select id="menu-state">${[['all','Tous les états'],['available','Disponibles'],['stock','Rupture de stock'],['hidden','Masqués']].map(([value,label])=>option(value,label)).join('')}</select>`)}${button('Catégories','categories','sliders','aria-label="Gérer les catégories"')}${button('Groupes de choix','groups','sliders')}${button('Actualiser','refresh','refresh')}</div>
+        <div class="menu-tools"><label class="menu-search"><span class="sr-only">Rechercher un produit</span>${icon('search')}<input id="menu-admin-search" type="search" name="product-search" placeholder="Nom du produit…" autocomplete="off"></label>${button('Catégories','categories','sliders','aria-label="Gérer les catégories"')}${button('Groupes de choix','groups','sliders')}<button type="button" class="admin-button catalog-filter-toggle" id="menu-filter-toggle" aria-expanded="false" aria-controls="menu-filter-panel">${icon('filter')}<span>Filtres</span><b id="menu-filter-count" hidden></b></button></div>
+        <div id="menu-filter-panel" class="catalog-filter-panel" hidden>
+            ${field('Stock','menu-state',`<select id="menu-state">${option('all','Tous')}${option('available','Disponibles')}${option('stock','En rupture')}</select>`)}
+            ${field('Publication','menu-publication',`<select id="menu-publication">${option('all','Tous')}${option('published','Publiés')}${option('hidden','Masqués')}</select>`)}
+            <div class="catalog-filter-actions"><button type="button" id="menu-filter-reset" class="admin-button" disabled>Réinitialiser</button>${button('Actualiser','refresh','refresh')}</div>
+        </div>
         <nav id="menu-categories-list" class="menu-category-chips" aria-label="Catégories des produits"></nav><div id="menu-feedback" role="status" class="menu-feedback"></div>
         <div id="menu-bulk" class="menu-bulk" hidden><strong id="menu-selected"></strong><select id="menu-bulk-action" aria-label="Action groupée"><option value="stock">Mettre en rupture</option><option value="available">Rendre disponible</option><option value="hide">Masquer</option><option value="show">Publier</option><option value="move">Changer de catégorie</option><option value="delete">Supprimer de la carte</option></select><select id="menu-bulk-category" aria-label="Catégorie de destination"></select>${button('Appliquer','bulk','check')}${button('Annuler la sélection','clear','x')}</div>
-        <div class="menu-list-heading"><h3 id="active-category-title">Tous les produits</h3><span id="menu-count"></span></div><div id="items-grid" class="menu-products" aria-label="Produits"></div>`;
+        <div class="menu-list-heading"><h3 id="active-category-title">Tous les produits</h3><span id="menu-count" role="status"></span></div><div id="items-grid" class="menu-products" aria-label="Produits"></div>`;
     const layout=document.createElement('div');layout.className='menu-approved-layout';
     const categoriesPane=document.createElement('aside');categoriesPane.className='menu-approved-categories';
     categoriesPane.innerHTML='<p>Catégories</p>';
@@ -34,12 +39,10 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
     productSurface.append(root.querySelector('.menu-list-heading'),root.querySelector('#items-grid'));
     productsPane.append(productSurface);
     layout.append(categoriesPane,productsPane);root.append(layout);
-    const filters=document.createElement('details');filters.className='menu-approved-filters';filters.innerHTML='<summary aria-label="Filtres du menu">'+icon('filter')+'<span>Filtres</span></summary>';
-    const filterBody=document.createElement('div');filterBody.append(root.querySelector('.menu-tools .menu-field'),root.querySelector('[data-menu-action="refresh"]'));filters.append(filterBody);root.querySelector('.menu-tools').append(filters);
     for(const [id,title] of [['item-editor','Produit'],['menu-categories-dialog','Catégories'],['menu-groups-dialog','Groupes réutilisables'],['menu-group-editor','Groupe de choix'],['menu-preview','Aperçu client']]) {
         if(id==='item-editor')document.getElementById(id)?.remove();
         const dialog=document.createElement('dialog');dialog.id=id;dialog.className='menu-dialog';dialog.setAttribute('aria-labelledby',`${id}-title`);
-        dialog.innerHTML=`<header><div><p>${id==='item-editor'?'BIGTAC / Catalogue':'Menu Builder'}</p><h2 id="${id}-title">${title}</h2></div>${button('Fermer','close','x',`data-dialog="${id}"`)}</header><div class="menu-dialog-body"></div><footer></footer>`;
+        dialog.innerHTML=`<header><div><p>Catalogue</p><h2 id="${id}-title">${title}</h2></div>${button('Fermer','close','x',`data-dialog="${id}" aria-label="Fermer"`)}</header><div class="menu-dialog-body"></div><footer></footer>`;
         document.body.append(dialog);dialogs[id]=dialog;
         dialog.addEventListener('cancel',event=>{event.preventDefault();close(id);});
         dialog.addEventListener('click',event=>{
@@ -80,7 +83,18 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
         return true;
     }
     function paint() {
-        const categories=data.categories,items=ordered(data.menuItems),rows=items.filter(item=>(category==='all'||categoryFor(item,categories)?.id===category)&&(!search||`${item.name} ${item.category}`.toLocaleLowerCase('fr').includes(search.toLocaleLowerCase('fr')))&&(state==='all'||state==='hidden'&&item.isVisible===false||state==='stock'&&item.isAvailable===false||state==='available'&&item.isAvailable!==false));
+        const categories=data.categories,items=ordered(data.menuItems);
+        const rows=items.filter(item=>{
+            if(category!=='all'&&categoryFor(item,categories)?.id!==category)return false;
+            if(stock==='stock'&&item.isAvailable!==false||stock==='available'&&item.isAvailable===false)return false;
+            if(publication==='hidden'&&item.isVisible!==false||publication==='published'&&item.isVisible===false)return false;
+            return !search||`${item.name} ${item.category}`.toLocaleLowerCase('fr').includes(search.toLocaleLowerCase('fr'));
+        });
+        const filtersUsed=Number(stock!=='all')+Number(publication!=='all');
+        $('menu-filter-count').textContent=filtersUsed;
+        $('menu-filter-count').hidden=!filtersUsed;
+        $('menu-filter-reset').disabled=!filtersUsed;
+        $('menu-filter-toggle').setAttribute('aria-label',filtersUsed?`Filtres du menu, ${filtersUsed} ${filtersUsed===1?'actif':'actifs'}`:'Filtres du menu');
         $('menu-categories-list').innerHTML=`${button('Tout voir','filter','grid',`data-category="all" aria-pressed="${category==='all'}"`)}${categories.map(row=>button(`${e(row.name)} · ${items.filter(item=>categoryFor(item,categories)?.id===row.id).length}`,'filter','grid',`data-category="${e(row.id)}" aria-pressed="${category===row.id}"`)).join('')}`;
         const categoryList=$('menu-categories-list'),activeChip=categoryList.querySelector('[aria-pressed="true"]');
         if(activeChip&&matchMedia('(max-width:767px)').matches){const bounds=categoryList.getBoundingClientRect(),chip=activeChip.getBoundingClientRect();const delta=chip.left<bounds.left+4?chip.left-bounds.left-4:chip.right>bounds.right-4?chip.right-bounds.right+4:0;if(delta)categoryList.scrollTo({left:categoryList.scrollLeft+delta,behavior:'auto'});}
@@ -91,7 +105,7 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
         if(readError)$('menu-feedback').textContent=readError;
         else if(blocked&&!loading)$('menu-feedback').textContent='Carte en cache, incomplète ou groupes non vérifiés : les modifications attendent une lecture complète du serveur.';
         $('menu-feedback').hidden=!busy&&!loading&&!readError&&!blocked;
-        $('items-grid').innerHTML=rows.map(item=>`<div class="menu-product ${item.isAvailable===false?'menu-product--stock':''}" data-product="${e(item.id)}"><div class="menu-product-main"><div class="menu-product-visual"><label class="menu-select"><input type="checkbox" aria-label="Sélectionner ${e(item.name)}" data-select="${e(item.id)}" ${selected.has(item.id)?'checked':''}></label><img src="${e(safeImage(item.imageUrl))}" width="72" height="72" alt="" class="menu-product-image"></div><div class="menu-product-info"><h4>${e(item.name)}</h4><p>${e(categoryFor(item,categories)?.name||item.category||'Catégorie manquante')}</p><div class="menu-badges"><span class="menu-badge ${item.isVisible===false?'muted':'green'}">${icon(item.isVisible===false?'off':'check')}${item.isVisible===false?'Masqué':'Publié'}</span>${item.isPopular?`<span class="menu-badge purple">${icon('tag')}Best Seller</span>`:''}${categoryFor(item,categories)?.isVisible===false?'<span class="menu-badge amber">Catégorie masquée</span>':''}</div></div><div class="menu-row-actions">${button('Modifier','edit','edit',`data-id="${e(item.id)}"`)}<details><summary aria-label="Autres actions pour ${e(item.name)}">•••</summary><div>${button('Dupliquer','duplicate','copy',`data-id="${e(item.id)}"`)}${button(item.isVisible===false?'Publier':'Masquer','visibility','off',`data-id="${e(item.id)}"`)}${button('Monter','up','up',`data-id="${e(item.id)}"`)}${button('Descendre','down','down',`data-id="${e(item.id)}"`)}${button('Supprimer','delete-product','trash',`data-id="${e(item.id)}"`)}</div></details></div></div><div class="menu-product-bottom"><strong class="menu-price">${money(item.price)}</strong><button class="menu-stock" data-menu-action="stock" data-id="${e(item.id)}" role="switch" aria-checked="${item.isAvailable!==false}" aria-busy="${busy}" aria-label="Disponibilité de ${e(item.name)}" ${busy||blocked?'disabled':''}>${icon(item.isAvailable===false?'off':'check')}<span>${busy?'Enregistrement…':item.isAvailable===false?'Rupture de stock':'Disponible'}</span></button></div></div>`).join('')||`<div class="menu-empty">${icon(loading?'clock':'shopping-bag')}<h3>${loading?'Chargement…':'Aucun produit à afficher'}</h3><p>${search||state!=='all'?'Modifiez vos filtres.':'Ajoutez votre premier produit ou choisissez une autre catégorie.'}</p></div>`;
+        $('items-grid').innerHTML=rows.map(item=>`<div class="menu-product ${item.isAvailable===false?'menu-product--stock':''}" data-product="${e(item.id)}"><div class="menu-product-main"><div class="menu-product-visual"><label class="menu-select"><input type="checkbox" aria-label="Sélectionner ${e(item.name)}" data-select="${e(item.id)}" ${selected.has(item.id)?'checked':''}></label><img src="${e(safeImage(item.imageUrl))}" width="72" height="72" alt="" class="menu-product-image"></div><div class="menu-product-info"><h4>${e(item.name)}</h4><p>${e(categoryFor(item,categories)?.name||item.category||'Catégorie manquante')}</p><div class="menu-badges"><span class="menu-badge ${item.isVisible===false?'muted':'green'}">${icon(item.isVisible===false?'off':'check')}${item.isVisible===false?'Masqué':'Publié'}</span>${item.isPopular?`<span class="menu-badge purple">${icon('tag')}Best Seller</span>`:''}${categoryFor(item,categories)?.isVisible===false?'<span class="menu-badge amber">Catégorie masquée</span>':''}</div></div><div class="menu-row-actions">${button('Modifier','edit','edit',`data-id="${e(item.id)}"`)}<details><summary aria-label="Autres actions pour ${e(item.name)}">•••</summary><div>${button('Dupliquer','duplicate','copy',`data-id="${e(item.id)}"`)}${button(item.isVisible===false?'Publier':'Masquer','visibility','off',`data-id="${e(item.id)}"`)}${button('Monter','up','up',`data-id="${e(item.id)}"`)}${button('Descendre','down','down',`data-id="${e(item.id)}"`)}${button('Supprimer','delete-product','trash',`data-id="${e(item.id)}"`)}</div></details></div></div><div class="menu-product-bottom"><strong class="menu-price">${money(item.price)}</strong><button class="menu-stock" data-menu-action="stock" data-id="${e(item.id)}" role="switch" aria-checked="${item.isAvailable!==false}" aria-busy="${busy}" aria-label="Disponibilité de ${e(item.name)}" ${busy||blocked?'disabled':''}>${icon(item.isAvailable===false?'off':'check')}<span>${item.isAvailable===false?'En rupture':'Disponible'}</span></button></div></div>`).join('')||`<div class="menu-empty">${icon(loading?'clock':'shopping-bag')}<h3>${loading?'Chargement…':'Aucun produit à afficher'}</h3><p>${search||filtersUsed?'Modifiez vos filtres.':'Ajoutez votre premier produit ou choisissez une autre catégorie.'}</p></div>`;
         root.querySelectorAll('img').forEach(img=>img.onerror=()=>{img.onerror=null;img.src='assets/tacos-campaign.jpg';});
         $('menu-bulk').hidden=!selected.size;$('menu-selected').textContent=`${selected.size} sélectionné(s)`;
         $('menu-bulk-category').innerHTML=categories.map(row=>option(row.id,row.name)).join('');
@@ -124,12 +138,20 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
         const editorBody=body('item-editor'),previousScroll=editorBody.scrollTop;
         const expanded=[...editorBody.querySelectorAll('[data-rule-key][open]')].map(el=>el.dataset.ruleKey);
         $('item-editor-title').textContent=expected?'Modifier le produit':'Nouveau produit';
-        body('item-editor').innerHTML=`<nav class="menu-editor-tabs" aria-label="Sections du produit">${tab('Informations','basic','note')}${tab('Choix','choices','sliders')}${tab('Suppléments','extras','plus')}${tab('Publication','publish','check')}${tab('Aperçu','preview','external-link')}</nav><div id="menu-product-errors" class="menu-inline-error" role="alert" hidden></div><form id="item-form" novalidate><section data-editor-panel="basic" ${section!=='basic'?'hidden':''}><h3>${icon('note')}Informations du produit</h3><p class="menu-help">Les informations visibles sur votre carte.</p><div class="editor-basics"><div class="editor-details">${field('Nom du produit','input-name',input('input-name',draft.name,'text','autocomplete="off" required maxlength="160"'))}${field('Description','input-desc',`<textarea id="input-desc" name="description" rows="3" maxlength="1500">${e(draft.description)}</textarea>`)}<div class="menu-field-pair">${field('Catégorie','input-category',`<select id="input-category">${option('','Choisir une catégorie')}${data.categories.map(row=>option(row.id,row.name,row.id===draft.categoryId)).join('')}</select>`)}${field('Prix de base (DH)','input-price',input('input-price',draft.price,'number','min="0" max="1000000" step="0.01" inputmode="decimal"'))}</div></div><aside class="editor-media"><h4>Photo du produit</h4><p class="editor-section-help">Une image qui donne envie de commander.</p><div class="menu-image-editor"><label class="editor-image-frame" for="menu-image-file" aria-label="${objectURL||draft.imageUrl?'Remplacer':'Ajouter'} la photo du produit"><span class="editor-image-placeholder">${icon('image')}<span>Ajoutez votre photo</span></span><img id="menu-image-preview" ${!objectURL&&!draft.imageUrl?'hidden':''} src="${e(objectURL||safeImage(draft.imageUrl))}" width="120" height="100" alt="Aperçu du produit"></label><div class="editor-photo-control"><input id="menu-image-file" class="editor-file-input" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="menu-photo-filename menu-photo-help"><label class="editor-photo-button" for="menu-image-file">${objectURL||draft.imageUrl?'Remplacer la photo':'Ajouter une photo'}</label></div><p id="menu-photo-filename" class="editor-photo-filename">${e(file?.name||(draft.imageUrl?'Photo actuelle':'Aucun fichier sélectionné'))}</p><p id="menu-photo-help" class="editor-photo-help">JPG, PNG ou WebP · 5 Mo maximum</p>${button('Retirer l’image','remove-image','x')}<p id="menu-upload-progress" role="status"></p></div></aside></div></section><section data-editor-panel="choices" ${section!=='choices'?'hidden':''}><h3>${icon('sliders')}Choix du client</h3><p class="menu-help">Configurez les tailles, sauces ou viandes.</p><div id="container-choices">${draft.mandatoryChoices.map((group,index)=>(draft.modifierGroupIds||[]).includes(group.sourceGroupId)?'':groupEditor(group,index)).join('')}</div><div class="menu-group-create">${templatePicker('menu-choice-template')}${button('Ajouter un groupe','add-choice','plus')}</div><div class="menu-shared-attach"><h4>Réutiliser un groupe partagé</h4><select id="menu-attach-group" aria-label="Groupe à lier">${data.modifierGroups.filter(group=>!(draft.modifierGroupIds||[]).includes(group.id)).map(group=>option(group.id,`${group.title} · ${group.kind==='supplements'?'suppléments':'choix'}`)).join('')}</select>${button('Lier au produit','attach-group','sliders')}<div>${(draft.modifierGroupIds||[]).map((id,index)=>{const group=data.modifierGroups.find(row=>row.id===id);return `<div class="menu-linked"><span>${icon('sliders')}${e(group?.title||'Groupe supprimé')}</span>${button('Copie indépendante','detach-group','note',`data-id="${e(id)}"`)}${button('Monter','linked-up','up',`data-index="${index}"`)}${button('Détacher','unlink-group','x',`data-id="${e(id)}"`)}</div>`;}).join('')}</div><p class="menu-help">Les changements partagés s’appliquent à tous les produits liés après enregistrement. Une copie indépendante reste propre à ce produit.</p></div></section><section data-editor-panel="extras" ${section!=='extras'?'hidden':''}><h3>${icon('plus')}Suppléments payants</h3><p class="menu-help">Plusieurs suppléments facultatifs peuvent être sélectionnés par le client.</p><div id="container-supplements">${draft.supplements.map((row,index)=>(draft.modifierGroupIds||[]).includes(row.sourceGroupId)?'':optionEditor(row,index,'extra')).join('')}</div>${button('Ajouter un supplément','add-extra','plus')}</section><section data-editor-panel="publish" ${section!=='publish'?'hidden':''}><h3>${icon('check')}Disponibilité et publication</h3>${check('input-available','Disponible à la commande',draft.isAvailable!==false)}<p class="menu-help">En rupture, le produit reste affiché mais ne peut plus être commandé.</p>${check('input-visible','Publié sur la carte',draft.isVisible!==false)}${check('input-popular','Afficher dans Best Seller',draft.isPopular===true)}<p class="menu-help">Le classement des produits se règle avec Monter / Descendre dans la liste. Une duplication commence masquée.</p></section><section data-editor-panel="preview" ${section!=='preview'?'hidden':''}><h3>${icon('external-link')}Aperçu local non publié</h3><div id="menu-product-preview"></div></section></form>`;
+        body('item-editor').innerHTML=`<nav class="menu-editor-tabs" aria-label="Sections du produit">${tab('Informations','basic','note')}${tab('Choix','choices','sliders')}${tab('Suppléments','extras','plus')}${tab('Publication','publish','check')}${tab('Aperçu','preview','external-link')}</nav><div id="menu-product-errors" class="menu-inline-error" role="alert" hidden></div><form id="item-form" novalidate><section data-editor-panel="basic" ${section!=='basic'?'hidden':''}><h3>${icon('note')}Informations du produit</h3><div class="editor-basics"><div class="editor-details">${field('Nom du produit','input-name',input('input-name',draft.name,'text','autocomplete="off" required maxlength="160"'))}${field('Description','input-desc',`<textarea id="input-desc" name="description" rows="3" maxlength="1500">${e(draft.description)}</textarea>`)}<div class="menu-field-pair">${field('Catégorie','input-category',`<select id="input-category">${option('','Choisir une catégorie')}${data.categories.map(row=>option(row.id,row.name,row.id===draft.categoryId)).join('')}</select>`)}${field('Prix de base (DH)','input-price',input('input-price',draft.price,'number','min="0" max="1000000" step="0.01" inputmode="decimal"'))}</div></div><aside class="editor-media"><h4>Photo du produit</h4><div class="menu-image-editor"><label class="editor-image-frame" for="menu-image-file" aria-label="${objectURL||draft.imageUrl?'Remplacer':'Ajouter'} la photo du produit"><span class="editor-image-placeholder">${icon('image')}<span>Ajoutez votre photo</span></span><img id="menu-image-preview" ${!objectURL&&!draft.imageUrl?'hidden':''} src="${e(objectURL||safeImage(draft.imageUrl))}" width="120" height="100" alt="Aperçu du produit"></label><div class="catalog-photo-caption" id="product-photo-caption" hidden><strong></strong><span></span></div><div class="editor-photo-control"><input id="menu-image-file" class="editor-file-input" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="menu-photo-filename menu-photo-help"><label class="editor-photo-button" for="menu-image-file">${objectURL||draft.imageUrl?'Remplacer la photo':'Ajouter une photo'}</label></div><p id="menu-photo-filename" class="editor-photo-filename">${e(file?.name||(draft.imageUrl?'Photo actuelle':'Aucun fichier sélectionné'))}</p><p id="menu-photo-help" class="editor-photo-help">JPG, PNG ou WebP · 5 Mo maximum</p>${button('Retirer l’image','remove-image','x')}<p id="menu-upload-progress" role="status"></p></div></aside></div></section><section data-editor-panel="choices" ${section!=='choices'?'hidden':''}><h3>${icon('sliders')}Choix du client</h3><p class="menu-help">Configurez les tailles, sauces ou viandes.</p><div id="container-choices">${draft.mandatoryChoices.map((group,index)=>(draft.modifierGroupIds||[]).includes(group.sourceGroupId)?'':groupEditor(group,index)).join('')}</div><div class="menu-group-create">${templatePicker('menu-choice-template')}${button('Ajouter un groupe','add-choice','plus')}</div><div class="menu-shared-attach"><h4>Réutiliser un groupe partagé</h4><select id="menu-attach-group" aria-label="Groupe à lier">${data.modifierGroups.filter(group=>!(draft.modifierGroupIds||[]).includes(group.id)).map(group=>option(group.id,`${group.title} · ${group.kind==='supplements'?'suppléments':'choix'}`)).join('')}</select>${button('Lier au produit','attach-group','sliders')}<div>${(draft.modifierGroupIds||[]).map((id,index)=>{const group=data.modifierGroups.find(row=>row.id===id);return `<div class="menu-linked"><span>${icon('sliders')}${e(group?.title||'Groupe supprimé')}</span>${button('Copie indépendante','detach-group','note',`data-id="${e(id)}"`)}${button('Monter','linked-up','up',`data-index="${index}"`)}${button('Détacher','unlink-group','x',`data-id="${e(id)}"`)}</div>`;}).join('')}</div><p class="menu-help">Les changements partagés s’appliquent à tous les produits liés après enregistrement. Une copie indépendante reste propre à ce produit.</p></div></section><section data-editor-panel="extras" ${section!=='extras'?'hidden':''}><h3>${icon('plus')}Suppléments payants</h3><p class="menu-help">Plusieurs suppléments facultatifs peuvent être sélectionnés par le client.</p><div id="container-supplements">${draft.supplements.map((row,index)=>(draft.modifierGroupIds||[]).includes(row.sourceGroupId)?'':optionEditor(row,index,'extra')).join('')}</div>${button('Ajouter un supplément','add-extra','plus')}</section><section data-editor-panel="publish" ${section!=='publish'?'hidden':''}><h3>${icon('check')}Disponibilité et publication</h3>${check('input-available','Disponible à la commande',draft.isAvailable!==false)}<p class="menu-help">En rupture, le produit reste affiché mais ne peut plus être commandé.</p>${check('input-visible','Publié sur la carte',draft.isVisible!==false)}${check('input-popular','Afficher dans Best Seller',draft.isPopular===true)}<p class="menu-help">Le classement des produits se règle avec Monter / Descendre dans la liste. Une duplication commence masquée.</p></section><section data-editor-panel="preview" ${section!=='preview'?'hidden':''}><h3>${icon('external-link')}Aperçu local non publié</h3><div id="menu-product-preview"></div></section></form>`;
         footer('item-editor').innerHTML=`<p data-save-state role="status">${expected?'Enregistrer pour appliquer.':'Brouillon non publié.'}</p><div>${expected?button('Supprimer le produit','delete-product','trash',`data-id="${e(expected.id)}" aria-label="Supprimer le produit"`):''}${button('Annuler','close','x','data-dialog="item-editor"')}<button id="btn-save-item" class="admin-button primary" data-menu-action="save-product">${icon('check')}Enregistrer</button></div>`;
         if(section==='preview')renderPreview($('menu-product-preview'),materializeProduct(draft,data.modifierGroups));
+        updatePhotoCaption();
         syncEditorTabs();
         for(const key of expanded){const details=editorBody.querySelector(`[data-rule-key="${key}"]`);if(details)details.open=true;}
         editorBody.scrollTop=previousScroll;
+    }
+    function updatePhotoCaption() {
+        const caption=$('product-photo-caption');
+        if(!caption)return;
+        caption.hidden=!draft.name&&!String(draft.price??'').trim();
+        caption.querySelector('strong').textContent=draft.name;
+        caption.querySelector('span').textContent=String(draft.price??'').trim()?money(draft.price):'';
     }
     function syncEditorTabs() {
         const tabs=body('item-editor').querySelector('.menu-editor-tabs');
@@ -191,11 +213,63 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
     }
     function renderGroup(){const expanded=body('menu-group-editor').querySelector('.menu-rule-details')?.open;body('menu-group-editor').innerHTML=`<p class="menu-library-intro">${icon('sliders')}${groupExpected?`${(groupExpected.productIds||[]).length} produit(s) lié(s) seront mis à jour ensemble.`:'Groupe réutilisable indépendant.'}</p><div id="menu-group-error" role="alert" hidden></div>${field('Usage du groupe','menu-group-kind',`<select id="menu-group-kind">${option('choice','Choix du client',groupDraft.kind!=='supplements')}${option('supplements','Suppléments facultatifs',groupDraft.kind==='supplements')}</select>`)}<details class="menu-template-details"><summary>Partir d’un modèle</summary><div>${templatePicker('menu-group-template')}${button('Utiliser ce modèle','group-template','sliders')}</div></details>${groupEditor(groupDraft,0,true)}`;footer('menu-group-editor').innerHTML=`<p data-save-state role="status"></p>${button('Annuler','close','x','data-dialog="menu-group-editor"')}<button class="admin-button primary" data-menu-action="save-group">${icon('check')}Enregistrer le groupe</button>`;if(expanded)body('menu-group-editor').querySelector('.menu-rule-details').open=true;}
     function renderPreview(container,product) {
-        const steps=buildCustomizationSteps(product);previewSelections={};
-        try{moneyCents(product.price||0);steps.flatMap(step=>choiceRules(step).options).forEach(option=>moneyCents(option.price||0));}catch{container.innerHTML='<p class="menu-inline-error" role="alert">Corrigez les prix : deux décimales maximum avant la simulation.</p>';container.onchange=null;return;}
-        container.innerHTML=`<p class="menu-help">Simulation locale : aucun produit ni commande n’est publié.</p><article class="menu-customer-preview"><img src="${e(objectURL||safeImage(product.imageUrl))}" alt="" width="320" height="180"><div><h3>${e(product.name||'Nom du produit')}</h3><p>${e(product.description)}</p><strong>${money(product.price)}</strong><span class="menu-badge ${product.isAvailable===false?'amber':'green'}">${product.isAvailable===false?'Rupture de stock':'Disponible'}</span></div></article>${steps.map((step,index)=>{const rules=choiceRules(step);return `<fieldset class="menu-preview-step"><legend>${e(step.title)} · ${rules.min?`au moins ${rules.min}`:'facultatif'} · max ${rules.max}</legend>${rules.options.map((row,i)=>`<label><input type="${rules.radio?'radio':'checkbox'}" name="preview-${index}" data-preview-step="${index}" data-preview-option="${i}">${e(row.name)} <span>+ ${money(row.price)}</span></label>`).join('')}</fieldset>`;}).join('')}<p id="menu-preview-issue" role="status"></p><strong id="menu-preview-total">Total : ${money(product.price)}</strong>`;
-        $('menu-preview-issue').textContent=steps.map(step=>selectionIssue(step,[])).find(Boolean)||'Choix facultatifs : vous pouvez les passer.';
-        container.onchange=event=>{const el=event.target;if(!el.dataset.previewStep)return;const index=Number(el.dataset.previewStep),rules=choiceRules(steps[index]),row=rules.options[Number(el.dataset.previewOption)],current=previewSelections[index]||[];if(el.checked&&!rules.radio&&current.length>=rules.max){el.checked=false;$('menu-preview-issue').textContent=`Maximum ${rules.max} option(s).`;return;}previewSelections[index]=rules.radio?[row]:el.checked?[...current,row]:current.filter(value=>value!==row);$('menu-preview-total').textContent=`Total : ${money(customizationPrice(product,previewSelections))}`;$('menu-preview-issue').textContent=steps.map((step,i)=>selectionIssue(step,previewSelections[i])).find(Boolean)||'Choix complets. Aucun ajout au panier dans cet aperçu.';};
+        const steps=buildCustomizationSteps(product);
+        const rulesByStep=steps.map(choiceRules);
+        const selections={};
+        try {
+            moneyCents(product.price||0);
+            rulesByStep.flatMap(rules=>rules.options).forEach(option=>moneyCents(option.price||0));
+        } catch {
+            container.innerHTML='<p class="menu-inline-error" role="alert">Corrigez les prix : deux décimales maximum avant la simulation.</p>';
+            container.onchange=null;
+            return;
+        }
+        const soldOut=product.isAvailable===false;
+        container.innerHTML=`
+            <article class="menu-customer-preview">
+                <img src="${e(objectURL||safeImage(product.imageUrl))}" alt="" width="320" height="180">
+                <div class="menu-preview-body">
+                    <div class="menu-preview-title">
+                        <h4>${e(product.name||'Nom du produit')}</h4>
+                        <span class="menu-badge ${soldOut?'amber':'green'}">${soldOut?'Rupture de stock':'Disponible'}</span>
+                    </div>
+                    ${product.description?'<p class="menu-preview-description">'+e(product.description)+'</p>':''}
+                    ${steps.length?`<div class="menu-preview-base"><span>Prix de base</span><b>${money(product.price)}</b></div>`:''}
+                    ${steps.map((step,index)=>{
+                        const rules=rulesByStep[index];
+                        return `<fieldset class="menu-preview-step">
+                            <legend>${e(step.title)} <small>${rules.min?`Au moins ${rules.min}`:'Facultatif'} · Max. ${rules.max}</small></legend>
+                            ${rules.options.map((row,i)=>`<label><input type="${rules.radio?'radio':'checkbox'}" name="preview-${index}" data-preview-step="${index}" data-preview-option="${i}"><span>${e(row.name)}</span><b>+ ${money(row.price)}</b></label>`).join('')}
+                        </fieldset>`;
+                    }).join('')}
+                    ${steps.length?'<p id="menu-preview-issue" role="status"></p>':''}
+                </div>
+                <div class="menu-preview-summary" aria-live="polite" aria-atomic="true">
+                    <span>Total</span><strong id="menu-preview-total">${money(product.price)}</strong>
+                </div>
+            </article>`;
+        container.onchange=null;
+        if(!steps.length)return;
+        const issue=container.querySelector('#menu-preview-issue');
+        const total=container.querySelector('#menu-preview-total');
+        const updateIssue=()=>{issue.textContent=steps.map((step,i)=>selectionIssue(step,selections[i])).find(Boolean)||'';};
+        updateIssue();
+        container.onchange=event=>{
+            const input=event.target;
+            if(input.dataset.previewStep===undefined)return;
+            const index=Number(input.dataset.previewStep);
+            const rules=rulesByStep[index];
+            const row=rules.options[Number(input.dataset.previewOption)];
+            const current=selections[index]||[];
+            if(input.checked&&!rules.radio&&current.length>=rules.max){
+                input.checked=false;
+                issue.textContent=`Maximum ${rules.max} option(s).`;
+                return;
+            }
+            selections[index]=rules.radio?[row]:input.checked?[...current,row]:current.filter(value=>value!==row);
+            total.textContent=money(customizationPrice(product,selections));
+            updateIssue();
+        };
     }
     function move(rows,index,direction){if(index<0||index+direction<0||index+direction>=rows.length)return;[rows[index],rows[index+direction]]=[rows[index+direction],rows[index]];}
     function groupFeedback(fieldset,target){
@@ -207,6 +281,7 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
     }
     function editField(event) {
         if(event.target.closest('#item-form'))syncProduct();
+        if(event.target.matches('#input-name,#input-price'))updatePhotoCaption();
         const row=event.target.closest('[data-option-kind]'),group=event.target.closest('[data-group-index]');
         const activeGroup=group?(event.target.closest('#menu-group-editor')?groupDraft:draft?.mandatoryChoices[Number(group.dataset.groupIndex)]):null;
         if(activeGroup&&(event.target.matches('[data-selection-preset]')||event.target.matches('[data-group-required]'))){
@@ -251,7 +326,14 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
         }
         if(action==='filter'){category=target.dataset.category;return paint();}if(action==='clear'){selected.clear();return paint();}
         if(action==='refresh')return api.start(true);if(action==='categories')return openCategories();if(action==='groups')return sharedReady?openGroups():toast('Les groupes partagés ne sont pas disponibles. Faites vérifier leurs autorisations.','error');
-        if(action==='stock'||action==='visibility')return operation(()=>service.bulk([item],action==='stock'?{isAvailable:item.isAvailable===false}:{isVisible:item.isVisible===false}));
+        if(action==='stock'||action==='visibility'){
+            await operation(()=>service.bulk([item],action==='stock'?{isAvailable:item.isAvailable===false}:{isVisible:item.isVisible===false}));
+            if(action==='stock'&&event.detail===0&&running&&document.activeElement===document.body){
+                const control=root.querySelector(`[data-menu-action="stock"][data-id="${CSS.escape(id)}"]`);
+                (control||$('menu-filter-toggle')).focus({preventScroll:true});
+            }
+            return;
+        }
         if(action==='bulk'){
             const rows=data.menuItems.filter(row=>selected.has(row.id)),kind=$('menu-bulk-action').value;
             if(kind==='delete'){
@@ -294,7 +376,29 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
         }
     });});
     root.addEventListener('input',event=>{if(event.target.id==='menu-admin-search'){search=event.target.value;paint();}});
-    root.addEventListener('change',event=>{if(event.target.id==='menu-state'){state=event.target.value;paint();}if(event.target.dataset.select){event.target.checked?selected.add(event.target.dataset.select):selected.delete(event.target.dataset.select);paint();}});
+    const filterToggle=$('menu-filter-toggle'),filterPanel=$('menu-filter-panel');
+    function setFilterPanel(open) {
+        filterPanel.hidden=!open;
+        filterToggle.setAttribute('aria-expanded',String(open));
+    }
+    filterToggle.addEventListener('click',()=>setFilterPanel(filterPanel.hidden));
+    filterPanel.addEventListener('keydown',event=>{
+        if(event.key==='Escape'){setFilterPanel(false);filterToggle.focus();}
+    });
+    $('menu-filter-reset').addEventListener('click',()=>{
+        stock=publication='all';
+        $('menu-state').value=$('menu-publication').value='all';
+        paint();
+        $('menu-state').focus();
+    });
+    root.addEventListener('change',event=>{
+        if(event.target.id==='menu-state'||event.target.id==='menu-publication'){
+            stock=$('menu-state').value;
+            publication=$('menu-publication').value;
+            paint();
+        }
+        if(event.target.dataset.select){event.target.checked?selected.add(event.target.dataset.select):selected.delete(event.target.dataset.select);paint();}
+    });
     window.addEventListener('beforeunload',event=>{if(isDirty()||groupDraft&&dialogs['menu-group-editor'].open&&fingerprint(groupDraft)!==groupBaseline){event.preventDefault();event.returnValue='';}});
     const api={
         start(force=false){
