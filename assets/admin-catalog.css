@@ -274,3 +274,32 @@
 @media(min-width:375px) and (max-width:767px) {
     #view-menu .catalog-filter-toggle>span {display:inline;font-size:12px}
 }
+#menu-import-dialog .menu-dialog-body { overflow-wrap:anywhere; }
+#menu-import-dialog [hidden] { display:none; }
+.menu-import-guide ol { list-style:decimal; padding-inline-start:20px; margin:0 0 14px; }
+.menu-import-guide li + li { margin-top:5px; }
+.menu-import-copy-status:empty { display:none; }
+.menu-import-copy-status,.menu-import-source label span { color:var(--admin-muted); }
+.menu-import-source,.menu-import-results { margin-top:20px; padding-top:10px; border-top:1px solid var(--admin-border); }
+.menu-import-prompt,.menu-import-paste { margin-block:10px; }
+.menu-import-prompt textarea,.menu-import-paste textarea { display:block; margin:6px 0; font-family:monospace; resize:vertical; }
+.menu-import-source input[type=file] { display:block; min-height:44px; max-width:100%; margin-top:6px; font-size:14px; }
+.menu-import-source input::file-selector-button { min-height:36px; margin-inline-end:8px; }
+#menu-import-feedback { margin-top:12px; }
+.menu-import-total { margin-bottom:6px; font-weight:700; }
+.menu-import-section > ul { margin:0; padding:0; list-style:none; }
+.menu-import-section > ul > li { border-top:1px solid var(--admin-border); }
+.menu-import-section h3 { flex-wrap:wrap; }
+.menu-import-section h3 span,.menu-import-section small,.menu-import-group > span { color:var(--admin-muted); font-size:12px; font-weight:500; }
+.menu-import-row,.menu-import-section summary { display:flex; justify-content:space-between; align-items:center; gap:12px; min-height:44px; }
+.menu-import-section summary { font-weight:700; cursor:pointer; }
+.menu-import-section summary::marker { content:""; }
+.menu-import-section summary > :first-child::before { content:"›"; display:inline-block; margin-inline-end:6px; color:var(--admin-accent); }
+.menu-import-section details[open] summary > :first-child::before { transform:rotate(90deg); }
+.menu-import-section summary small { display:block; }
+.menu-import-meta { text-align:end; white-space:nowrap; }
+.menu-import-section details > p,.menu-import-group { margin:4px 0 12px; }
+.menu-import-group ul { margin-top:4px; list-style:disc; padding-inline-start:20px; }
+@media (max-width:600px) {
+    #view-menu .menu-heading:has(.menu-heading-actions) { flex-direction:column; }
+}

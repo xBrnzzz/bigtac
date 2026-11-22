@@ -1,5 +1,6 @@
 import {icon} from './admin-icons.js';
 import {watchMenu,createMenuService} from './admin-menu-service.js';
+import {setupMenuImport} from './admin-menu-import.js';
 import {MENU_LIMIT,copy,newId,ordered,categoryFor,materializeProduct,independentProduct,productIssues,groupIssues,imageIssue,fingerprint,selectionPresets,selectionPreset,selectionSummary,applySelectionPreset,groupTemplate,duplicateOption} from './menu-model.js';
 import {buildCustomizationSteps,choiceRules,selectionIssue,customizationPrice,moneyCents} from './customization.js';
 
@@ -19,7 +20,7 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
     let categoryExpected=null,groupExpected=null,groupDraft=null,groupBaseline='',categoryBaseline='';
     const dialogs={};
     root.className='menu-workspace hidden';
-    root.innerHTML=`<header class="menu-heading"><div><h2>Votre menu</h2><p id="menu-summary">Vos produits, leurs choix et leur disponibilité.</p></div><button class="admin-button primary" data-menu-action="new">${icon('plus')}<span class="menu-add-label">Ajouter un produit</span></button></header>
+    root.innerHTML=`<header class="menu-heading"><div><h2>Votre menu</h2><p id="menu-summary">Vos produits, leurs choix et leur disponibilité.</p></div><div class="menu-heading-actions">${button('Importer un menu','import','note')}<button class="admin-button primary" data-menu-action="new">${icon('plus')}<span class="menu-add-label">Ajouter un produit</span></button></div></header>
         <div class="menu-tools"><label class="menu-search"><span class="sr-only">Rechercher un produit</span>${icon('search')}<input id="menu-admin-search" type="search" name="product-search" placeholder="Nom du produit…" autocomplete="off"></label>${button('Catégories','categories','sliders','aria-label="Gérer les catégories"')}${button('Groupes de choix','groups','sliders')}<button type="button" class="admin-button catalog-filter-toggle" id="menu-filter-toggle" aria-expanded="false" aria-controls="menu-filter-panel">${icon('filter')}<span>Filtres</span><b id="menu-filter-count" hidden></b></button></div>
         <div id="menu-filter-panel" class="catalog-filter-panel" hidden>
             ${field('Stock','menu-state',`<select id="menu-state">${option('all','Tous')}${option('available','Disponibles')}${option('stock','En rupture')}</select>`)}
@@ -39,7 +40,7 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
     productSurface.append(root.querySelector('.menu-list-heading'),root.querySelector('#items-grid'));
     productsPane.append(productSurface);
     layout.append(categoriesPane,productsPane);root.append(layout);
-    for(const [id,title] of [['item-editor','Produit'],['menu-categories-dialog','Catégories'],['menu-groups-dialog','Groupes réutilisables'],['menu-group-editor','Groupe de choix'],['menu-preview','Aperçu client']]) {
+    for(const [id,title] of [['item-editor','Produit'],['menu-categories-dialog','Catégories'],['menu-groups-dialog','Groupes réutilisables'],['menu-group-editor','Groupe de choix'],['menu-preview','Aperçu client'],['menu-import-dialog','Importer un menu']]) {
         if(id==='item-editor')document.getElementById(id)?.remove();
         const dialog=document.createElement('dialog');dialog.id=id;dialog.className='menu-dialog';dialog.setAttribute('aria-labelledby',`${id}-title`);
         dialog.innerHTML=`<header><div><p>Catalogue</p><h2 id="${id}-title">${title}</h2></div>${button('Fermer','close','x',`data-dialog="${id}" aria-label="Fermer"`)}</header><div class="menu-dialog-body"></div><footer></footer>`;
@@ -72,7 +73,7 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
     const body=id=>dialogs[id].querySelector('.menu-dialog-body');
     const footer=id=>dialogs[id].querySelector('footer');
     const $=id=>document.getElementById(id);
-    const message=error=>error.name==='MenuError'?error.message:'Enregistrement non confirmé. Vérifiez votre connexion ou vos autorisations, puis réessayez.';
+    const message=error=>['MenuError','MenuImportError'].includes(error.name)?error.message:'Enregistrement non confirmé. Vérifiez votre connexion ou vos autorisations, puis réessayez.';
     const isDirty=()=>draft&&(fingerprint(draft)!==baseline||!!file);
     const allowed=()=>running&&session()&&['admin','manager'].includes(session().role);
     function close(id,force=false) {
@@ -121,6 +122,7 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
         catch(error){if(generation===version){toast(message(error),'error');if(status){status.textContent=message(error);status.setAttribute('role','alert');}else{readError=message(error);}}return false;}
         finally{if(generation===version){busy=false;paint();document.querySelectorAll('.menu-dialog button').forEach(button=>button.disabled=false);}}
     }
+    setupMenuImport(dialogs['menu-import-dialog'], {service, operation});
     function openProduct(id,duplicate=false) {
         if(!allowed()||blocked)return;
         const source=data.menuItems.find(row=>row.id===id);expected=duplicate?null:source||null;
@@ -198,7 +200,7 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
     function categoryFormValue(){return dialogs['menu-categories-dialog'].open&&$('menu-category-name')?JSON.stringify([$('menu-category-name').value,$('menu-category-visible').checked]):'';}
     function renderCategories() {
         body('menu-categories-dialog').innerHTML=`<p class="menu-help">Les renommages conservent les produits. Pour supprimer une catégorie, choisissez où déplacer ses produits.</p><div class="menu-category-editor">${field(categoryExpected?'Renommer la catégorie':'Nouvelle catégorie','menu-category-name',input('menu-category-name',categoryExpected?.name||''))}${check('menu-category-visible','Afficher cette catégorie',categoryExpected?.isVisible!==false)}${button('Enregistrer la catégorie','save-category','check')}<p data-save-state role="status"></p></div><div class="menu-category-list">${data.categories.map(row=>`<article data-category-id="${e(row.id)}"><h3>${icon('grid')}${e(row.name)}</h3><p>${data.menuItems.filter(item=>categoryFor(item,data.categories)?.id===row.id).length} produit(s) · ${row.isVisible===false?'Masquée':'Visible'}</p><div>${button('Modifier','edit-category','note',`data-id="${e(row.id)}"`)}${button('Monter','category-up','up',`data-id="${e(row.id)}"`)}${button('Supprimer','delete-category','trash',`data-id="${e(row.id)}"`)}</div><label>Déplacer les produits vers<select data-destination="${e(row.id)}"><option value="">Choisir avant suppression…</option>${data.categories.filter(cat=>cat.id!==row.id).map(cat=>option(cat.id,cat.name)).join('')}</select></label></article>`).join('')}</div>`;
-        footer('menu-categories-dialog').innerHTML=button('Terminé','close','check','data-dialog="menu-categories-dialog"');
+        footer('menu-categories-dialog').innerHTML=`<div>${button('Importer un menu','import','note')}${button('Terminé','close','check','data-dialog="menu-categories-dialog"')}</div>`;
         categoryBaseline=JSON.stringify([categoryExpected?.name||'',categoryExpected?.isVisible!==false]);
     }
     function openGroups() {
@@ -314,6 +316,12 @@ export function createMenuWorkspace(root,{session,toast,upload}) {
         const target=event.target.closest('[data-menu-action]');if(!target||target.disabled||!allowed())return;
         const action=target.dataset.menuAction,id=target.dataset.id,index=Number(target.dataset.index),item=data.menuItems.find(row=>row.id===id);
         if(action==='close')return close(target.dataset.dialog);
+        if(action==='import'){
+            if(busy||blocked)return;
+            if(dialogs['menu-categories-dialog'].open&&!close('menu-categories-dialog'))return;
+            root.querySelector('[data-menu-action="import"]').focus({preventScroll:true});
+            return dialogs['menu-import-dialog'].showModal();
+        }
         if(action==='new')return openProduct();if(action==='edit')return openProduct(id);if(action==='duplicate')return openProduct(id,true);
         if(action==='delete-product'){
             const targetItem=item||(expected&&expected.id===id?expected:data.menuItems.find(row=>row.id===id));

@@ -541,7 +541,7 @@
 
         import {available as menuAvailable,listed as menuListed,categoryFor,cartMenuIssue,fingerprint as menuFingerprint} from './assets/menu-model.js';
         import { buildCustomizationSteps, choiceRules, selectionIssue, customizationPrice, cartSelections, cartChoiceSelections, optionSnapshot, moneyCents } from './assets/customization.js';
-        import {promotionState,orderingAvailable,safeURL} from './assets/operations-model.js';
+        import {promotionState,orderingAvailable,safeURL,compareOfferOrder} from './assets/operations-model.js';
         import { setupCarousel } from './assets/carousels.js';
         import { i18n, t } from './assets/i18n.js';
 
@@ -870,7 +870,7 @@
             stopPromotions?.();clearInterval(promoTimer);promotionsReady=false;
             return new Promise(resolve=>{
                 stopPromotions=onSnapshot(collection(db,'promotions'),{includeMetadataChanges:true},snap=>{
-                    rawPromotions=snap.docs.map(d=>({...d.data(),id:d.id,isPromo:true}));promotionsReady=!(snap.metadata?.fromCache||snap.metadata?.hasPendingWrites);renderLivePromotions();resolve();
+                    rawPromotions=snap.docs.map(d=>({...d.data(),id:d.id,isPromo:true})).sort(compareOfferOrder);promotionsReady=!(snap.metadata?.fromCache||snap.metadata?.hasPendingWrites);renderLivePromotions();resolve();
                 },()=>{promotionsReady=false;stockReady=false;updateCartUI();resolve();});
                 promoTimer=setInterval(()=>{applyRestaurantConfig();if(menuFingerprint(allPromotions)!==menuFingerprint(rawPromotions.filter(p=>promotionState(p)==='active')))renderLivePromotions();else updateCartUI();},30000);
             });

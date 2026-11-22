@@ -7,6 +7,7 @@ export const cents=value=>{
 };
 export const validZone=zone=>{try{new Intl.DateTimeFormat('fr',{timeZone:zone}).format();return typeof zone==='string'&&!!zone;}catch{return false;}};
 export const instant=value=>value==null||value===''?null:value?.toDate?value.toDate().getTime():value?.seconds!=null?value.seconds*1000:Date.parse(value);
+export const compareOfferOrder = (a, b) => (Number(a.order) || 0) - (Number(b.order) || 0);
 export function promotionState(p,now=Date.now()){
     const start=instant(p.startsAt),end=instant(p.endsAt);
     if(p.isVisible===false)return 'disabled';

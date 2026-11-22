@@ -1,7 +1,8 @@
-import {auth,db,collection,doc,query,onSnapshot,runTransaction} from '../firebase-config.js';
+import {auth,db,collection,doc,query,onSnapshot,getDocs,runTransaction} from '../firebase-config.js';
 import {limit} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import {profileRole} from './admin-model.js';
 import {MENU_LIMIT,copy,fingerprint,materializeProduct,productIssues,groupIssues,ordered,newId} from './menu-model.js';
+import {MenuImportError, importCollections, parseMenuImport, planMenuImport, checkImportCapacity} from './menu-import.js';
 
 export class MenuError extends Error { constructor(message){super(message);this.name='MenuError';} }
 export const watchMenu = (name,next,error) => onSnapshot(query(collection(db,name),limit(MENU_LIMIT+1)),{includeMetadataChanges:true},snapshot=>next({rows:ordered(snapshot.docs.map(row=>({...row.data(),id:row.id}))),cached:!!(snapshot.metadata?.fromCache||snapshot.metadata?.hasPendingWrites),partial:snapshot.docs.length>MENU_LIMIT}),error);
@@ -24,7 +25,115 @@ export function createMenuService(session) {
         });
     }
     const unchanged=(snapshot,expected)=>{if(!snapshot.exists()||fingerprint({...snapshot.data(),id:snapshot.id})!==fingerprint(expected))throw new MenuError('Ce contenu a changé sur un autre appareil. Fermez cette fiche et rechargez avant de réessayer.');};
+
+    async function readImportCatalogue() {
+        const snapshots = await Promise.all(importCollections.map(name => getDocs(query(collection(db, name), limit(MENU_LIMIT + 1)))));
+        if (snapshots.some(snap => snap.metadata?.fromCache || snap.metadata?.hasPendingWrites || snap.docs.length > MENU_LIMIT)) {
+            throw new MenuImportError('Impossible de vérifier tout le catalogue. Actualisez la carte et réessayez.');
+        }
+        return Object.fromEntries(importCollections.map((name, index) => [
+            name, snapshots[index].docs.map(row => ({...row.data(), id: row.id}))
+        ]));
+    }
+
     return {
+        async previewImport(source) {
+            const menu = parseMenuImport(source);
+            const catalogue = await readImportCatalogue();
+            const plan = planMenuImport(menu, catalogue);
+            checkImportCapacity(plan, catalogue);
+            return plan;
+        },
+        async importMenu(source, reviewedPlan) {
+            const menu = parseMenuImport(source);
+            const ids = Object.fromEntries(importCollections.map(name => [
+                name, new Map(menu[name].map(row => [row.id, newId()]))
+            ]));
+            return transact(async (tx, state) => {
+                const catalogue = await readImportCatalogue();
+                const plan = planMenuImport(menu, catalogue);
+                checkImportCapacity(plan, catalogue);
+                if (fingerprint(plan) !== fingerprint(reviewedPlan)) {
+                    throw new MenuImportError('Le catalogue a changé. Vérifiez à nouveau le fichier avant d’importer.');
+                }
+
+                const pending = [];
+                const categories = new Map();
+                const groups = new Map();
+                const categoryNames = Object.fromEntries(catalogue.categories.map(row => [row.id, row.name]));
+                const productCategories = {...state.productCategories};
+                const nextOrder = (name, minimum = 0) => Math.max(minimum, ...catalogue[name].map(row => (Number(row.order) || 0) + 1));
+                let categoryOrder = nextOrder('categories', Number(state.nextCategoryOrder) || 0);
+                let productOrder = nextOrder('menuItems', Number(state.nextProductOrder) || 0);
+                let promotionOrder = nextOrder('promotions', 1);
+
+                for (const {row, existingId} of plan.categories) {
+                    const categoryId = existingId || ids.categories.get(row.id);
+                    const existing = catalogue.categories.find(category => category.id === existingId);
+                    const name = existing?.name ?? row.name;
+                    categories.set(row.id, {id: categoryId, name});
+                    if (existingId) continue;
+                    categoryNames[categoryId] = name;
+                    pending.push(['categories', categoryId, {name, isVisible: false, order: categoryOrder++}]);
+                }
+
+                for (const {row, existingId} of plan.modifierGroups) {
+                    const groupId = existingId || ids.modifierGroups.get(row.id);
+                    const existing = catalogue.modifierGroups.find(group => group.id === existingId);
+                    const {id: _fileId, ...definition} = row;
+                    const group = existing || ({...definition, id: groupId, options: definition.options.map(option => ({...option, id: newId()})), productIds: []});
+                    groups.set(row.id, {group, existingId, added: []});
+                }
+
+                for (const {row, existingId} of plan.menuItems) {
+                    if (existingId) continue;
+                    const {id: localId, ...item} = row;
+                    const productId = ids.menuItems.get(localId);
+                    const category = categories.get(row.categoryId);
+                    const linked = row.modifierGroupIds.map(id => groups.get(id));
+                    linked.forEach(entry => entry.added.push(productId));
+                    const product = materializeProduct({
+                        ...item, categoryId: category.id, category: category.name, order: productOrder++,
+                        modifierGroupIds: linked.map(entry => entry.group.id), isVisible: false, imageUrl: ''
+                    }, linked.map(entry => entry.group));
+                    const issues = productIssues(product, [category]);
+                    if (issues.length) throw new MenuImportError(`${product.name} — ${issues[0][1]}`);
+                    productCategories[productId] = category.id;
+                    pending.push(['menuItems', productId, product]);
+                }
+
+                for (const {group, existingId, added} of groups.values()) {
+                    const {id: groupId, ...definition} = group;
+                    if (existingId && !added.length) continue;
+                    const productIds = [...new Set([...(definition.productIds || []), ...added])];
+                    if (productIds.length > MENU_LIMIT) throw new MenuImportError(`${group.title} — Trop de produits liés.`);
+                    pending.push(['modifierGroups', groupId, existingId ? {productIds} : {...definition, productIds}, !!existingId]);
+                }
+
+                for (const {row, existingId} of plan.promotions) {
+                    if (existingId) continue;
+                    const {id: localId, ...offer} = row;
+                    pending.push(['promotions', ids.promotions.get(localId), {
+                        ...offer, order: promotionOrder++, isVisible: false, imageUrl: ''
+                    }]);
+                }
+
+                if (!pending.length) throw new MenuImportError('Tous les éléments du fichier existent déjà.');
+                if (new TextEncoder().encode(JSON.stringify(pending)).length > 2 * 1024 * 1024) {
+                    throw new MenuImportError('Les groupes liés produisent un import trop volumineux. Divisez le menu en plusieurs fichiers.');
+                }
+
+                const reusable = [...plan.categories.filter(row => row.existingId).map(row => ['categories', row.existingId]),
+                    ...[...groups.values()].filter(entry => entry.existingId && entry.added.length).map(entry => ['modifierGroups', entry.existingId])];
+                const snapshots = await Promise.all(reusable.map(([name, id]) => tx.get(ref(name, id))));
+                reusable.forEach(([name, id], index) => unchanged(snapshots[index], catalogue[name].find(row => row.id === id)));
+                for (const [name, id, value, update] of pending) {
+                    if (update) tx.update(ref(name, id), value);
+                    else tx.set(ref(name, id), value);
+                }
+                Object.assign(state, {categoryNames, productCategories, nextCategoryOrder: categoryOrder, nextProductOrder: productOrder});
+            });
+        },
         async product(draft,expected,categories,{remove=false}={}) {
             const id=expected?.id || newId();
             return transact(async (tx,state)=>{

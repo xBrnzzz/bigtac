@@ -4,6 +4,7 @@
 .menu-heading h2 { margin:0 0 4px; font-size:24px; font-weight:650; letter-spacing:-.025em; }
 .menu-heading p,.menu-help { color:var(--admin-muted); font-size:13px; line-height:1.6; margin:4px 0 16px; }
 .menu-heading p { margin:0; }
+.menu-heading-actions { display:flex; gap:8px; flex-wrap:wrap; }
 .menu-tools { display:flex; align-items:end; gap:10px; flex-wrap:wrap; }
 .menu-tools .menu-field { margin:0; }
 .menu-workspace :is(input:not([type=checkbox]),select),.menu-dialog :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),textarea,select) { width:100%; min-width:0; border:1px solid var(--admin-control); background:white; color:var(--admin-text); border-radius:10px; padding:10px 12px; min-height:44px; font:inherit; font-size:14px; }
@@ -124,7 +125,8 @@
     .menu-workspace { padding:18px 16px 24px; }
     .menu-heading { align-items:flex-start; flex-direction:column; gap:12px; }
     .menu-heading h2 { font-size:22px; }
-    .menu-heading>.admin-button { width:100%; }
+    .menu-heading-actions { width:100%; }
+    .menu-heading-actions .admin-button { flex:1 1 auto; justify-content:center; }
     .menu-tools { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)) 44px; align-items:stretch; gap:8px; }
     .menu-tools .menu-search { grid-column:1/-1; }
     .menu-tools .menu-field { grid-column:1/-1; }

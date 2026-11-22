@@ -1,7 +1,7 @@
 import {db,doc,getDoc,collection,query,onSnapshot} from '../firebase-config.js';
 import {limit} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import {operationsService} from './operations-service.js';
-import {offerIssues,promotionState,stateLabels,localInstant,localInput,validZone,cents} from './operations-model.js';
+import {offerIssues,promotionState,stateLabels,localInstant,localInput,validZone,cents,compareOfferOrder} from './operations-model.js';
 import {copy,newId,imageIssue,groupIssues,selectionPresets,selectionPreset,selectionSummary,applySelectionPreset} from './menu-model.js';
 import {icon} from './admin-icons.js';
 const e=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -79,7 +79,7 @@ export function createPromotions({session,toast,upload,settings}){
         if(event.target.matches('#promo-name,#promo-price'))updatePhotoCaption();
     });
     function render(){
-        const labels=rows.map(p=>{
+        const labels=[...rows].sort(compareOfferOrder).map(p=>{
             const state=promotionState(p);
             const dateText=value=>e(localInput(value,zone()).replace('T',' · '));
             const actions=[['edit','Modifier','edit'],['duplicate','Copier','copy'],['toggle',p.isVisible===false?'Activer':'Désactiver',p.isVisible===false?'check':'off'],['delete','Supprimer','trash']];
