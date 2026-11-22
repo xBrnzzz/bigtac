@@ -2,6 +2,7 @@ import {auth,db,doc,runTransaction} from '../firebase-config.js';
 import {profileRole} from './admin-model.js';
 import {fingerprint} from './menu-model.js';
 import {offerIssues,assignmentIssue,settingsIssues} from './operations-model.js';
+import {storefrontAppearance,storefrontAppearanceIssue} from './storefront-appearance.js';
 // Client conflict/session safeguards; deployed Rules/trusted services are required.
 export function operationsService(session){
     async function transact(work){
@@ -28,6 +29,16 @@ export function operationsService(session){
             const issue=assignmentIssue(actor,snap.exists()?snap.data():null,target?.data(),expected);
             if(issue)throw Error(issue==='permission'?'Accès non autorisé.':issue==='driver'?'Ce livreur est indisponible.':'Attribution modifiée ou commande non attribuable. Actualisez.');
             tx.update(ref,{deliveryGuyId:driverId||null,deliveryGuyName:driverId?String(target.data().name||'Livreur'):null});
+        }),
+        appearance:(draft,expected)=>transact(async tx=>{
+            const issue=storefrontAppearanceIssue(draft);
+            if(issue)throw Error(issue);
+            const ref=doc(db,'settings','config'),snap=await tx.get(ref);
+            unchanged(snap,expected);
+            const current=snap.data().storefront;
+            const storefront={...current,...storefrontAppearance({storefront:draft})};
+            tx.update(ref,{storefront});
+            return storefront;
         }),
         settings:(patch,expected)=>transact(async tx=>{
             const editable=['isOpen','whatsappMode','restaurantName','description','phone','whatsappNumber','email','address','logoUrl','instagramUrl','facebookUrl','websiteUrl','reportingTimezone','orderingModes','openingHours'];

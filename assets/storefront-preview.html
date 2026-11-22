@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr" data-storefront-preview>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <base href="../">
+    <title>Aperçu de la vitrine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Cairo:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/storefront.css">
+    <link rel="stylesheet" href="assets/storefront-hero.css">
+    <link rel="stylesheet" href="assets/storefront-discovery.css">
+    <link rel="stylesheet" href="assets/storefront-footer.css">
+    <link rel="stylesheet" href="assets/storefront-appearance.css">
+</head>
+<body>
+    <header class="store-header">
+        <div class="store-header__inner app-wrap">
+            <a class="store-brand"><img src="assets/logo.png" width="44" height="44" alt=""><span><span id="store-brand-name">BIGTAC</span><small id="store-brand-tagline">Tacos &amp; grill · Fès</small></span></a>
+            <nav class="store-nav"><a data-i18n="nav.menu">La carte</a><a data-i18n="nav.offers">Les offres</a><a data-i18n="nav.info">Infos pratiques</a></nav>
+            <div class="store-actions"><span class="header-cart" data-i18n="nav.cart">Panier</span></div>
+        </div>
+    </header>
+    <main class="app-wrap store-main">
+        <section id="hero" class="restaurant-intro">
+            <div class="restaurant-intro__copy">
+                <h1><span class="hero-lead">Grosse faim ?</span> <span class="hero-name" id="hero-brand">BIGTAC</span></h1>
+                <p id="hero-description">Votre tacos, à votre façon.</p>
+                <div class="hero-links">
+                    <a class="primary-button intro-cta"><span>Commander maintenant</span><span aria-hidden="true">↓</span></a>
+                    <a class="glovo-button" data-glovo-placement="hero" hidden><span data-glovo-label></span><span aria-hidden="true">↗</span></a>
+                </div>
+            </div>
+            <img id="hero-photo" src="assets/tacos-campaign.jpg" alt="" width="1536" height="1024">
+            <div class="hero-service-line"><span class="store-status" id="storeStatus"></span><div class="restaurant-services">
+                <span data-mode="livraison" data-i18n="service.delivery"></span>
+                <span data-mode="emporter" data-i18n="hero.takeaway"></span>
+                <span data-mode="sur_place" data-i18n="hero.dinein"></span>
+            </div></div>
+        </section>
+        <div class="discovery-row">
+            <section id="promotions" class="menu-feature menu-feature--offers">
+                <div class="section-heading"><h2 id="promotions-title">Promotions</h2></div>
+                <div id="promotionsGrid" class="featured-grid">
+                    <article class="product-card product-card--offer">
+                        <div class="product-card__media"><img src="assets/tacos-campaign.jpg" alt=""></div>
+                        <div class="product-card__body"><h3 data-preview-copy="offer">Exemple de promotion</h3>
+                            <div class="product-card__footer"><strong>55 DH</strong><span class="product-card__choose" data-i18n="modal.composer">Composer</span></div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+            <section id="popular" class="menu-feature menu-feature--popular">
+                <div class="section-heading"><h2 id="popular-title">Best Seller</h2></div>
+                <div id="popularGrid" class="featured-grid">
+                    <article class="product-card product-card--popular">
+                        <div class="product-card__media"><img src="assets/tacos-campaign.jpg" alt=""></div>
+                        <div class="product-card__body"><h3 data-preview-copy="product">Exemple de produit</h3>
+                            <div class="product-card__footer"><strong>45 DH</strong><span class="product-card__choose" data-i18n="modal.choose">Choisir</span></div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </div>
+        <section id="menu-unified">
+            <div class="store-menu-heading"><h2 id="menu-title">Notre carte</h2><p id="menu-description"></p></div>
+            <article class="product-card">
+                <div class="product-card__media"><img src="assets/tacos-campaign.jpg" alt=""></div>
+                <div class="product-card__body"><h3 data-preview-copy="product">Exemple de produit</h3>
+                    <div class="product-card__footer"><strong>45 DH</strong><span class="product-card__choose" data-i18n="modal.choose">Choisir</span></div>
+                </div>
+            </article>
+        </section>
+    </main>
+    <footer id="locations" class="restaurant-footer">
+        <div class="restaurant-footer__inner">
+            <div class="restaurant-footer__info">
+                <section class="restaurant-footer__visit"><h2 id="info-title"></h2><address id="footer-address">Rue Abdelkrim Benjelloun, Fès</address><a class="footer-directions" data-i18n="location.itinerary"></a></section>
+                <section class="restaurant-footer__hours"><h3 data-i18n="location.hours_title"></h3><p id="restaurant-hours"></p><dl id="footer-week" hidden></dl></section>
+                <section class="restaurant-footer__contact"><h3 id="footer-contact-title"></h3><div class="footer-contact-links">
+                    <button tabindex="-1" type="button">WhatsApp</button><button tabindex="-1" type="button" data-i18n="location.call"></button>
+                    <a class="glovo-button" data-glovo-placement="footer" hidden><span data-glovo-label></span><span aria-hidden="true">↗</span></a>
+                </div></section>
+            </div>
+            <div class="restaurant-footer__sign"><a class="footer-wordmark" id="footer-brand">BIGTAC</a><div class="footer-links"><a data-i18n="nav.menu"></a><a>Instagram</a></div></div>
+        </div>
+    </footer>
+</body>
+</html>

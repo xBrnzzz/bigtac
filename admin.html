@@ -146,6 +146,7 @@
     <link rel="stylesheet" href="assets/admin-ledger.css">
     <link rel="stylesheet" href="assets/admin-analysis.css">
     <link rel="stylesheet" href="assets/admin-catalog.css">
+    <link rel="stylesheet" href="assets/admin-storefront-editor.css">
     <link rel="stylesheet" href="assets/admin-service-floor.css">
     <script type="module" src="assets/i18n.js"></script>
 </head>
@@ -428,6 +429,7 @@
         import { createOverview } from './assets/admin-overview.js';
         import { operationsService } from './assets/operations-service.js';
         import { createSettingsEditor } from './assets/admin-settings-editor.js';
+        import { createStorefrontEditor } from './assets/admin-storefront-editor.js';
         import { createPromotions } from './assets/admin-promotions.js';
         import { createMenuWorkspace } from './assets/admin-menu.js';
         import { createOrderWorkspace } from './assets/admin-orders.js';
@@ -498,6 +500,7 @@
             menuWorkspace.stop();
             promotionsWorkspace.stop();
             settingsEditor.clear();
+            storefrontEditor.clear();
             if (settingsUnsub) settingsUnsub(); settingsUnsub = null;
             driverUnsubscribers.forEach(unsubscribe => unsubscribe()); driverUnsubscribers = [];
             overview.stop(); overviewStarted = false; currentView = null;
@@ -645,22 +648,23 @@
             const feedback=document.getElementById('admin-settings-feedback');
             const retry=document.getElementById('admin-settings-retry');
             const inputs=['toggle-store','toggle-whatsapp'].map(id=>document.getElementById(id));
-            const publish=config=>{
-                settingsData=config; settingsEditor.update(config); shell.restaurant(config); orderWorkspace.settingsChanged();
+            const publish=(config,cached=false)=>{
+                settingsData=config; settingsEditor.update(config,cached); storefrontEditor.update(config,cached); shell.restaurant(config); orderWorkspace.settingsChanged();
                 if (authorized('overview')) {
                     if (overviewStarted) overview.update(config);
                     else { overview.start(config); overviewStarted=true; }
                 }
             };
             inputs.forEach(input=>input.disabled=true);
-            settingsUnsub=onSnapshot(doc(db,'settings','config'),snap=>{
+            settingsUnsub=onSnapshot(doc(db,'settings','config'),{includeMetadataChanges:true},snap=>{
                 if (version!==workVersion || !authorized('settings')) return;
                 if (!snap.exists()) {
                     publish({ _unavailable:true });
                     feedback.textContent='Configuration absente. Demandez sa préparation à un administrateur.';
                     retry.hidden=false; return;
                 }
-                const config=snap.data(); publish(config);settingsEditor.update(config,!!(snap.metadata?.fromCache||snap.metadata?.hasPendingWrites));
+                publish(snap.data(),!!(snap.metadata?.fromCache||snap.metadata?.hasPendingWrites));
+                const config=settingsData;
                 inputs[0].checked=config.isOpen!==false; inputs[1].checked=config.whatsappMode===true;
                 inputs.forEach(input=>input.disabled=saving);
                 if(!saving)feedback.textContent=snap.metadata?.fromCache ? 'Réglages en cache. Vérifiez la connexion avant une modification.' : 'Réglages synchronisés.';
@@ -762,6 +766,7 @@
         // Phase 4 reuses the existing offer editor and styling.
         const promotionsWorkspace=createPromotions({session:orderActor,toast:(...args)=>showToast(...args),upload:uploadToCloudinary,settings:()=>settingsData});
         const settingsEditor=createSettingsEditor({session:orderActor,toast:(...args)=>showToast(...args),upload:uploadToCloudinary});
+        const storefrontEditor=createStorefrontEditor({session:orderActor,toast:(...args)=>showToast(...args),upload:uploadToCloudinary});
         function loadPromotions(){promotionsWorkspace.start();}
         window.openPromoEditor=id=>promotionsWorkspace.open(id);
         window.closePromoEditor=()=>promotionsWorkspace.close();
