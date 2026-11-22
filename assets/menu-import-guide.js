@@ -81,3 +81,59 @@ Utilise [] pour une liste vide et "" si aucune description n’a été fournie. 
 Utilise des nombres JSON en DH, positifs ou nuls, avec au plus deux décimales. Pour les promotions, utilise null quand il n’y a pas de date, ou une date ISO 8601 avec fuseau explicite, par exemple 2026-12-01T12:00:00+01:00. La fin doit suivre le début. Limite le fichier à 512 Ko et chacune des quatre listes à 300 éléments. Si le menu ne tient pas dans un import de 399 nouveaux éléments, demande comment le répartir en fichiers où toutes les références nécessaires sont présentes.
 
 Avant d’exporter, vérifie les totaux de commandes types avec options payantes, la disponibilité pour les groupes obligatoires, les références et les dates. Si une donnée importante reste incertaine, demande une réponse avant d’exporter. Quand les règles sont confirmées, renvoie un fichier UTF-8 restaurant-menu.json. Si tu ne peux pas joindre de fichier, renvoie uniquement le JSON brut, sans commentaires, balises Markdown ni texte supplémentaire.`;
+
+const translatedInstructions = {
+    en: `Read the attached photos of my restaurant menu and produce one JSON file containing categories, products, choice groups, extras, promotions and best sellers.
+
+1. Read and clarify
+Keep the language, spelling, accents and order used on the physical menu. Use only printed or confirmed descriptions. Deduplicate overlapping photos and ask for replacements for missing or unreadable pages. Before writing the file, ask all necessary questions in one numbered list in my language. Name the affected items, skip questions the menu answers, and wait for my answers before resolving anything that affects ordering or prices.
+
+- Confirm unclear categories, names and prices. Ask whether different sizes are separate products or choices. For choices, confirm the base price and each price difference (M at 45 DH and L at 55 DH means base 45, M +0, L +10). Ask which DH prices to use if another currency is shown.
+- Confirm what each group applies to, whether it is required, its minimum and maximum, whether choices must be distinct, and any price differences. For “2 meats”, ask whether they are fixed or selected. Share a group only if its rules and prices match across all linked products.
+- For extras listed separately, ask whether each is included by default, included among choices, an optional paid extra, or a separately sold product. Confirm the price and the items or offers to which each extra applies.
+- Confirm fixed-price offers, quantities, substitutions, choices and dates in the restaurant's time zone. A promotion can be ordered separately. Ask before adapting discounts with cart conditions, delivery-mode restrictions or weekly schedules.
+- Use explicit best seller and availability marks. If unclear, ask which products to feature or whether to leave the selection empty. Ask how to handle seasonal items. Tell the owner that ordinary items and options will be treated as available if the menu gives no availability information.
+
+The site adds selected option prices to the base price and counts each group independently. Each option can be selected once. Explain and ask before adapting rules like “two sauces free, then 3 DH each”, repeatable options or prices that depend on another choice. Describe what the customer could choose and pay. If no suitable adaptation exists, ask for a supported rule or permission to omit the affected entry. Never invent prices, ingredients, choices, best sellers or dates.
+
+2. Selection rules
+Every group has title, type, min, max and options. Use radio with max 1 and min 1 for one required choice, or min 0 for one optional choice. Use checkbox for multiple distinct choices: min 0/max N for up to N, min N/max N for exactly N, min N/max M for a range, and max 0 when there is no limit beyond the number available. Use integer limits, verify the minimum is achievable, and price options as additions to the base price (0 if included). Set isAvailable to false for unavailable options.
+
+Put product- and promotion-specific groups in mandatoryChoices even if min is 0. Put optional extras in supplements, which allows one of each. Use a choice group for extras that have a selection limit. Confirm reusable groups before adding them to modifierGroups. A shared supplements group uses kind supplements, checkbox, min 0 and max 0. Only products can refer to shared groups through modifierGroupIds. Products show their own choices first, then shared choices, then extras. Use mandatoryChoices if a specific order requires mixing those groups. Copy the applicable choices and extras into each promotion. Avoid duplicate options on one item. Allow at most 60 options per group and across combined extras, 12 links to shared groups and 20 choice groups total per product.
+
+3. Output
+Use exactly the keys in the example and replace its values with my menu's data. Use [] for empty lists, "" when no description was supplied, and true/false for flags. IDs must be unique within each list, at most 80 characters, and use lowercase ASCII letters, digits and hyphens. categoryId and modifierGroupIds must reference IDs in the same file. Declare each identical shared group once. Preserve printed order. Limit category names, group titles and option names to 120 characters, product and promotion names to 160 and descriptions to 3,000. Ask for shortened text where necessary. Add no publication fields or menu photos as product images.
+
+Use nonnegative JSON numbers in DH with at most two decimal places. For promotions, use null for absent dates or ISO 8601 with an explicit offset, for example 2026-12-01T12:00:00+01:00. The end must follow the start. Limit the file to 512 KB and each of the four lists to 300 entries. If there would be over 399 new entries, ask how to split them into files with all required references.
+
+Verify sample order totals with paid options, required choice availability, references and dates. Ask if anything important is unresolved. Return a UTF-8 restaurant-menu.json file, or raw JSON only with no comments, Markdown or extra text if attaching a file is unavailable.`,
+    ar: `اقرأ الصور المرفقة لقائمة مطعمي وأنشئ ملف JSON واحداً يحتوي على الفئات والمنتجات ومجموعات الاختيارات والإضافات والعروض والأصناف الأكثر طلباً.
+
+١. القراءة والاستيضاح
+احتفظ بلغة القائمة وأسمائها وترتيبها كما هي. استعمل الأوصاف المطبوعة أو المؤكدة فقط. أزل التكرار بين الصور المتداخلة، واطلب صورة جديدة لأي صفحة ناقصة أو غير مقروءة. قبل إنشاء الملف، اجمع الأسئلة اللازمة في قائمة مرقمة واحدة بلغتي. حدّد الأصناف والمجموعات المعنية، ولا تسأل عما توضحه القائمة، وانتظر جوابي عندما تؤثر القاعدة في السعر أو طريقة الطلب.
+
+- أكّد الفئات والأسماء والأسعار الملتبسة. اسأل هل الأحجام المختلفة منتجات مستقلة أم اختيارات. إن كانت اختيارات فأكّد سعر الأساس والفرق لكل خيار. مثال: إذا كان الحجم M بسعر 45 درهماً وL بسعر 55 درهماً، فالأساس 45، وخيار M يضيف 0، وخيار L يضيف 10. اسأل عن أسعار الدرهم إذا كانت العملة المطبوعة مختلفة.
+- حدّد الأصناف والعروض التي تنطبق عليها كل مجموعة، وهل هي إلزامية، والحدين الأدنى والأقصى، وهل يجب أن تكون الخيارات مختلفة، وأي خيار يزيد السعر. إذا وجدت عبارة «نوعان من اللحم»، فاسأل هل النوعان محددان أم يختارهما العميل. لا تعِد استعمال المجموعة نفسها إلا عند تطابق قواعدها وأسعارها.
+- اسأل عن كل إضافة في قائمة منفصلة: هل تأتي مع الصنف تلقائياً، أم تدخل ضمن الاختيارات، أم تباع كإضافة اختيارية بمقابل، أم هي منتج مستقل؟ أكّد أسعارها والأصناف أو العروض التي تناسبها.
+- أكّد سعر العرض الثابت والكميات المضمّنة والبدائل والخيارات والتواريخ حسب توقيت المطعم. العرض صنف مستقل يمكن طلبه. استشرني قبل تكييف خصم مشروط بمحتوى السلة أو طريقة الاستلام أو جدول أسبوعي.
+- اعتمد علامات التوفر والأكثر طلباً الواضحة. عند غيابها اسأل عن الأصناف التي أريد إبرازها أو إن كنت أفضّل تركها فارغة. استوضح أمر الأصناف الموسمية واذكر أن الأصناف والخيارات العادية ستعتبر متوفرة عند غياب أي بيان عن توفرها.
+
+يضيف الموقع أسعار الاختيارات إلى السعر الأساسي، ويطبّق الحدود على كل مجموعة على حدة. كل خيار يمكن تحديده مرة واحدة. اشرح القيود واطلب الموافقة قبل تكييف قاعدة مثل «صلصتان مجاناً ثم 3 دراهم لكل صلصة» أو خيار متكرر أو سعر يعتمد على خيار آخر. وضّح ما الذي سيتمكن العميل من اختياره وما الذي سيدفعه. إن تعذّر التكييف، اطلب قاعدة يدعمها الموقع أو إذناً بحذف العنصر. لا تخترع أسعاراً أو مكونات أو اختيارات أو تواريخ أو أصنافاً أكثر طلباً.
+
+٢. قواعد الاختيار
+تتضمن كل مجموعة الحقول title وtype وmin وmax وoptions. استخدم radio لاختيار واحد مع max بقيمة 1، وmin بقيمة 1 للإلزام أو 0 للاختيار. استخدم checkbox لاختيارات متعددة ومختلفة: min بقيمة 0 وmax بقيمة N حتى N خيارات، أو min وmax بقيمة N لاختيار N بالضبط، أو من N إلى M. في checkbox يشير max بقيمة 0 إلى السماح بجميع الخيارات المتاحة مرة واحدة لكل خيار. استخدم أعداداً صحيحة للحدود وتحقق من إمكانية بلوغ الحد الأدنى. سعر الخيار زيادة على الأساس (0 للخيار المضمّن). استخدم false في isAvailable للخيار غير المتوفر.
+
+ضع مجموعات الصنف أو العرض الخاصة في mandatoryChoices حتى عندما تكون min بقيمة 0. ضع الإضافات الاختيارية في supplements، ويُسمح بتحديد كل إضافة مرة واحدة. استخدم مجموعة اختيارات إذا لزم تقييد عدد الإضافات. ضع المجموعات المشتركة المؤكدة في modifierGroups. لمجموعة إضافات مشتركة استخدم kind بقيمة supplements، وcheckbox، وmin وmax بقيمة 0. المنتجات فقط ترتبط بمجموعات مشتركة عبر modifierGroupIds. تظهر الاختيارات الخاصة أولاً، ثم المشتركة، ثم الإضافات. إذا تطلب ترتيب القائمة دمجها فضعها في mandatoryChoices. انسخ الاختيارات والإضافات المناسبة داخل كل عرض. تجنّب تكرار الخيار في الصنف ذاته. الحد لكل مجموعة أو لقائمة الإضافات المجمعة 60 خياراً. الحد لكل منتج 12 ارتباطاً مشتركاً و20 مجموعة اختيارات إجمالاً.
+
+٣. صيغة الملف
+استخدم حقول المثال بالضبط واستبدل قيمه ببيانات قائمتي. استخدم [] للقوائم الفارغة، و"" عند غياب الوصف، وtrue أو false للمؤشرات. يجب أن يكون كل معرّف فريداً داخل قائمته وبحد أقصى 80 حرفاً، من حروف لاتينية صغيرة أو أرقام أو شرطات. يجب أن يشير categoryId وmodifierGroupIds إلى معرّف موجود في الملف ذاته. عرّف المجموعة المشتركة المتطابقة مرة واحدة. حافظ على ترتيب القائمة. الحد لأسماء الفئات وعناوين المجموعات وأسماء الخيارات 120 حرفاً، ولأسماء المنتجات والعروض 160، وللوصف 3000. اطلب نصاً مختصراً عند تجاوز الحد. لا تضف حقول نشر أو تستخدم صور القائمة صوراً للمنتجات.
+
+الأسعار أرقام JSON بالدرهم غير سالبة وبمنزلتين عشريتين على الأكثر. استخدم null عند غياب تاريخ للعرض أو صيغة ISO 8601 بتوقيت صريح، مثل 2026-12-01T12:00:00+01:00. تاريخ النهاية بعد البداية. الحد لحجم الملف 512 كيلوبايت و300 عنصر في كل قائمة من القوائم الأربع. إذا تجاوز عدد العناصر الجديدة 399، اسأل كيف تقسمها إلى ملفات فيها جميع المراجع المطلوبة.
+
+تحقق من إجمالي الطلبات النموذجية ذات الاختيارات المدفوعة وتوفر الخيارات الإجبارية وصحة المراجع والتواريخ. استوضح أي معلومة مهمة ناقصة قبل التصدير. أرسل ملف restaurant-menu.json بترميز UTF-8، أو أرسل JSON الخام فقط دون تعليقات أو Markdown أو نص إضافي إذا تعذر إرفاق ملف.`
+};
+
+export function menuImportPromptFor(locale) {
+    const instructions = translatedInstructions[locale];
+    return instructions ? instructions + '\n\n' + JSON.stringify(menuImportExample, null, 2) : menuImportPrompt;
+}

@@ -31,7 +31,7 @@
 @media(max-width:767px){
  .order-ticket-footer .order-reject,.order-ticket-footer .order-detail-link{height:46px;min-height:46px}
  .menu-heading>.admin-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:104px;padding:10px 13px;min-height:44px}
- .menu-heading>.admin-button:after{display:none}.menu-add-label{font-size:0;line-height:1.5}.menu-add-label:after{content:'Ajouter';font-size:12px;font-weight:700}
+ .menu-heading>.admin-button:after{display:none}.menu-add-label{font-size:0;line-height:1.5}.menu-add-label:after{content:attr(data-short-label);font-size:12px;font-weight:700}
  .menu-tools{gap:8px}.menu-tools>[data-menu-action=groups]{display:flex;align-items:center;justify-content:center;gap:0;padding:0;min-width:44px;height:44px}.menu-tools>[data-menu-action=groups]>span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
  .menu-approved-filters>summary{display:flex;align-items:center;justify-content:center;gap:0;height:44px;padding:0}
  .promo-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
@@ -43,7 +43,7 @@
  .menu-approved-categories{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px 12px;align-items:center;margin:2px 0 4px;min-width:0}
  .menu-approved-categories>p{display:block;grid-column:1;grid-row:1;padding:0;margin:0;font-size:12px;font-weight:750;color:var(--admin-text)}
  .menu-approved-categories>.admin-button{grid-column:2;grid-row:1;min-height:44px;padding:8px 10px;margin:0;gap:6px;border:0;background:transparent;color:var(--admin-muted);font-size:12px;justify-self:end}
- .menu-approved-categories>.admin-button>span{font-size:0}.menu-approved-categories>.admin-button>span:after{content:'Gérer';font-size:12px}.menu-approved-categories>.admin-button svg{width:15px;height:15px}
+ .menu-approved-categories>.admin-button>span{font-size:0}.menu-approved-categories>.admin-button:after{content:attr(data-short-label);font-size:12px}.menu-approved-categories>.admin-button svg{width:15px;height:15px}
  .menu-category-chips{grid-column:1/-1;grid-row:2;flex-direction:row;gap:7px;min-width:0;width:100%;padding:3px 3px 6px;overflow-x:auto;overscroll-behavior-x:contain;scroll-behavior:smooth;scroll-padding-inline:4px;-webkit-overflow-scrolling:touch}
  .menu-category-chips .admin-button{flex:0 0 auto;min-height:44px;max-width:calc(100% - 8px);padding:9px 12px;border:1px solid #e0e3e8;border-radius:10px;background:white;color:#626773;font-size:12px;font-weight:650;white-space:normal;overflow-wrap:anywhere;gap:0}
  .menu-category-chips .admin-button[aria-pressed=true]{background:#fff0e7;border-color:#edc2aa;color:#a63b0b;font-weight:800}

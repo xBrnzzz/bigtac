@@ -1,3 +1,4 @@
+import { setUiText, uiText, uiBinding, uiMarkup } from './i18n.js';
 import {db,doc,getDoc,collection,query,onSnapshot} from '../firebase-config.js';
 import {limit} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import {operationsService} from './operations-service.js';
@@ -8,7 +9,7 @@ const e=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt
 export function createPromotions({session,toast,upload,settings}){
     const service=operationsService(session),$=id=>document.getElementById(id);let stop=null,timer=null,rows=[],expected=null,groups=[],extras=[],busy=false,blocked=true,epoch=0;
     const feedback=document.createElement('p');feedback.id='promo-feedback';feedback.setAttribute('role','status');$('promotions-list').before(feedback);
-    const schedule=document.createElement('section');schedule.className='promo-schedule';schedule.dataset.promoPanel='publish';schedule.hidden=true;schedule.innerHTML='<h4>Publication et calendrier</h4><p>Choisissez la visibilité et les dates de votre offre.</p><label class="editor-publication"><input type="checkbox" id="promo-visible" checked><span>Publié sur la carte</span></label><p>Dates facultatives · fuseau du restaurant</p><label>Début<input id="promo-start" name="promotion-start" type="datetime-local" class="w-full p-3 border rounded-xl"></label><label>Fin<input id="promo-end" name="promotion-end" type="datetime-local" class="w-full p-3 border rounded-xl"></label>';$('promo-form').append(schedule);
+    const schedule=document.createElement('section');schedule.className='promo-schedule';schedule.dataset.promoPanel='publish';schedule.hidden=true;schedule.innerHTML="<h4 data-ui-copy=\"Publication et calendrier\">Publication et calendrier</h4><p data-ui-copy=\"Choisissez la visibilité et les dates de votre offre.\">Choisissez la visibilité et les dates de votre offre.</p><label class=\"editor-publication\"><input type=\"checkbox\" id=\"promo-visible\" checked><span data-ui-copy=\"Publié sur la carte\">Publié sur la carte</span></label><p data-ui-copy=\"Dates facultatives · fuseau du restaurant\">Dates facultatives · fuseau du restaurant</p><label data-ui-copy=\"Début\">Début<input id=\"promo-start\" name=\"promotion-start\" type=\"datetime-local\" class=\"w-full p-3 border rounded-xl\"></label><label data-ui-copy=\"Fin\">Fin<input id=\"promo-end\" name=\"promotion-end\" type=\"datetime-local\" class=\"w-full p-3 border rounded-xl\"></label>";$('promo-form').append(schedule);
     let baseline=null;
     const editorValue=()=>JSON.stringify([...$('promo-form').querySelectorAll('input,select:not([data-preset]),textarea')].map(field=>field.type==='file'?[...field.files].map(file=>[file.name,file.size,file.lastModified]):field.type==='checkbox'?field.checked:field.value));
     const isDirty=()=>!$('promo-editor').classList.contains('hidden')&&baseline!==null&&editorValue()!==baseline;
@@ -30,10 +31,10 @@ export function createPromotions({session,toast,upload,settings}){
         $('promo-form').querySelectorAll('[aria-invalid]').forEach(el=>{el.removeAttribute('aria-invalid');const description=(el.getAttribute('aria-describedby')||'').split(' ').filter(id=>id&&id!=='promo-field-error').join(' ');if(description)el.setAttribute('aria-describedby',description);else el.removeAttribute('aria-describedby');});
     }
     function showError(message,target=null){
-        clearError();const error=$('promo-edit-error');error.hidden=!!target;error.textContent=message;
+        clearError();const error=$('promo-edit-error');error.hidden=!!target;setUiText(error,message);
         if(target){
             switchSection(target.closest('[data-promo-panel]').dataset.promoPanel);
-            const inline=document.createElement('p');inline.id='promo-field-error';inline.className='editor-field-error';inline.textContent=message;
+            const inline=document.createElement('p');inline.id='promo-field-error';inline.className='editor-field-error';setUiText(inline,message);
             (target.closest('.promo-identity-fields')||target).after(inline);target.setAttribute('aria-invalid','true');target.setAttribute('aria-describedby',[target.getAttribute('aria-describedby'),inline.id].filter(Boolean).join(' '));
         }
         const focus=target||error;focus.focus({preventScroll:true});focus.scrollIntoView({block:'center'});
@@ -62,9 +63,9 @@ export function createPromotions({session,toast,upload,settings}){
         const selected=$('promo-image-file').files[0],hasPhoto=!!(selected||$('promo-image-url').value);
         if(!selected){
             if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;$('promo-image-preview').replaceChildren();
-            if($('promo-image-url').value){const image=document.createElement('img');image.src=$('promo-image-url').value;image.alt='Aperçu de la promotion';$('promo-image-preview').append(image);}
+            if($('promo-image-url').value){const image=document.createElement('img');image.src=$('promo-image-url').value;image.alt=image.dataset.uiAlt='Aperçu de la promotion';$('promo-image-preview').append(image);}
         }
-        $('promo-photo-button').textContent=hasPhoto?'Remplacer la photo':'Ajouter une photo';
+        setUiText($('promo-photo-button'), hasPhoto?'Remplacer la photo':'Ajouter une photo');
         $('promo-photo-frame').setAttribute('aria-label',hasPhoto?'Remplacer la photo de la promotion':'Ajouter la photo de la promotion');
         $('promo-photo-filename').textContent=selected?.name||(hasPhoto?'Photo actuelle':'Aucun fichier sélectionné');
     }
@@ -72,7 +73,7 @@ export function createPromotions({session,toast,upload,settings}){
         const file=$('promo-image-file').files[0];if(!file)return;
         const issue=imageIssue(file);if(issue){$('promo-image-file').value='';photoState();showError(issue,$('promo-image-file'));return;}
         clearError();if(previewURL)URL.revokeObjectURL(previewURL);previewURL=URL.createObjectURL(file);
-        const image=document.createElement('img');image.src=previewURL;image.alt='Aperçu de la promotion';$('promo-image-preview').replaceChildren(image);photoState();
+        const image=document.createElement('img');image.src=previewURL;image.alt=image.dataset.uiAlt='Aperçu de la promotion';$('promo-image-preview').replaceChildren(image);photoState();
     });
     $('promo-form').addEventListener('input',event=>{
         if(event.target.hasAttribute('aria-invalid'))clearError();
@@ -86,36 +87,36 @@ export function createPromotions({session,toast,upload,settings}){
             return `<article class="promo-entry">
                 <div class="promo-art">${p.imageUrl?`<img src="${e(p.imageUrl)}" alt="" loading="lazy">`:icon('image')}</div>
                 <div class="promo-entry-body">
-                    <span class="promo-entry-state" data-state="${e(state)}">${e(stateLabels[state])}</span>
+                    <span class="promo-entry-state" data-state="${e(state)}">${uiMarkup(stateLabels[state])}</span>
                     <h3>${e(p.name)}</h3>
                     ${p.description?`<p class="promo-entry-description">${e(p.description)}</p>`:''}
-                    ${p.startsAt||p.endsAt?`<p class="promo-entry-schedule">${icon('clock')}<span>${[p.startsAt?'Début : '+dateText(p.startsAt):'',p.endsAt?'Fin : '+dateText(p.endsAt):''].filter(Boolean).join(' / ')}</span></p>`:''}
+                    ${p.startsAt||p.endsAt?`<p class="promo-entry-schedule">${icon('clock')}<span>${[p.startsAt?uiMarkup('Début')+' : '+dateText(p.startsAt):'',p.endsAt?uiMarkup('Fin')+' : '+dateText(p.endsAt):''].filter(Boolean).join(' / ')}</span></p>`:''}
                 </div>
                 <strong class="promo-entry-price">${e(p.price)} <small>DH</small></strong>
-                <div class="promo-actions">${actions.map(([action,label,glyph])=>`<button type="button" class="admin-button" data-promo-action="${action}" data-id="${e(p.id)}" aria-label="${e(label)}" title="${e(label)}" ${busy||blocked?'disabled':''}>${icon(glyph)}<span class="sr-only">${label}</span></button>`).join('')}</div>
+                <div class="promo-actions">${actions.map(([action,label,glyph])=>`<button type="button" class="admin-button" data-promo-action="${action}" data-id="${e(p.id)}" aria-label="${e(label)}" title="${e(label)}" data-ui-aria-label="${e(label)}" data-ui-title="${e(label)}" ${busy||blocked?'disabled':''}>${icon(glyph)}<span class="sr-only" ${uiBinding(label)}>${e(label)}</span></button>`).join('')}</div>
             </article>`;
         });
-        $('promotions-list').innerHTML=labels.join('')||(blocked?'':'<div class="menu-empty"><h3>Aucune offre enregistrée.</h3></div>');
+        $('promotions-list').innerHTML=labels.join('')||(blocked?'':"<div class=\"menu-empty\"><h3 data-ui-copy=\"Aucune offre enregistrée.\">Aucune offre enregistrée.</h3></div>");
     }
     function draw(){
-        const option=(o,path)=>`<div class="promo-option-fields"><label>Option<input aria-label="Nom de l’option" class="p-2 border rounded-xl min-w-0" data-pfield="${path}.name" value="${e(o.name)}"></label><label>Prix + DH<input aria-label="Prix de l’option" class="p-2 border rounded-xl w-24" type="number" min="0" step="0.01" data-pfield="${path}.price" value="${e(o.price)}"></label></div>`;
+        const option=(o,path)=>`<div class="promo-option-fields"><label data-ui-copy="Option">Option<input aria-label="Nom de l’option" class="p-2 border rounded-xl min-w-0" data-pfield="${path}.name" value="${e(o.name)}" data-ui-aria-label="Nom de l’option"></label><label data-ui-copy="Prix + DH">Prix + DH<input aria-label="Prix de l’option" class="p-2 border rounded-xl w-24" type="number" min="0" step="0.01" data-pfield="${path}.price" value="${e(o.price)}" data-ui-aria-label="Prix de l’option"></label></div>`;
         $('promo-container-choices').innerHTML=groups.map((g,i)=>`<fieldset class="menu-choice-group" data-promo-group="${i}">
             <legend>Groupe ${i+1}</legend>
             <div class="menu-group-config">
-                <label>Nom du groupe<input data-pfield="g.${i}.title" value="${e(g.title)}"></label>
-                <label>Règle de sélection<select data-preset="${i}">${selectionPresets.map(([key,label])=>`<option value="${key}">${label}</option>`).join('')}</select></label>
+                <label data-ui-copy="Nom du groupe">Nom du groupe<input data-pfield="g.${i}.title" value="${e(g.title)}"></label>
+                <label data-ui-copy="Règle de sélection">Règle de sélection<select data-preset="${i}">${selectionPresets.map(([key,label])=>`<option value="${key}" ${uiBinding(label)}>${label}</option>`).join('')}</select></label>
             </div>
             <p class="menu-rule-summary" data-rule-summary></p>
-            <details class="menu-rule-details"><summary>Ajuster</summary><div class="menu-rule-fields">
-                <label>Type de choix<select data-pfield="g.${i}.type"><option value="radio" ${g.type==='radio'?'selected':''}>Choix unique</option><option value="checkbox" ${g.type==='checkbox'?'selected':''}>Choix multiple</option></select></label>
-                <label>Minimum requis<input type="number" min="0" data-pfield="g.${i}.min" value="${e(g.min)}"></label>
-                <label>Maximum<input type="number" min="0" data-pfield="g.${i}.max" value="${e(g.max)}"></label>
-            </div><p class="menu-help">Minimum 0 : facultatif. Maximum 0 : toutes les options, pour un choix multiple.</p></details>
+            <details class="menu-rule-details"><summary data-ui-copy="Ajuster">Ajuster</summary><div class="menu-rule-fields">
+                <label data-ui-copy="Type de choix">Type de choix<select data-pfield="g.${i}.type"><option value="radio" ${g.type==='radio'?'selected':''} data-ui-copy="Choix unique">Choix unique</option><option value="checkbox" ${g.type==='checkbox'?'selected':''} data-ui-copy="Choix multiple">Choix multiple</option></select></label>
+                <label data-ui-copy="Minimum requis">Minimum requis<input type="number" min="0" data-pfield="g.${i}.min" value="${e(g.min)}"></label>
+                <label data-ui-copy="Maximum">Maximum<input type="number" min="0" data-pfield="g.${i}.max" value="${e(g.max)}"></label>
+            </div><p class="menu-help" data-ui-copy="Minimum 0 : facultatif. Maximum 0 : toutes les options, pour un choix multiple.">Minimum 0 : facultatif. Maximum 0 : toutes les options, pour un choix multiple.</p></details>
             <div class="menu-group-options">${(g.options||[]).map((o,j)=>`<div class="promo-choice-option">${option(o,`g.${i}.options.${j}`)}<button type="button" class="admin-button" aria-label="Retirer l’option ${e(o.name||j+1)}" data-pedit="option-remove" data-i="${i}" data-j="${j}">${icon('trash')}</button></div>`).join('')}</div>
-            <div class="menu-group-footer"><button type="button" class="admin-button" data-pedit="option" data-i="${i}">Ajouter une option</button><button type="button" class="admin-button" aria-label="Retirer le groupe ${i+1}" data-pedit="remove" data-i="${i}">${icon('trash')}</button></div>
+            <div class="menu-group-footer"><button type="button" class="admin-button" data-pedit="option" data-i="${i}" data-ui-copy="Ajouter une option">Ajouter une option</button><button type="button" class="admin-button" aria-label="Retirer le groupe ${i+1}" data-pedit="remove" data-i="${i}">${icon('trash')}</button></div>
         </fieldset>`).join('');
         groups.forEach((group,i)=>updateRule($('promo-container-choices').children[i],group));
-        $('promo-container-supplements').innerHTML=extras.map((o,i)=>`<div>${option(o,`s.${i}`)}<button type="button" data-pedit="extra-remove" data-i="${i}">Retirer</button></div>`).join('');
+        $('promo-container-supplements').innerHTML=extras.map((o,i)=>`<div>${option(o,`s.${i}`)}<button type="button" data-pedit="extra-remove" data-i="${i}" data-ui-copy="Retirer">Retirer</button></div>`).join('');
     }
     function updateRule(panel,group){
         panel.querySelector('[data-preset]').value=group.type==='radio'&&Number(group.min??1)===0?'custom':selectionPreset(group);
@@ -167,7 +168,7 @@ export function createPromotions({session,toast,upload,settings}){
         const version=++epoch;$('promo-form').reset();$('promo-image-url').value='';expected=null;groups=[];extras=[];draw();clearError();$('edit-promo-id').value=id||'';$('promo-image-preview').replaceChildren();photoState();$('promo-editor').classList.remove('hidden');switchSection('basic');$('btn-save-promo').disabled=!!id;
         baseline=editorValue();
         if(id)try{const snap=await getDoc(doc(db,'promotions',id));if(version!==epoch||!allowed())return;if(!snap.exists()||snap.metadata?.fromCache)throw Error('Offre introuvable ou non confirmée.');expected={...snap.data(),id};for(const [field,key]of [['promo-name','name'],['promo-price','price'],['promo-desc','description'],['promo-image-url','imageUrl']])$(field).value=expected[key]??'';$('promo-visible').checked=expected.isVisible!==false;$('promo-start').value=localInput(expected.startsAt,zone());$('promo-end').value=localInput(expected.endsAt,zone());groups=copy(expected.mandatoryChoices||[]);extras=copy(expected.supplements||[]);draw();photoState();}catch(error){showError(error.message);return;}
-        if(version===epoch){baseline=editorValue();$('promo-editor-title').textContent=id?'Modifier la promotion':'Nouvelle promotion';$('btn-save-promo').disabled=false;}
+        if(version===epoch){baseline=editorValue();setUiText($('promo-editor-title'), id?'Modifier la promotion':'Nouvelle promotion');$('btn-save-promo').disabled=false;}
     }
     function close(force=false){if(!force&&!canLeave())return false;++epoch;$('promo-editor').classList.add('hidden');if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;expected=null;baseline=null;return true;}
     async function save(){
@@ -181,7 +182,13 @@ export function createPromotions({session,toast,upload,settings}){
             await service.offer({id:expected?.id||newId(),patch,expected});toast('Offre enregistrée.');busy=false;close(true);
         }catch(error){if(version===epoch){showError(error.message,errorTarget);if(!errorTarget)toast(error.message,'error');}}finally{busy=false;$('btn-save-promo').disabled=false;render();}
     }
-    $('promotions-list').addEventListener('click',async event=>{const b=event.target.closest('[data-promo-action]');if(!b||busy||blocked||!allowed())return;const p=rows.find(row=>row.id===b.dataset.id);if(!p)return;if(b.dataset.promoAction==='edit')return open(p.id);if(b.dataset.promoAction==='delete'&&!confirm('Supprimer cette offre ? Les commandes passées restent inchangées.'))return;busy=true;render();try{if(b.dataset.promoAction==='duplicate'){const patch=copy(p);delete patch.id;patch.name+=' (copie)';patch.isVisible=false;await service.offer({id:newId(),patch});}else await service.offer({id:p.id,expected:p,remove:b.dataset.promoAction==='delete',patch:{isVisible:p.isVisible===false}});toast('Offre mise à jour.');}catch(error){toast(error.message,'error');}finally{busy=false;render();}});
-    function start(){if(stop)return;blocked=true;feedback.textContent='Chargement…';stop=onSnapshot(query(collection(db,'promotions'),limit(301)),{includeMetadataChanges:true},snap=>{blocked=!!(snap.metadata?.fromCache||snap.metadata?.hasPendingWrites)||snap.docs.length>300;rows=snap.docs.slice(0,300).map(d=>({...d.data(),id:d.id}));feedback.textContent=blocked?'Offres non confirmées ou liste partielle. Édition indisponible.':'Offres synchronisées.';render();},()=>{blocked=true;feedback.innerHTML='Lecture impossible. <button class="admin-button" id="promo-retry">Réessayer</button>';$('promo-retry').onclick=()=>{stop?.();stop=null;start();};render();});timer=setInterval(render,30000);}
+    $('promotions-list').addEventListener('click',async event=>{const b=event.target.closest('[data-promo-action]');if(!b||busy||blocked||!allowed())return;const p=rows.find(row=>row.id===b.dataset.id);if(!p)return;if(b.dataset.promoAction==='edit')return open(p.id);if(b.dataset.promoAction==='delete'&&!confirm(uiText('Supprimer cette offre ? Les commandes passées restent inchangées.')))return;busy=true;render();try{if(b.dataset.promoAction==='duplicate'){const patch=copy(p);delete patch.id;patch.name+=' (copie)';patch.isVisible=false;await service.offer({id:newId(),patch});}else await service.offer({id:p.id,expected:p,remove:b.dataset.promoAction==='delete',patch:{isVisible:p.isVisible===false}});toast('Offre mise à jour.');}catch(error){toast(error.message,'error');}finally{busy=false;render();}});
+    function start(){if(stop)return;blocked=true;setUiText(feedback, 'Chargement…');stop=onSnapshot(query(collection(db,'promotions'),limit(301)),{includeMetadataChanges:true},snap=>{blocked=!!(snap.metadata?.fromCache||snap.metadata?.hasPendingWrites)||snap.docs.length>300;rows=snap.docs.slice(0,300).map(d=>({...d.data(),id:d.id}));setUiText(feedback, blocked?'Offres non confirmées ou liste partielle. Édition indisponible.':'Offres synchronisées.');render();},()=>{blocked=true;feedback.innerHTML="Lecture impossible. <button class=\"admin-button\" id=\"promo-retry\" data-ui-copy=\"Réessayer\">Réessayer</button>";$('promo-retry').onclick=()=>{stop?.();stop=null;start();};render();});timer=setInterval(render,30000);}
+    window.addEventListener('bigtac:langchange', () => {
+        for(const panel of $('promo-container-choices').querySelectorAll('[data-promo-group]')) {
+            const group=groups[Number(panel.dataset.promoGroup)];
+            if(group)updateRule(panel,group);
+        }
+    });
     return {start,stop(){++epoch;stop?.();stop=null;clearInterval(timer);blocked=true;close(true);},open,save,close,canLeave,switchSection};
 }

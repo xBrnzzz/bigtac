@@ -1,3 +1,4 @@
+import { uiMarkup, setUiText, uiText, i18n } from './i18n.js';
 import {db,collection,query,where,getDocs} from '../firebase-config.js';
 import {limit} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import {operationsService} from './operations-service.js';
@@ -11,14 +12,14 @@ const serviceIcon = type => type === 'livraison' ? 'truck' : type === 'emporter'
 
 export function createOrderWorkspace(root,{session,settings,toast}) {
     root.className='orders-workspace hidden';
-    root.innerHTML=`<header class="orders-heading"><div><h2 id="orders-title">Commandes<span> en direct</span></h2></div><div class="orders-utilities"><button id="orders-sound" class="admin-button" aria-pressed="false">${icon('sound')}<span>Son désactivé</span></button><button id="orders-refresh" class="admin-button">${icon('refresh')}Actualiser</button></div></header>
-        <div class="orders-toolbar"><div class="orders-control-row"><div class="orders-mode" role="group" aria-label="Présentation des commandes"><button id="orders-mode-service" aria-pressed="true">${icon('shopping-bag')}Service</button><button id="orders-mode-kitchen" aria-pressed="false">${icon('chef')}Cuisine</button></div><span id="orders-connection" role="status">Chargement…</span><span id="orders-period" class="orders-period"></span></div>
-        <div class="orders-search-row"><label class="orders-search"><span class="sr-only">Rechercher un numéro de commande</span>${icon('search')}<input id="orders-search" type="search" placeholder="Rechercher un numéro…" autocomplete="off" name="order-search"></label><button id="orders-filters-toggle" class="admin-button" aria-expanded="false" aria-controls="orders-filters">${icon('filter')}Filtres</button></div></div>
-        <div id="orders-filters" class="orders-filters" hidden><label>Service<select id="orders-service"><option value="all">Tous les services</option><option value="livraison">Livraison</option><option value="emporter">À emporter</option><option value="sur_place">Sur place</option></select></label><label>Statut<select id="orders-status"><option value="all">Tous les statuts</option><option value="pending">En attente</option><option value="confirmed">En cuisine</option><option value="en_livraison">Prêt / livraison</option><option value="history">Terminées</option><option value="delivered">Remises / livrées</option><option value="rejected">Refusées</option><option value="ready">Prêtes (ancien statut)</option></select></label><label>Date de réception<input id="orders-date" type="date" name="order-date"></label><label>Repère local (min)<input id="orders-threshold" type="number" min="0" max="240" step="1" value="0" inputmode="numeric"><small>0 : aucun avertissement. Repère local depuis réception, pas délai de cuisson.</small></label><button id="orders-clear" class="admin-button">Effacer les filtres</button></div>
-        <div id="orders-notification" class="orders-notification" role="status" hidden>${icon('bell')}<span></span><button class="admin-button" id="orders-show-new">Voir les nouvelles</button></div>
+    root.innerHTML=`<header class="orders-heading"><div><h2 id="orders-title" data-ui-copy="Commandes">Commandes</h2></div><div class="orders-utilities"><button id="orders-sound" class="admin-button" aria-pressed="false">${icon('sound')}<span data-ui-copy="Son désactivé">Son désactivé</span></button><button id="orders-refresh" class="admin-button" data-ui-copy="Actualiser">${icon('refresh')}Actualiser</button></div></header>
+        <div class="orders-toolbar"><div class="orders-control-row"><div class="orders-mode" role="group" aria-label="Présentation des commandes" data-ui-aria-label="Présentation des commandes"><button id="orders-mode-service" aria-pressed="true" data-ui-copy="Service">${icon('shopping-bag')}Service</button><button id="orders-mode-kitchen" aria-pressed="false" data-ui-copy="Cuisine">${icon('chef')}Cuisine</button></div><span id="orders-connection" role="status" data-ui-copy="Chargement…">Chargement…</span><span id="orders-period" class="orders-period"></span></div>
+        <div class="orders-search-row"><label class="orders-search"><span class="sr-only" data-ui-copy="Rechercher un numéro de commande">Rechercher un numéro de commande</span>${icon('search')}<input id="orders-search" type="search" placeholder="Rechercher un numéro…" autocomplete="off" name="order-search" data-ui-placeholder="Rechercher un numéro…"></label><button id="orders-filters-toggle" class="admin-button" aria-expanded="false" aria-controls="orders-filters" data-ui-copy="Filtres">${icon('filter')}Filtres</button></div></div>
+        <div id="orders-filters" class="orders-filters" hidden><label data-ui-copy="Service">Service<select id="orders-service"><option value="all" data-ui-copy="Tous les services">Tous les services</option><option value="livraison" data-ui-copy="Livraison">Livraison</option><option value="emporter" data-ui-copy="À emporter">À emporter</option><option value="sur_place" data-ui-copy="Sur place">Sur place</option></select></label><label data-ui-copy="Statut">Statut<select id="orders-status"><option value="all" data-ui-copy="Tous les statuts">Tous les statuts</option><option value="pending" data-ui-copy="En attente">En attente</option><option value="confirmed" data-ui-copy="En cuisine">En cuisine</option><option value="en_livraison" data-ui-copy="Prêt / livraison">Prêt / livraison</option><option value="history" data-ui-copy="Terminées">Terminées</option><option value="delivered" data-ui-copy="Remises / livrées">Remises / livrées</option><option value="rejected" data-ui-copy="Refusées">Refusées</option><option value="ready" data-ui-copy="Prêtes (ancien statut)">Prêtes (ancien statut)</option></select></label><label data-ui-copy="Date de réception">Date de réception<input id="orders-date" type="date" name="order-date"></label><label data-ui-copy="Repère local (min)">Repère local (min)<input id="orders-threshold" type="number" min="0" max="240" step="1" value="0" inputmode="numeric"><small data-ui-copy="0 : aucun avertissement. Repère local depuis réception, pas délai de cuisson.">0 : aucun avertissement. Repère local depuis réception, pas délai de cuisson.</small></label><button id="orders-clear" class="admin-button" data-ui-copy="Effacer les filtres">Effacer les filtres</button></div>
+        <div id="orders-notification" class="orders-notification" role="status" hidden>${icon('bell')}<span></span><button class="admin-button" id="orders-show-new" data-ui-copy="Voir les nouvelles">Voir les nouvelles</button></div>
         <div id="orders-error" class="orders-feedback" role="alert" hidden></div><div id="orders-summary" class="orders-summary" role="status"></div>
-        <nav class="orders-tabs" aria-label="Files de commandes">${ORDER_COLUMNS.map(column=>`<button id="mtab-${column.id}" data-tab="${column.id}" data-tone="${column.tone}" aria-pressed="${column.id==='pending'}">${icon(queueIcon(column.id))}${column.label} <span id="count-${column.id}">—</span></button>`).join('')}</nav>
-        <div class="orders-board">${ORDER_COLUMNS.map(column=>`<section id="col-${column.id}" class="orders-column" data-column="${column.id}" data-tone="${column.tone}" aria-labelledby="order-heading-${column.id}"><header><div><h3 id="order-heading-${column.id}" tabindex="-1">${icon(queueIcon(column.id))}${column.label}</h3><p>${column.hint}</p></div><span data-count="${column.id}" aria-label="Commandes affichées">—</span></header><div id="list-${column.id}" class="orders-list"></div>${column.id==='history'?'<footer><button id="orders-history-more" class="admin-button">Charger l’historique</button><p id="orders-history-note">7 derniers jours. Chargement à la demande.</p></footer>':''}</section>`).join('')}</div>`;
+        <nav class="orders-tabs" aria-label="Files de commandes" data-ui-aria-label="Files de commandes">${ORDER_COLUMNS.map(column=>`<button id="mtab-${column.id}" data-tab="${column.id}" data-tone="${column.tone}" aria-pressed="${column.id==='pending'}">${icon(queueIcon(column.id))}${uiMarkup(column.label)} <span id="count-${column.id}">—</span></button>`).join('')}</nav>
+        <div class="orders-board">${ORDER_COLUMNS.map(column=>`<section id="col-${column.id}" class="orders-column" data-column="${column.id}" data-tone="${column.tone}" aria-labelledby="order-heading-${column.id}"><header><div><h3 id="order-heading-${column.id}" tabindex="-1">${icon(queueIcon(column.id))}${uiMarkup(column.label)}</h3><p>${uiMarkup(column.hint)}</p></div><span data-count="${column.id}" aria-label="Commandes affichées" data-ui-aria-label="Commandes affichées">—</span></header><div id="list-${column.id}" class="orders-list"></div>${column.id==='history'?"<footer><button id=\"orders-history-more\" class=\"admin-button\" data-ui-copy=\"Charger l’historique\">Charger l’historique</button><p id=\"orders-history-note\" data-ui-copy=\"7 derniers jours. Chargement à la demande.\">7 derniers jours. Chargement à la demande.</p></footer>":''}</section>`).join('')}</div>`;
     const toolbar=root.querySelector('.orders-toolbar');
     toolbar.append(root.querySelector('.orders-utilities'));
     const metadata=document.createElement('div');metadata.className='orders-metadata';
@@ -32,7 +33,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     root.querySelector('#orders-refresh').setAttribute('aria-label','Actualiser les commandes');
     for(const [id,title] of [['orders-refresh','Actualiser'],['orders-sound','Notifications sonores'],['orders-filters-toggle','Filtres'],['orders-mode-service','Service'],['orders-mode-kitchen','Cuisine']])root.querySelector('#'+id).title=title;
     const dialog=document.createElement('dialog'); dialog.id='order-detail'; dialog.className='order-detail'; dialog.setAttribute('aria-labelledby','order-detail-title');
-    dialog.innerHTML=`<header><div><p>Détail de commande</p><h2 id="order-detail-title"></h2></div><button id="order-detail-close" class="admin-icon-button" aria-label="Fermer le détail">${icon('x')}</button></header><div id="order-detail-body" class="order-detail-body"></div><footer id="order-detail-actions"></footer>`;
+    dialog.innerHTML=`<header><div><p data-ui-copy="Détail de commande">Détail de commande</p><h2 id="order-detail-title"></h2></div><button id="order-detail-close" class="admin-icon-button" aria-label="Fermer le détail" data-ui-aria-label="Fermer le détail">${icon('x')}</button></header><div id="order-detail-body" class="order-detail-body"></div><footer id="order-detail-actions"></footer>`;
     document.body.append(dialog);
     const receipt=document.createElement('section'); receipt.id='order-print-receipt'; receipt.hidden=true; document.body.append(receipt);
     let active=[],historyOrders=[],historyCursor=null,hasMore=true,historyLoaded=false,historyBusy=false,historyError='',historyRequest=0;
@@ -43,48 +44,48 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     const assignments=operationsService(session);
     const pending=new Map(),failures=new Map(),cards=new Map();
     const $=id=>document.getElementById(id);
-    const money=order=>e(orderAmount(order.total));
+    const money=order=>e(uiText(orderAmount(order.total)));
     const knownOrder=id=>selected?.id===id ? selected : active.find(order=>order.id===id)||historyOrders.find(order=>order.id===id);
     const profile=()=>session();
     const canContact=()=>enabled&&!kitchen&&['admin','manager'].includes(profileRole(profile()));
     function contactMarkup(order) {
         if(!canContact())return '';
         const phone=customerPhone(order.customer?.phone),map=deliveryMap(order);
-        const link=(kind,href,label,glyph,title)=>`<a class="order-contact-link ${kind}" data-order-contact="${kind}" href="${e(href)}" ${kind==='call'?'':'target="_blank" rel="noopener noreferrer"'} title="${e(title)}">${icon(glyph)}<span>${label}</span></a>`;
+        const link=(kind,href,label,glyph,title)=>`<a class="order-contact-link ${kind}" data-order-contact="${kind}" href="${e(href)}" ${kind==='call'?'':'target="_blank" rel="noopener noreferrer"'} title="${e(uiText(title))}">${icon(glyph)}${uiMarkup(label)}</a>`;
         const links=(phone?link('whatsapp','https://wa.me/'+phone.slice(1),'WhatsApp','message','Conversation WhatsApp du client')+link('call','tel:'+phone,'Appeler','phone','Appeler le client'):'')+(map?link('maps',map.url,map.kind==='gps'?'GPS / Maps':'Adresse','pin',map.kind==='gps'?'Coordonnées GPS fournies par le client — position à confirmer':'Rechercher l’adresse dans Google Maps — emplacement à confirmer'):'');
         return links?`<nav class="order-contact-actions" aria-label="Contacter le client de la commande #${e(orderNumber(order))}">${links}</nav>`:'';
     }
     function config() { timezone=reportingTimezone(settings()?.reportingTimezone); }
-    function clock(date,full=false) { return date ? new Intl.DateTimeFormat('fr-MA',{timeZone:timezone,...(full?{dateStyle:'medium',timeStyle:'short'}:{hour:'2-digit',minute:'2-digit',hourCycle:'h23'})}).format(date) : 'Heure non renseignée'; }
-    function table(order) { const value=textValue(order.tableNumber ?? order.table); return value ? `Table ${e(value)}` : ''; }
+    function clock(date,full=false) { return date ? new Intl.DateTimeFormat(i18n.getLang()+'-MA',{timeZone:timezone,...(full?{dateStyle:'medium',timeStyle:'short'}:{hour:'2-digit',minute:'2-digit',hourCycle:'h23'})}).format(date) : uiText('Heure non renseignée'); }
+    function table(order) { const value=textValue(order.tableNumber ?? order.table); return value ? e(uiText('Table {number}', {number:value})) : ''; }
     function canAct() { return enabled && !!profile() && !loading && !cached && !activeError && navigator.onLine; }
     function actionMarkup(order,detail=false) {
         const state=pending.get(order.id),failure=failures.get(order.id),next=nextOrderAction(order),disabled=assignmentBusy || !canAct() || !!state || detail && (detailCached||!!detailError);
-        const primary=next?`<button class="admin-button primary" data-transition="${next.status}" data-service="${e(order.type)}" aria-busy="${!!state}" ${disabled?'disabled':''}>${icon(next.status==='confirmed'?'chef':next.status==='en_livraison'?'package':'check')}${state ? state.waiting?'Confirmation en attente…':'Enregistrement…' : next.label}</button>`:'';
-        return `<div class="order-actions" data-order-id="${e(order.id)}">${primary}${order.status==='pending'?`<button class="admin-button order-reject" data-transition="rejected" ${disabled?'disabled':''}>${icon('x')}<span>Refuser</span></button>`:''}</div>${failure?`<div class="order-operation-error" role="alert"><p>${e(failure.message)}</p>${next && !['conflict','missing','permission','transition'].includes(failure.code)?`<button class="admin-button" data-retry="${e(order.id)}" ${disabled?'disabled':''}>Réessayer</button>`:''}</div>`:''}`;
+        const primary=next?`<button class="admin-button primary" data-transition="${next.status}" data-service="${e(order.type)}" aria-busy="${!!state}" ${disabled?'disabled':''}>${icon(next.status==='confirmed'?'chef':next.status==='en_livraison'?'package':'check')}${state ? state.waiting?uiMarkup('Confirmation en attente…'):uiMarkup('Enregistrement…') : uiMarkup(next.label)}</button>`:'';
+        return `<div class="order-actions" data-order-id="${e(order.id)}">${primary}${order.status==='pending'?`<button class="admin-button order-reject" data-transition="rejected" ${disabled?'disabled':''}>${icon('x')}<span data-ui-copy="Refuser">Refuser</span></button>`:''}</div>${failure?`<div class="order-operation-error" role="alert"><p>${uiMarkup(failure.message)}</p>${next && !['conflict','missing','permission','transition'].includes(failure.code)?`<button class="admin-button" data-retry="${e(order.id)}" ${disabled?'disabled':''} data-ui-copy="Réessayer">Réessayer</button>`:''}</div>`:''}`;
     }
     function itemMarkup(order,detail=false) {
         const items=recordedItems(order);
-        if(!items.length) return '<p class="orders-muted">Détail des produits non renseigné.</p>';
-        return `<ul class="order-products">${items.map(item=>`<li><div class="order-product-title"><strong><span>${e(item.qty)}×</span> ${e(item.name)}</strong>${detail && !kitchen?`<span>${e(orderAmount(item.price))}</span>`:''}</div>${item.options.length?`<p class="order-options"><b>Choix :</b> ${item.options.map(e).join(' · ')}</p>`:''}${item.supplements.length?`<p class="order-options"><b>Suppléments :</b> ${item.supplements.map(e).join(' · ')}</p>`:''}${item.note?`<p class="order-instructions"><b>Instruction produit :</b> ${e(item.note)}</p>`:''}</li>`).join('')}</ul>`;
+        if(!items.length) return "<p class=\"orders-muted\" data-ui-copy=\"Détail des produits non renseigné.\">Détail des produits non renseigné.</p>";
+        return `<ul class="order-products">${items.map(item=>`<li><div class="order-product-title"><strong><span>${e(item.qty)}×</span> ${e(item.name)}</strong>${detail && !kitchen?`<span>${e(uiText(orderAmount(item.price)))}</span>`:''}</div>${item.options.length?`<p class="order-options"><b data-ui-copy="Choix :">Choix :</b> ${item.options.map(e).join(' · ')}</p>`:''}${item.supplements.length?`<p class="order-options"><b data-ui-copy="Suppléments :">Suppléments :</b> ${item.supplements.map(e).join(' · ')}</p>`:''}${item.note?`<p class="order-instructions"><b data-ui-copy="Instruction produit :">Instruction produit :</b> ${e(item.note)}</p>`:''}</li>`).join('')}</ul>`;
     }
-    function noteMarkup(order) { return customerNotes(order).map(note=>`<div class="order-instructions"><b>${icon('note')}Consigne client</b><p>${e(note)}</p></div>`).join(''); }
-    function ageMarkup(order) { const age=orderAge(order,Date.now(),threshold); return `<span class="order-age" data-age-id="${e(order.id)}" data-age-tone="${age.tone}" title="Temps depuis réception">${e(age.label)}${age.tone==='late'?' · repère dépassé':age.tone==='soon'?' · à surveiller':''}</span>`; }
+    function noteMarkup(order) { return customerNotes(order).map(note=>`<div class="order-instructions"><b>${icon('note')}${uiMarkup('Consigne client')}</b><p>${e(note)}</p></div>`).join(''); }
+    function ageMarkup(order) { const age=orderAge(order,Date.now(),threshold); return `<span class="order-age" data-age-id="${e(order.id)}" data-age-tone="${age.tone}" title="Temps depuis réception" data-ui-title="Temps depuis réception">${uiMarkup(age.label)}${age.tone==='late'?uiMarkup(' · repère dépassé'):age.tone==='soon'?uiMarkup(' · à surveiller'):''}</span>`; }
     function cardMarkup(order) {
         const number=e(orderNumber(order)),id=e(order.id);
         return `<div class="order-card-heading">
-            <button class="order-open" data-open="${id}" aria-label="Ouvrir la commande ${number}"><strong dir="ltr">#${number}</strong></button>
+            <button class="order-open" data-open="${id}" aria-label="${e(uiText('Ouvrir la commande {number}', {number:orderNumber(order)}))}"><strong dir="ltr">#${number}</strong></button>
             ${ageMarkup(order)}
         </div>
         <div class="order-ticket-time">
-            <span class="order-service" data-service="${e(order.type)}">${icon(serviceIcon(order.type))}${e(serviceName(order.type))}${table(order)?' · '+table(order):''}</span>
-            <span class="order-status" data-state="${e(order.status)}">${e(statusName(order))}</span>
+            <span class="order-service" data-service="${e(order.type)}">${icon(serviceIcon(order.type))}${uiMarkup(serviceName(order.type))}${table(order)?' · '+table(order):''}</span>
+            <span class="order-status" data-state="${e(order.status)}">${uiMarkup(statusName(order))}</span>
         </div>
         <div class="order-ticket-content">${itemMarkup(order)}${noteMarkup(order)}</div>
         <footer class="order-ticket-footer">
-            ${!kitchen?`<div class="ticket-handoff"><div class="order-card-total"><span>Total enregistré</span><strong>${money(order)}</strong></div>${contactMarkup(order)}</div>`:''}
+            ${!kitchen?`<div class="ticket-handoff"><div class="order-card-total"><span data-ui-copy="Total enregistré">Total enregistré</span><strong>${money(order)}</strong></div>${contactMarkup(order)}</div>`:''}
             ${actionMarkup(order)}
-            <button class="order-detail-link" data-open="${id}" aria-label="Détails et reçu de la commande ${number}" title="Détails et reçu">${icon('arrow')}<span class="sr-only">Détails & reçu</span></button>
+            <button class="order-detail-link" data-open="${id}" aria-label="${e(uiText('Détails et reçu de la commande {number}',{number:orderNumber(order)}))}" title="Détails et reçu" data-ui-title="Détails et reçu">${icon('arrow')}<span class="sr-only" data-ui-copy="Détails &amp; reçu">Détails & reçu</span></button>
         </footer>`;
 
     }
@@ -93,30 +94,31 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
         root.querySelectorAll('[data-age-id]').forEach(element=>{
             const order=knownOrder(element.dataset.ageId); if(!order) return;
             const age=orderAge(order,Date.now(),threshold); element.dataset.ageTone=age.tone;
-            element.textContent=age.label+(age.tone==='late'?' · repère dépassé':age.tone==='soon'?' · à surveiller':'');
+            element.textContent=uiText(age.label)+(age.tone==='late'?uiText(' · repère dépassé'):age.tone==='soon'?uiText(' · à surveiller'):'');
         });
-        if(selected && dialog.open) { const element=$('order-detail-age'); if(element) element.textContent=orderAge(selected,Date.now(),threshold).label; }
+        if(selected && dialog.open) { const element=$('order-detail-age'); if(element) element.textContent=uiText(orderAge(selected,Date.now(),threshold).label); }
     }
     function render() {
         if(!enabled) return;
         config(); root.dataset.tab=tab; root.dataset.kitchen=String(kitchen);
-        $('orders-title').innerHTML=kitchen?'Cuisine':'Commandes<span> en direct</span>';
-        $('orders-connection').textContent=!navigator.onLine?'Hors connexion':activeError?'Synchronisation interrompue':loading?'Chargement…':cached?'Données en cache':'Synchronisé en direct';
+        setUiText($('orders-title'),kitchen?'Cuisine':'Commandes');
+        setUiText($('orders-connection'), !navigator.onLine?'Hors connexion':activeError?'Synchronisation interrompue':loading?'Chargement…':cached?'Données en cache':'Synchronisé en direct');
         $('orders-connection').dataset.live=String(navigator.onLine&&!activeError&&!loading&&!cached);
-        $('orders-period').textContent=`${timezone} · ${threshold ? `repère local ${threshold} min` : `sans seuil de délai`}`;
+        $('orders-period').textContent=`${timezone} · ${threshold ? uiText('repère local {count} min',{count:threshold}) : uiText('sans seuil de délai')}`;
         const problems=[];
         if(activeError) problems.push(activeError);
         if(cached) problems.push('File en cache : les actions attendent la reconnexion et une lecture confirmée.');
-        if(partial) problems.push(`${ORDER_LIMIT} commandes actives affichées. La file dépasse cette limite : les compteurs sont partiels. Faites vérifier la capacité de la file.`);
+        if(partial) problems.push(`${uiText('{count} commandes actives affichées. La file dépasse cette limite : les compteurs sont partiels. Faites vérifier la capacité de la file.',{count:ORDER_LIMIT})}`);
         $('orders-error').dataset.tone=activeError?'error':'attention';
-        $('orders-error').hidden=!problems.length; $('orders-error').textContent=problems.join(' ');
+        $('orders-error').hidden=!problems.length; $('orders-error').textContent=problems.map(problem=>uiText(problem)).join(' ');
         const data=[...active.slice(0,ORDER_LIMIT),...historyOrders.filter(order=>!active.some(current=>current.id===order.id))];
         const filtered=filterOrders(data,{...filter,kitchen},timezone).sort((a,b)=>(timestampDate(a.createdAt)?.getTime()||0)-(timestampDate(b.createdAt)?.getTime()||0));
         const activeKnown=!loading && !activeError;
         const visibleCount=filtered.filter(order=>orderColumn(order.status)===tab).length;
         const known=tab==='history'?historyLoaded:activeKnown;
         const unavailable=tab==='history'?(historyError?'Historique indisponible':'Chargement de l’historique…'):(activeError?'Files indisponibles':'Chargement des files…');
-        $('orders-summary').textContent=known?`${visibleCount} commande${visibleCount===1?'':'s'} affichée${visibleCount===1?'':'s'}${filter.search?' · recherche dans les commandes chargées':''}`:unavailable;
+        const summary=known ? uiText(visibleCount===1?'{count} commande affichée':'{count} commandes affichées',{count:visibleCount}) : uiText(unavailable);
+        $('orders-summary').textContent=summary+(known && filter.search ? ' · '+uiText('recherche dans les commandes chargées') : '');
         $('orders-mode-service').setAttribute('aria-pressed',String(!kitchen)); $('orders-mode-kitchen').setAttribute('aria-pressed',String(kitchen));
         const present=new Set();
         for(const column of ORDER_COLUMNS) {
@@ -130,7 +132,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
             rows.forEach((order,index)=>{
                 present.add(order.id);
                 let card=cards.get(order.id); if(!card) {card=document.createElement('article');card.className='order-card';card.dataset.orderId=order.id;cards.set(order.id,card);}
-                const fingerprint=JSON.stringify([order,kitchen,canContact(),pending.get(order.id),failures.get(order.id),canAct()]);
+                const fingerprint=JSON.stringify([i18n.getLang(),order,kitchen,canContact(),pending.get(order.id),failures.get(order.id),canAct()]);
                 if(card._fingerprint!==fingerprint) {
                     const focused=card.contains(document.activeElement),action=document.activeElement?.dataset.transition;
                     card.innerHTML=cardMarkup(order); card._fingerprint=fingerprint;
@@ -141,13 +143,14 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
             if(!rows.length) {
                 const empty=document.createElement('p');empty.className='orders-queue-empty';
                 empty.textContent=loading && column.id!=='history'?'Chargement…':activeError && column.id!=='history'?'File indisponible. Utilisez Actualiser.':column.id==='history'&&!historyLoaded?'Chargez les commandes terminées à la demande.':filter.search||filter.date||filter.service!=='all'||filter.status!=='all'?'Aucune commande ne correspond aux filtres.':'Aucune commande dans cette file.';
+                setUiText(empty,empty.textContent);
                 empty.insertAdjacentHTML('afterbegin',icon(activeError?'alert':loading?'clock':queueIcon(column.id)));list.append(empty);
             }
         }
         for(const [id,card] of cards) if(!present.has(id)) { const focused=card.contains(document.activeElement);card.remove();cards.delete(id);if(focused) $(`order-heading-${tab}`)?.focus({preventScroll:true}); }
         $('orders-history-more').disabled=historyBusy || !navigator.onLine || historyLoaded&&!hasMore&&!historyError;
-        $('orders-history-more').textContent=historyBusy?'Chargement…':historyError?'Réessayer l’historique':!historyLoaded?'Charger l’historique':hasMore?'Charger davantage':'Historique chargé';
-        $('orders-history-note').textContent=historyError || `${historyOrders.length} chargée(s) · ${filter.date?'date sélectionnée':'7 derniers jours'}${historyLoaded?' · Actualiser pour relire les états.':'.'}`;
+        setUiText($('orders-history-more'), historyBusy?'Chargement…':historyError?'Réessayer l’historique':!historyLoaded?'Charger l’historique':hasMore?'Charger davantage':'Historique chargé');
+        $('orders-history-note').textContent=historyError ? uiText(historyError) : `${uiText('{count} chargée(s)',{count:historyOrders.length})} · ${uiText(filter.date?'date sélectionnée':'7 derniers jours')}${historyLoaded?' · '+uiText('Actualiser pour relire les états.'):'.'}`;
         if(selected && dialog.open) renderDetail();
     }
     function renderDetail() {
@@ -157,11 +160,11 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
         const priorAssignment=$('delivery-assignee');
         const savedDriver=priorAssignment?.dataset.order===order.id && priorAssignment.dataset.assigned===(order.deliveryGuyId||'') ? priorAssignment.value : null;
         const assignmentFocus=['delivery-assignee','delivery-assign'].includes(focused?.id)?focused.id:null;
-        $('order-detail-title').textContent=`Commande #${orderNumber(order)}`;
+        setUiText($('order-detail-title'),'Commande #{number}', {number:orderNumber(order)});
         const milestones=timelineEntries(order);
-        $('order-detail-body').innerHTML=`<div class="order-detail-meta"><span>${e(serviceName(order.type))}${table(order)?` · ${table(order)}`:''}</span><strong>${e(statusName(order))}</strong><span>Reçue ${e(clock(timestampDate(order.createdAt),true))}</span><span>Depuis réception : <b id="order-detail-age">${e(orderAge(order,Date.now(),threshold).label)}</b></span></div>${detailError?`<p class="orders-feedback" role="alert">${e(detailError)}</p>`:''}${detailCached?'<p class="orders-feedback">Détail en cache. Les actions sont suspendues.</p>':''}<section><h3>${icon('chef')}À préparer</h3>${itemMarkup(order,true)}${noteMarkup(order)}</section>${!kitchen?`<section><h3>${icon('package')}Remise de commande</h3><p>${e(textValue(order.customer?.name,'Client'))}</p>${contact&&order.customer?.phone?`<p>Téléphone : ${e(textValue(order.customer.phone))}</p>`:''}${contact&&order.type==='livraison'?`<p>Destination : ${e(textValue(order.location,'Non renseignée'))}</p><p>Livreur : ${e(textValue(order.deliveryGuyName,'Non attribué'))}</p>`:''}<dl class="admin-breakdown"><dt>Total enregistré</dt><dd>${money(order)}</dd><dt>Paiement</dt><dd>Non vérifié</dd></dl></section>`:''}<section><h3>${icon('clock')}Historique enregistré</h3><ul class="order-timeline">${milestones.map(entry=>`<li><span>${e(entry.label)}</span><time>${e(clock(entry.date,true))}</time></li>`).join('')}</ul><p class="orders-muted">Seules les heures enregistrées sont affichées. Aucune durée de cuisson ou preuve d’encaissement n’est déduite.</p></section>`;
+        $('order-detail-body').innerHTML=`<div class="order-detail-meta"><span>${uiMarkup(serviceName(order.type))}${table(order)?` · ${table(order)}`:''}</span><strong>${uiMarkup(statusName(order))}</strong><span>${uiMarkup('Reçue')} ${e(clock(timestampDate(order.createdAt),true))}</span><span data-ui-copy="Depuis réception :">Depuis réception : <b id="order-detail-age">${e(uiText(orderAge(order,Date.now(),threshold).label))}</b></span></div>${detailError?`<p class="orders-feedback" role="alert">${uiMarkup(detailError)}</p>`:''}${detailCached?"<p class=\"orders-feedback\" data-ui-copy=\"Détail en cache. Les actions sont suspendues.\">Détail en cache. Les actions sont suspendues.</p>":''}<section><h3>${icon('chef')}${uiMarkup('À préparer')}</h3>${itemMarkup(order,true)}${noteMarkup(order)}</section>${!kitchen?`<section><h3>${icon('package')}${uiMarkup('Remise de commande')}</h3><p>${e(textValue(order.customer?.name,uiText('Client')))}</p>${contact&&order.customer?.phone?`<p>${uiMarkup('Téléphone :')} ${e(textValue(order.customer.phone))}</p>`:''}${contact&&order.type==='livraison'?`<p>${uiMarkup('Destination :')} ${e(textValue(order.location,uiText('Non renseignée')))}</p><p>${uiMarkup('Livreur :')} ${e(textValue(order.deliveryGuyName,uiText('Non attribué')))}</p>`:''}<dl class="admin-breakdown"><dt data-ui-copy="Total enregistré">Total enregistré</dt><dd>${money(order)}</dd><dt data-ui-copy="Paiement">Paiement</dt><dd data-ui-copy="Non vérifié">Non vérifié</dd></dl></section>`:''}<section><h3>${icon('clock')}${uiMarkup('Historique enregistré')}</h3><ul class="order-timeline">${milestones.map(entry=>`<li><span>${uiMarkup(entry.label)}</span><time>${e(clock(entry.date,true))}</time></li>`).join('')}</ul><p class="orders-muted" data-ui-copy="Seules les heures enregistrées sont affichées. Aucune durée de cuisson ou preuve d’encaissement n’est déduite.">Seules les heures enregistrées sont affichées. Aucune durée de cuisson ou preuve d’encaissement n’est déduite.</p></section>`;
         if(contact&&order.type==='livraison'&&order.status==='en_livraison'){
-            const section=document.createElement('section');section.innerHTML=`<h3>${icon('truck')}Attribution au livreur</h3><p role="status">${e(driverError||(!driverLoaded?'Chargement des livreurs…':'Les attributions précédentes ne constituent pas un historique audité.'))}</p><label for="delivery-assignee">Livreur</label><select id="delivery-assignee" class="admin-button w-full" ${!driverLoaded||assignmentBusy?'disabled':''}><option value="">Sans livreur</option>${deliveryDrivers.map(driver=>`<option value="${e(driver.id)}" ${order.deliveryGuyId===driver.id?'selected':''}>${e(driver.name||'Livreur')}</option>`).join('')}</select><button id="delivery-assign" class="admin-button primary" ${!driverLoaded||assignmentBusy||!canAct()||detailCached||!!detailError?'disabled':''}>${assignmentBusy?'Enregistrement…':'Enregistrer l’attribution'}</button>`;
+            const section=document.createElement('section');section.innerHTML=`<h3>${icon('truck')}${uiMarkup('Attribution au livreur')}</h3><p role="status">${e(uiText(driverError||(!driverLoaded?'Chargement des livreurs…':'Les attributions précédentes ne constituent pas un historique audité.')))}</p><label for="delivery-assignee" data-ui-copy="Livreur">Livreur</label><select id="delivery-assignee" class="admin-button w-full" ${!driverLoaded||assignmentBusy?'disabled':''}><option value="" data-ui-copy="Sans livreur">Sans livreur</option>${deliveryDrivers.map(driver=>`<option value="${e(driver.id)}" ${order.deliveryGuyId===driver.id?'selected':''}>${e(driver.name||uiText('Livreur'))}</option>`).join('')}</select><button id="delivery-assign" class="admin-button primary" ${!driverLoaded||assignmentBusy||!canAct()||detailCached||!!detailError?'disabled':''}>${assignmentBusy?uiMarkup('Enregistrement…'):uiMarkup('Enregistrer l’attribution')}</button>`;
             const select=section.querySelector('select');
             select.dataset.order=order.id;
             select.dataset.assigned=order.deliveryGuyId||'';
@@ -177,7 +180,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
             };
         }
         $('order-detail-body').insertAdjacentHTML('beforeend',contactMarkup(order));
-        $('order-detail-actions').innerHTML=`${actionMarkup(order,true)}<button class="admin-button" id="order-print">${icon('printer')}Imprimer ${kitchen?'le bon cuisine':'le reçu'}</button>`;
+        $('order-detail-actions').innerHTML=`${actionMarkup(order,true)}<button class="admin-button" id="order-print">${icon('printer')}${uiMarkup(kitchen?'Imprimer le bon cuisine':'Imprimer le reçu')}</button>`;
         if(footerFocused) ($('order-detail-actions').querySelector(`[data-transition="${focusedTransition}"]:not(:disabled)`) || $('order-print')).focus({preventScroll:true});
     }
     function openDetail(id) {
@@ -187,8 +190,8 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
         deliveryDrivers=[];driverLoaded=false;driverError='';
         if(selected) renderDetail();
         else {
-            $('order-detail-title').textContent='Commande';
-            $('order-detail-body').innerHTML='<p class="orders-feedback" role="status">Chargement de la commande…</p>';
+            setUiText($('order-detail-title'), 'Commande');
+            $('order-detail-body').innerHTML="<p class=\"orders-feedback\" role=\"status\" data-ui-copy=\"Chargement de la commande…\">Chargement de la commande…</p>";
             $('order-detail-actions').replaceChildren();
         }
         if(!dialog.open) dialog.showModal();
@@ -211,13 +214,13 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
             if(version!==epoch||request!==driverRequest||!enabled||!dialog.open)return;
             detailError=operationMessage(error);
             if(selected)renderDetail();
-            else {$('order-detail-body').innerHTML=`<p class="orders-feedback" role="alert">${e(detailError)}</p>`;}
+            else {$('order-detail-body').innerHTML=`<p class="orders-feedback" role="alert">${uiMarkup(detailError)}</p>`;}
         });
     }
     function printSelected() {
         if(!selected || !enabled || !profile()) return;
         const order=selected,name=textValue(settings()?.restaurantName,'BIGTAC');
-        receipt.innerHTML=`<h1>${e(name)}</h1><h2>${kitchen?'Bon cuisine':'Reçu de commande'} #${e(orderNumber(order))}</h2><p>${e(serviceName(order.type))} ${table(order)}</p><p>${e(clock(timestampDate(order.createdAt),true))}</p>${itemMarkup(order,true)}${noteMarkup(order)}${!kitchen?`<p>Total enregistré : <strong>${money(order)}</strong></p><p>Paiement non vérifié. Ce document ne confirme pas un encaissement.</p>`:''}`;
+        receipt.innerHTML=`<h1>${e(name)}</h1><h2>${kitchen?uiMarkup('Bon cuisine'):uiMarkup('Reçu de commande')} #${e(orderNumber(order))}</h2><p>${uiMarkup(serviceName(order.type))} ${table(order)}</p><p>${e(clock(timestampDate(order.createdAt),true))}</p>${itemMarkup(order,true)}${noteMarkup(order)}${!kitchen?`<p data-ui-copy="Total enregistré :">Total enregistré : <strong>${money(order)}</strong></p><p data-ui-copy="Paiement non vérifié. Ce document ne confirme pas un encaissement.">Paiement non vérifié. Ce document ne confirme pas un encaissement.</p>`:''}`;
         window.print();
     }
     async function changeStatus(id,next,explicitExpected) {
@@ -277,7 +280,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     $('orders-sound').onclick=async()=>{
         try {if(!sound){const Context=window.AudioContext||window.webkitAudioContext;if(!Context)throw Error();audio ||=new Context();await audio.resume();if(audio.state!=='running')throw Error();}sound=!sound;}
         catch{sound=false;toast('Le son n’est pas disponible. Les alertes visuelles restent actives.','error');}
-        $('orders-sound').querySelector('span').textContent=sound?'Son activé':'Son désactivé';$('orders-sound').setAttribute('aria-pressed',String(sound));
+        setUiText($('orders-sound').querySelector('span'), sound?'Son activé':'Son désactivé');$('orders-sound').setAttribute('aria-pressed',String(sound));
     };
     $('orders-refresh').onclick=()=>{if(enabled){subscribe();if(historyLoaded||tab==='history')historyPage(true);}};
     $('orders-filters-toggle').onclick=()=>{const open=$('orders-filters').hidden;$('orders-filters').hidden=!open;$('orders-filters-toggle').setAttribute('aria-expanded',String(open));};
@@ -310,9 +313,10 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     };
     root.addEventListener('click',click);dialog.addEventListener('click',click);
     window.addEventListener('offline',()=>{if(enabled)render();});window.addEventListener('online',()=>{if(enabled)render();});
+    window.addEventListener('bigtac:langchange', () => { if(enabled)render(); });
     return {
         start(){if(enabled)return;enabled=true;epoch++;config();active=[];historyOrders=[];historyCursor=null;historyLoaded=false;historyBusy=false;historyError='';hasMore=true;failures.clear();newCount=0;$('orders-notification').hidden=true;tracker=new IncomingOrderTracker();threshold=0;try{const saved=Number(localStorage.getItem(`bigtac.order-age.${profile()?.uid}`));if(Number.isInteger(saved)&&saved>=0&&saved<=240)threshold=saved;}catch{}$('orders-threshold').value=threshold;subscribe();timer=setInterval(updateTimers,30000);},
-        stop(){enabled=false;epoch++;stopLive?.();stopLive=null;stopDetail?.();stopDetail=null;clearInterval(timer);timer=null;if(dialog.open)dialog.close();$('order-detail-body').replaceChildren();$('order-detail-actions').replaceChildren();active=[];historyOrders=[];cards.forEach(card=>card.remove());cards.clear();pending.clear();failures.clear();receipt.replaceChildren();sound=false;$('orders-sound').querySelector('span').textContent='Son désactivé';$('orders-sound').setAttribute('aria-pressed','false');if(audio){audio.close().catch(()=>{});audio=null;}},
+        stop(){enabled=false;epoch++;stopLive?.();stopLive=null;stopDetail?.();stopDetail=null;clearInterval(timer);timer=null;if(dialog.open)dialog.close();$('order-detail-body').replaceChildren();$('order-detail-actions').replaceChildren();active=[];historyOrders=[];cards.forEach(card=>card.remove());cards.clear();pending.clear();failures.clear();receipt.replaceChildren();sound=false;setUiText($('orders-sound').querySelector('span'), 'Son désactivé');$('orders-sound').setAttribute('aria-pressed','false');if(audio){audio.close().catch(()=>{});audio=null;}},
         column:setTab,focusOrder:openDetail,changeStatus, settingsChanged(){if(enabled){const before=timezone;config();if(before!==timezone&&(historyLoaded||historyBusy))historyPage(true);render();}},
     };
 }

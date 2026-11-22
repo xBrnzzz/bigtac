@@ -39,6 +39,23 @@ async function visit(url, width) {
 }
 
 try {
+    for (const width of [320, 390, 1440]) {
+        const page = await visit(store.url + '/index.html?scenario=closed', width);
+        await page.locator('#hero-photo[src]').waitFor();
+        const copy = await page.locator('.hero-message').boundingBox();
+        const cta = await page.locator('.intro-cta').boundingBox();
+        const panel = await page.locator('.restaurant-intro__copy').boundingBox();
+        assert(await page.locator('html').evaluate(el => el.scrollWidth <= innerWidth));
+        if (width < 700) {
+            assert(cta.x + cta.width < copy.x, 'Hero button sits in the left column');
+            assert(copy.x >= panel.x + panel.width * .38, 'Hero headline uses the right column');
+            assert.equal(await page.locator('.intro-cta').evaluate(el => getComputedStyle(el).textAlign), 'center');
+        } else {
+            assert(await page.locator('.hero-lead').evaluate(el => parseFloat(getComputedStyle(el).fontSize)) >= 88);
+            assert(cta.height >= 60);
+        }
+        await page.context().close();
+    }
     for (const width of [320, 390, 768, 1440]) {
         const page = await visit(admin.url + '/admin.html#settings', width);
         await page.locator('#edit-storefront').click();
@@ -66,6 +83,8 @@ try {
     await frame.locator('[data-glovo-placement="hero"]').waitFor();
     await dialog.locator('#site-color-accent').fill('#3159ac');
     await dialog.locator('#site-color-background').fill('#edf7fa');
+    await dialog.locator('#site-color-surface').fill('#f4f1fb');
+    assert.equal(await page.locator('html').evaluate(el => getComputedStyle(el).getPropertyValue('--admin-primary').trim()), '#c84a13', 'Admin keeps the saved palette while previewing a draft');
     await dialog.getByText('Glovo', {exact:true}).click();
     await dialog.locator('[name="glovoUrl"]').fill('https://glovoapp.com.example.test/x');
     await dialog.locator('button[type=submit]').click();
@@ -102,6 +121,16 @@ try {
     assert.equal(saved.showPopular, false);
     assert.equal(saved.glovo.placement, 'both');
     assert.equal(saved.palette.accent, '#3159ac');
+    const adminButton = page.locator('#edit-storefront');
+    assert.equal(await adminButton.evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(244, 241, 251)');
+    assert.equal(await page.locator('#views-container').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(237, 247, 250)');
+    assert.equal(await page.locator('html').evaluate(el => getComputedStyle(el).getPropertyValue('--admin-primary').trim()), '#3159ac');
+    await page.evaluate(() => {
+        const config = __adminFixture.data.settings[0];
+        config.storefront.palette.accent = '#f8e36a';
+        __adminFixture.emit();
+    });
+    assert.equal(await page.locator('#admin-desktop-nav [aria-current]').evaluate(el => getComputedStyle(el).color), 'rgb(0, 0, 0)');
     await dialog.locator('#site-color-accent').fill('#235f54');
     await page.evaluate(() => {
         __adminFixture.data.settings[0].address = 'Réglage modifié en parallèle';
@@ -127,6 +156,30 @@ try {
     assert(await glovo.isHidden());
     assert.equal(await glovo.getAttribute('href'), null);
     assert.equal(await customer.evaluate(() => __fixture.orders.length), 0);
+
+    const delayed = await visit(store.url + '/index.html?scenario=settings-wait', 390);
+    for (let entry = 0; entry < 2; entry++) {
+        await delayed.waitForFunction(() => __fixture.settingsListeners.size === 1);
+        await delayed.waitForTimeout(1100);
+        assert(await delayed.locator('#storefront-startup').isVisible(), 'Slow config shows a neutral loading state');
+        assert(await delayed.locator('#app-shell').isHidden(), 'Cached branding stays hidden');
+        assert.equal(await delayed.locator('#hero-photo').getAttribute('src'), null);
+        assert.equal(await delayed.title(), 'Carte du restaurant');
+        await delayed.evaluate(config => {
+            __fixture.settings.restaurantName = 'Maison Démo';
+            __fixture.settings.storefront = config;
+            __fixture.emitSettings();
+        }, saved);
+        await delayed.locator('#app-shell').waitFor();
+        assert.equal(await delayed.locator('#store-brand-name').textContent(), 'Maison Démo');
+        assert.equal(await delayed.locator('.hero-lead').textContent(), 'À table');
+        assert.equal(await delayed.locator('#hero-photo').getAttribute('src'), saved.heroImage);
+        assert(await delayed.locator('#storefront-startup').isHidden());
+        if (entry === 0) await delayed.reload({waitUntil:'domcontentloaded'});
+    }
+    const unavailable = await visit(store.url + '/index.html?scenario=settings-error', 390);
+    await unavailable.locator('#storefront-startup-retry').waitFor();
+    assert(await unavailable.locator('#app-shell').isHidden(), 'A failed configuration read stays neutral and offers retry');
     assert.equal(production, 0);
     assert.deepEqual(errors, []);
     console.log('PASS storefront appearance: Glovo defaults and validation, live preview, four widths, photo upload, translations and persisted storefront.');

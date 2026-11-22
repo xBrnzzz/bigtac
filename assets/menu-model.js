@@ -1,4 +1,5 @@
 // Shared client configuration/availability rules. These are not backend authorization.
+import {uiText} from './i18n.js';
 import {buildCustomizationSteps,selectionIssue,optionMatches,recordedChoices,moneyCents} from './customization.js';
 export const MENU_LIMIT = 300;
 export const copy = value => JSON.parse(JSON.stringify(value));
@@ -6,10 +7,10 @@ export const newId = () => globalThis.crypto.randomUUID();
 export const selectionPresets=[['one','Exactement un choix'],['upto','Jusqu’à N choix'],['atleast','Au moins N choix'],['between','Entre N et M choix'],['custom','Personnalisé']];
 export function selectionSummary(group) {
     const min=Number(group.min??(group.type==='radio'?1:0)),max=Number(group.max??(group.type==='radio'?1:0));
-    if(!Number.isFinite(min)||!Number.isFinite(max))return 'Vérifiez les limites de sélection.';
-    if(group.type==='radio')return min>0?'Un choix obligatoire':'Un choix facultatif';
-    if(max===0)return min>0?`Au moins ${min} choix`:'Plusieurs choix facultatifs';
-    return min>0?`De ${min} à ${max} choix`:`Jusqu’à ${max} choix`;
+    if(!Number.isFinite(min)||!Number.isFinite(max))return uiText('Vérifiez les limites de sélection.');
+    if(group.type==='radio')return uiText(min>0?'Un choix obligatoire':'Un choix facultatif');
+    if(max===0)return uiText(min>0?'Au moins {min} choix':'Plusieurs choix facultatifs', {min});
+    return uiText(min>0?'De {min} à {max} choix':'Jusqu’à {max} choix',{min,max});
 }
 export function selectionPreset(group){return group.type==='radio'?'one':Number(group.min)===0&&Number(group.max)>0?'upto':Number(group.min)>0&&Number(group.max)===0?'atleast':Number(group.min)>0&&Number(group.max)>0?'between':'custom';}
 export function applySelectionPreset(group,preset){

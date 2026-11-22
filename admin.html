@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
-    <title>BIGTAC — Studio Admin & Contrôle</title>
+    <title data-ui-copy="BIGTAC — Studio Admin &amp; Contrôle">BIGTAC — Studio Admin & Contrôle</title>
     <link rel="icon" href="assets/logo.png" type="image/png">
 
     <!-- Tailwind CSS CDN -->
@@ -154,7 +154,7 @@
 <body class="bg-slate-100 text-slate-800 antialiased h-screen overflow-hidden flex flex-col md:flex-row">
 
     <!-- WARNING BANNER IF OPENED DIRECTLY VIA FILE:// -->
-    <div id="file-protocol-warning" class="fixed top-0 left-0 right-0 z-[100] bg-amber-500 text-stone-900 px-4 py-2 text-xs font-bold text-center shadow-md hidden">
+    <div id="file-protocol-warning" class="fixed top-0 left-0 right-0 z-[100] bg-amber-500 text-stone-900 px-4 py-2 text-xs font-bold text-center shadow-md hidden" data-ui-copy="⚠️ Attention : Ce fichier a été ouvert directement (file://). Pour que la connexion Firebase fonctionne, veuillez utiliser un serveur local (ex: clic droit &quot;Open with Live Server&quot; dans VS Code, ou http://localhost:3000).">
         ⚠️ Attention : Ce fichier a été ouvert directement (file://). Pour que la connexion Firebase fonctionne, veuillez utiliser un serveur local (ex: clic droit "Open with Live Server" dans VS Code, ou http://localhost:3000).
     </div>
 
@@ -164,19 +164,19 @@
             <!-- Language Selector on Login Modal -->
             <div class="flex justify-end mb-2">
                 <div class="lang-selector relative" id="loginLangSelector">
-                    <button type="button" id="btnLoginLang" class="lang-toggle-btn" onclick="toggleLangMenu('loginLangDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Langue / Language / اللغة">
-                        <span class="lang-globe" aria-hidden="true">🌐</span>
+                    <button type="button" id="btnLoginLang" class="lang-toggle-btn" onclick="toggleLangMenu('loginLangDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Langue / Language / اللغة" data-ui-aria-label="Langue / Language / اللغة">
+                        <i data-feather="globe" aria-hidden="true"></i>
                         <span class="lang-current current-lang-code">FR</span>
                     </button>
                     <div id="loginLangDropdown" class="lang-menu hidden" role="menu">
                         <button type="button" class="lang-option" data-lang-btn="fr" onclick="setAppLanguage('fr')" role="menuitem">
-                            <span class="lang-flag">🇫🇷</span> <span>Français</span>
+                            <span lang="fr">Français</span>
                         </button>
                         <button type="button" class="lang-option" data-lang-btn="en" onclick="setAppLanguage('en')" role="menuitem">
-                            <span class="lang-flag">🇬🇧</span> <span>English</span>
+                            <span lang="en">English</span>
                         </button>
                         <button type="button" class="lang-option" data-lang-btn="ar" onclick="setAppLanguage('ar')" role="menuitem">
-                            <span class="lang-flag">🇲🇦</span> <span>العربية</span>
+                            <span lang="ar">العربية</span>
                         </button>
                     </div>
                 </div>
@@ -222,12 +222,12 @@
             <div class="max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-2xl font-black text-slate-900 tracking-tight">Promotions</h2>
-                        <p class="text-xs text-slate-500">Offres à prix fixe de la carte.</p>
+                        <h2 class="text-2xl font-black text-slate-900 tracking-tight" data-ui-copy="Promotions">Promotions</h2>
+                        <p class="text-xs text-slate-500" data-ui-copy="Offres à prix fixe de la carte.">Offres à prix fixe de la carte.</p>
                     </div>
                     <button onclick="openPromoEditor()" class="admin-button primary">
                         <i data-feather="plus" class="w-4 h-4"></i>
-                        <span>Nouvelle promotion</span>
+                        <span data-ui-copy="Nouvelle promotion">Nouvelle promotion</span>
                     </button>
                 </div>
                 <div id="promotions-list" class="promotion-ledger">
@@ -240,24 +240,24 @@
         <div id="view-drivers" class="absolute inset-0 p-4 sm:p-6 hidden overflow-y-auto">
             <div class="max-w-5xl mx-auto space-y-6">
                 <div>
-                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Équipe</h2>
-                    <p class="text-xs text-slate-500">Consultez les comptes et les accès de votre équipe</p>
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight" data-ui-copy="Équipe">Équipe</h2>
+                    <p class="text-xs text-slate-500" data-ui-copy="Consultez les comptes et les accès de votre équipe">Consultez les comptes et les accès de votre équipe</p>
                 </div>
 
                 <!-- Employee cards retain the existing table hooks and column semantics. -->
                 <section class="admin-team-accounts" aria-labelledby="team-accounts-title">
-                    <div class="admin-team-heading"><p class="admin-team-readonly">Consultation des comptes · modification indisponible.</p>
-                        <h3 id="team-accounts-title" class="font-extrabold text-slate-700 text-sm">Comptes de l’équipe</h3>
+                    <div class="admin-team-heading"><p class="admin-team-readonly" data-ui-copy="Consultation des comptes · modification indisponible.">Consultation des comptes · modification indisponible.</p>
+                        <h3 id="team-accounts-title" class="font-extrabold text-slate-700 text-sm" data-ui-copy="Comptes de l’équipe">Comptes de l’équipe</h3>
                     </div>
                     <div class="admin-team-table-wrap">
                         <table class="admin-team-list" role="table" aria-labelledby="team-accounts-title">
                             <thead class="admin-team-columns" role="rowgroup">
                                 <tr>
-                                    <th id="team-column-user" scope="col">Utilisateur</th>
-                                    <th id="team-column-email" scope="col">Email</th>
-                                    <th id="team-column-state" scope="col">État</th>
-                                    <th id="team-column-access" scope="col">Accès</th>
-                                    <th id="team-column-action" scope="col">Action</th>
+                                    <th id="team-column-user" scope="col" data-ui-copy="Utilisateur">Utilisateur</th>
+                                    <th id="team-column-email" scope="col" data-ui-copy="Email">Email</th>
+                                    <th id="team-column-state" scope="col" data-ui-copy="État">État</th>
+                                    <th id="team-column-access" scope="col" data-ui-copy="Accès">Accès</th>
+                                    <th id="team-column-action" scope="col" data-ui-copy="Action">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="drivers-table-body" class="admin-team-grid" role="rowgroup">
@@ -269,31 +269,31 @@
 
                 <!-- Unavailable account controls remain disabled and inspectable. -->
                 <details class="admin-team-unavailable">
-                    <summary>Gestion des comptes indisponible</summary>
+                    <summary data-ui-copy="Gestion des comptes indisponible">Gestion des comptes indisponible</summary>
                     <form id="user-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
                         <div>
-                            <label for="user-name" class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Nom Complet</label>
-                            <input type="text" id="user-name" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm" placeholder="Ex: Karim Alami" required>
+                            <label for="user-name" class="text-[10px] font-black text-slate-400 uppercase mb-1 block" data-ui-copy="Nom Complet">Nom Complet</label>
+                            <input type="text" id="user-name" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-sm" placeholder="Ex: Karim Alami" required data-ui-placeholder="Ex: Karim Alami">
                         </div>
                         <div>
-                            <label for="user-email" class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Email</label>
+                            <label for="user-email" class="text-[10px] font-black text-slate-400 uppercase mb-1 block" data-ui-copy="Email">Email</label>
                             <input type="email" id="user-email" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="karim@bigtac.ma" required>
                         </div>
                         <div>
-                            <label for="user-password" class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Mot de passe</label>
-                            <input type="password" id="user-password" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Min. 6 caractères" required minlength="6">
+                            <label for="user-password" class="text-[10px] font-black text-slate-400 uppercase mb-1 block" data-ui-copy="Mot de passe">Mot de passe</label>
+                            <input type="password" id="user-password" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm" placeholder="Min. 6 caractères" required minlength="6" data-ui-placeholder="Min. 6 caractères">
                         </div>
                         <div>
-                            <label for="user-role" class="text-[10px] font-black text-slate-400 uppercase mb-1 block">Rôle</label>
+                            <label for="user-role" class="text-[10px] font-black text-slate-400 uppercase mb-1 block" data-ui-copy="Rôle">Rôle</label>
                             <select id="user-role" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold">
-                                <option value="livreur">Livreur</option>
-                                <option value="caissier">Caissier</option>
-                                <option value="manager">Manager</option>
-                                <option value="admin">Administrateur</option>
+                                <option value="livreur" data-ui-copy="Livreur">Livreur</option>
+                                <option value="caissier" data-ui-copy="Caissier">Caissier</option>
+                                <option value="manager" data-ui-copy="Manager">Manager</option>
+                                <option value="admin" data-ui-copy="Administrateur">Administrateur</option>
                             </select>
                         </div>
                         <div class="flex items-end">
-                            <button type="submit" id="btn-add-user" class="w-full bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-xl font-black text-sm shadow-md transition">
+                            <button type="submit" id="btn-add-user" class="w-full bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-xl font-black text-sm shadow-md transition" data-ui-copy="Ajouter">
                                 <i data-feather="user-plus" class="w-4 h-4 inline mr-1"></i> Ajouter
                             </button>
                         </div>
@@ -310,24 +310,24 @@
                     <img src="assets/logo.png" alt="BIGTAC" class="h-9 w-9 object-contain rounded-xl bg-black p-0.5" onerror="this.src='assets/snack.png'">
                     <div>
                         <h1 class="font-black text-base leading-none text-slate-900" data-i18n="driver.header_title">BIGTAC Livraison</h1>
-                        <p class="text-xs text-brand-600 font-bold mt-0.5" id="driver-name-display">Livreur</p>
+                        <p class="text-xs text-brand-600 font-bold mt-0.5" id="driver-name-display" data-ui-copy="Livreur">Livreur</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <div class="lang-selector relative" id="driverLangSelector">
-                        <button type="button" id="btnDriverLang" class="lang-toggle-btn" onclick="toggleLangMenu('driverLangDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Langue / Language / اللغة">
+                        <button type="button" id="btnDriverLang" class="lang-toggle-btn" onclick="toggleLangMenu('driverLangDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Langue / Language / اللغة" data-ui-aria-label="Langue / Language / اللغة">
                             <i data-feather="globe" aria-hidden="true"></i>
                             <span class="lang-current current-lang-code">FR</span>
                         </button>
                         <div id="driverLangDropdown" class="lang-menu hidden" role="menu">
                             <button type="button" class="lang-option" data-lang-btn="fr" onclick="setAppLanguage('fr')" role="menuitem">
-                                <span class="lang-flag">🇫🇷</span> <span>Français</span>
+                                <span lang="fr">Français</span>
                             </button>
                             <button type="button" class="lang-option" data-lang-btn="en" onclick="setAppLanguage('en')" role="menuitem">
-                                <span class="lang-flag">🇬🇧</span> <span>English</span>
+                                <span lang="en">English</span>
                             </button>
                             <button type="button" class="lang-option" data-lang-btn="ar" onclick="setAppLanguage('ar')" role="menuitem">
-                                <span class="lang-flag">🇲🇦</span> <span>العربية</span>
+                                <span lang="ar">العربية</span>
                             </button>
                         </div>
                     </div>
@@ -370,53 +370,53 @@
         <div class="absolute inset-0" onclick="closePromoEditor()"></div>
         <div class="absolute flex flex-col z-10">
             <div class="flex justify-between items-center shrink-0">
-                <div><p class="editor-context">Promotions</p><h3 id="promo-editor-title">Nouvelle promotion</h3></div>
-                <button type="button" onclick="closePromoEditor()" aria-label="Fermer" class="editor-close"><i data-feather="x"></i><span>Fermer</span></button>
+                <div><p class="editor-context" data-ui-copy="Promotions">Promotions</p><h3 id="promo-editor-title" data-ui-copy="Nouvelle promotion">Nouvelle promotion</h3></div>
+                <button type="button" onclick="closePromoEditor()" aria-label="Fermer" class="editor-close" data-ui-aria-label="Fermer"><i data-feather="x"></i><span data-ui-copy="Fermer">Fermer</span></button>
             </div>
             <div class="flex-1 overflow-y-auto min-h-0">
-                <nav class="menu-editor-tabs promo-section-tabs" aria-label="Sections de la promotion">
-                    <button type="button" id="promo-tab-basic" onclick="switchPromoTab('basic')" aria-pressed="true"><i data-feather="file-text"></i>Informations</button>
-                    <button type="button" id="promo-tab-choices" onclick="switchPromoTab('choices')" aria-pressed="false"><i data-feather="sliders"></i>Choix</button>
-                    <button type="button" id="promo-tab-supplements" onclick="switchPromoTab('supplements')" aria-pressed="false"><i data-feather="plus"></i>Suppléments</button>
-                    <button type="button" id="promo-tab-publish" onclick="switchPromoTab('publish')" aria-pressed="false"><i data-feather="check-circle"></i>Publication</button>
+                <nav class="menu-editor-tabs promo-section-tabs" aria-label="Sections de la promotion" data-ui-aria-label="Sections de la promotion">
+                    <button type="button" id="promo-tab-basic" onclick="switchPromoTab('basic')" aria-pressed="true" data-ui-copy="Informations"><i data-feather="file-text"></i>Informations</button>
+                    <button type="button" id="promo-tab-choices" onclick="switchPromoTab('choices')" aria-pressed="false" data-ui-copy="Choix"><i data-feather="sliders"></i>Choix</button>
+                    <button type="button" id="promo-tab-supplements" onclick="switchPromoTab('supplements')" aria-pressed="false" data-ui-copy="Suppléments"><i data-feather="plus"></i>Suppléments</button>
+                    <button type="button" id="promo-tab-publish" onclick="switchPromoTab('publish')" aria-pressed="false" data-ui-copy="Publication"><i data-feather="check-circle"></i>Publication</button>
                 </nav>
                 <p id="promo-edit-error" class="menu-inline-error" role="alert" tabindex="-1" hidden></p>
                 <form id="promo-form" novalidate>
                     <input type="hidden" id="edit-promo-id">
                     <section class="editor-info" data-promo-panel="basic">
-                        <h4>Informations de la promotion</h4>
+                        <h4 data-ui-copy="Informations de la promotion">Informations de la promotion</h4>
                         <div class="editor-basics"><div class="editor-details">
                             <div class="promo-identity-fields">
-                                <div><label for="promo-name">Nom de la promotion *</label><input type="text" id="promo-name" name="promotion-name" class="w-full" required autocomplete="off" placeholder="Ex. Menu Duo Tacos"></div>
-                                <div><label for="promo-price">Prix (DH) *</label><input type="number" id="promo-price" name="promotion-price" class="w-full" step="0.01" min="0" inputmode="decimal" required placeholder="Ex. 49"></div>
+                                <div><label for="promo-name" data-ui-copy="Nom de la promotion *">Nom de la promotion *</label><input type="text" id="promo-name" name="promotion-name" class="w-full" required autocomplete="off" placeholder="Ex. Menu Duo Tacos" data-ui-placeholder="Ex. Menu Duo Tacos"></div>
+                                <div><label for="promo-price" data-ui-copy="Prix (DH) *">Prix (DH) *</label><input type="number" id="promo-price" name="promotion-price" class="w-full" step="0.01" min="0" inputmode="decimal" required placeholder="Ex. 49" data-ui-placeholder="Ex. 49"></div>
                             </div>
-                            <div><label for="promo-desc">Description</label><textarea id="promo-desc" name="promotion-description" class="w-full" rows="3" placeholder="2 tacos, 2 boissons et frites"></textarea></div>
+                            <div><label for="promo-desc" data-ui-copy="Description">Description</label><textarea id="promo-desc" name="promotion-description" class="w-full" rows="3" placeholder="2 tacos, 2 boissons et frites"></textarea></div>
                         </div><aside class="editor-media">
-                            <h4>Photo de la promotion</h4>
+                            <h4 data-ui-copy="Photo de la promotion">Photo de la promotion</h4>
                             <div class="promo-image-editor">
-                                <label id="promo-photo-frame" class="editor-image-frame" for="promo-image-file" aria-label="Ajouter la photo de la promotion"><span class="editor-image-placeholder"><i data-feather="image"></i><span>Ajoutez votre photo</span></span><span id="promo-image-preview"></span></label>
+                                <label id="promo-photo-frame" class="editor-image-frame" for="promo-image-file" aria-label="Ajouter la photo de la promotion" data-ui-aria-label="Ajouter la photo de la promotion"><span class="editor-image-placeholder"><i data-feather="image"></i><span data-ui-copy="Ajoutez votre photo">Ajoutez votre photo</span></span><span id="promo-image-preview"></span></label>
                                 <div class="catalog-photo-caption" id="promo-photo-caption" hidden><strong></strong><span></span></div>
-                                <div class="editor-photo-control"><input type="file" id="promo-image-file" class="editor-file-input" accept="image/jpeg,image/png,image/webp" aria-describedby="promo-photo-filename promo-photo-help"><label class="editor-photo-button" id="promo-photo-button" for="promo-image-file">Ajouter une photo</label></div>
+                                <div class="editor-photo-control"><input type="file" id="promo-image-file" class="editor-file-input" accept="image/jpeg,image/png,image/webp" aria-describedby="promo-photo-filename promo-photo-help"><label class="editor-photo-button" id="promo-photo-button" for="promo-image-file" data-ui-copy="Ajouter une photo">Ajouter une photo</label></div>
                                 <input type="hidden" id="promo-image-url">
-                                <p id="promo-photo-filename" class="editor-photo-filename">Aucun fichier sélectionné</p><p id="promo-photo-help" class="editor-photo-help">JPG, PNG ou WebP · 5 Mo maximum</p>
+                                <p id="promo-photo-filename" class="editor-photo-filename" data-ui-copy="Aucun fichier sélectionné">Aucun fichier sélectionné</p><p id="promo-photo-help" class="editor-photo-help" data-ui-copy="JPG, PNG ou WebP · 5 Mo maximum">JPG, PNG ou WebP · 5 Mo maximum</p>
                             </div>
                         </aside></div>
                     </section>
                     <section id="promo-panel-choices" data-promo-panel="choices" hidden>
-                        <h4>Choix du client</h4><p class="editor-section-help">Les options incluses dans votre offre.</p>
+                        <h4 data-ui-copy="Choix du client">Choix du client</h4><p class="editor-section-help" data-ui-copy="Les options incluses dans votre offre.">Les options incluses dans votre offre.</p>
                         <div id="promo-container-choices"></div>
-                        <div class="editor-section-actions"><button type="button" onclick="addPromoChoiceGroup()" class="admin-button">+ Ajouter un groupe</button></div>
+                        <div class="editor-section-actions"><button type="button" onclick="addPromoChoiceGroup()" class="admin-button" data-ui-copy="+ Ajouter un groupe">+ Ajouter un groupe</button></div>
                     </section>
                     <section id="promo-panel-supplements" data-promo-panel="supplements" hidden>
-                        <h4>Suppléments payants</h4><p class="editor-section-help">Les options facultatives ajoutées au prix de l’offre.</p>
-                        <div class="editor-section-actions"><span>Suppléments payants optionnels</span><button type="button" onclick="addPromoSupplementRow()" class="admin-button">+ Option</button></div>
+                        <h4 data-ui-copy="Suppléments payants">Suppléments payants</h4><p class="editor-section-help" data-ui-copy="Les options facultatives ajoutées au prix de l’offre.">Les options facultatives ajoutées au prix de l’offre.</p>
+                        <div class="editor-section-actions"><span data-ui-copy="Suppléments payants optionnels">Suppléments payants optionnels</span><button type="button" onclick="addPromoSupplementRow()" class="admin-button" data-ui-copy="+ Option">+ Option</button></div>
                         <div id="promo-container-supplements"></div>
                     </section>
                 </form>
             </div>
             <div class="promo-editor-footer shrink-0">
-                <p>Enregistrer pour appliquer.</p><button type="button" class="admin-button" onclick="closePromoEditor()">Annuler</button>
-                <button type="button" onclick="savePromo()" id="btn-save-promo" class="admin-button primary">Enregistrer la promotion</button>
+                <p data-ui-copy="Enregistrer pour appliquer.">Enregistrer pour appliquer.</p><button type="button" class="admin-button" onclick="closePromoEditor()" data-ui-copy="Annuler">Annuler</button>
+                <button type="button" onclick="savePromo()" id="btn-save-promo" class="admin-button primary" data-ui-copy="Enregistrer la promotion">Enregistrer la promotion</button>
             </div>
         </div>
     </div>
@@ -430,6 +430,7 @@
         import { operationsService } from './assets/operations-service.js';
         import { createSettingsEditor } from './assets/admin-settings-editor.js';
         import { createStorefrontEditor } from './assets/admin-storefront-editor.js';
+        import { applyAdminPalette } from './assets/storefront-appearance.js';
         import { createPromotions } from './assets/admin-promotions.js';
         import { createMenuWorkspace } from './assets/admin-menu.js';
         import { createOrderWorkspace } from './assets/admin-orders.js';
@@ -444,7 +445,7 @@
 
         import {limit} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import {staffAdministration} from "./assets/staff-service.js";
-        import { i18n } from './assets/i18n.js';
+        import { i18n, setUiText, uiText, uiMarkup } from './assets/i18n.js';
 
         // Initialize multi-language
         i18n.init();
@@ -478,7 +479,7 @@
             document.querySelectorAll('#view-driver button[data-driver-order]').forEach(button=>{
                 const busy=driverPending.has(button.dataset.driverOrder);
                 button.disabled=busy;
-                if(busy){button.dataset.idleLabel ||= button.textContent;button.textContent='Enregistrement…';}
+                if(busy){button.dataset.idleLabel ||= button.textContent;setUiText(button, 'Enregistrement…');}
                 else if(button.dataset.idleLabel){button.textContent=button.dataset.idleLabel;delete button.dataset.idleLabel;}
             });
         }
@@ -501,6 +502,7 @@
             promotionsWorkspace.stop();
             settingsEditor.clear();
             storefrontEditor.clear();
+            applyAdminPalette(document);
             if (settingsUnsub) settingsUnsub(); settingsUnsub = null;
             driverUnsubscribers.forEach(unsubscribe => unsubscribe()); driverUnsubscribers = [];
             overview.stop(); overviewStarted = false; currentView = null;
@@ -521,7 +523,7 @@
                 ${adminIcon(glyph)}
                 <span></span>
             `;
-            container.querySelector('span').textContent = msg;
+            setUiText(container.querySelector('span'), String(msg));
             document.body.appendChild(container);
             requestAnimationFrame(() => container.classList.remove('opacity-0', 'translate-y-4'));
 
@@ -567,6 +569,7 @@
                 cleanSession();
                 currentUser = { ...profile, uid: user.uid, role };
                 shell.showSession(currentUser, role);
+                initSettings();
                 if (role === 'livreur') initDriverApp();
                 else initApp(role, version);
             }, error => {
@@ -591,7 +594,7 @@
             const password = document.getElementById('password').value;
 
             btn.disabled = true;
-            btn.innerHTML = `<i data-feather="loader" class="w-4 h-4 inline animate-spin"></i> <span>Connexion...</span>`;
+            btn.innerHTML = `<i data-feather="loader" class="w-4 h-4 inline animate-spin"></i> <span data-ui-copy="Connexion...">Connexion...</span>`;
             if (window.feather) feather.replace();
             errEl.classList.add('hidden');
 
@@ -618,7 +621,7 @@
                 errEl.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<span>Se Connecter</span>`;
+                btn.innerHTML = `<span data-ui-copy="Se Connecter">Se Connecter</span>`;
             }
         });
 
@@ -632,7 +635,6 @@
 
         // --- MAIN APP INITIALIZATION ---
         async function initApp(role, version) {
-            if (authorized('settings')) initSettings();
             if (version !== sessionVersion || !currentUser) return;
             const requested = location.hash.slice(1);
             switchView(mayView(role, requested) ? requested : roleViews[role][0], true);
@@ -644,45 +646,56 @@
         function initSettings() {
             settingsUnsub?.();
             const version=workVersion;
+            const settingsRef=doc(db,'settings','config');
+            if (!authorized('settings')) {
+                settingsUnsub=onSnapshot(settingsRef,{includeMetadataChanges:true},snap=>{
+                    if (version!==workVersion || snap.metadata?.fromCache || snap.metadata?.hasPendingWrites) return;
+                    applyAdminPalette(document,snap.exists()?snap.data():{});
+                    shell.restaurant(snap.exists()?snap.data():{});
+                },()=>{if (version===workVersion) applyAdminPalette(document);});
+                return;
+            }
             let saving=false;
             const feedback=document.getElementById('admin-settings-feedback');
             const retry=document.getElementById('admin-settings-retry');
             const inputs=['toggle-store','toggle-whatsapp'].map(id=>document.getElementById(id));
             const publish=(config,cached=false)=>{
-                settingsData=config; settingsEditor.update(config,cached); storefrontEditor.update(config,cached); shell.restaurant(config); orderWorkspace.settingsChanged();
+                settingsData=config;
+                if (!cached) applyAdminPalette(document, config);
+                settingsEditor.update(config,cached); storefrontEditor.update(config,cached); shell.restaurant(config); orderWorkspace.settingsChanged();
                 if (authorized('overview')) {
                     if (overviewStarted) overview.update(config);
                     else { overview.start(config); overviewStarted=true; }
                 }
             };
             inputs.forEach(input=>input.disabled=true);
-            settingsUnsub=onSnapshot(doc(db,'settings','config'),{includeMetadataChanges:true},snap=>{
+            settingsUnsub=onSnapshot(settingsRef,{includeMetadataChanges:true},snap=>{
                 if (version!==workVersion || !authorized('settings')) return;
                 if (!snap.exists()) {
                     publish({ _unavailable:true });
-                    feedback.textContent='Configuration absente. Demandez sa préparation à un administrateur.';
+                    setUiText(feedback, 'Configuration absente. Demandez sa préparation à un administrateur.');
                     retry.hidden=false; return;
                 }
                 publish(snap.data(),!!(snap.metadata?.fromCache||snap.metadata?.hasPendingWrites));
                 const config=settingsData;
                 inputs[0].checked=config.isOpen!==false; inputs[1].checked=config.whatsappMode===true;
                 inputs.forEach(input=>input.disabled=saving);
-                if(!saving)feedback.textContent=snap.metadata?.fromCache ? 'Réglages en cache. Vérifiez la connexion avant une modification.' : 'Réglages synchronisés.';
+                if(!saving)setUiText(feedback, snap.metadata?.fromCache ? 'Réglages en cache. Vérifiez la connexion avant une modification.' : 'Réglages synchronisés.');
                 retry.hidden=true;
             },()=>{
                 if (version!==workVersion) return;
                 inputs.forEach(input=>input.disabled=true);
-                feedback.textContent='Impossible de charger les réglages. Vérifiez la connexion puis réessayez.';
+                setUiText(feedback, 'Impossible de charger les réglages. Vérifiez la connexion puis réessayez.');
                 retry.hidden=false; publish({ _unavailable:true });
             });
             retry.onclick=()=>{ if (requireView('settings')) initSettings(); };
             async function saveSetting(field,input) {
                 if (!requireView('settings') || settingsData._unavailable || saving) return;
                 const checked=input.checked;
-                if (field==='isOpen' && !checked && !confirm('Fermer le restaurant ? Toutes les commandes en attente seront aussi refusées.')) {
+                if (field==='isOpen' && !checked && !confirm(uiText('Fermer le restaurant ? Toutes les commandes en attente seront aussi refusées.'))) {
                     input.checked=settingsData.isOpen!==false; return;
                 }
-                saving=true;inputs.forEach(control=>control.disabled=true); feedback.textContent='Enregistrement…';
+                saving=true;inputs.forEach(control=>control.disabled=true); setUiText(feedback, 'Enregistrement…');
                 try {
                     await operationsService(orderActor).settings({[field]:checked},{...settingsData,id:'config'});
                     // Preserve existing closure behavior, with its consequence confirmed above.
@@ -696,11 +709,11 @@
                         }
                     }
                     if (version!==workVersion) return;
-                    feedback.textContent='Modification enregistrée.'; showToast('Réglage enregistré.');
+                    setUiText(feedback, 'Modification enregistrée.'); showToast('Réglage enregistré.');
                 } catch {
                     if (version!==workVersion) return;
                     input.checked=field==='isOpen' ? settingsData.isOpen!==false : settingsData.whatsappMode===true;
-                    feedback.textContent='Modification non aboutie ou fermeture partielle. Vérifiez les réglages et les commandes avant de réessayer.';
+                    setUiText(feedback, 'Modification non aboutie ou fermeture partielle. Vérifiez les réglages et les commandes avant de réessayer.');
                     showToast('Impossible de terminer la modification. Vérifiez son état.','error');
                 } finally { saving=false;if (version===workVersion && authorized('settings')) inputs.forEach(control=>control.disabled=false); }
             }
@@ -778,16 +791,16 @@
         const staffForm=document.getElementById('user-form');
         staffForm.querySelectorAll('input,select,button').forEach(control=>control.disabled=true);
         document.getElementById('user-password').value='';
-        const staffNotice=document.createElement('p');staffNotice.className='admin-notice';staffNotice.setAttribute('role','status');staffNotice.textContent='Vous pouvez consulter les comptes existants. Leur création et la modification des accès sont indisponibles pour le moment.';staffForm.before(staffNotice);
+        const staffNotice=document.createElement('p');staffNotice.className='admin-notice';staffNotice.setAttribute('role','status');setUiText(staffNotice, 'Vous pouvez consulter les comptes existants. Leur création et la modification des accès sont indisponibles pour le moment.');staffForm.before(staffNotice);
         staffForm.addEventListener('submit',async event=>{event.preventDefault();try{await staffAdministration.create();}catch(error){showToast(error.message,'error');}});
         const teamRoleLabels = new Map([['admin','Administrateur'],['manager','Manager'],['caissier','Caissier'],['livreur','Livreur'],['delivery','Livreur']]);
         async function loadDrivers(){
-            if(!authorized('drivers'))return;const version=workVersion,body=document.getElementById('drivers-table-body');body.textContent='Chargement…';
+            if(!authorized('drivers'))return;const version=workVersion,body=document.getElementById('drivers-table-body');setUiText(body, 'Chargement…');
             try{
                 const snap=await getDocs(query(collection(db,'users'),limit(201)));if(version!==workVersion||!authorized('drivers'))return;
                 if(snap.metadata?.fromCache||snap.docs.length>200)throw Error('Liste non confirmée ou partielle.');
-                body.innerHTML=snap.docs.map(d=>{const u=d.data(),role=profileRole(u);return `<tr class="admin-employee-card" role="row"><td class="admin-employee-identity" headers="team-column-user" role="cell"><strong>${escapeOrderText(String(u.name||'Sans nom'))}</strong><p>${escapeOrderText(teamRoleLabels.get(u.role) || String(u.role||'Non renseigné'))}</p></td><td class="admin-employee-email" headers="team-column-email" role="cell"><span class="admin-employee-label">Email</span><span>${escapeOrderText(String(u.email||''))}</span></td><td class="admin-employee-status" headers="team-column-state" role="cell"><span class="admin-employee-label">État</span><span class="admin-employee-state${role?'':' is-unrecognized'}">${role?'Actif':'Accès désactivé ou profil invalide'}</span></td><td class="admin-employee-access" headers="team-column-access" role="cell"><span class="admin-employee-label">Accès</span><span>${role?'Profil reconnu':'Refusé'}</span></td><td class="admin-employee-action" headers="team-column-action" role="cell"><span class="sr-only">Modification indisponible</span></td></tr>`;}).join('')||'<tr class="admin-team-message"><td colspan="5">Aucun compte enregistré.</td></tr>';
-            }catch(error){body.innerHTML='<tr class="admin-team-message"><td colspan="5">Lecture impossible. Rechargez Équipe pour réessayer.</td></tr>';}
+                body.innerHTML=snap.docs.map(d=>{const u=d.data(),role=profileRole(u);return `<tr class="admin-employee-card" role="row"><td class="admin-employee-identity" headers="team-column-user" role="cell"><strong>${u.name?escapeOrderText(String(u.name)):uiMarkup('Sans nom')}</strong><p>${teamRoleLabels.has(u.role)?uiMarkup(teamRoleLabels.get(u.role)):u.role?escapeOrderText(String(u.role)):uiMarkup('Non renseigné')}</p></td><td class="admin-employee-email" headers="team-column-email" role="cell"><span class="admin-employee-label" data-ui-copy="Email">Email</span><span>${escapeOrderText(String(u.email||''))}</span></td><td class="admin-employee-status" headers="team-column-state" role="cell"><span class="admin-employee-label" data-ui-copy="État">État</span><span class="admin-employee-state${role?'':' is-unrecognized'}">${role?uiMarkup('Actif'):uiMarkup('Accès désactivé ou profil invalide')}</span></td><td class="admin-employee-access" headers="team-column-access" role="cell"><span class="admin-employee-label" data-ui-copy="Accès">Accès</span><span>${role?uiMarkup('Profil reconnu'):uiMarkup('Refusé')}</span></td><td class="admin-employee-action" headers="team-column-action" role="cell"><span class="sr-only" data-ui-copy="Modification indisponible">Modification indisponible</span></td></tr>`;}).join('')||"<tr class=\"admin-team-message\"><td colspan=\"5\" data-ui-copy=\"Aucun compte enregistré.\">Aucun compte enregistré.</td></tr>";
+            }catch(error){body.innerHTML="<tr class=\"admin-team-message\"><td colspan=\"5\" data-ui-copy=\"Lecture impossible. Rechargez Équipe pour réessayer.\">Lecture impossible. Rechargez Équipe pour réessayer.</td></tr>";}
         }
         window.deleteDriver=async()=>{try{await staffAdministration.remove();}catch(error){showToast(error.message,'error');return false;}};
 
@@ -799,7 +812,11 @@
             if (driverView) driverView.classList.remove('hidden');
 
             const nameDisplay = document.getElementById('driver-name-display');
-            if (nameDisplay) nameDisplay.innerText = currentUser.name || 'Livreur';
+            if (nameDisplay) {
+                delete nameDisplay.dataset.uiCopy;
+                if(currentUser.name)nameDisplay.textContent=currentUser.name;
+                else setUiText(nameDisplay,'Livreur');
+            }
 
             listenToAvailableRuns();
             listenToMyDeliveries();
@@ -862,11 +879,11 @@
                     const address=orderText(order.customer?.address||order.address);
                     rows.push(`<article class="driver-sheet">
                         <header><h3><span dir="ltr">#${number}</span></h3><span class="driver-state-label">${adminIcon('truck')}${label('assigned')}</span></header>
-                        <div class="driver-stop"><strong>${escapeOrderText(orderText(order.customer?.name,'Client'))}</strong>
+                        <div class="driver-stop"><strong>${order.customer?.name?escapeOrderText(orderText(order.customer.name)):uiMarkup('Client')}</strong>
                             <p>${escapeOrderText(orderText(order.location,i18n.t('driver.no_destination')))}</p>
                             ${address?`<p class="driver-address">${escapeOrderText(address)}</p>`:''}
                         </div>
-                        <dl><div><dt>${label('total')}</dt><dd>${escapeOrderText(orderAmount(order.total))}</dd></div>
+                        <dl><div><dt>${label('total')}</dt><dd>${escapeOrderText(uiText(orderAmount(order.total)))}</dd></div>
                             <div><dt>${label('fee')}</dt><dd>${escapeOrderText(orderAmount(getDeliveryPrice(order.location)))}</dd></div></dl>
                         ${phone||map?`<div class="driver-contacts">
                             ${phone?`<a href="tel:${escapeOrderText(phone)}">${adminIcon('phone')}${label('call')}</a><a href="https://wa.me/${phone.slice(1)}" target="_blank" rel="noopener noreferrer">${adminIcon('message')}WhatsApp</a>`:''}
@@ -886,7 +903,7 @@
 
         window.markDelivered = async orderId => {
             if(driverPending.has(orderId))return false;
-            if(!confirm('Confirmer la livraison ? Cette action ne confirme pas un encaissement.'))return false;
+            if(!confirm(uiText('Confirmer la livraison ? Cette action ne confirme pas un encaissement.')))return false;
             const actor=orderActor(),version=workVersion;
             driverPending.add(orderId);refreshDriverActions();
             try {

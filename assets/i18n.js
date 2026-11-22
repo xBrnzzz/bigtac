@@ -1,3 +1,5 @@
+import { interfaceCopy } from './interface-copy.js';
+
 /**
  * BIGTAC Internationalization (i18n) Module
  * Supports: Français (FR), English (EN), العربية (AR) with RTL
@@ -1128,6 +1130,100 @@ const translations = {
 };
 
 const LANG_STORAGE_KEY = 'bigtac_lang';
+let activeLanguage;
+let observer;
+const normalizeCopy = value => value.replace(/\s+/g, ' ').trim();
+const copyKeys = new Map(Object.entries(translations.fr).map(([key, value]) => [normalizeCopy(value), key]));
+const languageIndex = { en: 0, ar: 1 };
+const bindings = {
+    'data-i18n-placeholder': 'placeholder',
+    'data-i18n-alt': 'alt',
+    'data-i18n-aria': 'aria-label',
+    'data-i18n-title': 'title',
+    'data-ui-title': 'title',
+    'data-ui-aria-label': 'aria-label',
+    'data-ui-placeholder': 'placeholder',
+    'data-ui-alt': 'alt',
+    'data-ui-short-label': 'data-short-label'
+};
+const textNodes = new WeakMap();
+const attributeValues = new WeakMap();
+
+export function uiText(source, values = {}, lang = i18n.getLang()) {
+    const normalized = normalizeCopy(source);
+    const key = copyKeys.get(normalized);
+    const entry = Object.hasOwn(interfaceCopy, normalized) ? interfaceCopy[normalized] : undefined;
+    const localized = lang === 'fr' ? source : entry?.[languageIndex[lang]] ?? translations[lang]?.[key] ?? source;
+    return localized.replace(/\{(\w+)\}/g, (match, name) => values[name] ?? match);
+}
+
+function escapeCopy(value) {
+    return value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+}
+
+export const uiBinding = source => `data-ui-copy="${escapeCopy(source)}"`;
+export function uiMarkup(source, values = {}) {
+    const args = Object.keys(values).length ? ` data-ui-values="${escapeCopy(JSON.stringify(values))}"` : '';
+    return `<span ${uiBinding(source)}${args}>${escapeCopy(uiText(source, values))}</span>`;
+}
+
+export function setUiText(element, source, values = {}) {
+    if (!element) return;
+    element.textContent = uiText(source, values);
+    element.dataset.uiCopy = source;
+    textNodes.set(element, { text: element.textContent, values });
+}
+
+function updateText(element, key, isCopy, lang) {
+    const target = element.querySelector('[data-i18n-text]') || element;
+    const node = Array.from(target.childNodes).find(child => child.nodeType === 3 && child.data.trim());
+    const original = node?.data.trim() || '';
+    const previous = textNodes.get(target);
+    const values = isCopy && (previous?.values || (target.dataset.uiValues ? JSON.parse(target.dataset.uiValues) : {}));
+    if (isCopy && original !== previous?.text &&
+        !['fr', 'en', 'ar'].some(lang => original === uiText(key, values, lang).trim())) return;
+    const translated = isCopy ? uiText(key, values, lang) : (translations[lang]?.[key] ?? translations.fr[key] ?? original);
+    if (!translated || original === translated) return;
+    if (node) node.data = node.data.replace(original, () => translated);
+    else target.append(translated);
+    if (isCopy) textNodes.set(target, { ...previous, text: translated });
+}
+
+function translateElement(element, lang) {
+    if (element.hasAttribute('data-i18n')) updateText(element, element.dataset.i18n, false, lang);
+    else if (element.hasAttribute('data-ui-copy')) updateText(element, element.dataset.uiCopy, true, lang);
+    for (const [binding, attribute] of Object.entries(bindings)) {
+        const key = element.getAttribute(binding);
+        if (!key) continue;
+        const current = element.getAttribute(attribute) || '';
+        if (binding.startsWith('data-i18n')) {
+            const value = translations[lang]?.[key] ?? translations.fr[key] ?? current;
+            if (value !== current) element.setAttribute(attribute, value);
+            continue;
+        }
+        const previous = attributeValues.get(element) || {};
+        if (current !== previous[attribute] &&
+            !['fr', 'en', 'ar'].some(lang => current === uiText(key, {}, lang))) continue;
+        const value = uiText(key, {}, lang);
+        if (value !== current) element.setAttribute(attribute, value);
+        previous[attribute] = value;
+        attributeValues.set(element, previous);
+    }
+    if (element.matches('.current-lang-code') && element.textContent !== i18n.getLang().toUpperCase()) element.textContent = i18n.getLang().toUpperCase();
+    if (element.hasAttribute('data-lang-btn')) {
+        const active = element.dataset.langBtn === i18n.getLang();
+        for (const name of ['active', 'font-black', 'text-brand-600']) element.classList.toggle(name, active);
+        element.setAttribute('aria-pressed', String(active));
+    }
+}
+
+const localizedSelector = ['[data-i18n]', '[data-ui-copy]', '.current-lang-code', '[data-lang-btn]',
+    ...Object.keys(bindings).map(binding => `[${binding}]`)].join(',');
+
+export function translateDOM(root, lang = i18n.getLang()) {
+    if (root.matches?.(localizedSelector)) translateElement(root, lang);
+    root.querySelectorAll(localizedSelector).forEach(element => translateElement(element, lang));
+}
 
 export const i18n = {
     translations,
@@ -1136,6 +1232,7 @@ export const i18n = {
      * Get the active language (default: 'fr')
      */
     getLang() {
+        if (activeLanguage) return activeLanguage;
         try {
             const saved = localStorage.getItem(LANG_STORAGE_KEY);
             if (saved && (saved === 'fr' || saved === 'en' || saved === 'ar')) {
@@ -1164,7 +1261,8 @@ export const i18n = {
      * Switch active language
      */
     setLang(lang) {
-        if (!translations[lang]) lang = 'fr';
+        if (!Object.hasOwn(translations, lang)) lang = 'fr';
+        activeLanguage = lang;
         try {
             localStorage.setItem(LANG_STORAGE_KEY, lang);
         } catch (_) {}
@@ -1181,78 +1279,17 @@ export const i18n = {
             root.classList.remove('is-rtl');
         }
 
-        // Update all text nodes with data-i18n
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.getAttribute('data-i18n');
-            const textTarget = el.querySelector('[data-i18n-text]') || el;
-            const translation = this.t(key, textTarget.textContent.trim());
-            if (translation) {
-                // If element has a designated child target, update only that
-                // If it contains direct child icons or svg, only update the text node
-                if (el.querySelector('svg, i[data-feather]')) {
-                    let updated = false;
-                    for (const node of el.childNodes) {
-                        if (node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0) {
-                            node.textContent = (lang === 'ar' ? ' ' : ' ') + translation + ' ';
-                            updated = true;
-                            break;
-                        }
+        translateDOM(document);
+        if (!observer) {
+            observer = new MutationObserver(records => {
+                for (const { addedNodes } of records) {
+                    for (const node of addedNodes) {
+                        if (node.nodeType === 1 && node.isConnected) translateDOM(node);
                     }
-                    if (!updated) {
-                        // Fallback: prepend translation before svg
-                        const svg = el.querySelector('svg, i[data-feather]');
-                        if (svg) {
-                            const tn = document.createTextNode(translation + ' ');
-                            el.insertBefore(tn, svg);
-                        }
-                    }
-                } else {
-                    textTarget.textContent = translation;
                 }
-            }
-        });
-
-        // Update placeholders
-        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-            const key = el.getAttribute('data-i18n-placeholder');
-            const translation = this.t(key, el.getAttribute("placeholder") || '');
-            if (translation) el.setAttribute('placeholder', translation);
-        });
-
-        document.querySelectorAll('[data-i18n-alt]').forEach(image => {
-            image.alt = this.t(image.dataset.i18nAlt, image.alt);
-        });
-
-        // Update ARIA labels
-        document.querySelectorAll('[data-i18n-aria]').forEach(el => {
-            const key = el.getAttribute('data-i18n-aria');
-            const translation = this.t(key, el.getAttribute("aria-label") || '');
-            if (translation) el.setAttribute('aria-label', translation);
-        });
-
-        // Update titles
-        document.querySelectorAll('[data-i18n-title]').forEach(el => {
-            const key = el.getAttribute('data-i18n-title');
-            const translation = this.t(key, el.getAttribute("title") || '');
-            if (translation) el.setAttribute('title', translation);
-        });
-
-        // Update language buttons active state
-        document.querySelectorAll('[data-lang-btn]').forEach(btn => {
-            const btnLang = btn.getAttribute('data-lang-btn');
-            if (btnLang === lang) {
-                btn.classList.add('active', 'font-black', 'text-brand-600');
-                btn.setAttribute('aria-pressed', 'true');
-            } else {
-                btn.classList.remove('active', 'font-black', 'text-brand-600');
-                btn.setAttribute('aria-pressed', 'false');
-            }
-        });
-
-        // Update current language label display
-        document.querySelectorAll('.current-lang-code').forEach(label => {
-            label.textContent = lang.toUpperCase();
-        });
+            });
+            observer.observe(root, { childList: true, subtree: true });
+        }
 
         // Close any open language dropdowns and reset aria-expanded
         document.querySelectorAll('.lang-menu:not(.hidden)').forEach(m => m.classList.add('hidden'));
@@ -1281,7 +1318,7 @@ if (typeof window !== 'undefined') {
         const dd = document.getElementById(id);
         if (dd) {
             dd.classList.toggle('hidden');
-            const btn = dd.previousElementSibling?.closest('.lang-selector')?.querySelector('.lang-toggle-btn');
+            const btn = dd.closest('.lang-selector')?.querySelector('.lang-toggle-btn');
             if (btn) {
                 btn.setAttribute('aria-expanded', String(!dd.classList.contains('hidden')));
             }

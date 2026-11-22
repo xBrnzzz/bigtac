@@ -2473,10 +2473,7 @@ body.has-tracker {
     background: var(--app-line);
     border-color: var(--app-accent);
 }
-.lang-globe {
-    font-size: 14px;
-    line-height: 1;
-}
+.lang-toggle-btn svg { width: 16px; height: 16px; }
 .lang-current {
     font-size: 12px;
     font-weight: 800;
@@ -2525,9 +2522,6 @@ body.has-tracker {
     background: var(--app-tint);
     color: var(--app-accent);
     font-weight: 700;
-}
-.lang-flag {
-    font-size: 15px;
 }
 
 /* RTL Layout Enhancements for Arabic */
@@ -2600,3 +2594,16 @@ body.has-tracker {
     left: 8px;
     right: auto;
 }
+.product-modal--compact .product-sheet {
+    height:auto;
+    max-width:500px;
+}
+.product-modal--compact .product-sheet__image {
+    height:clamp(92px,19dvh,146px);
+}
+.product-modal--compact .sheet-scroll {
+    flex:0 1 auto;
+    padding-block:8px 16px;
+}
+.product-modal--compact .product-detail-description { margin:0; }
+.product-modal--compact :is(.sheet-scroll,.customization-hint)[hidden] { display:none; }

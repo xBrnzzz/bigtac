@@ -1,3 +1,4 @@
+import { uiText } from './i18n.js';
 import { safeURL } from './operations-model.js';
 
 export const GLOVO_LISTING = 'https://glovoapp.com/fr/ma/fes/stores/big-tac-fes';
@@ -76,12 +77,45 @@ export function storefrontAppearanceIssue(value) {
     return '';
 }
 
-export function foreground(background) {
+function luminance(background) {
     const linear = background.slice(1).match(/../g).map(pair => {
         const channel = parseInt(pair, 16) / 255;
         return channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4;
     });
-    return linear[0] * .2126 + linear[1] * .7152 + linear[2] * .0722 >= .179 ? '#000000' : '#ffffff';
+    return linear[0] * .2126 + linear[1] * .7152 + linear[2] * .0722;
+}
+
+export function foreground(background) {
+    return luminance(background) >= .179 ? '#000000' : '#ffffff';
+}
+
+function applyPalette(styles, palette) {
+    for (const [key] of paletteFields) {
+        const color = palette[key];
+        if (color) {
+            styles.setProperty('--site-' + key, color);
+            styles.setProperty('--site-' + key + '-ink', foreground(color));
+        } else {
+            styles.removeProperty('--site-' + key);
+            styles.removeProperty('--site-' + key + '-ink');
+        }
+    }
+    if (palette.accent) {
+        const tone = foreground(palette.accent) === '#000000' ? '#ffffff' : '#000000';
+        styles.setProperty('--site-accent-hover', `color-mix(in srgb,${palette.accent} 90%,${tone})`);
+    } else styles.removeProperty('--site-accent-hover');
+}
+
+export function applyAdminPalette(doc, config = {}) {
+    const {accent, background, surface} = storefrontAppearance(config).palette;
+    const styles = doc.documentElement.style;
+    applyPalette(styles, {accent, background, surface});
+    // The POS remains a light workspace with dark labels. Dark colours tint its paper.
+    for (const [key, color] of [['background', background], ['surface', surface]]) {
+        const variable = '--site-admin-' + key;
+        if (color) styles.setProperty(variable, luminance(color) >= .75 ? color : `color-mix(in srgb,${color} 12%,white)`);
+        else styles.removeProperty(variable);
+    }
 }
 
 export function appearanceText(config, key, language, translate) {
@@ -92,7 +126,7 @@ export function appearanceText(config, key, language, translate) {
         heroName: config.restaurantName || 'BIGTAC',
         heroSubtitle: config.description || translate('hero.subtitle'),
         heroAlt: config.storefront?.heroImage ? '' : translate('hero.photo'),
-        tagline: 'Tacos & grill · Fès',
+        tagline: uiText('Tacos & grill · Fès', {}, language),
         glovoLabel: glovoLabels[language] || glovoLabels.fr
     };
     return Object.hasOwn(fallback, key) ? fallback[key] : translate(field[2]);
@@ -124,20 +158,7 @@ export function renderStorefrontHours(doc, hours, language, translate) {
 export function renderStorefrontAppearance(doc, config, {language, translate, open, table = false, localImage = ''}) {
     const settings = storefrontAppearance(config);
     const styles = doc.documentElement.style;
-    for (const [key] of paletteFields) {
-        const color = settings.palette[key];
-        if (color) {
-            styles.setProperty('--site-' + key, color);
-            styles.setProperty('--site-' + key + '-ink', foreground(color));
-        } else {
-            styles.removeProperty('--site-' + key);
-            styles.removeProperty('--site-' + key + '-ink');
-        }
-    }
-    if (settings.palette.accent) {
-        const tone = foreground(settings.palette.accent) === '#000000' ? '#ffffff' : '#000000';
-        styles.setProperty('--site-accent-hover', `color-mix(in srgb,${settings.palette.accent} 90%,${tone})`);
-    } else styles.removeProperty('--site-accent-hover');
+    applyPalette(styles, settings.palette);
     const getText = key => appearanceText(config, key, language, translate);
     const name = config.restaurantName || 'BIGTAC';
     doc.getElementById('store-brand-name').textContent = name;
@@ -146,6 +167,12 @@ export function renderStorefrontAppearance(doc, config, {language, translate, op
     const logo = doc.querySelector('.store-brand img');
     const logoSrc = safeURL(config.logoUrl) ? config.logoUrl : 'assets/logo.png';
     if (logo.getAttribute('src') !== logoSrc) logo.setAttribute('src', logoSrc);
+    if (!doc.documentElement.hasAttribute('data-storefront-preview')) {
+        doc.title = name + ' · ' + translate('sections.menu');
+        doc.querySelectorAll('[data-storefront-icon]').forEach(icon => {
+            if (icon.getAttribute('href') !== logoSrc) icon.href = logoSrc;
+        });
+    }
     for (const [key, , , , selector] of copyFields) {
         if (key === 'heroAlt' || key === (open ? 'heroClosedCta' : 'heroCta')) continue;
         doc.querySelectorAll(selector).forEach(node => { node.textContent = getText(key); });
@@ -157,10 +184,9 @@ export function renderStorefrontAppearance(doc, config, {language, translate, op
     if (image.dataset.requested !== src) {
         image.dataset.requested = src;
         image.onerror = () => {
-            image.onerror = null;
-            image.src = 'assets/tacos-campaign.jpg';
-            image.alt = translate('hero.photo');
+            image.classList.add('hidden');
         };
+        image.classList.remove('hidden');
         image.setAttribute('src', src);
     }
     image.alt = image.getAttribute('src') === src

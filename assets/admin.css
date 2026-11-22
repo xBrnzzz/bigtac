@@ -1,15 +1,18 @@
 :root {
     color-scheme: light;
     /* Restaurant operations. White paper, a warm frame and BIGTAC orange. */
-    --admin-ground:#fbf8f3;
-    --admin-surface:#fff;
-    --admin-frame:#f1ebe3;
-    --admin-raised:#f8f2ea;
+    --admin-ground:var(--site-admin-background,#fbf8f3);
+    --admin-surface:var(--site-admin-surface,#fff);
+    --admin-bg:var(--admin-ground);
+    --admin-frame:var(--site-admin-frame,#f1ebe3);
+    --admin-raised:var(--site-admin-raised,#f8f2ea);
+    --site-admin-frame:color-mix(in srgb,var(--site-admin-background) 88%,#a79c8e);
+    --site-admin-raised:color-mix(in srgb,var(--site-admin-background) 75%,var(--admin-surface));
     --admin-field-surface:#f4f2ef;
     --admin-field-hover:#eee8df;
-    --admin-neutral-control:#fff;
+    --admin-neutral-control:var(--admin-surface);
     --admin-neutral-hover:#eee8df;
-    --admin-section-surface:#fff;
+    --admin-section-surface:var(--admin-surface);
     --admin-sidebar:var(--admin-frame);
     --admin-text:#2e2822;
     --admin-muted:#6b6258;
@@ -26,12 +29,15 @@
     --admin-shadow:var(--shadow-card);
     --admin-card-shadow:var(--admin-shadow);
     --admin-card-hover:var(--shadow-hover);
-    --admin-accent:#c84a13;
-    --admin-accent-hover:#a93b0c;
-    --admin-orange-ink:#98380f;
-    --admin-active:#fff0e3;
+    --admin-accent:var(--site-accent,#c84a13);
+    --admin-accent-hover:var(--site-accent-hover,#a93b0c);
+    --admin-orange-ink:var(--site-admin-accent-ink,#98380f);
+    --admin-active:var(--site-admin-accent-tint,#fff0e3);
+    --site-admin-accent-ink:color-mix(in srgb,var(--site-accent) 42%,#171310);
+    --site-admin-accent-tint:color-mix(in srgb,var(--site-accent) 13%,var(--admin-surface));
     --admin-primary:var(--admin-accent);
     --admin-primary-hover:var(--admin-accent-hover);
+    --admin-on-primary:var(--site-accent-ink,#fff);
     /* semantic */
     --admin-positive:#217252;  --admin-green-bg:#eaf6ef;  --admin-green-border:#c0dece;
     --admin-blue:#315db5;      --admin-blue-bg:#edf2ff;   --admin-blue-border:#c5d3ef;
@@ -131,7 +137,7 @@ html,body { margin:0; height:100%; }
 /* ── Buttons — flat fills only, no box-shadow at rest ── */
 .admin-button { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 15px; min-height:42px; border:1px solid var(--admin-border); border-radius:var(--admin-control-radius); background:var(--admin-surface); color:var(--admin-text); font-size:12px; font-weight:700; text-decoration:none; cursor:pointer; white-space:nowrap; }
 .admin-button:hover { background:var(--admin-raised); border-color:#b8bec9; }
-.admin-button.primary { background:var(--admin-primary); color:white; border-color:var(--admin-primary); box-shadow:none; }
+.admin-button.primary { background:var(--admin-primary); color:var(--admin-on-primary); border-color:var(--admin-primary); box-shadow:none; }
 .admin-button.primary:hover { background:var(--admin-primary-hover); border-color:var(--admin-primary-hover); }
 .admin-button:active:not(:disabled) { transform:translateY(1px); }
 .admin-button:disabled { cursor:wait; opacity:.7; }
@@ -389,6 +395,7 @@ html,body { margin:0; height:100%; }
     cursor: pointer;
     transition: all 0.2s ease;
 }
+.lang-toggle-btn svg { width: 16px; height: 16px; }
 .lang-toggle-btn:hover {
     background: #e2e8f0;
     border-color: #ea580c;
@@ -435,9 +442,6 @@ html,body { margin:0; height:100%; }
     background: #fff7ed;
     color: #ea580c;
     font-weight: 700;
-}
-.lang-flag {
-    font-size: 14px;
 }
 
 /* RTL for Admin and Driver */

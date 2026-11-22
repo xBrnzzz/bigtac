@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="../">
-    <title>Aperçu de la vitrine</title>
+    <title data-ui-copy="Aperçu de la vitrine">Aperçu de la vitrine</title>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Cairo:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/storefront.css">
     <link rel="stylesheet" href="assets/storefront-hero.css">
@@ -23,10 +23,12 @@
     <main class="app-wrap store-main">
         <section id="hero" class="restaurant-intro">
             <div class="restaurant-intro__copy">
-                <h1><span class="hero-lead">Grosse faim ?</span> <span class="hero-name" id="hero-brand">BIGTAC</span></h1>
-                <p id="hero-description">Votre tacos, à votre façon.</p>
+                <div class="hero-message">
+                    <h1><span class="hero-lead" data-ui-copy="Grosse faim ?">Grosse faim ?</span> <span class="hero-name" id="hero-brand">BIGTAC</span></h1>
+                    <p id="hero-description" data-ui-copy="Votre tacos, à votre façon.">Votre tacos, à votre façon.</p>
+                </div>
                 <div class="hero-links">
-                    <a class="primary-button intro-cta"><span>Commander maintenant</span><span aria-hidden="true">↓</span></a>
+                    <a class="primary-button intro-cta"><span data-ui-copy="Commander maintenant">Commander maintenant</span><span aria-hidden="true">↓</span></a>
                     <a class="glovo-button" data-glovo-placement="hero" hidden><span data-glovo-label></span><span aria-hidden="true">↗</span></a>
                 </div>
             </div>
@@ -39,7 +41,7 @@
         </section>
         <div class="discovery-row">
             <section id="promotions" class="menu-feature menu-feature--offers">
-                <div class="section-heading"><h2 id="promotions-title">Promotions</h2></div>
+                <div class="section-heading"><h2 id="promotions-title" data-ui-copy="Promotions">Promotions</h2></div>
                 <div id="promotionsGrid" class="featured-grid">
                     <article class="product-card product-card--offer">
                         <div class="product-card__media"><img src="assets/tacos-campaign.jpg" alt=""></div>
@@ -62,7 +64,7 @@
             </section>
         </div>
         <section id="menu-unified">
-            <div class="store-menu-heading"><h2 id="menu-title">Notre carte</h2><p id="menu-description"></p></div>
+            <div class="store-menu-heading"><h2 id="menu-title" data-ui-copy="Notre carte">Notre carte</h2><p id="menu-description"></p></div>
             <article class="product-card">
                 <div class="product-card__media"><img src="assets/tacos-campaign.jpg" alt=""></div>
                 <div class="product-card__body"><h3 data-preview-copy="product">Exemple de produit</h3>
