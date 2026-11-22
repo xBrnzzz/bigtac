@@ -1,11 +1,14 @@
 import { mayView, roleViews } from './admin-model.js';
 import { icon } from './admin-icons.js';
 import { i18n, t, setUiText } from './i18n.js';
+import { safeURL } from './operations-model.js';
+
+const defaultLogo = 'assets/logo.png';
 
 const destinations = [
     ['overview', 'Vue d’ensemble', 'home', 'Opérations', 'admin.overview'],
     ['orders', 'Commandes', 'shopping-bag', 'Opérations', 'admin.orders'],
-    ['menu', 'Menu & produits', 'grid', 'Catalogue', 'admin.menu'],
+    ['menu', 'Menu', 'book', 'Catalogue', 'admin.menu'],
     ['promotions', 'Promotions', 'tag', 'Catalogue', 'admin.promotions'],
     ['drivers', 'Équipe', 'users', 'Gestion', 'admin.team'],
     ['settings', 'Paramètres', 'sliders', 'Gestion', 'admin.settings']
@@ -24,19 +27,36 @@ export function mountAdminShell() {
     shell.innerHTML = `
         <a class="admin-skip" href="#views-container" data-ui-copy="Aller au contenu">Aller au contenu</a>
         <aside class="admin-sidebar" aria-label="Navigation principale" data-ui-aria-label="Navigation principale">
-            <a class="admin-brand" href="index.html" target="_blank" rel="noopener"><img src="assets/logo.png" width="44" height="44" alt=""><span><strong data-restaurant-name>BIGTAC</strong><small data-i18n="admin.workspace">Espace équipe</small></span></a>
+            <a class="admin-brand" href="index.html" target="_blank" rel="noopener"><img src="${defaultLogo}" width="44" height="44" alt="" data-restaurant-logo><span><strong data-restaurant-name>BIGTAC</strong><small data-i18n="admin.workspace">Espace équipe</small></span></a>
             <nav id="admin-desktop-nav"></nav>
             <div class="admin-account"><span class="admin-avatar" aria-hidden="true">E</span><span><strong data-staff-name></strong><small data-staff-role></small></span></div>
             <button id="logout-btn" class="admin-text-button">${icon('log-out')}<span data-i18n="admin.logout">Déconnexion</span></button>
         </aside>
         <div class="admin-workspace">
-            <header class="admin-topbar"><div class="admin-location"><span class="location-restaurant" data-restaurant-name>BIGTAC</span><span class="location-separator" aria-hidden="true">/</span><h1 id="admin-page-name" data-ui-copy="Vue d’ensemble">Vue d’ensemble</h1></div><div class="admin-top-actions"><div class="lang-selector relative" id="adminLangSelector"><button type="button" id="btnAdminLang" class="lang-toggle-btn" onclick="toggleLangMenu('adminLangDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Langue / Language / اللغة" data-ui-aria-label="Langue / Language / اللغة">${icon('globe')}<span class="lang-current current-lang-code">FR</span></button><div id="adminLangDropdown" class="lang-menu hidden" role="menu"><button type="button" class="lang-option" data-lang-btn="fr" onclick="setAppLanguage('fr')" role="menuitem"><span lang="fr">Français</span></button><button type="button" class="lang-option" data-lang-btn="en" onclick="setAppLanguage('en')" role="menuitem"><span lang="en">English</span></button><button type="button" class="lang-option" data-lang-btn="ar" onclick="setAppLanguage('ar')" role="menuitem"><span lang="ar">العربية</span></button></div></div><span id="admin-store-status" class="admin-store-status" hidden></span><span id="admin-connection" role="status" data-ui-copy="Connexion…">Connexion…</span><a class="admin-preview" href="index.html" target="_blank" rel="noopener"><span data-i18n="admin.view_site">Voir le site</span> ${icon('external-link')}</a><button id="admin-profile-button" class="admin-profile-button" aria-label="Ouvrir votre espace équipe" aria-expanded="false" data-ui-aria-label="Ouvrir votre espace équipe"><span class="admin-avatar" aria-hidden="true">E</span><span class="admin-profile-copy"><strong data-staff-name></strong><small data-staff-role></small></span>${icon('chevron-down')}</button><button id="admin-more-button" class="admin-icon-button" aria-label="Ouvrir le menu" aria-expanded="false" data-ui-aria-label="Ouvrir le menu">${icon('menu')}</button></div></header>
+            <header class="admin-topbar"><div class="admin-location"><span class="location-restaurant" data-restaurant-name>BIGTAC</span><span class="location-separator" aria-hidden="true">/</span><h1 id="admin-page-name" data-ui-copy="Vue d’ensemble">Vue d’ensemble</h1></div><div class="admin-top-actions"><div class="lang-selector relative" id="adminLangSelector"><button type="button" id="btnAdminLang" class="lang-toggle-btn" onclick="toggleLangMenu('adminLangDropdown')" aria-expanded="false" aria-haspopup="true" aria-label="Langue / Language / اللغة" data-ui-aria-label="Langue / Language / اللغة">${icon('globe')}<span class="lang-current current-lang-code">FR</span></button><div id="adminLangDropdown" class="lang-menu hidden" role="menu"><button type="button" class="lang-option" data-lang-btn="fr" onclick="setAppLanguage('fr')" role="menuitem"><span lang="fr">Français</span></button><button type="button" class="lang-option" data-lang-btn="en" onclick="setAppLanguage('en')" role="menuitem"><span lang="en">English</span></button><button type="button" class="lang-option" data-lang-btn="ar" onclick="setAppLanguage('ar')" role="menuitem"><span lang="ar">العربية</span></button></div></div><button id="admin-mode-toggle" class="admin-icon-button" type="button" hidden aria-label="Mode sombre" data-ui-aria-label="Mode sombre"><span class="mode-moon">${icon('moon')}</span><span class="mode-sun">${icon('sun')}</span></button><span id="admin-store-status" class="admin-store-status" hidden></span><span id="admin-connection" role="status" data-ui-copy="Connexion…">Connexion…</span><a class="admin-preview" href="index.html" target="_blank" rel="noopener"><span data-i18n="admin.view_site">Voir le site</span> ${icon('external-link')}</a><button id="admin-profile-button" class="admin-profile-button" aria-label="Ouvrir votre espace équipe" aria-expanded="false" data-ui-aria-label="Ouvrir votre espace équipe"><span class="admin-avatar" aria-hidden="true">E</span><span class="admin-profile-copy"><strong data-staff-name></strong><small data-staff-role></small></span>${icon('chevron-down')}</button><button id="admin-more-button" class="admin-icon-button" aria-label="Ouvrir le menu" aria-expanded="false" data-ui-aria-label="Ouvrir le menu">${icon('menu')}</button></div></header>
             <div id="admin-content-slot"></div>
         </div>
         <nav id="admin-bottom-nav" class="admin-bottom-nav" aria-label="Navigation mobile" data-ui-aria-label="Navigation mobile"></nav>
         <dialog id="admin-more" class="admin-more" aria-labelledby="admin-more-title"><header><h2 id="admin-more-title" data-ui-copy="Votre espace">Votre espace</h2><button id="admin-more-close" class="admin-icon-button" aria-label="Fermer le menu" data-ui-aria-label="Fermer le menu">${icon('x')}</button></header><div class="admin-more-identity"><span class="admin-avatar" aria-hidden="true">E</span><span><strong data-staff-name></strong><small data-staff-role></small></span></div><nav id="admin-more-nav"></nav><a class="admin-button" href="index.html" target="_blank" rel="noopener" data-i18n="admin.view_site">Voir le site client</a><button id="admin-more-logout" class="admin-button" data-i18n="admin.logout">Déconnexion</button></dialog>`;
     document.body.append(shell);
     shell.querySelector('#admin-content-slot').replaceWith(views);
+    const logos = shell.querySelectorAll('[data-restaurant-logo]');
+    const favicon = document.getElementById('admin-favicon');
+    let configuredLogo = defaultLogo;
+    for (const logo of logos) {
+        logo.addEventListener('error', () => {
+            if (logo.getAttribute('src') === defaultLogo) return;
+            logo.src = defaultLogo;
+            favicon.href = defaultLogo;
+        });
+    }
+    function updateLogo(url) {
+        const src = safeURL(url) ? url : defaultLogo;
+        if (src === configuredLogo) return;
+        configuredLogo = src;
+        for (const logo of logos) logo.src = src;
+        favicon.href = src;
+    }
     views.setAttribute('role', 'main'); views.tabIndex = -1;
     document.body.className = 'admin-body';
     const settings = document.createElement('section'); settings.id = 'view-settings'; settings.className = 'admin-page hidden';
@@ -58,6 +78,16 @@ export function mountAdminShell() {
     const gate = document.createElement('section'); gate.id = 'admin-access'; gate.className = 'admin-access'; gate.hidden = true;
     gate.innerHTML = `<div class="admin-panel"><img src="assets/logo.png" width="48" height="48" alt="BIGTAC"><h1 data-ui-copy="Accès au restaurant indisponible">Accès au restaurant indisponible</h1><p id="admin-access-message" role="alert"></p><button id="admin-access-retry" class="admin-button primary" data-ui-copy="Réessayer">Réessayer</button><button id="admin-access-logout" class="admin-button" data-ui-copy="Se déconnecter">Se déconnecter</button></div>`;
     document.body.append(gate);
+    // "Plus" sits raised in the middle of the bottom nav in every theme, like the storefront cart.
+    // It moves in the DOM, not with CSS order, so keyboard and screen-reader order match what is shown.
+    function arrangeBottomNav() {
+        const nav = document.getElementById('admin-bottom-nav');
+        const moreButton = nav.querySelector('[data-more]');
+        if (!moreButton) return;
+        const links = [...nav.querySelectorAll('.admin-nav-link:not([data-more])')];
+        const before = links[Math.ceil(links.length / 2)] || null;
+        if (moreButton.nextElementSibling !== before) nav.insertBefore(moreButton, before);
+    }
     const more = document.getElementById('admin-more');
     const expanded = value => ['admin-more-button','admin-profile-button'].forEach(id=>document.getElementById(id).setAttribute('aria-expanded',String(value)));
     const closeMore = () => { more.close(); expanded(false); };
@@ -125,12 +155,14 @@ export function mountAdminShell() {
                 if (entries.length) { const section = document.createElement('div'); section.innerHTML = `<p class="admin-nav-group" data-i18n="${groupKeys[group]}">${group}</p>${entries.map(navLink).join('')}`; nav.append(section); }
             }
             document.getElementById('admin-more-nav').innerHTML = allowed.map(navLink).join('');
-            const primary = allowed.filter(([id]) => ['overview', 'orders', 'menu'].includes(id));
+            const primary = allowed.filter(([id]) => ['overview', 'orders', 'menu', 'promotions'].includes(id));
             document.getElementById('admin-bottom-nav').innerHTML = primary.map(navLink).join('') + `<button class="admin-nav-link" data-more>${icon('menu')}<span data-i18n="admin.more">Plus</span></button>`;
+            arrangeBottomNav();
             if (window.feather) window.feather.replace();
             i18n.setLang(i18n.getLang());
         },
         hideSession() {
+            updateLogo();
             shell.hidden = true; shell.inert = true; gate.hidden = true;
             if (more.open) closeMore();
             views.querySelectorAll(':scope > [id^="view-"]').forEach(view => view.classList.add('hidden'));
@@ -149,7 +181,8 @@ export function mountAdminShell() {
             if (location.hash !== `#${view}`) history[replace || view === 'driver' ? 'replaceState' : 'pushState'](null, '', `#${view}`);
             views.focus({ preventScroll: true });
         },
-        restaurant(config = {}) {
+        restaurant(config = {}, cached = false) {
+            if (!cached) updateLogo(config.logoUrl);
             shell.querySelectorAll('[data-restaurant-name]').forEach(node => node.textContent = config.restaurantName || 'BIGTAC');
             const status=document.getElementById('admin-store-status');status.hidden=!!config._unavailable;
             status.dataset.i18n = config.isOpen===false ? 'admin.closed' : 'admin.open'; status.textContent=t(status.dataset.i18n);status.dataset.open=String(config.isOpen!==false);

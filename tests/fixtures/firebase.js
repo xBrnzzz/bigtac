@@ -16,6 +16,14 @@ const items = [
 ];
 const promotions=[{...base,id:'promo',isPromo:true,name:'Menu Tacos',price:35,description:'Un tacos, des frites et une boisson.',mandatoryChoices:[choices[0]]}];
 const categories=['Tacos Français','Gratinés','Burgers','À côté'];
+// ?cutouts=1 mixes photos with cut-outs on a transparent background (tests/fixtures/images/LICENSES.md),
+// so the preview shows both ways Charbon displays dish images. The default data stays unchanged for the tests.
+if (new URLSearchParams(location.search).has('cutouts')) {
+ items.find(item=>item.id==='optional').imageUrl='/fixture-images/cheeseburger.png';
+ items.push({...base,id:'cheese',name:'Cheeseburger',category:'Burgers',price:32,description:'Double cheddar, oignons et cornichons.',imageUrl:'/fixture-images/cheeseburger-side.png',isPopular:true});
+ items.push({...base,id:'pizza',name:'Pizza 4 saisons',category:'Pizzas',price:45,description:'Jambon, champignons, artichauts et olives.',imageUrl:'/fixture-images/pizza-quattro-stagioni.png',isPopular:true});
+ categories.splice(3,0,'Pizzas');
+}
 const categoryRows=categories.map((name,i)=>({id:'cat'+i,name,order:i}));
 const catalogListeners=new Set();
 window.__fixture={orders:[],failMenu:scenario==='error',failSubmission:scenario==='submit-error',failTracking:scenario==='tracker-error',state:'pending',tracker:null,setStatus(status){this.state=status;this.tracker?.({exists:()=>true,data:()=>({shortId:1234,status,type:'livraison'})});}};

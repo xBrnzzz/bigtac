@@ -21,6 +21,14 @@ export async function startFixtureServer(port = 0) {
             response.setHeader('Content-Type', ({ '.js':'text/javascript', '.css':'text/css', '.woff2':'font/woff2', '.ttf':'font/ttf' })[path.extname(name)] || 'application/octet-stream');
             return response.end(fs.readFileSync(path.join(cache, name)));
         }
+        // Preview-only cut-out photos (see tests/fixtures/images/LICENSES.md), used with ?cutouts=1.
+        if (pathname.startsWith('/fixture-images/')) {
+            const name = path.basename(pathname);
+            const file = path.join(directory, 'images', name);
+            if (!/^[a-z0-9-]+\.png$/.test(name) || !fs.existsSync(file)) { response.writeHead(404); return response.end(); }
+            response.setHeader('Content-Type', 'image/png');
+            return response.end(fs.readFileSync(file));
+        }
         if (pathname === '/firebase-config.js') {
             response.setHeader('Content-Type', 'text/javascript; charset=utf-8');
             return response.end(fs.readFileSync(path.join(directory, 'firebase.js')));

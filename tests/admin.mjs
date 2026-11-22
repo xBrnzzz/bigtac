@@ -84,7 +84,8 @@ try {
             check(await page.locator('#toggle-store').isEnabled(), 'Legacy settings available to admin');
             await page.evaluate(()=>switchView('overview'));
             if (width<1000) {
-                await page.locator('#admin-more-button').click();
+                // The raised Plus button in the bottom nav opens the secondary menu on phones and tablets.
+                await page.locator('#admin-bottom-nav [data-more]').click();
                 check(await page.locator('#admin-more').isVisible(), 'Secondary menu opens');
                 await page.keyboard.press('Escape');
                 check(!(await page.locator('#admin-more').isVisible()), 'Menu keyboard dismissal');

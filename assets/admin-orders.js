@@ -18,7 +18,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
         <div id="orders-filters" class="orders-filters" hidden><label data-ui-copy="Service">Service<select id="orders-service"><option value="all" data-ui-copy="Tous les services">Tous les services</option><option value="livraison" data-ui-copy="Livraison">Livraison</option><option value="emporter" data-ui-copy="À emporter">À emporter</option><option value="sur_place" data-ui-copy="Sur place">Sur place</option></select></label><label data-ui-copy="Statut">Statut<select id="orders-status"><option value="all" data-ui-copy="Tous les statuts">Tous les statuts</option><option value="pending" data-ui-copy="En attente">En attente</option><option value="confirmed" data-ui-copy="En cuisine">En cuisine</option><option value="en_livraison" data-ui-copy="Prêt / livraison">Prêt / livraison</option><option value="history" data-ui-copy="Terminées">Terminées</option><option value="delivered" data-ui-copy="Remises / livrées">Remises / livrées</option><option value="rejected" data-ui-copy="Refusées">Refusées</option><option value="ready" data-ui-copy="Prêtes (ancien statut)">Prêtes (ancien statut)</option></select></label><label data-ui-copy="Date de réception">Date de réception<input id="orders-date" type="date" name="order-date"></label><label data-ui-copy="Repère local (min)">Repère local (min)<input id="orders-threshold" type="number" min="0" max="240" step="1" value="0" inputmode="numeric"><small data-ui-copy="0 : aucun avertissement. Repère local depuis réception, pas délai de cuisson.">0 : aucun avertissement. Repère local depuis réception, pas délai de cuisson.</small></label><button id="orders-clear" class="admin-button" data-ui-copy="Effacer les filtres">Effacer les filtres</button></div>
         <div id="orders-notification" class="orders-notification" role="status" hidden>${icon('bell')}<span></span><button class="admin-button" id="orders-show-new" data-ui-copy="Voir les nouvelles">Voir les nouvelles</button></div>
         <div id="orders-error" class="orders-feedback" role="alert" hidden></div><div id="orders-summary" class="orders-summary" role="status"></div>
-        <nav class="orders-tabs" aria-label="Files de commandes" data-ui-aria-label="Files de commandes">${ORDER_COLUMNS.map(column=>`<button id="mtab-${column.id}" data-tab="${column.id}" data-tone="${column.tone}" aria-pressed="${column.id==='pending'}">${icon(queueIcon(column.id))}${uiMarkup(column.label)} <span id="count-${column.id}">—</span></button>`).join('')}</nav>
+        <nav class="orders-tabs" aria-label="Files de commandes" data-ui-aria-label="Files de commandes"><button id="mtab-all" data-tab="all" aria-pressed="true">${icon('grid')}${uiMarkup('Tous')} <span id="count-all">—</span></button>${ORDER_COLUMNS.map(column=>`<button id="mtab-${column.id}" data-tab="${column.id}" data-tone="${column.tone}" aria-pressed="false">${icon(queueIcon(column.id))}${uiMarkup(column.label)} <span id="count-${column.id}">—</span></button>`).join('')}</nav>
         <div class="orders-board">${ORDER_COLUMNS.map(column=>`<section id="col-${column.id}" class="orders-column" data-column="${column.id}" data-tone="${column.tone}" aria-labelledby="order-heading-${column.id}"><header><div><h3 id="order-heading-${column.id}" tabindex="-1">${icon(queueIcon(column.id))}${uiMarkup(column.label)}</h3><p>${uiMarkup(column.hint)}</p></div><span data-count="${column.id}" aria-label="Commandes affichées" data-ui-aria-label="Commandes affichées">—</span></header><div id="list-${column.id}" class="orders-list"></div>${column.id==='history'?"<footer><button id=\"orders-history-more\" class=\"admin-button\" data-ui-copy=\"Charger l’historique\">Charger l’historique</button><p id=\"orders-history-note\" data-ui-copy=\"7 derniers jours. Chargement à la demande.\">7 derniers jours. Chargement à la demande.</p></footer>":''}</section>`).join('')}</div>`;
     const toolbar=root.querySelector('.orders-toolbar');
     toolbar.append(root.querySelector('.orders-utilities'));
@@ -38,7 +38,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
     const receipt=document.createElement('section'); receipt.id='order-print-receipt'; receipt.hidden=true; document.body.append(receipt);
     let active=[],historyOrders=[],historyCursor=null,hasMore=true,historyLoaded=false,historyBusy=false,historyError='',historyRequest=0;
     let stopLive=null,stopDetail=null,timer=null,selected=null,detailError='',detailCached=false;
-    let enabled=false,epoch=0,activeError='',loading=true,cached=false,partial=false,kitchen=false,tab='pending',timezone='Africa/Casablanca',newCount=0;
+    let enabled=false,epoch=0,activeError='',loading=true,cached=false,partial=false,kitchen=false,tab='all',timezone='Africa/Casablanca',newCount=0;
     let filter={search:'',service:'all',status:'all',date:''},threshold=0,tracker=null,audio=null,sound=false;
     let deliveryDrivers=[],driverError='',driverLoaded=false,driverRequest=0,assignmentBusy=false;
     const assignments=operationsService(session);
@@ -114,12 +114,15 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
         const data=[...active.slice(0,ORDER_LIMIT),...historyOrders.filter(order=>!active.some(current=>current.id===order.id))];
         const filtered=filterOrders(data,{...filter,kitchen},timezone).sort((a,b)=>(timestampDate(a.createdAt)?.getTime()||0)-(timestampDate(b.createdAt)?.getTime()||0));
         const activeKnown=!loading && !activeError;
-        const visibleCount=filtered.filter(order=>orderColumn(order.status)===tab).length;
+        // Tous shows every queue at once, one lane per status.
+        const visibleCount=tab==='all'?filtered.length:filtered.filter(order=>orderColumn(order.status)===tab).length;
         const known=tab==='history'?historyLoaded:activeKnown;
         const unavailable=tab==='history'?(historyError?'Historique indisponible':'Chargement de l’historique…'):(activeError?'Files indisponibles':'Chargement des files…');
         const summary=known ? uiText(visibleCount===1?'{count} commande affichée':'{count} commandes affichées',{count:visibleCount}) : uiText(unavailable);
         $('orders-summary').textContent=summary+(known && filter.search ? ' · '+uiText('recherche dans les commandes chargées') : '');
         $('orders-mode-service').setAttribute('aria-pressed',String(!kitchen)); $('orders-mode-kitchen').setAttribute('aria-pressed',String(kitchen));
+        $('mtab-all').setAttribute('aria-pressed',String(tab==='all'));
+        $('count-all').textContent=activeKnown?String(filtered.filter(order=>orderColumn(order.status)!=='history').length):'—';
         const present=new Set();
         for(const column of ORDER_COLUMNS) {
             const rows=filtered.filter(order=>orderColumn(order.status)===column.id); if(column.id==='history') rows.reverse();
@@ -262,7 +265,7 @@ export function createOrderWorkspace(root,{session,settings,toast}) {
         } catch(error){if(version===epoch && request===historyRequest)historyError=operationMessage(error);}
         finally{if(version===epoch && request===historyRequest){historyBusy=false;render();}}
     }
-    function setTab(id) {if(!ORDER_COLUMNS.some(column=>column.id===id))return;tab=kitchen?'confirmed':id;if(id==='history'&&!historyLoaded&&!historyBusy)historyPage();render();}
+    function setTab(id) {if(id!=='all'&&!ORDER_COLUMNS.some(column=>column.id===id))return;tab=kitchen?'confirmed':id;if(id==='history'&&!historyLoaded&&!historyBusy)historyPage();render();}
     function subscribe() {
         stopLive?.();loading=true;activeError='';cached=false;render();const version=epoch;
         stopLive=watchActiveOrders(snapshot=>{
