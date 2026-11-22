@@ -20,6 +20,7 @@
         <link rel="stylesheet" href="assets/storefront-hero.css">
         <link rel="stylesheet" href="assets/storefront-discovery.css">
         <link rel="stylesheet" href="assets/storefront-footer.css">
+        <link rel="stylesheet" href="assets/storefront-appearance.css">
     </head>
     <body>
         <a class="skip-link" href="#menu-unified" data-i18n="nav.skip">Aller à la carte</a>
@@ -28,10 +29,7 @@
                 <div class="store-header__inner app-wrap">
                     <a href="#hero" class="store-brand" aria-label="BIGTAC, accueil">
                         <img src="assets/logo.png" alt="" width="44" height="44">
-                        <span translate="no">
-                            BIGTAC
-                            <small>Tacos &amp; grill · Fès</small>
-                        </span>
+                        <span translate="no"><span id="store-brand-name">BIGTAC</span><small id="store-brand-tagline">Tacos &amp; grill · Fès</small></span>
                     </a>
                     <nav class="store-nav" aria-label="Navigation principale">
                         <a href="#menu-unified" data-i18n="nav.menu">La carte</a>
@@ -75,17 +73,21 @@
                 <section id="hero" class="restaurant-intro" aria-labelledby="store-title">
                     <div class="restaurant-intro__copy">
                         <h1 id="store-title"><span class="hero-lead" data-i18n="hero.title_lead">Grosse faim ?</span> <span class="hero-name" id="hero-brand" translate="no">BIGTAC</span></h1>
-                        <p data-i18n="hero.subtitle">Votre tacos, à votre façon.</p>
+                        <p id="hero-description" data-i18n="hero.subtitle">Votre tacos, à votre façon.</p>
                         <div id="tableNotice" class="restaurant-services hidden" style="margin-top: 10px;">
                             <span style="background: var(--app-accent); color: var(--app-on-accent); font-weight: 700; border: none;"><span data-i18n="hero.table_order">🪑 Commande à la Table</span> <b id="tableNoticeNumber"></b></span>
                         </div>
-                        <a class="primary-button intro-cta" href="#menu-unified">
-                            <span data-i18n="hero.cta">Commander maintenant</span>
-                            <i data-feather="arrow-down" aria-hidden="true">
-                            </i>
-                        </a>
+                        <div class="hero-links">
+                            <a class="primary-button intro-cta" href="#menu-unified">
+                                <span data-i18n="hero.cta">Commander maintenant</span>
+                                <i data-feather="arrow-down" aria-hidden="true"></i>
+                            </a>
+                            <a class="glovo-button" data-glovo-placement="hero" target="_blank" rel="noopener noreferrer" hidden>
+                                <span data-glovo-label>Commander sur Glovo</span><i data-feather="external-link" aria-hidden="true"></i>
+                            </a>
+                        </div>
                     </div>
-                    <img src="assets/tacos-campaign.jpg" alt="Tacos français grillé, servi avec des frites" data-i18n-alt="hero.photo" width="1536" height="1024" fetchpriority="high">
+                    <img id="hero-photo" src="assets/tacos-campaign.jpg" alt="Tacos français grillé, servi avec des frites" data-i18n-alt="hero.photo" width="1536" height="1024" fetchpriority="high">
                     <div class="hero-service-line">
                         <span class="store-status" id="storeStatus" data-i18n="hero.status_loading">Disponibilité en cours…</span>
                         <div class="restaurant-services">
@@ -123,7 +125,7 @@
                 <section id="menu-unified" aria-labelledby="menu-title">
                     <div class="store-menu-heading">
                         <h2 id="menu-title" data-i18n="sections.menu">Notre carte</h2>
-                        <p data-i18n="sections.menu_sub">Tacos, gratinés, burgers… À vous de choisir.</p>
+                        <p id="menu-description" data-i18n="sections.menu_sub">Tacos, gratinés, burgers… À vous de choisir.</p>
                     </div>
                     <div id="stickyFilterBar" class="menu-toolbar">
                         <div class="store-search">
@@ -203,10 +205,11 @@
                             <dl id="footer-week" hidden></dl>
                         </section>
                         <section class="restaurant-footer__contact">
-                            <h3 data-i18n="location.question">Une question sur votre commande ?</h3>
+                            <h3 id="footer-contact-title" data-i18n="location.question">Une question sur votre commande ?</h3>
                             <div class="footer-contact-links">
                                 <button type="button" onclick="contactWhatsApp()"><i data-feather="message-circle" aria-hidden="true"></i><span data-i18n="location.whatsapp">WhatsApp</span></button>
                                 <button type="button" onclick="contactCall()"><i data-feather="phone" aria-hidden="true"></i><span data-i18n="location.call">Appeler</span></button>
+                                <a class="glovo-button" data-glovo-placement="footer" target="_blank" rel="noopener noreferrer" hidden><span data-glovo-label>Commander sur Glovo</span><i data-feather="external-link" aria-hidden="true"></i></a>
                             </div>
                         </section>
                     </div>
@@ -544,6 +547,7 @@
         import {promotionState,orderingAvailable,safeURL,compareOfferOrder} from './assets/operations-model.js';
         import { setupCarousel } from './assets/carousels.js';
         import { i18n, t } from './assets/i18n.js';
+        import { renderStorefrontAppearance, renderStorefrontHours } from './assets/storefront-appearance.js';
 
         // --- CONFIG & CONSTANTS ---
         const WHATSAPP_NUMBERS = {
@@ -767,44 +771,19 @@
         }
 
         const modes=['livraison','emporter','sur_place'];
-        const profileDefaults={description:document.querySelector('.restaurant-intro__copy>p').textContent,logoUrl:document.querySelector('.store-brand img').getAttribute('src'),address:document.getElementById('footer-address').textContent,map:document.getElementById('footer-directions').href,hours:document.getElementById('restaurant-hours').textContent,instagram:document.getElementById('footer-instagram').href};
+        const profileDefaults={address:document.getElementById('footer-address').textContent,map:document.getElementById('footer-directions').href,instagram:document.getElementById('footer-instagram').href};
         function storeAvailable(){return configReady&&modes.some(mode=>orderingAvailable(appConfig,mode));}
         function applyRestaurantConfig(){
             const open=storeAvailable(),status=document.getElementById('storeStatus');status.textContent=open?t('hero.status_open'):t('hero.unavailable');status.classList.toggle('is-open',open);status.classList.toggle('is-closed',!open);document.getElementById('closedBanner').classList.toggle('hidden',open);
-            const heroBrand = document.getElementById('hero-brand');
-            heroBrand.textContent = appConfig.restaurantName || 'BIGTAC';
-            heroBrand.toggleAttribute('data-custom', heroBrand.textContent.toUpperCase() !== 'BIGTAC');
+            renderStorefrontAppearance(document, appConfig, {language:i18n.getLang(),translate:t,open,table:!!urlTable});
+            syncDiscoveryVisibility();
             document.querySelectorAll('.hero-service-line [data-mode]').forEach(label => {
                 label.hidden = appConfig.orderingModes?.[label.dataset.mode] === false;
             });
-            const heroAction = document.querySelector('.intro-cta span');
-            heroAction.dataset.i18n = open ? 'hero.cta' : 'hero.cta_closed';
-            heroAction.textContent = t(heroAction.dataset.i18n);
             document.querySelectorAll('.service-choice').forEach((button,index)=>{button.disabled=!configReady||!orderingAvailable(appConfig,modes[index]);button.setAttribute('aria-disabled',String(button.disabled));});
-            if(appConfig.restaurantName){const brand=document.querySelector('.store-brand>span');brand.firstChild.textContent=appConfig.restaurantName;document.querySelector('.store-brand').setAttribute('aria-label',appConfig.restaurantName+', '+t('common.home'));}
-            document.querySelector('.restaurant-intro__copy>p').textContent=appConfig.description||t('hero.subtitle',profileDefaults.description);
-            document.querySelector('.store-brand img').src=appConfig.logoUrl&&safeURL(appConfig.logoUrl)?appConfig.logoUrl:profileDefaults.logoUrl;
-            document.getElementById('footer-brand').textContent=appConfig.restaurantName || 'BIGTAC';
             document.getElementById('footer-address').textContent=appConfig.address||profileDefaults.address;document.getElementById('footer-directions').href=appConfig.address?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(appConfig.address):profileDefaults.map;
             document.getElementById('footer-instagram').href=appConfig.instagramUrl&&safeURL(appConfig.instagramUrl)?appConfig.instagramUrl:profileDefaults.instagram;
-            const weeklyHours = document.getElementById('footer-week');
-            const hoursSummary = document.getElementById('restaurant-hours');
-            const hasSchedule = Array.isArray(appConfig.openingHours) && appConfig.openingHours.length === 7
-                && appConfig.openingHours.every(hours => hours && (hours.closed || (hours.start && hours.end)));
-            hoursSummary.hidden = hasSchedule;
-            weeklyHours.hidden = !hasSchedule;
-            weeklyHours.replaceChildren();
-            if (hasSchedule) {
-                const weekdays = new Intl.DateTimeFormat(i18n.getLang(), {weekday:'short', timeZone:'UTC'});
-                appConfig.openingHours.forEach((hours, index) => {
-                    const day = document.createElement('dt');
-                    const time = document.createElement('dd');
-                    day.textContent = weekdays.format(new Date(Date.UTC(2026, 0, 5 + index)));
-                    time.textContent = hours.closed ? t('location.closed') : hours.start + '–' + hours.end;
-                    time.dir = hours.closed ? 'auto' : 'ltr';
-                    weeklyHours.append(day, time);
-                });
-            } else hoursSummary.textContent = t('location.hours_val', profileDefaults.hours);
+            renderStorefrontHours(document, appConfig.openingHours, i18n.getLang(), t);
             document.getElementById('btnFinalize').disabled=orderSubmitting||!storeAvailable()||!!checkoutData.type&&!orderingAvailable(appConfig,checkoutData.type);
         }
 
@@ -857,9 +836,8 @@
         function renderLivePromotions(){
             allPromotions=rawPromotions.filter(p=>promotionState(p)==='active');
             const container=document.getElementById('promotionsGrid');
-            document.querySelector('.store-nav a[href="#promotions"]').hidden = !allPromotions.length;
-            document.getElementById('promotions').classList.toggle('hidden',!allPromotions.length);
             container.innerHTML=allPromotions.map(p=>createCardHTML(p,'h3','offer')).join('');setupCarousel(container);
+            syncDiscoveryVisibility();
             if(currentItem?.isPromo&&!document.getElementById('addItemModal').classList.contains('hidden')){
                 const fresh=allPromotions.find(p=>p.id===currentItem.id);
                 if(!fresh||menuFingerprint(fresh)!==menuFingerprint(currentItem)){closeAddItemModal();showToast(t('menu.offer_changed'),'error');}
@@ -961,18 +939,17 @@
 
         function renderPopular(items) {
             const popContainer = document.getElementById('popularGrid');
-            const popSection = document.getElementById('popular');
             const populars = items.filter(item => item.isPopular === true);
-
-            if (!popContainer || populars.length === 0) {
-                if (popSection) popSection.classList.add('hidden');
-                if (popContainer) { popContainer.replaceChildren(); setupCarousel(popContainer); }
-                return;
-            }
-
-            popSection.classList.remove('hidden');
             popContainer.innerHTML = populars.map(item => createCardHTML(item, 'h3', 'popular')).join('');
             setupCarousel(popContainer);
+            syncDiscoveryVisibility();
+        }
+        function syncDiscoveryVisibility() {
+            const offers = appConfig.storefront?.showOffers !== false && !!allPromotions.length;
+            const popular = appConfig.storefront?.showPopular !== false && !!document.getElementById('popularGrid').childElementCount;
+            document.querySelector('.store-nav a[href="#promotions"]').hidden = !offers;
+            document.getElementById('promotions').classList.toggle('hidden', !offers);
+            document.getElementById('popular').classList.toggle('hidden', !popular);
         }
 
         let activeCategory = null;
