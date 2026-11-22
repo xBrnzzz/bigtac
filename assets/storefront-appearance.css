@@ -14,6 +14,22 @@
     --site-background-dark:color-mix(in srgb,var(--site-background) 14%,#1d1b18);
     --site-surface-dark:color-mix(in srgb,var(--site-surface) 14%,#292620);
 }
+/* Dark restaurant themes (Braise, Dorée): neutral surfaces built from the theme's own colours, one accent. */
+:root.dark[data-site-mode="dark"] {
+    --site-background-dark:var(--site-background);
+    --site-surface-dark:var(--site-surface);
+    --app-soft:color-mix(in srgb,var(--app-surface) 90%,#fff);
+    --app-line:color-mix(in srgb,var(--app-surface) 84%,#fff);
+    --app-ink:#f4f4f2;
+    --app-muted:#a9a9ae;
+    --app-tint:color-mix(in srgb,var(--app-accent) 16%,var(--app-surface));
+    --app-section-warm:color-mix(in srgb,var(--app-bg) 55%,var(--app-surface));
+    --app-success-bg:color-mix(in srgb,#2fb36b 18%,var(--app-surface));
+    --app-error-bg:color-mix(in srgb,#ef4b5f 18%,var(--app-surface));
+}
+#btnDarkMode[hidden] { display:none; }
+/* Elements that exist only for a theme's own layout (assets/theme-*.css). */
+:root:not([data-site-theme="charbon"]) .theme-only { display:none!important; }
 :root {
     --app-tint-ink:var(--site-tint-ink,#98380f);
     --site-tint-ink:color-mix(in srgb,var(--site-accent) 35%,#000);

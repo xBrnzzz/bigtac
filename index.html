@@ -21,7 +21,7 @@
         </style>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Cairo:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Cairo:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <script src="https://cdn.tailwindcss.com">
         </script>
         <script>tailwind.config = { darkMode: 'class' };</script>
@@ -32,6 +32,7 @@
         <link rel="stylesheet" href="assets/storefront-discovery.css">
         <link rel="stylesheet" href="assets/storefront-footer.css">
         <link rel="stylesheet" href="assets/storefront-appearance.css">
+        <link rel="stylesheet" href="assets/theme-charbon.css">
     </head>
     <body>
         <div id="storefront-startup">
@@ -83,6 +84,9 @@
                         <button type="button" id="btnDarkMode" class="icon-button" onclick="toggleDarkMode()" aria-label="Changer le thème" data-i18n-aria="nav.theme">
                             <i data-feather="moon" aria-hidden="true">
                             </i>
+                        </button>
+                        <button type="button" id="btnThemeSearch" class="icon-button theme-only" onclick="document.getElementById('menu-unified').scrollIntoView();document.getElementById('menuSearch').focus({preventScroll:true})" aria-label="Rechercher dans la carte" data-i18n-aria="search.label">
+                            <i data-feather="search" aria-hidden="true"></i>
                         </button>
                         <button type="button" id="btnNavCart" class="header-cart" onclick="openCart()" aria-label="Ouvrir le panier" data-i18n-aria="nav.cart">
                             <i data-feather="shopping-bag" aria-hidden="true">
@@ -144,6 +148,7 @@
                     <section id="popular" class="menu-feature menu-feature--popular hidden" aria-labelledby="popular-title" data-carousel>
                         <div class="section-heading">
                             <h2 id="popular-title" data-i18n="sections.bestseller">Best Seller</h2>
+                            <p class="feature-lead theme-only" data-i18n="sections.menu_sub">Tacos, gratinés, burgers… À vous de choisir.</p>
                         </div>
                         <div id="popularGrid" class="featured-grid">
                         </div>
@@ -250,6 +255,13 @@
                 </div>
             </footer>
         </div>
+        <nav data-app-content class="theme-tabbar theme-only" aria-label="Navigation rapide" data-ui-aria-label="Navigation rapide">
+            <a href="#hero" aria-label="Accueil" data-ui-aria-label="Accueil"><i data-feather="home" aria-hidden="true"></i></a>
+            <a href="#menu-unified" aria-label="La carte" data-i18n-aria="nav.menu"><i data-feather="grid" aria-hidden="true"></i></a>
+            <button type="button" class="theme-tabbar__cart" onclick="openCart()" aria-label="Ouvrir le panier" data-i18n-aria="nav.cart"><i data-feather="shopping-bag" aria-hidden="true"></i><span id="tabbarCartCount" class="hidden">0</span></button>
+            <a href="#promotions" data-theme-offers aria-label="Les offres" data-i18n-aria="nav.offers" hidden><i data-feather="tag" aria-hidden="true"></i></a>
+            <a href="#locations" aria-label="Infos pratiques" data-i18n-aria="nav.info"><i data-feather="map-pin" aria-hidden="true"></i></a>
+        </nav>
         <button data-app-content type="button" id="fabCart" class="mobile-cart-bar hidden" onclick="openCart()">
             <span class="mobile-cart-bar__count" id="fabCount">0</span>
             <span data-i18n="cart.view_cart">Voir mon panier</span>
@@ -316,7 +328,7 @@
                             <button type="button" onclick="updateModalQty(1)" aria-label="Augmenter la quantité" data-i18n-aria="modal.increase">+</button>
                         </div>
                         <button type="button" class="primary-button add-to-cart-button" id="btnModalAddToCart" onclick="addToCartFromModal()">
-                            <span id="addToCartLabel" data-i18n="modal.add_to_cart">Ajouter au panier</span>
+                            <span class="add-to-cart-icon theme-only" aria-hidden="true"><i data-feather="shopping-bag"></i></span><span id="addToCartLabel" data-i18n="modal.add_to_cart">Ajouter au panier</span>
                             <strong id="modalTotalPriceDisplay" aria-live="polite" aria-atomic="true" data-ui-copy="0 Dh">0 Dh</strong>
                         </button>
                     </div>
@@ -650,13 +662,15 @@
         };
 
         function applyTheme() {
-            if (currentTheme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-            document.querySelector('meta[name="theme-color"]').content = currentTheme === 'dark' ? '#171b19' : '#ffffff';
-            document.getElementById('btnDarkMode').setAttribute('aria-pressed', String(currentTheme === 'dark'));
+            // A dark restaurant theme is always dark; the customer's toggle only applies to a light theme.
+            const forced = document.documentElement.dataset.siteMode === 'dark';
+            const dark = forced || currentTheme === 'dark';
+            document.documentElement.classList.toggle('dark', dark);
+            const background = forced && getComputedStyle(document.documentElement).getPropertyValue('--site-background').trim();
+            document.querySelector('meta[name="theme-color"]').content = background || (dark ? '#171b19' : '#ffffff');
+            const toggle = document.getElementById('btnDarkMode');
+            toggle.hidden = forced;
+            toggle.setAttribute('aria-pressed', String(dark));
         }
         applyTheme();
 
@@ -813,6 +827,7 @@
             if (!configRead) return;
             const open=storeAvailable(),status=document.getElementById('storeStatus');status.textContent=open?t('hero.status_open'):t('hero.unavailable');status.classList.toggle('is-open',open);status.classList.toggle('is-closed',!open);document.getElementById('closedBanner').classList.toggle('hidden',open);
             renderStorefrontAppearance(document, appConfig, {language:i18n.getLang(),translate:t,open,table:!!urlTable});
+            applyTheme();
             syncDiscoveryVisibility();
             document.querySelectorAll('.hero-service-line [data-mode]').forEach(label => {
                 label.hidden = appConfig.orderingModes?.[label.dataset.mode] === false;
@@ -984,7 +999,7 @@
         function syncDiscoveryVisibility() {
             const offers = appConfig.storefront?.showOffers !== false && !!allPromotions.length;
             const popular = appConfig.storefront?.showPopular !== false && !!document.getElementById('popularGrid').childElementCount;
-            document.querySelector('.store-nav a[href="#promotions"]').hidden = !offers;
+            for (const link of document.querySelectorAll('.store-nav a[href="#promotions"],[data-theme-offers]')) link.hidden = !offers;
             document.getElementById('promotions').classList.toggle('hidden', !offers);
             document.getElementById('popular').classList.toggle('hidden', !popular);
         }
@@ -1253,8 +1268,8 @@
                     <div class="cart-item-actions"><div class="quantity-control"><button type="button" onclick="updateCartItemQty(${index}, -1)" aria-label="${escapeCardText(t('cart.decrease', '', {name:item.name}))}">−</button><span aria-label="${t('modal.quantity')}">${item.qty}</span><button type="button" onclick="updateCartItemQty(${index}, 1)" aria-label="${escapeCardText(t('cart.increase', '', {name:item.name}))}">+</button></div><button type="button" class="text-button" onclick="removeCartItem(${index})" aria-label="${t('cart.remove', 'Retirer')} ${escapeCardText(item.name)}">${t('cart.remove', 'Retirer')}</button></div>
                 </article>`).join('');
             }
-            for (const id of ['navCartCount', 'fabCount']) document.getElementById(id).textContent = totalQty;
-            document.getElementById('navCartCount').classList.toggle('hidden', !cart.length);
+            for (const id of ['navCartCount', 'fabCount', 'tabbarCartCount']) document.getElementById(id).textContent = totalQty;
+            for (const id of ['navCartCount', 'tabbarCartCount']) document.getElementById(id).classList.toggle('hidden', !cart.length);
             for (const id of ['cartFinalTotal', 'navCartTotal', 'fabTotal', 'desktopCartTotal']) document.getElementById(id).textContent = money(totalPrice);
             document.getElementById('fabCart').classList.toggle('hidden', !cart.length);
             document.body.classList.toggle('has-cart', Boolean(cart.length));

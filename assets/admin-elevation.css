@@ -40,8 +40,8 @@
 .admin-body .menu-product:has(.menu-select input:checked) {outline:2px solid var(--admin-accent);outline-offset:2px}
 
 /* Receipt perforations are meaningful separators, not surface decoration. */
-.admin-body .order-ticket-footer {border-top-color:#dce0e6!important}
-.admin-body .order-detail .order-products li+li {border-top-color:#dce0e6!important}
+.admin-body .order-ticket-footer {border-top-color:var(--th-line,#dce0e6)!important}
+.admin-body .order-detail .order-products li+li {border-top-color:var(--th-line,#dce0e6)!important}
 
 /* White table rows share a parent surface; don't stack card shadows inside it. */
 @media(min-width:768px) {.admin-body .menu-product {box-shadow:none!important}}
@@ -92,7 +92,7 @@
 }
 .admin-body :where(.orders-search-row,.menu-tools)>.admin-button:not(.primary):not([aria-pressed=true]):not(:disabled) {background:var(--admin-surface)!important;box-shadow:var(--shadow-control)!important}
 .admin-body .order-reject:not(:disabled) {background:var(--admin-red-bg)!important;color:var(--admin-negative)!important}
-.admin-body .order-reject:not(:disabled):hover {background:#fee3df!important}
+.admin-body .order-reject:not(:disabled):hover {background:var(--th-tint-red,#fee3df)!important}
 .admin-body #promo-editor>div:last-child>div:first-child>button {background:var(--admin-neutral-control);box-shadow:none!important;min-width:44px;min-height:44px;display:grid;place-items:center}
 .admin-body input::file-selector-button {background:var(--admin-neutral-control);color:var(--admin-text);min-height:44px;padding:8px 12px;font:600 12px var(--font);box-shadow:none}
 .admin-body .menu-image-editor input::file-selector-button {background:var(--admin-surface)}
@@ -113,7 +113,7 @@
 .admin-body .admin-bottom-nav,.admin-body #view-driver>nav {background:var(--admin-surface);box-shadow:var(--shadow-floating)!important;isolation:isolate}
 .admin-body .admin-bottom-nav :where(a,button),.admin-body #view-driver>nav button {box-shadow:none!important}
 .admin-body .admin-bottom-nav .admin-nav-link[aria-current] {background:var(--admin-active);color:var(--admin-orange-ink);box-shadow:none!important}
-.admin-body :where(button:disabled,input:disabled:not([type=checkbox]):not([type=radio]),select:disabled,textarea:disabled) {background:#eef0f3!important;color:var(--admin-muted)!important;box-shadow:none!important;opacity:1;cursor:not-allowed}
+.admin-body :where(button:disabled,input:disabled:not([type=checkbox]):not([type=radio]),select:disabled,textarea:disabled) {background:var(--th-soft,#eef0f3)!important;color:var(--admin-muted)!important;box-shadow:none!important;opacity:1;cursor:not-allowed}
 .admin-body .menu-stock[aria-busy=true] {background:var(--admin-orange-bg)!important;color:var(--admin-orange-ink)!important;cursor:wait}
 @media(prefers-reduced-motion:reduce) {.admin-body :where(button,a,input,select,textarea,summary) {transition:none!important}}
 @media(forced-colors:active) {
@@ -130,16 +130,16 @@
 .admin-body .order-options {font-size:13px;line-height:1.45}
 .admin-body .menu-product-info h4 {font-size:16px;letter-spacing:-.02em}
 .admin-body :is(.order-card,#driver-tab-available>div,#driver-tab-deliveries>div) {box-shadow:var(--shadow-ticket)!important}
-.admin-body :is(.menu-product-main,.menu-product-bottom,.admin-employee-card,#promotions-list>div) {background:white!important}
+.admin-body :is(.menu-product-main,.menu-product-bottom,.admin-employee-card,#promotions-list>div) {background:var(--th-paper,white)!important}
 .admin-body .admin-settings-panel .admin-setting-row {max-width:760px}
 .admin-body :is(.orders-search input,.menu-search input) {background:var(--admin-field-surface)!important;box-shadow:none!important}
-.admin-body .menu-approved-filters>summary {background:white!important;box-shadow:var(--shadow-control)!important}
+.admin-body .menu-approved-filters>summary {background:var(--th-paper,white)!important;box-shadow:var(--shadow-control)!important}
 .admin-body :is(.admin-panel,.menu-dialog,.order-detail,.admin-more,#promo-editor,[class~=bg-white]) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]),select,textarea) {background:var(--admin-field-surface)!important;box-shadow:none!important}
 .admin-body :is(.admin-panel,.menu-dialog,.order-detail,.admin-more,#promo-editor) :is(input,select,textarea)[aria-invalid=true] {background:var(--admin-red-bg)!important}
-.admin-body .orders-mode {background:white;box-shadow:var(--shadow-control)}
+.admin-body .orders-mode {background:var(--th-paper,white);box-shadow:var(--shadow-control)}
 
 /* The catalogue heading and rows share one rounded surface. Menus can extend past it. */
-.admin-body .menu-list-surface {background:white;border-radius:18px;box-shadow:var(--shadow-card)}
+.admin-body .menu-list-surface {background:var(--th-paper,white);border-radius:18px;box-shadow:var(--shadow-card)}
 .admin-body .menu-list-surface .menu-products {box-shadow:none!important}
 .admin-body .menu-list-surface .menu-list-heading {border-radius:18px 18px 0 0;padding:16px 20px}
 .admin-body .menu-list-surface .menu-products {padding:0 20px 6px;border-radius:0 0 18px 18px}
@@ -170,7 +170,7 @@
 .admin-body :is(.admin-page-heading>p,.menu-heading p,.orders-heading p) {font-size:13px;line-height:1.55}
 .admin-body .admin-location h1 {font-size:13px;font-weight:750}
 .admin-body .admin-nav-group {font-size:12px;font-weight:650}
-#login-section :is(.lang-toggle-btn,.lang-option) {background:white;color:var(--admin-text);min-height:44px}
+#login-section :is(.lang-toggle-btn,.lang-option) {background:var(--th-paper,white);color:var(--admin-text);min-height:44px}
 #login-section .lang-current {color:var(--admin-text)}
 @media(max-width:1000px) {
  .admin-body .settings-section {grid-template-columns:minmax(0,1fr);gap:22px}

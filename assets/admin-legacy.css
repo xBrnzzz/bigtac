@@ -8,7 +8,7 @@
 :is(#view-promotions,#view-drivers,#view-driver,#promo-editor) .font-mono { font-family:var(--font); font-variant-numeric:tabular-nums; }
 :is(#view-promotions,#view-drivers,#view-driver,#promo-editor) svg { stroke-width:1.8; }
 :is(#view-promotions,#view-drivers) label { font-size:13px; font-weight:600; text-transform:none; letter-spacing:0; color:var(--admin-muted); }
-:is(#view-promotions,#view-drivers) :is(input,select) { background:white; border:1px solid var(--admin-control); color:var(--admin-text); font-size:14px; font-weight:500; }
+:is(#view-promotions,#view-drivers) :is(input,select) { background:var(--th-paper,white); border:1px solid var(--admin-control); color:var(--admin-text); font-size:14px; font-weight:500; }
 :is(#view-promotions,#view-drivers,#view-driver) :is(.bg-brand-500,.bg-brand-600) { background:var(--admin-primary); color:var(--admin-on-primary); box-shadow:none; }
 #view-promotions>div>div:first-child>button { background:var(--admin-primary); border:1px solid var(--admin-primary); min-height:44px; box-shadow:none; }
 #view-promotions>div>div:first-child>button:hover { background:var(--admin-primary-hover); }
@@ -52,7 +52,7 @@
 #view-driver :is(button,a) { min-height:44px; }
 #promo-editor>div:last-child { border-radius:0; }
 #promo-editor :is(h2,h3) { color:var(--admin-text); }
-#promo-editor :is(input,select,textarea) { border-color:var(--admin-control); background:white; color:var(--admin-text); }
+#promo-editor :is(input,select,textarea) { border-color:var(--admin-control); background:var(--th-paper,white); color:var(--admin-text); }
 #promo-editor label { text-transform:none; letter-spacing:0; font-size:13px; }
 /* Legacy option controls share the editor's field geometry and group hierarchy. */
 #promo-container-choices>section,#promo-container-supplements>div {background:var(--admin-neutral-control);border-radius:12px;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}

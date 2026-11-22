@@ -1,0 +1,83 @@
+/* Dark restaurant themes (Braise, Dorée) for Admin.
+   applyAdminPalette() sets data-site-mode on <html> and the theme's background, surface and accent.
+   Light themes never match these rules, so the light workspace is unchanged. */
+:root[data-site-mode="dark"] {
+    color-scheme:dark;
+    --admin-ground:var(--site-admin-background,#0c0c0d);
+    --admin-surface:var(--site-admin-surface,#18181b);
+    --admin-frame:color-mix(in srgb,var(--admin-ground) 55%,var(--admin-surface));
+    --admin-raised:color-mix(in srgb,var(--admin-surface) 93%,#fff);
+    --admin-field-surface:color-mix(in srgb,var(--admin-surface) 92%,#fff);
+    --admin-field-hover:color-mix(in srgb,var(--admin-surface) 86%,#fff);
+    --admin-neutral-hover:var(--admin-field-hover);
+    --admin-sidebar-hover:color-mix(in srgb,var(--admin-frame) 88%,#fff);
+    --admin-text:#f2f2f0;
+    --admin-muted:#a7a7ac;
+    --admin-border:color-mix(in srgb,var(--admin-surface) 84%,#fff);
+    --admin-control:color-mix(in srgb,var(--admin-surface) 72%,#fff);
+    --shadow-ticket:0 2px 6px #0007;
+    --shadow-card:0 1px 2px #0006;
+    --shadow-hover:0 3px 10px #0008;
+    --shadow-floating:0 16px 40px #000b;
+    --admin-accent:var(--site-accent,#e11d38);
+    --admin-orange-ink:color-mix(in srgb,var(--admin-accent) 62%,#fff);
+    --admin-active:color-mix(in srgb,var(--admin-accent) 18%,var(--admin-surface));
+    /* semantic: light enough to read as text on dark surfaces */
+    --admin-positive:#5cc98f;  --admin-green-bg:color-mix(in srgb,#2fa868 18%,var(--admin-surface));  --admin-green-border:color-mix(in srgb,#2fa868 42%,var(--admin-surface));
+    --admin-blue:#86a8ff;      --admin-blue-bg:color-mix(in srgb,#4f7cf0 18%,var(--admin-surface));   --admin-blue-border:color-mix(in srgb,#4f7cf0 42%,var(--admin-surface));
+    --admin-warning:#e8b45a;   --admin-amber-bg:color-mix(in srgb,#d99a2b 18%,var(--admin-surface));  --admin-amber-border:color-mix(in srgb,#d99a2b 42%,var(--admin-surface));
+    --admin-negative:#ff7a7a;  --admin-red-bg:color-mix(in srgb,#e5484d 18%,var(--admin-surface));    --admin-red-border:color-mix(in srgb,#e5484d 42%,var(--admin-surface));
+    --admin-orange-bg:color-mix(in srgb,var(--admin-accent) 18%,var(--admin-surface)); --admin-orange-border:color-mix(in srgb,var(--admin-accent) 42%,var(--admin-surface));
+    --admin-teal:#5cc98f;      --admin-teal-bg:var(--admin-green-bg); --admin-teal-border:var(--admin-green-border);
+    --admin-purple:#b9a4ff;    --admin-purple-bg:color-mix(in srgb,#7a5fd6 18%,var(--admin-surface)); --admin-purple-border:color-mix(in srgb,#7a5fd6 42%,var(--admin-surface));
+    --admin-solid-navy:#3a3d46;
+    /* light-only literals in the Admin sheets, by role (see var(--th-*, literal) in each file) */
+    --th-paper:var(--admin-surface);
+    --th-soft:var(--admin-raised);
+    --th-glass:color-mix(in srgb,var(--admin-surface) 90%,transparent);
+    --th-line:var(--admin-border);
+    --th-hairline:#ffffff1a;
+    --th-ink:var(--admin-text);
+    --th-muted:var(--admin-muted);
+    --th-tint-red:var(--admin-red-bg);       --th-line-red:var(--admin-red-border);       --th-ink-red:var(--admin-negative);
+    --th-tint-orange:var(--admin-orange-bg); --th-line-orange:var(--admin-orange-border); --th-ink-orange:var(--admin-orange-ink);
+    --th-tint-amber:var(--admin-amber-bg);   --th-line-amber:var(--admin-amber-border);   --th-ink-amber:var(--admin-warning);
+    --th-tint-green:var(--admin-green-bg);   --th-line-green:var(--admin-green-border);   --th-ink-green:var(--admin-positive);
+    --th-tint-blue:var(--admin-blue-bg);     --th-line-blue:var(--admin-blue-border);     --th-ink-blue:#c3d0ea;
+    --th-tint-purple:var(--admin-purple-bg); --th-line-purple:var(--admin-purple-border); --th-ink-purple:var(--admin-purple);
+    /* charts read these */
+    --axis-ink:var(--admin-muted);
+    --chart-muted:#5d5d64;
+}
+
+/* Semantic colours used as solid fills behind white labels keep a darker shade. */
+:root[data-site-mode="dark"] :is(.orders-feedback[role=alert]:not([data-tone=attention]),.order-status[data-state=rejected],.admin-recent-status[data-state=rejected]) { background:#c0353a; }
+:root[data-site-mode="dark"] #view-driver [data-driver-action=complete] { background:#217252; }
+:root[data-site-mode="dark"] .order-actions [data-transition=en_livraison] { background:#315db5; border-color:#315db5; }
+:root[data-site-mode="dark"] .order-actions [data-transition=delivered] { background:#217252; border-color:#217252; }
+:root[data-site-mode="dark"] .admin-kpi[data-metric=value] { --metric-ink:var(--admin-text); }
+:root[data-site-mode="dark"] [data-tone=cooking] { --order-tone:#315db5; }
+
+/* Inline rules in admin.html */
+:root[data-site-mode="dark"] ::-webkit-scrollbar-thumb { background:#ffffff2e; }
+:root[data-site-mode="dark"] .toggle-slider { background-color:var(--admin-control); }
+:root[data-site-mode="dark"] input:checked + .toggle-slider { background-color:var(--admin-primary); }
+:root[data-site-mode="dark"] .sortable-ghost { background:var(--admin-active)!important; border-color:var(--admin-accent)!important; }
+
+/* Tailwind utilities still used in Admin markup and modules */
+:root[data-site-mode="dark"] .bg-white { background-color:var(--admin-surface); }
+:root[data-site-mode="dark"] :is(.bg-slate-50,.bg-slate-100) { background-color:var(--admin-raised); }
+:root[data-site-mode="dark"] :is(.bg-red-50) { background-color:var(--admin-red-bg); }
+:root[data-site-mode="dark"] :is(.bg-brand-50) { background-color:var(--admin-orange-bg); }
+:root[data-site-mode="dark"] :is(.border-slate-100,.border-slate-200) { border-color:var(--admin-border); }
+:root[data-site-mode="dark"] .border-red-100 { border-color:var(--admin-red-border); }
+:root[data-site-mode="dark"] :is(.text-slate-900,.text-slate-800,.text-slate-700,.text-stone-900) { color:var(--admin-text); }
+:root[data-site-mode="dark"] :is(.text-slate-500,.text-slate-400) { color:var(--admin-muted); }
+:root[data-site-mode="dark"] .text-red-500 { color:var(--admin-negative); }
+:root[data-site-mode="dark"] .text-brand-600 { color:var(--admin-orange-ink); }
+:root[data-site-mode="dark"] :is(.bg-brand-500,.bg-brand-600) { background-color:var(--admin-primary); color:var(--admin-on-primary); }
+:root[data-site-mode="dark"] .ring-brand-500 { --tw-ring-color:var(--admin-accent); }
+
+/* Form controls without an explicit Admin colour */
+:root[data-site-mode="dark"] .admin-body :is(input:not([type=checkbox],[type=radio],[type=color],[type=range]),select,textarea) { color:var(--admin-text); }
+:root[data-site-mode="dark"] .admin-body :is(input,select,textarea)::placeholder { color:#8a8a90; }

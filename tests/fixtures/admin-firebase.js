@@ -26,7 +26,7 @@ const data = {
     categories: [{ id: 'tacos', name: 'Tacos', order: 0 }, { id: 'burgers', name: 'Burgers', order: 1 }],
     menuItems: [{ id: 'tacos', name: 'Tacos poulet', category: 'Tacos', order: 0, price: 45, imageUrl: 'assets/tacos-campaign.jpg', isVisible: true, mandatoryChoices: [], supplements: [] }, { id: 'burger', name: 'Burger maison', category: 'Burgers', order: 1, price: 55, imageUrl: 'assets/tacos-campaign.jpg', isVisible: true }],
     promotions: [{ id: 'duo', name: 'Menu duo', price: 80, imageUrl: 'assets/tacos-campaign.jpg', isVisible: true }],
-    settings: [{ id: 'config', isOpen: true, whatsappMode: false, reportingTimezone: 'Africa/Casablanca', restaurantName: 'BIGTAC' }]
+    settings: [{ id: 'config', isOpen: true, whatsappMode: false, reportingTimezone: 'Africa/Casablanca', restaurantName: 'BIGTAC', ...(parameters.get('theme') ? { storefront: { theme: parameters.get('theme') } } : {}) }]
 };
 if(parameters.get('menu')==='rich') {
     data.categories.push({id:'sides',name:'Accompagnements',order:2});

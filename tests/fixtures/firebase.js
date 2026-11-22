@@ -19,7 +19,7 @@ const categories=['Tacos Français','Gratinés','Burgers','À côté'];
 const categoryRows=categories.map((name,i)=>({id:'cat'+i,name,order:i}));
 const catalogListeners=new Set();
 window.__fixture={orders:[],failMenu:scenario==='error',failSubmission:scenario==='submit-error',failTracking:scenario==='tracker-error',state:'pending',tracker:null,setStatus(status){this.state=status;this.tracker?.({exists:()=>true,data:()=>({shortId:1234,status,type:'livraison'})});}};
-Object.assign(window.__fixture,{settings:{isOpen:scenario!=='closed',whatsappMode:scenario==='whatsapp'},promotions,settingsListeners:new Set(),emitSettings(){for(const cb of this.settingsListeners)cb({exists:()=>true,data:()=>this.settings});},menuItems:items,categories:categoryRows,catalogListeners,emitCatalog(){for(const listener of catalogListeners)getDocs(listener.ref).then(listener.next,listener.error);}});
+Object.assign(window.__fixture,{settings:{isOpen:scenario!=='closed',whatsappMode:scenario==='whatsapp',...(new URLSearchParams(location.search).get('theme')?{storefront:{theme:new URLSearchParams(location.search).get('theme')}}:{})},promotions,settingsListeners:new Set(),emitSettings(){for(const cb of this.settingsListeners)cb({exists:()=>true,data:()=>this.settings});},menuItems:items,categories:categoryRows,catalogListeners,emitCatalog(){for(const listener of catalogListeners)getDocs(listener.ref).then(listener.next,listener.error);}});
 export const collection=(_,name)=>name;
 export const doc=(_,name,id)=>({name,id});
 export const query=x=>x;
