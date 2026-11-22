@@ -109,6 +109,15 @@ try {
         await page.locator('#popularGrid').getByRole('button', { name: 'Choisir Tacos Poulet', exact: true }).click();
         check(await page.locator('#modalItemName').innerText() === 'Tacos Poulet', `${width}: featured favourite opens its original item`);
         check(await page.locator('.option-group').count() === 3, `${width}: featured favourite retains choices and supplements`);
+        const fullHeight = (await page.locator('.product-sheet').boundingBox()).height;
+        await closeProduct(page);
+        await choose(page, 'simple');
+        check((await page.locator('.product-sheet').boundingBox()).height < fullHeight * .75, `${width}: plain product opens a compact sheet`);
+        check(await page.locator('#customizationHint').isHidden(), `${width}: plain product omits instructions for choices`);
+        check(await page.locator('#modalItemBasePrice').innerText() === await page.locator('#modalTotalPriceDisplay').innerText(), `${width}: plain product shows a fixed price`);
+        await page.getByRole('button', {name:'Augmenter la quantité', exact:true}).click();
+        check(await price(page, '#modalTotalPriceDisplay') === 54, `${width}: compact sheet supports quantity changes`);
+        await snap(page, `${width}-compact-product`);
         await closeProduct(page);
         const categories=page.locator('#categoryFilters');
         const burgers=categories.getByRole('button', { name: 'Burgers', exact: true });

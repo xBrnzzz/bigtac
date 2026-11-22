@@ -8,7 +8,7 @@
     scroll-margin-block:100px;
 }
 .storefront-settings-panel h3,.storefront-preview h3 { margin:0; font-size:17px; font-weight:750; }
-.storefront-settings-panel p,.storefront-preview p,.storefront-editor-language p {
+.storefront-settings-panel p,.storefront-preview p,.storefront-editor-language p,.storefront-palette-help {
     margin:4px 0 0;
     font-size:13px;
     color:var(--admin-muted);

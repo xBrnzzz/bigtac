@@ -1,13 +1,13 @@
 import { operationsService } from './operations-service.js';
 import { copy, fingerprint, imageIssue } from './menu-model.js';
 import { orderingAvailable } from './operations-model.js';
-import { translations } from './i18n.js';
+import { translations, uiMarkup, uiText, setUiText, translateDOM } from './i18n.js';
 import {
     appearanceText, copyFields, languages, paletteFields, renderStorefrontAppearance, renderStorefrontHours,
     storefrontAppearance, storefrontAppearanceIssue
 } from './storefront-appearance.js';
 
-const field = (label, input) => `<label class="settings-field"><span>${label}</span>${input}</label>`;
+const field = (label, input) => `<label class="settings-field">${uiMarkup(label)}${input}</label>`;
 const translate = (locale, key) => translations[locale]?.[key] || translations.fr[key] || '';
 const sample = {
     fr: {offer:'Exemple de promotion', product:'Exemple de produit'},
@@ -20,11 +20,13 @@ export function createStorefrontEditor({session, upload, toast}) {
     const panel = document.createElement('section');
     panel.id = 'settings-appearance';
     panel.className = 'admin-panel storefront-settings-panel';
-    panel.innerHTML = `<div><h3>Vitrine en ligne</h3><p>Palette, photo, textes et bouton Glovo.</p></div>
-        <button type="button" class="admin-button" id="edit-storefront" disabled>Personnaliser la vitrine</button>`;
+    panel.innerHTML = `<div><h3 data-ui-copy="Vitrine en ligne">Vitrine en ligne</h3><p data-ui-copy="Palette, photo, textes et bouton Glovo.">Palette, photo, textes et bouton Glovo.</p></div>
+        <button type="button" class="admin-button" id="edit-storefront" disabled data-ui-copy="Personnaliser la vitrine">Personnaliser la vitrine</button>`;
     document.getElementById('settings-service').after(panel);
     const trigger = panel.querySelector('button');
-    document.querySelector('.settings-jump select').add(new Option('Vitrine en ligne', panel.id), 1);
+    const jumpOption = new Option('Vitrine en ligne', panel.id);
+    jumpOption.dataset.uiCopy = 'Vitrine en ligne';
+    document.querySelector('.settings-jump select').add(jumpOption, 1);
 
     const dialog = document.createElement('dialog');
     dialog.id = 'storefront-editor';
@@ -34,55 +36,56 @@ export function createStorefrontEditor({session, upload, toast}) {
         field(label, key.endsWith('Subtitle')
             ? `<textarea name="${key}" maxlength="${max}" rows="2" dir="auto"></textarea>`
             : `<input name="${key}" maxlength="${max}" dir="auto">`)).join('');
-    dialog.innerHTML = `<header class="storefront-editor-header"><h2 id="storefront-editor-title">Personnaliser la vitrine</h2>
-        <div><button type="button" class="admin-button" id="jump-storefront-preview">Aperçu</button>
-        <button type="button" class="admin-button" id="close-storefront-editor">Fermer</button></div></header>
+    dialog.innerHTML = `<header class="storefront-editor-header"><h2 id="storefront-editor-title" data-ui-copy="Personnaliser la vitrine">Personnaliser la vitrine</h2>
+        <div><button type="button" class="admin-button" id="jump-storefront-preview" data-ui-copy="Aperçu">Aperçu</button>
+        <button type="button" class="admin-button" id="close-storefront-editor" data-ui-copy="Fermer">Fermer</button></div></header>
         <div class="storefront-editor-layout">
             <form id="storefront-form" novalidate>
                 <div class="storefront-editor-language">${field('Langue des textes et de l’aperçu',
                     `<select name="locale">${languages.map(([id, label]) => `<option value="${id}">${label}</option>`).join('')}</select>`)}
-                    <p>Un champ de texte vide utilise le texte par défaut de la langue.</p>
+                    <p data-ui-copy="Un champ de texte vide utilise le texte par défaut de la langue.">Un champ de texte vide utilise le texte par défaut de la langue.</p>
                 </div>
-                <details open class="storefront-editor-group"><summary>Palette</summary>
+                <details open class="storefront-editor-group"><summary data-ui-copy="Palette">Palette</summary>
+                    <p class="storefront-palette-help" data-ui-copy="Les accents, le fond de page et les surfaces s’appliquent aussi à l’interface Admin. Les fonds foncés y sont éclaircis pour la lisibilité.">Les accents, le fond de page et les surfaces s’appliquent aussi à l’interface Admin. Les fonds foncés y sont éclaircis pour la lisibilité.</p>
                     <div class="storefront-color-list">${paletteFields.map(([key, label, color]) =>
-                        `<div class="storefront-color-row"><label for="site-color-${key}">${label}</label>
-                        <input data-swatch="${key}" type="color" aria-label="Choisir : ${label}" value="${color}">
+                        `<div class="storefront-color-row"><label for="site-color-${key}">${uiMarkup(label)}</label>
+                        <input data-swatch="${key}" type="color" aria-label="${uiText('Choisir : {label}', {label:uiText(label)})}" value="${color}">
                         <input name="color-${key}" id="site-color-${key}" placeholder="${color}" maxlength="7" spellcheck="false" dir="ltr"></div>`).join('')}</div>
-                    <button type="button" class="admin-button" id="reset-storefront-palette">Rétablir la palette BIGTAC</button>
+                    <button type="button" class="admin-button" id="reset-storefront-palette" data-ui-copy="Rétablir la palette BIGTAC">Rétablir la palette BIGTAC</button>
                 </details>
-                <details class="storefront-editor-group"><summary>Photo et texte du bandeau</summary>
+                <details class="storefront-editor-group"><summary data-ui-copy="Photo et texte du bandeau">Photo et texte du bandeau</summary>
                     ${field('Adresse HTTPS de la photo', '<input type="url" name="heroImage" placeholder="https://…" maxlength="2048" dir="ltr">')}
                     ${field('Importer une photo', '<input type="file" name="heroFile" accept="image/jpeg,image/png,image/webp">')}
-                    ${field('Cadrage horizontal', '<select name="heroPosition"><option value="">Automatique</option><option value="left">Gauche</option><option value="center">Centre</option><option value="right">Droite</option></select>')}
+                    ${field('Cadrage horizontal', "<select name=\"heroPosition\"><option value=\"\" data-ui-copy=\"Automatique\">Automatique</option><option value=\"left\" data-ui-copy=\"Gauche\">Gauche</option><option value=\"center\" data-ui-copy=\"Centre\">Centre</option><option value=\"right\" data-ui-copy=\"Droite\">Droite</option></select>")}
                     ${copyInputs(['heroLead','heroName','heroSubtitle','heroCta','heroClosedCta','heroAlt'])}
                 </details>
                 <details class="storefront-editor-group"><summary>Glovo</summary>
-                    <label class="storefront-editor-check"><input type="checkbox" name="glovoEnabled"> Afficher le bouton Glovo</label>
+                    <label class="storefront-editor-check" data-ui-copy="Afficher le bouton Glovo"><input type="checkbox" name="glovoEnabled"> Afficher le bouton Glovo</label>
                     ${field('Lien Glovo de votre restaurant', '<input type="url" name="glovoUrl" placeholder="https://glovoapp.com/…" maxlength="2048" dir="ltr">')}
-                    ${field('Emplacement du bouton', '<select name="glovoPlacement"><option value="hero">Bandeau d’accueil</option><option value="footer">Pied de page</option><option value="both">Les deux</option></select>')}
+                    ${field('Emplacement du bouton', "<select name=\"glovoPlacement\"><option value=\"hero\" data-ui-copy=\"Bandeau d’accueil\">Bandeau d’accueil</option><option value=\"footer\" data-ui-copy=\"Pied de page\">Pied de page</option><option value=\"both\" data-ui-copy=\"Les deux\">Les deux</option></select>")}
                     ${copyInputs(['glovoLabel'])}
                 </details>
-                <details class="storefront-editor-group"><summary>Navigation, carte et pied de page</summary>
+                <details class="storefront-editor-group"><summary data-ui-copy="Navigation, carte et pied de page">Navigation, carte et pied de page</summary>
                     ${copyInputs(['tagline','menuTitle','menuSubtitle'])}
-                    <label class="storefront-editor-check"><input type="checkbox" name="showOffers"> Afficher les promotions actives</label>
+                    <label class="storefront-editor-check" data-ui-copy="Afficher les promotions actives"><input type="checkbox" name="showOffers"> Afficher les promotions actives</label>
                     ${copyInputs(['offersTitle'])}
-                    <label class="storefront-editor-check"><input type="checkbox" name="showPopular"> Afficher les best sellers</label>
+                    <label class="storefront-editor-check" data-ui-copy="Afficher les best sellers"><input type="checkbox" name="showPopular"> Afficher les best sellers</label>
                     ${copyInputs(['popularTitle','footerTitle','footerContact'])}
                 </details>
             </form>
             <section class="storefront-preview" aria-labelledby="storefront-preview-title">
-                <div class="storefront-preview-heading"><h3 id="storefront-preview-title" tabindex="-1">Aperçu du brouillon</h3><p>Les produits et prix affichés sont des exemples.</p></div>
+                <div class="storefront-preview-heading"><h3 id="storefront-preview-title" tabindex="-1" data-ui-copy="Aperçu du brouillon">Aperçu du brouillon</h3><p data-ui-copy="Les produits et prix affichés sont des exemples.">Les produits et prix affichés sont des exemples.</p></div>
                 <div class="storefront-preview-controls">
-                    ${field('Écran', '<select id="storefront-preview-device"><option value="mobile">Téléphone</option><option value="desktop">Ordinateur</option></select>')}
-                    ${field('Section', '<select id="storefront-preview-section"><option value="hero">Accueil</option><option value="promotions">Promotions</option><option value="popular">Best sellers</option><option value="menu-unified">Carte</option><option value="locations">Pied de page</option></select>')}
-                    <label class="storefront-editor-check"><input type="checkbox" id="storefront-preview-dark"> Mode sombre</label>
-                    <label class="storefront-editor-check"><input type="checkbox" id="storefront-preview-closed"> Restaurant fermé</label>
+                    ${field('Écran', "<select id=\"storefront-preview-device\"><option value=\"mobile\" data-ui-copy=\"Téléphone\">Téléphone</option><option value=\"desktop\" data-ui-copy=\"Ordinateur\">Ordinateur</option></select>")}
+                    ${field('Section', "<select id=\"storefront-preview-section\"><option value=\"hero\" data-ui-copy=\"Accueil\">Accueil</option><option value=\"promotions\" data-ui-copy=\"Promotions\">Promotions</option><option value=\"popular\" data-ui-copy=\"Best sellers\">Best sellers</option><option value=\"menu-unified\" data-ui-copy=\"Carte\">Carte</option><option value=\"locations\" data-ui-copy=\"Pied de page\">Pied de page</option></select>")}
+                    <label class="storefront-editor-check" data-ui-copy="Mode sombre"><input type="checkbox" id="storefront-preview-dark"> Mode sombre</label>
+                    <label class="storefront-editor-check" data-ui-copy="Restaurant fermé"><input type="checkbox" id="storefront-preview-closed"> Restaurant fermé</label>
                 </div>
-                <div class="storefront-preview-window"><iframe title="Aperçu de la vitrine" sandbox="allow-same-origin"></iframe></div>
+                <div class="storefront-preview-window"><iframe title="Aperçu de la vitrine" sandbox="allow-same-origin" data-ui-title="Aperçu de la vitrine"></iframe></div>
             </section>
         </div>
         <footer class="storefront-editor-footer"><p id="storefront-editor-status" role="status"></p>
-            <button type="submit" form="storefront-form" class="admin-button primary">Enregistrer la vitrine</button>
+            <button type="submit" form="storefront-form" class="admin-button primary" data-ui-copy="Enregistrer la vitrine">Enregistrer la vitrine</button>
         </footer>`;
     document.body.append(dialog);
     const form = dialog.querySelector('form');
@@ -101,7 +104,7 @@ export function createStorefrontEditor({session, upload, toast}) {
     let latest = null, expected = null, draft = null, baseline = '';
     let confirmed = false, busy = false, localImage = '', file = null, epoch = 0;
 
-    const say = (message, error = false) => { status.textContent = message; status.classList.toggle('is-error', error); };
+    const say = (message, error = false) => { setUiText(status, message); status.classList.toggle('is-error', error); };
     const changed = () => draft && (fingerprint(draft) !== baseline || file);
     const stale = () => expected && fingerprint({...latest, id:'config'}) !== fingerprint(expected);
     function enableSave() {
@@ -162,7 +165,7 @@ export function createStorefrontEditor({session, upload, toast}) {
         doc.documentElement.lang = locale;
         doc.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
         doc.documentElement.classList.toggle('dark', dark.checked);
-        doc.querySelectorAll('[data-i18n]').forEach(node => { node.textContent = t(node.dataset.i18n); });
+        translateDOM(doc, locale);
         doc.querySelectorAll('[data-preview-copy]').forEach(node => { node.textContent = sample[locale][node.dataset.previewCopy]; });
         doc.querySelectorAll('[data-mode]').forEach(node => { node.hidden = config.orderingModes?.[node.dataset.mode] === false; });
         const state = doc.getElementById('storeStatus');
@@ -210,7 +213,7 @@ export function createStorefrontEditor({session, upload, toast}) {
     }
     function dismiss() {
         if (busy) return;
-        if (!changed() || confirm('Fermer sans enregistrer la vitrine ?')) dialog.close();
+        if (!changed() || confirm(uiText('Fermer sans enregistrer la vitrine ?'))) dialog.close();
     }
 
     trigger.addEventListener('click', openEditor);

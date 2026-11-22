@@ -134,7 +134,7 @@
     .menu-tools>.admin-button { padding:8px; font-size:12px; }
     .menu-tools>[data-menu-action=refresh] { font-size:0; padding:8px; }
     .menu-tools>[data-menu-action=groups] { font-size:0; }
-    .menu-tools>[data-menu-action=groups]::after { content:'Choix'; font-size:12px; }
+    .menu-tools>[data-menu-action=groups]::after { content:attr(data-short-label); font-size:12px; }
     .menu-workspace input,.menu-workspace select,.menu-dialog :is(input,select,textarea) { font-size:16px!important; }
     .menu-dialog>header { padding:16px; }
     .menu-dialog header .admin-button { padding:8px; font-size:12px; }

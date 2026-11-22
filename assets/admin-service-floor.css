@@ -4,12 +4,12 @@
 #view-orders .orders-heading h2 { margin:0; }
 #view-orders .orders-mode { background:var(--ledger-mist); box-shadow:none; padding:3px; border-radius:9px; }
 #view-orders .orders-mode button { min-height:44px; color:var(--admin-muted); box-shadow:none; }
-#view-orders .orders-mode button[aria-pressed=true] { background:var(--admin-primary); color:white; }
+#view-orders .orders-mode button[aria-pressed=true] { background:var(--admin-primary); color:var(--admin-on-primary); }
 #view-orders .orders-toolbar { display:flex; align-items:center; padding:0; gap:8px; }
 #view-orders .orders-tabs { flex:1 1 auto; flex-wrap:wrap; gap:6px; padding:0; margin:0; overflow:visible; }
 #view-orders .orders-tabs button { gap:8px; min-height:44px; padding:7px 12px; border:1px solid #c7b9ac; border-radius:8px; background:var(--admin-surface); color:var(--admin-text); font-size:14px; font-weight:700; line-height:1.25; box-shadow:none!important; }
 #view-orders .orders-tabs button:hover { border-color:var(--admin-primary); background:var(--admin-active); }
-#view-orders .orders-tabs button[aria-pressed=true] { color:white; border-color:var(--admin-primary); background:var(--admin-primary); }
+#view-orders .orders-tabs button[aria-pressed=true] { color:var(--admin-on-primary); border-color:var(--admin-primary); background:var(--admin-primary); }
 #view-orders .orders-tabs button span { min-width:22px; padding:2px 5px; border-radius:5px; background:var(--admin-raised); color:var(--admin-text); font-size:13px; font-weight:750; text-align:center; font-variant-numeric:tabular-nums; }
 #view-orders .orders-tabs button[aria-pressed=true] span { background:white; color:var(--admin-orange-ink); }
 #view-orders .orders-tabs button svg { display:none; }

@@ -37,7 +37,17 @@ export const onSnapshot=(ref,callback,error,extraError)=>{
    const listener={ref,next:callback,error};catalogListeners.add(listener);getDocs(ref).then(value=>{if(catalogListeners.has(listener))callback(value);},error);
    return ()=>catalogListeners.delete(listener);
  }
- if(ref.name==='settings'){window.__fixture.settingsListeners.add(callback);callback({exists:()=>true,data:()=>window.__fixture.settings});return ()=>window.__fixture.settingsListeners.delete(callback);}
+ if(ref.name==='settings'){
+   if (scenario === 'settings-error') {
+     queueMicrotask(() => error?.(new Error('Fixture settings unavailable')));
+     return () => {};
+   }
+   window.__fixture.settingsListeners.add(callback);
+   if (scenario === 'settings-wait') {
+     callback({exists:()=>true,metadata:{fromCache:true},data:()=>({restaurantName:'BIGTAC',isOpen:true})});
+   } else callback({exists:()=>true,data:()=>window.__fixture.settings});
+   return ()=>window.__fixture.settingsListeners.delete(callback);
+ }
  else if(ref.name==='orders'){
    const next=typeof callback==='function'?callback:callback.next;
    window.__fixture.tracker=next;

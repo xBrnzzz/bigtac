@@ -1,4 +1,5 @@
 import { MENU_LIMIT, categoryFor, fingerprint, groupIssues, materializeProduct, productIssues, validPrice } from './menu-model.js';
+import { uiText } from './i18n.js';
 import { offerIssues } from './operations-model.js';
 
 export const MAX_IMPORT_BYTES = 512 * 1024;
@@ -8,25 +9,25 @@ export const importName = name => String(name ?? '').trim().normalize('NFC').toL
 
 export class MenuImportError extends Error {
     constructor(message) {
-        super(message);
+        super(uiText(message));
         this.name = 'MenuImportError';
     }
 }
 
 function requireValue(ok, path, message) {
-    if (!ok) throw new MenuImportError(`${path} — ${message}`);
+    if (!ok) throw new MenuImportError(`${path} — ${uiText(message)}`);
 }
 
 function fields(value, keys, path) {
     const expected = keys.split(' ');
     requireValue(value && typeof value === 'object' && !Array.isArray(value), path, 'Objet JSON attendu.');
     requireValue(expected.every(key => Object.hasOwn(value, key)) && Object.keys(value).length === expected.length, path,
-        `Champs attendus : ${expected.join(', ')}.`);
+        uiText('Champs attendus : {fields}.',{fields:expected.join(', ')}));
 }
 
 function text(value, path, max, allowEmpty = false) {
     requireValue(typeof value === 'string' && (allowEmpty || value.trim().length > 0) && value.trim().length <= max,
-        path, `Texte ${allowEmpty ? '' : 'non vide '}(maximum ${max} caractères).`);
+        path, uiText(allowEmpty?'Texte (maximum {max} caractères).':'Texte non vide (maximum {max} caractères).',{max}));
     return value.trim();
 }
 
@@ -46,7 +47,7 @@ function flag(value, path) {
 }
 
 function list(value, path, limit, convert) {
-    requireValue(Array.isArray(value) && value.length <= limit, path, `Liste de ${limit} éléments maximum attendue.`);
+    requireValue(Array.isArray(value) && value.length <= limit, path, uiText('Liste de {limit} éléments maximum attendue.',{limit}));
     return value.map((row, index) => convert(row, `${path}[${index + 1}]`));
 }
 
@@ -73,7 +74,7 @@ function group(row, path, shared = false) {
         title: text(row.title, `${path}.title`, 120), type: row.type, min: row.min, max: row.max, options
     };
     const issues = groupIssues(value);
-    requireValue(!issues.length, path, issues.join(' '));
+    requireValue(!issues.length, path, issues.map(issue=>uiText(issue)).join(' '));
     return value;
 }
 
@@ -102,7 +103,7 @@ function item(row, path, promotion = false) {
         value.startsAt = schedule(row.startsAt, `${label}.startsAt`);
         value.endsAt = schedule(row.endsAt, `${label}.endsAt`);
         const issues = offerIssues(value);
-        requireValue(!issues.length, label, issues.join(' '));
+        requireValue(!issues.length, label, issues.map(issue=>uiText(issue)).join(' '));
         return value;
     }
     const modifierGroupIds = list(row.modifierGroupIds, `${label}.modifierGroupIds`, 12, id);
@@ -146,7 +147,7 @@ export function parseMenuImport(source) {
         requireValue(row.modifierGroupIds.every(key => groupIds.has(key)), row.name, 'Un groupe partagé référencé est introuvable.');
         const resolved = materializeProduct(row, modifierGroups);
         const issues = productIssues(resolved, categories);
-        requireValue(!issues.length, row.name, issues.map(([, message]) => message).join(' '));
+        requireValue(!issues.length, row.name, issues.map(([, message]) => uiText(message)).join(' '));
     }
     unique(menuItems.map(row => productKey(row.name, localCategories.get(row.categoryId))), 'products', 'Chaque produit doit avoir un nom unique dans sa catégorie.');
     requireValue(Object.values(menu).some(rows => rows.length), 'Menu', 'Le fichier ne contient aucun élément à importer.');
@@ -187,7 +188,7 @@ export function checkImportCapacity(plan, current) {
     let writes = 1;
     for (const name of importCollections) {
         const additions = plan[name].filter(entry => !entry.existingId).length;
-        requireValue(current[name].length + additions <= MENU_LIMIT, name, `Le catalogue peut contenir jusqu’à ${MENU_LIMIT} éléments de ce type.`);
+        requireValue(current[name].length + additions <= MENU_LIMIT, name, uiText('Le catalogue peut contenir jusqu’à {max} éléments de ce type.',{max:MENU_LIMIT}));
         writes += additions;
     }
     const used = new Set(plan.menuItems.filter(entry => !entry.existingId).flatMap(entry => entry.row.modifierGroupIds));
