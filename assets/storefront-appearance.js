@@ -13,6 +13,16 @@ export const paletteFields = [
     ['footer', 'Fond du pied de page', '#221d19'],
     ['glovo', 'Fond du bouton Glovo', '#ffc244']
 ];
+// A theme is a whole interface: its own layout (assets/theme-*.css), a starting palette and a light or dark mode.
+// Saved palette colours override the theme's palette role by role.
+// Light keeps each customer's own light/dark choice; a dark theme sets the storefront and Admin to dark.
+export const themePresets = {
+    bigtac: {label:'BIGTAC classique', description:'L’interface actuelle : papier chaud et orange BIGTAC.', mode:'light', palette:{}},
+    charbon: {label:'Charbon', description:'Nouvelle interface : charbon, éléments translucides, un seul accent.', mode:'dark', palette:{
+        accent:'#e11d38', background:'#141416', surface:'#1e1e21', hero:'#141416', footer:'#101012', glovo:'#ffc244'
+    }}
+};
+export const themeIds = Object.keys(themePresets);
 export const copyFields = [
     ['heroLead', 'Accroche du bandeau', 'hero.title_lead', 48, '.hero-lead'],
     ['heroName', 'Grand titre du bandeau', '', 48, '#hero-brand'],
@@ -47,6 +57,7 @@ export function storefrontAppearance(config = {}) {
     const name = string(config.restaurantName, 120);
     const defaultListing = !name || /^big\s*tac$/i.test(name) ? GLOVO_LISTING : '';
     return {
+        theme: themeIds.includes(value.theme) ? value.theme : 'bigtac',
         palette: Object.fromEntries(paletteFields.map(([key]) => [key, hex(value.palette?.[key]) ? value.palette[key] : ''])),
         heroImage: safeURL(value.heroImage) ? value.heroImage : '',
         heroPosition: imagePositions.includes(value.heroPosition) ? value.heroPosition : '',
@@ -65,6 +76,7 @@ export function storefrontAppearance(config = {}) {
 
 export function storefrontAppearanceIssue(value) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return 'Configuration de vitrine invalide.';
+    if (!themeIds.includes(value.theme)) return 'Thème inconnu.';
     if (!['showOffers', 'showPopular'].every(key => typeof value[key] === 'boolean')) return 'Visibilité des sections invalide.';
     if (!imagePositions.includes(value.heroPosition) || typeof value.heroImage !== 'string'
         || (value.heroImage && (value.heroImage.length > 2048 || !safeURL(value.heroImage)))) return 'Utilisez une adresse HTTPS valide pour la photo.';
@@ -106,14 +118,34 @@ function applyPalette(styles, palette) {
     } else styles.removeProperty('--site-accent-hover');
 }
 
+// The theme's mode and palette after saved colours override the preset, role by role.
+export function siteTheme(config = {}) {
+    const settings = storefrontAppearance(config);
+    const preset = themePresets[settings.theme];
+    return {
+        id: settings.theme,
+        mode: preset.mode,
+        palette: Object.fromEntries(paletteFields.map(([key]) => [key, settings.palette[key] || preset.palette[key] || '']))
+    };
+}
+
+function markTheme(doc, theme) {
+    const root = doc.documentElement;
+    root.dataset.siteTheme = theme.id;
+    root.dataset.siteMode = theme.mode;
+}
+
 export function applyAdminPalette(doc, config = {}) {
-    const {accent, background, surface} = storefrontAppearance(config).palette;
+    const theme = siteTheme(config);
+    const {accent, background, surface} = theme.palette;
     const styles = doc.documentElement.style;
     applyPalette(styles, {accent, background, surface});
-    // The POS remains a light workspace with dark labels. Dark colours tint its paper.
+    markTheme(doc, theme);
+    // A light theme keeps the POS a light workspace with dark labels, so dark colours only tint its paper.
+    // A dark theme uses its own dark surfaces and light labels.
     for (const [key, color] of [['background', background], ['surface', surface]]) {
         const variable = '--site-admin-' + key;
-        if (color) styles.setProperty(variable, luminance(color) >= .75 ? color : `color-mix(in srgb,${color} 12%,white)`);
+        if (color) styles.setProperty(variable, theme.mode === 'dark' || luminance(color) >= .75 ? color : `color-mix(in srgb,${color} 12%,white)`);
         else styles.removeProperty(variable);
     }
 }
@@ -157,8 +189,12 @@ export function renderStorefrontHours(doc, hours, language, translate) {
 
 export function renderStorefrontAppearance(doc, config, {language, translate, open, table = false, localImage = ''}) {
     const settings = storefrontAppearance(config);
+    const theme = siteTheme(config);
     const styles = doc.documentElement.style;
-    applyPalette(styles, settings.palette);
+    applyPalette(styles, theme.palette);
+    markTheme(doc, theme);
+    // A dark theme overrides the customer's light/dark choice; the page restores that choice for a light theme.
+    if (theme.mode === 'dark') doc.documentElement.classList.add('dark');
     const getText = key => appearanceText(config, key, language, translate);
     const name = config.restaurantName || 'BIGTAC';
     doc.getElementById('store-brand-name').textContent = name;

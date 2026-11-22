@@ -249,7 +249,7 @@
     }
     #view-menu .menu-product .menu-stock::after {
         content:"";position:absolute;inset-inline-start:14px;top:calc(50% - 5px);
-        width:10px;height:10px;border-radius:50%;background:white;
+        width:10px;height:10px;border-radius:50%;background:var(--th-paper,white);
     }
     #view-menu .menu-product .menu-stock[aria-checked=false]::after {inset-inline-start:4px}
     #view-menu .menu-product .menu-stock>span {overflow-wrap:normal}

@@ -4,15 +4,15 @@
 .admin-body #promo-editor>div:last-child {
     width:calc(100% - 48px);max-width:1040px;height:calc(100dvh - 48px);
     max-height:calc(100dvh - 48px);inset:24px 0;margin:0 auto;
-    border:0;border-radius:24px;background:#fff;overflow:hidden;
+    border:0;border-radius:24px;background:var(--th-paper,#fff);overflow:hidden;
     box-shadow:var(--shadow-floating)!important;
     color:var(--admin-text);font-family:var(--font);
 }
-#item-editor::backdrop {background:rgba(250,251,252,.88)}
-.admin-body #promo-editor>div:first-child {background:rgba(250,251,252,.88);backdrop-filter:none}
+#item-editor::backdrop {background:var(--th-glass,rgba(250,251,252,.88))}
+.admin-body #promo-editor>div:first-child {background:var(--th-glass,rgba(250,251,252,.88));backdrop-filter:none}
 .admin-body #item-editor>header,
 .admin-body #promo-editor>div:last-child>div:first-child {
-    padding:22px 40px 18px;min-height:92px;background:#fff!important;
+    padding:22px 40px 18px;min-height:92px;background:var(--th-paper,#fff)!important;
     box-shadow:none!important;gap:16px;
 }
 #item-editor>header p,#promo-editor .editor-context {font-size:12px;font-weight:600;color:var(--admin-muted);margin:0 0 6px}
@@ -25,10 +25,10 @@
 .admin-body #promo-editor>div:last-child>div:first-child>.editor-close {display:flex;flex-direction:row}
 #promo-editor .editor-close svg {width:18px;height:18px}
 .admin-body #item-editor .menu-dialog-body,.admin-body #promo-editor .overflow-y-auto {
-    padding:20px 40px 28px;background:#fff;overscroll-behavior:contain;scrollbar-gutter:stable;
+    padding:20px 40px 28px;background:var(--th-paper,#fff);overscroll-behavior:contain;scrollbar-gutter:stable;
 }
 .admin-body :is(#item-editor,#promo-editor) .menu-editor-tabs {
-    position:sticky;top:-20px;z-index:2;background:white;border-radius:0;gap:24px;
+    position:sticky;top:-20px;z-index:2;background:var(--th-paper,white);border-radius:0;gap:24px;
     padding:8px 0 12px;margin:-8px 0 18px;scrollbar-width:thin;flex:none;
 }
 .admin-body :is(#item-editor,#promo-editor) .menu-editor-tabs button {
@@ -53,7 +53,7 @@
     background:var(--admin-field-surface)!important;box-shadow:none!important;
     min-height:48px;border:0;border-radius:10px;padding:12px 14px;font:500 14px/1.5 var(--font);margin-top:0;
 }
-.admin-body :is(#item-editor,#promo-form) :is(input,select,textarea):focus-visible {background:white!important}
+.admin-body :is(#item-editor,#promo-form) :is(input,select,textarea):focus-visible {background:var(--th-paper,white)!important}
 :is(#item-editor,#promo-form) :is(input,textarea)::placeholder {color:var(--admin-muted);opacity:1}
 #item-editor textarea {resize:vertical;min-height:112px}
 #item-editor .editor-media h4,#promo-form .editor-media h4 {font-size:14px;font-weight:750;margin:0 0 6px;letter-spacing:0}
@@ -83,12 +83,12 @@
 #promo-edit-error {margin-bottom:18px}
 .admin-body #item-editor .menu-image-editor button {align-self:flex-start;background:transparent!important;padding:0;min-height:44px;font-size:12px;box-shadow:none!important;color:var(--admin-muted)}
 #item-editor #menu-upload-progress:empty {display:none}
-.admin-body #item-editor :is(.menu-choice-group,.menu-shared-attach,.menu-check) {background:white;box-shadow:var(--shadow-control)!important;border:0;border-radius:14px;padding:20px}
-.admin-body #item-editor .menu-option-row {background:white;box-shadow:var(--shadow-control)!important}
+.admin-body #item-editor :is(.menu-choice-group,.menu-shared-attach,.menu-check) {background:var(--th-paper,white);box-shadow:var(--shadow-control)!important;border:0;border-radius:14px;padding:20px}
+.admin-body #item-editor .menu-option-row {background:var(--th-paper,white);box-shadow:var(--shadow-control)!important}
 #item-editor .menu-check {min-height:64px;padding:18px;font-weight:600}
 #item-editor .menu-customer-preview {margin-top:20px}
 .admin-body #item-editor>footer,.admin-body #promo-editor .promo-editor-footer {
-    padding:18px 40px max(18px,env(safe-area-inset-bottom));background:white!important;
+    padding:18px 40px max(18px,env(safe-area-inset-bottom));background:var(--th-paper,white)!important;
     box-shadow:0 -6px 24px rgba(25,30,40,.045)!important;
 }
 #item-editor>footer>div {display:flex;align-items:center;gap:10px}
@@ -156,7 +156,7 @@
 }
 
 /* Modifier editing follows the group, its rule, then its editable option list. */
-.admin-body :is(#item-editor,#menu-group-editor,#promo-form) .menu-choice-group {min-width:0;padding:20px;margin:16px 0;background:white;border-radius:14px;box-shadow:var(--shadow-card)!important;overflow:visible}
+.admin-body :is(#item-editor,#menu-group-editor,#promo-form) .menu-choice-group {min-width:0;padding:20px;margin:16px 0;background:var(--th-paper,white);border-radius:14px;box-shadow:var(--shadow-card)!important;overflow:visible}
 .menu-choice-group>legend {color:var(--admin-text);font-size:14px;font-weight:750;padding:0 6px}
 #promo-form .menu-choice-group {margin:0}
 #promo-panel-choices .editor-section-actions {margin:12px 0 0}
@@ -178,16 +178,16 @@
 .menu-rule-fields+.menu-help {font-size:12px!important;margin:10px 0 0!important}
 .menu-group-options {display:grid;gap:10px}
 .menu-option-head {display:none}
-.admin-body :is(#item-editor,#menu-group-editor) .menu-option-row {display:grid;grid-template-columns:minmax(0,1fr) 110px 108px 44px;align-items:end;gap:12px;margin:0;padding:12px 0;background:white;box-shadow:none!important;border-radius:0}
+.admin-body :is(#item-editor,#menu-group-editor) .menu-option-row {display:grid;grid-template-columns:minmax(0,1fr) 110px 108px 44px;align-items:end;gap:12px;margin:0;padding:12px 0;background:var(--th-paper,white);box-shadow:none!important;border-radius:0}
 .admin-body :is(#item-editor,#menu-group-editor) .menu-option-row .menu-field {margin:0;gap:7px}
 .menu-option-row .menu-option-check {min-height:48px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:7px}
 .menu-option-actions {position:relative;align-self:end;flex:none}
-.menu-option-actions>summary {display:grid;place-items:center;width:44px;height:48px;cursor:pointer;border-radius:10px;background:white;list-style:none;box-shadow:var(--shadow-control)!important}
+.menu-option-actions>summary {display:grid;place-items:center;width:44px;height:48px;cursor:pointer;border-radius:10px;background:var(--th-paper,white);list-style:none;box-shadow:var(--shadow-control)!important}
 .menu-option-actions>summary::-webkit-details-marker {display:none}
 .menu-option-actions>summary svg {width:18px;height:18px;color:var(--admin-muted)}
-.menu-option-actions>div {position:absolute;bottom:calc(100% + 6px);right:0;z-index:5;display:grid;gap:3px;width:190px;padding:6px;background:white;border-radius:12px;box-shadow:var(--shadow-floating);overflow-y:auto}
+.menu-option-actions>div {position:absolute;bottom:calc(100% + 6px);right:0;z-index:5;display:grid;gap:3px;width:190px;padding:6px;background:var(--th-paper,white);border-radius:12px;box-shadow:var(--shadow-floating);overflow-y:auto}
 .menu-option-actions[data-placement=below]>div {top:calc(100% + 6px);bottom:auto}
-.admin-body .menu-option-actions>div .admin-button {justify-content:flex-start;width:100%;min-height:44px;border-radius:8px;padding:10px;font-size:13px;box-shadow:none!important;background:white!important}
+.admin-body .menu-option-actions>div .admin-button {justify-content:flex-start;width:100%;min-height:44px;border-radius:8px;padding:10px;font-size:13px;box-shadow:none!important;background:var(--th-paper,white)!important}
 .admin-body .menu-option-actions>div .admin-button:hover {background:var(--admin-field-surface)!important}
 .menu-option-actions [data-menu-action=option-remove],.menu-option-actions [data-menu-action=choice-remove] {color:var(--admin-negative)}
 .menu-group-footer {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}

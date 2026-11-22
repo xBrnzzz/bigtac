@@ -7,11 +7,11 @@
 #view-orders .orders-mode button[aria-pressed=true] { background:var(--admin-primary); color:var(--admin-on-primary); }
 #view-orders .orders-toolbar { display:flex; align-items:center; padding:0; gap:8px; }
 #view-orders .orders-tabs { flex:1 1 auto; flex-wrap:wrap; gap:6px; padding:0; margin:0; overflow:visible; }
-#view-orders .orders-tabs button { gap:8px; min-height:44px; padding:7px 12px; border:1px solid #c7b9ac; border-radius:8px; background:var(--admin-surface); color:var(--admin-text); font-size:14px; font-weight:700; line-height:1.25; box-shadow:none!important; }
+#view-orders .orders-tabs button { gap:8px; min-height:44px; padding:7px 12px; border:1px solid var(--th-line-orange,#c7b9ac); border-radius:8px; background:var(--admin-surface); color:var(--admin-text); font-size:14px; font-weight:700; line-height:1.25; box-shadow:none!important; }
 #view-orders .orders-tabs button:hover { border-color:var(--admin-primary); background:var(--admin-active); }
 #view-orders .orders-tabs button[aria-pressed=true] { color:var(--admin-on-primary); border-color:var(--admin-primary); background:var(--admin-primary); }
 #view-orders .orders-tabs button span { min-width:22px; padding:2px 5px; border-radius:5px; background:var(--admin-raised); color:var(--admin-text); font-size:13px; font-weight:750; text-align:center; font-variant-numeric:tabular-nums; }
-#view-orders .orders-tabs button[aria-pressed=true] span { background:white; color:var(--admin-orange-ink); }
+#view-orders .orders-tabs button[aria-pressed=true] span { background:var(--th-paper,white); color:var(--admin-orange-ink); }
 #view-orders .orders-tabs button svg { display:none; }
 #view-orders .orders-search-row { flex:1 1 212px; min-width:0; max-width:300px; margin:0; }
 #view-orders .orders-search input { font-size:14px; }
@@ -25,7 +25,7 @@
 #view-orders .orders-board { gap:14px; }
 #view-orders .order-card {
     border:1px solid var(--admin-border)!important; border-block-start:3px solid var(--lane-mark,#aa9989)!important;
-    border-radius:7px; background:#fff; box-shadow:0 2px 3px #2e282208!important; padding:0; align-self:start;
+    border-radius:7px; background:var(--th-paper,#fff); box-shadow:0 2px 3px #2e282208!important; padding:0; align-self:start;
 }
 #view-orders [data-column=pending] { --lane-mark:#b27929; }
 #view-orders [data-column=confirmed] { --lane-mark:#5b8090; }
@@ -34,19 +34,19 @@
 #view-orders .order-open { min-height:44px; justify-content:center; color:var(--admin-text); }
 #view-orders .order-open strong { font-size:23px; font-variant-numeric:tabular-nums; letter-spacing:-.045em; }
 #view-orders .order-age { margin:0; font-size:12px; color:var(--admin-muted); }
-#view-orders .order-age[data-age-tone=late], #view-orders .order-age[data-age-tone=soon] { color:#754408; background:#faedcf; padding:2px 6px; }
+#view-orders .order-age[data-age-tone=late], #view-orders .order-age[data-age-tone=soon] { color:var(--th-ink-orange,#754408); background:var(--th-tint-amber,#faedcf); padding:2px 6px; }
 #view-orders .order-ticket-time { padding:0 0 8px; margin:0 12px; border-bottom:1px solid var(--admin-border)!important; }
-#view-orders .order-status { border-radius:4px; white-space:normal; padding:2px 6px; font-size:11px; color:#76500d; background:#faf0d9; }
-#view-orders .order-status[data-state=confirmed] { color:#315463; background:#e6eff2; }
-#view-orders .order-status:is([data-state=en_livraison],[data-state=delivered],[data-state=ready]) { color:#275637; background:#e6f0e7; }
-#view-orders .order-status[data-state=rejected] { color:#8a382c; background:#f9e7e1; }
+#view-orders .order-status { border-radius:4px; white-space:normal; padding:2px 6px; font-size:11px; color:var(--th-ink-amber,#76500d); background:var(--th-tint-amber,#faf0d9); }
+#view-orders .order-status[data-state=confirmed] { color:var(--th-ink-blue,#315463); background:var(--th-tint-blue,#e6eff2); }
+#view-orders .order-status:is([data-state=en_livraison],[data-state=delivered],[data-state=ready]) { color:var(--th-ink-green,#275637); background:var(--th-soft,#e6f0e7); }
+#view-orders .order-status[data-state=rejected] { color:var(--th-ink-red,#8a382c); background:var(--th-tint-orange,#f9e7e1); }
 #view-orders .order-ticket-content { min-height:0; padding:10px 12px 0; }
 #view-orders .order-products li { padding:0; padding-inline-start:30px; }
 #view-orders .order-products li+li { margin:7px 0 0; }
 #view-orders .order-product-title>strong>span { inset-inline-start:0; inset-inline-end:auto; background:var(--admin-raised); color:var(--admin-text); border-radius:3px; }
 #view-orders .order-options { margin:1px 0 0; }
-#view-orders .order-instructions { background:#fff4d9; color:#62450d; padding:6px 8px; margin:6px 0 0; border-radius:3px; }
-#view-orders .order-ticket-footer { margin-top:10px; padding:5px 12px 10px; gap:4px; border-block-start:1px dashed #cdbbaa!important; }
+#view-orders .order-instructions { background:var(--th-tint-amber,#fff4d9); color:var(--th-ink-amber,#62450d); padding:6px 8px; margin:6px 0 0; border-radius:3px; }
+#view-orders .order-ticket-footer { margin-top:10px; padding:5px 12px 10px; gap:4px; border-block-start:1px dashed var(--th-line-orange,#cdbbaa)!important; }
 #view-orders .order-ticket-footer::before, #view-orders .order-ticket-footer::after { width:9px; height:9px; top:-5px; border-color:var(--admin-border)!important; background:var(--admin-ground); }
 #view-orders .ticket-handoff { grid-column:1/-1; display:flex; align-items:center; flex-wrap:wrap; justify-content:space-between; gap:0 8px; }
 #view-orders .order-card-total { display:flex; flex-direction:column; align-items:flex-start; gap:0; margin:3px 0; font-size:11px; line-height:1.35; }
@@ -59,7 +59,7 @@
 #view-orders .order-actions .admin-button { border-radius:6px; min-height:44px; box-shadow:none!important; font-size:12px; }
 #view-orders .order-actions .admin-button.primary:not(:disabled), #order-detail .order-actions .primary:not(:disabled) { color:#fff; background:var(--admin-primary); }
 #view-orders .order-actions .admin-button.primary:not(:disabled):hover, #order-detail .order-actions .primary:not(:disabled):hover { background:var(--admin-primary-hover); }
-#view-orders .order-actions .order-reject:not(:disabled) { background:#fff!important; color:#853728!important; min-width:44px; font-size:0; }
+#view-orders .order-actions .order-reject:not(:disabled) { background:var(--th-paper,#fff)!important; color:var(--th-ink-red,#853728)!important; min-width:44px; font-size:0; }
 #view-orders .order-detail-link { grid-column:2; grid-row:auto; background:var(--admin-raised)!important; color:var(--admin-text); box-shadow:none!important; border-radius:6px; }
 #view-orders[data-kitchen=true] .order-ticket-content { padding-block:14px 4px; }
 #view-orders[data-kitchen=true] .order-product-title { font-size:19px; }
@@ -112,8 +112,8 @@
 #view-driver :is(#driver-tab-deliveries,#driver-tab-available)>h2 { font-size:clamp(23px,2.2vw,31px); }
 #view-driver :is(#my-deliveries-list,#available-runs-list) { background:transparent; box-shadow:none!important; border-radius:0; }
 #view-driver .driver-manifest { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr)); align-items:start; gap:14px; }
-.driver-state { margin:0; padding:18px; border-inline-start:3px solid #cdbbaa; background:var(--ledger-mist); color:var(--admin-muted); font-size:14px; }
-.driver-sheet { min-width:0; overflow-wrap:anywhere; border:1px solid var(--ledger-line)!important; border-top:3px solid var(--admin-primary)!important; border-radius:7px; background:#fff; overflow:hidden; }
+.driver-state { margin:0; padding:18px; border-inline-start:3px solid var(--th-line-orange,#cdbbaa); background:var(--ledger-mist); color:var(--admin-muted); font-size:14px; }
+.driver-sheet { min-width:0; overflow-wrap:anywhere; border:1px solid var(--ledger-line)!important; border-top:3px solid var(--admin-primary)!important; border-radius:7px; background:var(--th-paper,#fff); overflow:hidden; }
 .driver-sheet>header, .driver-sheet dl { display:flex; justify-content:space-between; align-items:center; gap:14px; }
 .driver-sheet>header { padding:10px 16px; background:var(--admin-raised); }
 .driver-sheet h3 { margin:0; font-size:22px; font-weight:800; letter-spacing:-.04em; font-variant-numeric:tabular-nums; }

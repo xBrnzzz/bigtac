@@ -4,11 +4,20 @@ import { orderingAvailable } from './operations-model.js';
 import { translations, uiMarkup, uiText, setUiText, translateDOM } from './i18n.js';
 import {
     appearanceText, copyFields, languages, paletteFields, renderStorefrontAppearance, renderStorefrontHours,
-    storefrontAppearance, storefrontAppearanceIssue
+    storefrontAppearance, storefrontAppearanceIssue, themeIds, themePresets
 } from './storefront-appearance.js';
 
 const field = (label, input) => `<label class="settings-field">${uiMarkup(label)}${input}</label>`;
 const translate = (locale, key) => translations[locale]?.[key] || translations.fr[key] || '';
+const defaultColor = Object.fromEntries(paletteFields.map(([key, , color]) => [key, color]));
+const themeColor = (theme, key) => themePresets[theme].palette[key] || defaultColor[key];
+const themeOption = id => {
+    const {label, description} = themePresets[id];
+    const swatch = ['background', 'surface', 'accent'].map(key => `--theme-${key}:${themeColor(id, key)}`).join(';');
+    return `<label class="storefront-theme-option"><input type="radio" name="theme" value="${id}">
+        <span class="storefront-theme-swatch" style="${swatch}" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="storefront-theme-text"><strong data-ui-copy="${label}">${label}</strong><small data-ui-copy="${description}">${description}</small></span></label>`;
+};
 const sample = {
     fr: {offer:'Exemple de promotion', product:'Exemple de produit'},
     en: {offer:'Sample promotion', product:'Sample product'},
@@ -45,13 +54,17 @@ export function createStorefrontEditor({session, upload, toast}) {
                     `<select name="locale">${languages.map(([id, label]) => `<option value="${id}">${label}</option>`).join('')}</select>`)}
                     <p data-ui-copy="Un champ de texte vide utilise le texte par défaut de la langue.">Un champ de texte vide utilise le texte par défaut de la langue.</p>
                 </div>
+                <fieldset class="storefront-editor-group storefront-theme-group"><legend data-ui-copy="Thème">Thème</legend>
+                    <p class="storefront-palette-help" data-ui-copy="Le thème s’applique à la vitrine et à l’interface Admin. Un thème sombre passe les deux en mode sombre.">Le thème s’applique à la vitrine et à l’interface Admin. Un thème sombre passe les deux en mode sombre.</p>
+                    <div class="storefront-theme-list">${themeIds.map(themeOption).join('')}</div>
+                </fieldset>
                 <details open class="storefront-editor-group"><summary data-ui-copy="Palette">Palette</summary>
-                    <p class="storefront-palette-help" data-ui-copy="Les accents, le fond de page et les surfaces s’appliquent aussi à l’interface Admin. Les fonds foncés y sont éclaircis pour la lisibilité.">Les accents, le fond de page et les surfaces s’appliquent aussi à l’interface Admin. Les fonds foncés y sont éclaircis pour la lisibilité.</p>
+                    <p class="storefront-palette-help" data-ui-copy="Chaque couleur remplace celle du thème. Un champ vide garde la couleur du thème. Les accents, le fond de page et les surfaces s’appliquent aussi à l’interface Admin.">Chaque couleur remplace celle du thème. Un champ vide garde la couleur du thème. Les accents, le fond de page et les surfaces s’appliquent aussi à l’interface Admin.</p>
                     <div class="storefront-color-list">${paletteFields.map(([key, label, color]) =>
                         `<div class="storefront-color-row"><label for="site-color-${key}">${uiMarkup(label)}</label>
                         <input data-swatch="${key}" type="color" aria-label="${uiText('Choisir : {label}', {label:uiText(label)})}" value="${color}">
                         <input name="color-${key}" id="site-color-${key}" placeholder="${color}" maxlength="7" spellcheck="false" dir="ltr"></div>`).join('')}</div>
-                    <button type="button" class="admin-button" id="reset-storefront-palette" data-ui-copy="Rétablir la palette BIGTAC">Rétablir la palette BIGTAC</button>
+                    <button type="button" class="admin-button" id="reset-storefront-palette" data-ui-copy="Rétablir les couleurs du thème">Rétablir les couleurs du thème</button>
                 </details>
                 <details class="storefront-editor-group"><summary data-ui-copy="Photo et texte du bandeau">Photo et texte du bandeau</summary>
                     ${field('Adresse HTTPS de la photo', '<input type="url" name="heroImage" placeholder="https://…" maxlength="2048" dir="ltr">')}
@@ -127,10 +140,17 @@ export function createStorefrontEditor({session, upload, toast}) {
         }
     }
     function fillPalette() {
-        for (const [key, , fallback] of paletteFields) {
-            controls.namedItem('color-' + key).value = draft.palette[key];
-            form.querySelector(`[data-swatch="${key}"]`).value = draft.palette[key] || fallback;
+        for (const [key] of paletteFields) {
+            const input = controls.namedItem('color-' + key);
+            input.value = draft.palette[key];
+            input.placeholder = themeColor(draft.theme, key);
+            form.querySelector(`[data-swatch="${key}"]`).value = draft.palette[key] || themeColor(draft.theme, key);
         }
+    }
+    function syncThemeMode() {
+        const forced = themePresets[draft.theme].mode === 'dark';
+        dark.disabled = forced;
+        if (forced) dark.checked = true;
     }
     function resize() {
         if (!dialog.open) return;
@@ -199,6 +219,9 @@ export function createStorefrontEditor({session, upload, toast}) {
         closed.checked = !['livraison','emporter','sur_place'].some(mode => orderingAvailable(latest, mode));
         device.value = matchMedia('(max-width:800px)').matches ? 'mobile' : 'desktop';
         section.value = 'hero';
+        controls.theme.value = draft.theme;
+        dark.checked = false;
+        syncThemeMode();
         fillPalette();
         fillCopy();
         say('');
@@ -251,7 +274,14 @@ export function createStorefrontEditor({session, upload, toast}) {
         const key = input.name;
         if (!draft || input.type === 'file') return;
         if (key === 'locale') fillCopy();
-        else if (input.dataset.swatch) {
+        else if (key === 'theme') {
+            // A new theme starts from its own colours; the previous theme's overrides would clash with it.
+            draft.theme = input.value;
+            for (const [color] of paletteFields) draft.palette[color] = '';
+            dark.checked = false;
+            syncThemeMode();
+            fillPalette();
+        } else if (input.dataset.swatch) {
             draft.palette[input.dataset.swatch] = input.value;
             controls.namedItem('color-' + input.dataset.swatch).value = input.value;
         } else if (key.startsWith('color-')) {

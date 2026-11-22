@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
-import { foreground, glovoURL, GLOVO_LISTING } from '../assets/storefront-appearance.js';
+import { foreground, glovoURL, GLOVO_LISTING, siteTheme, storefrontAppearance, storefrontAppearanceIssue } from '../assets/storefront-appearance.js';
 import { startAdminFixtureServer } from './fixtures/admin-server.mjs';
 import { startFixtureServer } from './fixtures/server.mjs';
 
@@ -12,6 +12,16 @@ for (const invalid of ['javascript:alert(1)', 'http://glovoapp.com/x', 'https://
 }
 assert.equal(foreground('#000000'), '#ffffff');
 assert.equal(foreground('#ffffff'), '#000000');
+// Themes: BIGTAC light stays the default with no palette of its own; dark presets fill the roles saved colours leave empty.
+assert.equal(storefrontAppearance({}).theme, 'bigtac');
+assert.equal(storefrontAppearance({storefront:{theme:'neon'}}).theme, 'bigtac');
+assert.deepEqual(siteTheme({}), {id:'bigtac', mode:'light', palette:{accent:'', background:'', surface:'', hero:'', footer:'', glovo:''}});
+const charcoal = siteTheme({storefront:{theme:'charbon', palette:{accent:'#3159ac'}}});
+assert.equal(charcoal.mode, 'dark');
+assert.equal(charcoal.palette.accent, '#3159ac', 'A saved colour overrides the theme colour');
+assert.equal(charcoal.palette.background, '#141416');
+assert.equal(storefrontAppearanceIssue({...storefrontAppearance({}), theme:'neon'}), 'Thème inconnu.');
+assert.equal(storefrontAppearanceIssue(storefrontAppearance({storefront:{theme:'charbon'}})), '');
 
 const admin = await startAdminFixtureServer();
 const store = await startFixtureServer();
@@ -177,12 +187,77 @@ try {
         assert(await delayed.locator('#storefront-startup').isHidden());
         if (entry === 0) await delayed.reload({waitUntil:'domcontentloaded'});
     }
+    // Charbon is a whole interface: dark, the customer's toggle hidden, a tab bar on phones, a floating hero dish on desktop.
+    // BIGTAC classique restores the customer's own light/dark choice and the classic layout.
+    const themed = await visit(store.url + '/index.html', 390);
+    await themed.locator('#app-shell').waitFor();
+    assert.doesNotMatch(await themed.locator('html').getAttribute('class'), /\bdark\b/);
+    assert(await themed.locator('.theme-tabbar').isHidden(), 'Charbon-only elements stay hidden in the classic theme');
+    await themed.evaluate(() => {__fixture.settings.storefront = {theme:'charbon'}; __fixture.emitSettings();});
+    assert.match(await themed.locator('html').getAttribute('class'), /\bdark\b/);
+    assert.equal(await themed.locator('html').getAttribute('data-site-theme'), 'charbon');
+    assert(await themed.locator('#btnDarkMode').isHidden());
+    assert(await themed.locator('.theme-tabbar').isVisible(), 'Phones get the bottom tab bar');
+    assert(await themed.locator('#hero-photo').isHidden(), 'Phones open on the menu heading, not the photo poster');
+    assert.equal(await themed.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(29, 29, 31)');
+    assert.equal(await themed.locator('meta[name="theme-color"]').getAttribute('content'), '#141416');
+    assert.equal(await themed.locator('#menuContent .product-card__choose').first().evaluate(el => getComputedStyle(el).borderRadius), '50%');
+    assert(await themed.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    await themed.locator('#menuContent .product-card__choose').first().click();
+    await themed.locator('#addItemModal .add-to-cart-icon').waitFor();
+    await themed.evaluate(() => closeAddItemModal());
+    await themed.setViewportSize({width:1366, height:900});
+    assert(await themed.locator('.theme-tabbar').isHidden(), 'Desktop has no tab bar');
+    assert.equal(await themed.locator('#hero-photo').evaluate(el => getComputedStyle(el).borderRadius), '50%', 'Desktop hero dish floats');
+    assert.equal(await themed.locator('.intro-cta').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(225, 29, 56)');
+    assert(await themed.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    await themed.evaluate(() => {__fixture.settings.storefront = {theme:'bigtac'}; __fixture.emitSettings();});
+    assert.doesNotMatch(await themed.locator('html').getAttribute('class'), /\bdark\b/);
+    assert(await themed.locator('#btnDarkMode').isVisible());
+    assert(await themed.locator('#btnThemeSearch').isHidden());
+
+    // Admin follows the saved theme: Charbon brings the rail and glass cards; BIGTAC classique restores the light workspace.
+    const studio = await visit(admin.url + '/admin.html#orders', 1366);
+    await studio.locator('#view-orders .order-card').first().waitFor();
+    const paper = () => studio.locator('#view-orders .order-card').first().evaluate(el => getComputedStyle(el).backgroundColor);
+    const rail = () => studio.locator('.admin-sidebar').evaluate(el => Math.round(el.getBoundingClientRect().width));
+    assert.equal(await paper(), 'rgb(255, 255, 255)');
+    const classicRail = await rail();
+    await studio.evaluate(() => {__adminFixture.data.settings[0].storefront = {theme:'charbon'}; __adminFixture.emit();});
+    assert.equal(await studio.locator('html').getAttribute('data-site-mode'), 'dark');
+    assert.equal(await studio.locator('html').getAttribute('data-site-theme'), 'charbon');
+    assert.equal(await rail(), 104, 'Charbon uses the slim rail');
+    assert.equal(await studio.locator('.admin-body').evaluate(el => getComputedStyle(el).color), 'rgb(244, 244, 243)');
+    assert.equal(await studio.locator('#view-orders .order-card').first().evaluate(el => getComputedStyle(el).borderTopWidth), '1px');
+    await studio.evaluate(() => {__adminFixture.data.settings[0].storefront = {theme:'bigtac'}; __adminFixture.emit();});
+    assert.equal(await studio.locator('html').getAttribute('data-site-mode'), 'light');
+    assert.equal(await paper(), 'rgb(255, 255, 255)');
+    assert.equal(await rail(), classicRail, 'The classic sidebar returns unchanged');
+
+    // The editor's theme choice resets saved colours to the theme's own and locks the preview to dark.
+    const chooser = await visit(admin.url + '/admin.html#settings', 1366);
+    await chooser.locator('#edit-storefront').click();
+    const themeDialog = chooser.locator('#storefront-editor');
+    await themeDialog.frameLocator('iframe').locator('#hero-photo').waitFor();
+    await themeDialog.locator('#site-color-accent').fill('#3159ac');
+    await themeDialog.getByText('Charbon', {exact:true}).click();
+    assert.equal(await themeDialog.locator('#site-color-accent').inputValue(), '');
+    assert.equal(await themeDialog.locator('#site-color-accent').getAttribute('placeholder'), '#e11d38');
+    assert(await themeDialog.locator('#storefront-preview-dark').isChecked());
+    assert(await themeDialog.locator('#storefront-preview-dark').isDisabled());
+    assert.match(await themeDialog.frameLocator('iframe').locator('html').getAttribute('class'), /\bdark\b/);
+    assert.equal(await themeDialog.frameLocator('iframe').locator('html').getAttribute('data-site-theme'), 'charbon');
+    await themeDialog.locator('button[type=submit]').click();
+    await themeDialog.getByText('Vitrine enregistrée.', {exact:true}).waitFor();
+    assert.equal(await chooser.evaluate(() => __adminFixture.data.settings[0].storefront.theme), 'charbon');
+    assert.equal(await chooser.locator('html').getAttribute('data-site-mode'), 'dark');
+
     const unavailable = await visit(store.url + '/index.html?scenario=settings-error', 390);
     await unavailable.locator('#storefront-startup-retry').waitFor();
     assert(await unavailable.locator('#app-shell').isHidden(), 'A failed configuration read stays neutral and offers retry');
     assert.equal(production, 0);
     assert.deepEqual(errors, []);
-    console.log('PASS storefront appearance: Glovo defaults and validation, live preview, four widths, photo upload, translations and persisted storefront.');
+    console.log('PASS storefront appearance: Glovo defaults and validation, live preview, four widths, photo upload, translations, persisted storefront and light/dark restaurant themes.');
 } finally {
     for (const context of contexts) await context.close();
     await browser.close();
