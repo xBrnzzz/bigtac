@@ -187,7 +187,7 @@ try {
         assert(await delayed.locator('#storefront-startup').isHidden());
         if (entry === 0) await delayed.reload({waitUntil:'domcontentloaded'});
     }
-    // Charbon is a whole interface: dark, the customer's toggle hidden, a tab bar on phones, a floating hero dish on desktop.
+    // Charbon defaults to dark and remembers the visitor's local mode.
     // BIGTAC classique restores the customer's own light/dark choice and the classic layout.
     const themed = await visit(store.url + '/index.html', 390);
     await themed.locator('#app-shell').waitFor();
@@ -196,19 +196,60 @@ try {
     await themed.evaluate(() => {__fixture.settings.storefront = {theme:'charbon'}; __fixture.emitSettings();});
     assert.match(await themed.locator('html').getAttribute('class'), /\bdark\b/);
     assert.equal(await themed.locator('html').getAttribute('data-site-theme'), 'charbon');
-    assert(await themed.locator('#btnDarkMode').isHidden());
+    const toggle = themed.locator('#btnDarkMode');
+    await toggle.click();
+    assert.equal(await themed.locator('html').getAttribute('data-site-mode'), 'light');
+    assert.equal(await themed.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(245, 244, 241)');
+    await themed.goto(store.url + '/index.html?theme=charbon');
+    await themed.locator('#app-shell').waitFor();
+    assert.equal(await toggle.getAttribute('aria-pressed'), 'false', 'Light preference survives a fresh page load');
+    await toggle.click();
+    assert.equal(await toggle.getAttribute('aria-pressed'), 'true');
     assert(await themed.locator('.theme-tabbar').isVisible(), 'Phones get the bottom tab bar');
     assert(await themed.locator('#hero-photo').isHidden(), 'Phones open on the menu heading, not the photo poster');
     assert.equal(await themed.locator('body').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(29, 29, 31)');
     assert.equal(await themed.locator('meta[name="theme-color"]').getAttribute('content'), '#141416');
     assert.equal(await themed.locator('#menuContent .product-card__choose').first().evaluate(el => getComputedStyle(el).borderRadius), '50%');
     assert(await themed.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    // Photos (JPEG) stay framed; a single clear button in search; the cart label fits on one line.
+    await themed.locator('#menuContent .product-card[data-cutout="false"]').first().waitFor({state:'attached'});
+    assert.equal(await themed.locator('#menuContent .product-card__media').first().evaluate(el => getComputedStyle(el).borderRadius), '18px');
+    assert(await themed.evaluate(() => [...document.styleSheets].filter(sheet => sheet.href?.startsWith(location.origin)).some(sheet => [...sheet.cssRules].some(rule =>
+        rule.selectorText?.includes('#menuSearch::-webkit-search-cancel-button') && rule.style.display === 'none'))), 'Only the app’s own clear button shows');
     await themed.locator('#menuContent .product-card__choose').first().click();
     await themed.locator('#addItemModal .add-to-cart-icon').waitFor();
+    assert.equal(await themed.locator('#addToCartLabel').evaluate(el => getComputedStyle(el).whiteSpace), 'nowrap');
+    assert.equal(await themed.locator('#addItemModal .modal-panel').evaluate(el => { el.focus(); return getComputedStyle(el).outlineStyle; }), 'none');
     await themed.evaluate(() => closeAddItemModal());
+    // A product photo that fails falls back every time, not only for the first product opened.
+    const brokenNames = await themed.evaluate(() => {
+        const rows = __fixture.menuItems.filter(item => item.isVisible !== false).slice(0, 2);
+        rows.forEach(item => { item.imageUrl = 'assets/missing-photo.jpg'; });
+        __fixture.emitCatalog();
+        return rows.map(item => item.name);
+    });
+    for (const name of brokenNames) {
+        await themed.getByRole('button', {name:`Choisir ${name}`}).first().click();
+        await themed.waitForFunction(() => {
+            const image = document.getElementById('modalItemImage');
+            return image.complete && image.naturalWidth > 0 && !image.currentSrc.endsWith('missing-photo.jpg');
+        });
+        await themed.evaluate(() => closeAddItemModal());
+    }
     await themed.setViewportSize({width:1366, height:900});
     assert(await themed.locator('.theme-tabbar').isHidden(), 'Desktop has no tab bar');
-    assert.equal(await themed.locator('#hero-photo').evaluate(el => getComputedStyle(el).borderRadius), '50%', 'Desktop hero dish floats');
+    await themed.locator('#hero[data-cutout="false"]').waitFor({state:'attached'});
+    assert.equal(await themed.locator('#hero-photo').evaluate(el => getComputedStyle(el).borderRadius), '32px', 'A photo hero stays framed');
+    assert.equal(await themed.locator('#stickyFilterBar').evaluate(el => getComputedStyle(el).clipPath.startsWith('inset')), true, 'The sticky bar spans the page');
+    // A cut-out on a transparent background floats instead.
+    await themed.evaluate(() => {
+        const canvas = Object.assign(document.createElement('canvas'), {width:200, height:200});
+        const draw = canvas.getContext('2d');
+        draw.fillStyle = '#d58a32'; draw.beginPath(); draw.arc(100, 105, 70, 0, Math.PI * 2); draw.fill();
+        document.getElementById('hero-photo').src = canvas.toDataURL('image/png');
+    });
+    await themed.locator('#hero[data-cutout="true"]').waitFor({state:'attached'});
+    assert.equal(await themed.locator('#hero-photo').evaluate(el => getComputedStyle(el).objectFit), 'contain');
     assert.equal(await themed.locator('.intro-cta').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(225, 29, 56)');
     assert(await themed.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     await themed.evaluate(() => {__fixture.settings.storefront = {theme:'bigtac'}; __fixture.emitSettings();});
@@ -234,7 +275,7 @@ try {
     assert.equal(await paper(), 'rgb(255, 255, 255)');
     assert.equal(await rail(), classicRail, 'The classic sidebar returns unchanged');
 
-    // The editor's theme choice resets saved colours to the theme's own and locks the preview to dark.
+    // The editor's theme choice resets saved colours to the theme's own and previews its default mode.
     const chooser = await visit(admin.url + '/admin.html#settings', 1366);
     await chooser.locator('#edit-storefront').click();
     const themeDialog = chooser.locator('#storefront-editor');
@@ -244,13 +285,40 @@ try {
     assert.equal(await themeDialog.locator('#site-color-accent').inputValue(), '');
     assert.equal(await themeDialog.locator('#site-color-accent').getAttribute('placeholder'), '#e11d38');
     assert(await themeDialog.locator('#storefront-preview-dark').isChecked());
-    assert(await themeDialog.locator('#storefront-preview-dark').isDisabled());
+    assert(await themeDialog.locator('#storefront-preview-dark').isEnabled());
     assert.match(await themeDialog.frameLocator('iframe').locator('html').getAttribute('class'), /\bdark\b/);
     assert.equal(await themeDialog.frameLocator('iframe').locator('html').getAttribute('data-site-theme'), 'charbon');
     await themeDialog.locator('button[type=submit]').click();
     await themeDialog.getByText('Vitrine enregistrée.', {exact:true}).waitFor();
     assert.equal(await chooser.evaluate(() => __adminFixture.data.settings[0].storefront.theme), 'charbon');
     assert.equal(await chooser.locator('html').getAttribute('data-site-mode'), 'dark');
+
+    await themeDialog.getByText('Charbon clair', {exact:true}).click();
+    const previewRoot = themeDialog.frameLocator('iframe').locator('html');
+    assert.equal(await previewRoot.getAttribute('data-site-mode'), 'light');
+    await themeDialog.locator('#storefront-preview-dark').check();
+    assert.equal(await previewRoot.getAttribute('data-site-mode'), 'dark');
+    await themeDialog.locator('button[type=submit]').click();
+    await themeDialog.getByText('Vitrine enregistrée.', {exact:true}).waitFor();
+    assert.equal(await chooser.evaluate(() => __adminFixture.data.settings[0].storefront.theme), 'charbon-light');
+    assert.equal(await chooser.locator('html').getAttribute('data-site-mode'), 'light');
+    await themeDialog.evaluate(el => el.close());
+    await chooser.locator('#admin-mode-toggle').click();
+    assert.equal(await chooser.locator('html').getAttribute('data-site-mode'), 'dark');
+    assert.equal(await chooser.evaluate(() => __adminFixture.data.settings[0].storefront.theme), 'charbon-light');
+
+    for (const width of [320, 390, 768, 1366]) {
+        const view = await visit(store.url + '/index.html?theme=charbon-light', width);
+        await view.locator('#promotionsGrid article').first().waitFor();
+        assert.equal(await view.locator('html').getAttribute('data-site-mode'), 'light');
+        assert(await view.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+        const action = view.locator('#promotionsGrid .product-card__choose').first();
+        assert((await action.boundingBox()).height >= 44);
+        await view.evaluate(() => setAppLanguage('ar'));
+        await action.click();
+        await view.locator('#addItemModal').waitFor();
+        await view.context().close();
+    }
 
     const unavailable = await visit(store.url + '/index.html?scenario=settings-error', 390);
     await unavailable.locator('#storefront-startup-retry').waitFor();

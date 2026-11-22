@@ -62,9 +62,10 @@ try{
   check(await page.locator('.menu-list-surface').evaluate(e=>parseFloat(getComputedStyle(e).borderTopLeftRadius)>0),`${width}: catalogue has a rounded shared surface`);
   await page.evaluate(()=>switchView('orders'));await page.locator('#list-pending .order-card').first().waitFor();
   check(await page.locator('.orders-tabs button').evaluateAll(buttons=>
-   buttons.map(button=>button.dataset.tab).join(',')==='pending,confirmed,delivery,history'
-  ),`${width}: Orders offers only the four queues`);
-  check(await page.locator('#mtab-pending').getAttribute('aria-pressed')==='true',`${width}: Orders opens on En attente`);
+   buttons.map(button=>button.dataset.tab).join(',')==='all,pending,confirmed,delivery,history'
+  ),`${width}: Orders offers Tous and the four queues`);
+  check(await page.locator('#mtab-all').getAttribute('aria-pressed')==='true',`${width}: Orders opens on Tous`);
+  check(await page.locator('#list-pending .order-card').first().isVisible()&&await page.locator('#list-confirmed .order-card').first().isVisible(),`${width}: Tous shows every queue at once`);
   await page.locator('#mtab-confirmed').click();
   check(await page.locator('#list-confirmed .order-card').first().isVisible()&&!await page.locator('#list-pending .order-card').first().isVisible(),`${width}: changing queues shows only the selected status`);
   await page.locator('#mtab-pending').click();

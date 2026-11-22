@@ -1,4 +1,5 @@
 import { operationsService } from './operations-service.js';
+import { watchDishImages } from './dish-images.js';
 import { copy, fingerprint, imageIssue } from './menu-model.js';
 import { orderingAvailable } from './operations-model.js';
 import { translations, uiMarkup, uiText, setUiText, translateDOM } from './i18n.js';
@@ -55,7 +56,7 @@ export function createStorefrontEditor({session, upload, toast}) {
                     <p data-ui-copy="Un champ de texte vide utilise le texte par défaut de la langue.">Un champ de texte vide utilise le texte par défaut de la langue.</p>
                 </div>
                 <fieldset class="storefront-editor-group storefront-theme-group"><legend data-ui-copy="Thème">Thème</legend>
-                    <p class="storefront-palette-help" data-ui-copy="Le thème s’applique à la vitrine et à l’interface Admin. Un thème sombre passe les deux en mode sombre.">Le thème s’applique à la vitrine et à l’interface Admin. Un thème sombre passe les deux en mode sombre.</p>
+                    <p class="storefront-palette-help" data-ui-copy="Choisissez le thème par défaut de la vitrine et de l’Admin. Avec Charbon, chacun peut alterner entre clair et sombre.">Choisissez le thème par défaut de la vitrine et de l’Admin. Avec Charbon, chacun peut alterner entre clair et sombre.</p>
                     <div class="storefront-theme-list">${themeIds.map(themeOption).join('')}</div>
                 </fieldset>
                 <details open class="storefront-editor-group"><summary data-ui-copy="Palette">Palette</summary>
@@ -148,9 +149,7 @@ export function createStorefrontEditor({session, upload, toast}) {
         }
     }
     function syncThemeMode() {
-        const forced = themePresets[draft.theme].mode === 'dark';
-        dark.disabled = forced;
-        if (forced) dark.checked = true;
+        dark.checked = themePresets[draft.theme].mode === 'dark';
     }
     function resize() {
         if (!dialog.open) return;
@@ -200,7 +199,7 @@ export function createStorefrontEditor({session, upload, toast}) {
             if (!visible && section.value === id) section.value = 'hero';
         }
         doc.querySelector('[data-i18n="nav.offers"]').hidden = !draft.showOffers;
-        renderStorefrontAppearance(doc, config, {language:locale, translate:t, open, localImage});
+        renderStorefrontAppearance(doc, config, {language:locale, translate:t, open, localImage, preferredMode:dark.checked ? 'dark' : 'light'});
         renderStorefrontHours(doc, config.openingHours, locale, t);
     }
     function openEditor() {
@@ -220,7 +219,6 @@ export function createStorefrontEditor({session, upload, toast}) {
         device.value = matchMedia('(max-width:800px)').matches ? 'mobile' : 'desktop';
         section.value = 'hero';
         controls.theme.value = draft.theme;
-        dark.checked = false;
         syncThemeMode();
         fillPalette();
         fillCopy();
@@ -257,7 +255,7 @@ export function createStorefrontEditor({session, upload, toast}) {
         if (dialog.open && (busy || changed())) event.preventDefault();
     });
     new ResizeObserver(resize).observe(viewport);
-    frame.addEventListener('load', () => { preview(); goToSection(); });
+    frame.addEventListener('load', () => { watchDishImages(frame.contentDocument); preview(); goToSection(); });
     device.addEventListener('change', () => { resize(); goToSection(); });
     section.addEventListener('change', goToSection);
     dark.addEventListener('change', preview);
@@ -278,7 +276,6 @@ export function createStorefrontEditor({session, upload, toast}) {
             // A new theme starts from its own colours; the previous theme's overrides would clash with it.
             draft.theme = input.value;
             for (const [color] of paletteFields) draft.palette[color] = '';
-            dark.checked = false;
             syncThemeMode();
             fillPalette();
         } else if (input.dataset.swatch) {

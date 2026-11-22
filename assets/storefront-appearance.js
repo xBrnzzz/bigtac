@@ -15,11 +15,14 @@ export const paletteFields = [
 ];
 // A theme is a whole interface: its own layout (assets/theme-*.css), a starting palette and a light or dark mode.
 // Saved palette colours override the theme's palette role by role.
-// Light keeps each customer's own light/dark choice; a dark theme sets the storefront and Admin to dark.
+// The Charbon presets share a layout. Each sets the default mode for new visitors.
 export const themePresets = {
     bigtac: {label:'BIGTAC classique', description:'L’interface actuelle : papier chaud et orange BIGTAC.', mode:'light', palette:{}},
     charbon: {label:'Charbon', description:'Nouvelle interface : charbon, éléments translucides, un seul accent.', mode:'dark', palette:{
         accent:'#e11d38', background:'#141416', surface:'#1e1e21', hero:'#141416', footer:'#101012', glovo:'#ffc244'
+    }},
+    'charbon-light': {label:'Charbon clair', description:'La même interface sur fond clair.', mode:'light', palette:{
+        accent:'#bd1833', background:'#f5f4f1', surface:'#ffffff', hero:'#f5f4f1', footer:'#eae8e4', glovo:'#ffc244'
     }}
 };
 export const themeIds = Object.keys(themePresets);
@@ -119,24 +122,47 @@ function applyPalette(styles, palette) {
 }
 
 // The theme's mode and palette after saved colours override the preset, role by role.
-export function siteTheme(config = {}) {
+export function siteTheme(config = {}, preferredMode) {
     const settings = storefrontAppearance(config);
-    const preset = themePresets[settings.theme];
+    const selected = themePresets[settings.theme];
+    const switchMode = settings.theme !== 'bigtac' && ['dark','light'].includes(preferredMode) && preferredMode !== selected.mode;
+    const preset = switchMode ? themePresets[preferredMode === 'dark' ? 'charbon' : 'charbon-light'] : selected;
     return {
         id: settings.theme,
         mode: preset.mode,
-        palette: Object.fromEntries(paletteFields.map(([key]) => [key, settings.palette[key] || preset.palette[key] || '']))
+        palette: Object.fromEntries(paletteFields.map(([key]) => [key, ((!switchMode || key === 'accent' || key === 'glovo') && settings.palette[key]) || preset.palette[key] || '']))
     };
 }
 
 function markTheme(doc, theme) {
     const root = doc.documentElement;
-    root.dataset.siteTheme = theme.id;
+    root.dataset.siteTheme = theme.id === 'charbon-light' ? 'charbon' : theme.id;
     root.dataset.siteMode = theme.mode;
 }
 
+// A light/dark switch changes every colour at once. Turning transitions off for that frame
+// (.theme-switching in the stylesheets) keeps the switch instant instead of smearing.
+export function withoutTransitions(doc, change) {
+    const root = doc.documentElement;
+    root.classList.add('theme-switching');
+    change();
+    void root.offsetWidth;
+    setTimeout(() => root.classList.remove('theme-switching'), 0);
+}
+
 export function applyAdminPalette(doc, config = {}) {
-    const theme = siteTheme(config);
+    const savedTheme = config.storefront?.theme;
+    const key = 'bigtacAdminMode:' + savedTheme;
+    const theme = siteTheme(config, doc.defaultView?.localStorage.getItem(key));
+    const toggle = doc.getElementById('admin-mode-toggle');
+    if (toggle) {
+        toggle.hidden = theme.id === 'bigtac';
+        toggle.setAttribute('aria-pressed', String(theme.mode === 'dark'));
+        toggle.onclick = () => withoutTransitions(doc, () => {
+            doc.defaultView.localStorage.setItem(key, theme.mode === 'dark' ? 'light' : 'dark');
+            applyAdminPalette(doc, config);
+        });
+    }
     const {accent, background, surface} = theme.palette;
     const styles = doc.documentElement.style;
     applyPalette(styles, {accent, background, surface});
@@ -187,14 +213,13 @@ export function renderStorefrontHours(doc, hours, language, translate) {
     });
 }
 
-export function renderStorefrontAppearance(doc, config, {language, translate, open, table = false, localImage = ''}) {
+export function renderStorefrontAppearance(doc, config, {language, translate, open, table = false, localImage = '', preferredMode}) {
     const settings = storefrontAppearance(config);
-    const theme = siteTheme(config);
+    const theme = siteTheme(config, preferredMode);
     const styles = doc.documentElement.style;
     applyPalette(styles, theme.palette);
     markTheme(doc, theme);
-    // A dark theme overrides the customer's light/dark choice; the page restores that choice for a light theme.
-    if (theme.mode === 'dark') doc.documentElement.classList.add('dark');
+    if (theme.id !== 'bigtac') doc.documentElement.classList.toggle('dark', theme.mode === 'dark');
     const getText = key => appearanceText(config, key, language, translate);
     const name = config.restaurantName || 'BIGTAC';
     doc.getElementById('store-brand-name').textContent = name;

@@ -48,12 +48,12 @@
 :root[data-site-theme="charbon"] .store-brand small { display:none; }
 :root[data-site-theme="charbon"] .store-nav { margin-inline:clamp(24px,7vw,120px) auto; gap:clamp(20px,3vw,44px); }
 :root[data-site-theme="charbon"] .store-nav a { font-weight:400; font-size:14px; color:#d6d6d9; }
-:root[data-site-theme="charbon"] .store-nav a:hover { color:var(--ch-accent); }
+@media (hover:hover) { :root[data-site-theme="charbon"] .store-nav a:hover { color:var(--ch-accent); } }
 :root[data-site-theme="charbon"] .store-actions { gap:6px; margin-inline-start:auto; }
 :root[data-site-theme="charbon"] :is(.store-actions .icon-button,.lang-toggle-btn,.header-cart) {
-    background:transparent; border:0; color:var(--ch-ink); box-shadow:none;
+    background:transparent; border:0; color:var(--ch-ink); box-shadow:none; transition-property:background-color;
 }
-:root[data-site-theme="charbon"] :is(.store-actions .icon-button,.lang-toggle-btn,.header-cart):hover { background:var(--ch-faint); }
+@media (hover:hover) { :root[data-site-theme="charbon"] :is(.store-actions .icon-button,.lang-toggle-btn,.header-cart):hover { background:var(--ch-faint); } }
 :root[data-site-theme="charbon"] .header-cart { position:relative; width:44px; min-height:44px; padding:0; border-radius:50%; }
 :root[data-site-theme="charbon"] .header-cart .cart-label { display:none; }
 :root[data-site-theme="charbon"] .header-cart .count-badge {
@@ -70,14 +70,14 @@
     border:0; border-radius:16px; background:var(--ch-accent); color:var(--ch-on-accent);
     box-shadow:var(--ch-glow); font-weight:600;
 }
-:root[data-site-theme="charbon"] .primary-button:hover { background:color-mix(in srgb,var(--ch-accent) 88%,#fff); }
+@media (hover:hover) { :root[data-site-theme="charbon"] .primary-button:hover { background:color-mix(in srgb,var(--ch-accent) 88%,#fff); } }
 :root[data-site-theme="charbon"] .secondary-button {
     border:1px solid var(--ch-line); border-radius:16px; background:var(--ch-glass); color:var(--ch-ink);
 }
 :root[data-site-theme="charbon"] .glovo-button {
     border:1px solid var(--ch-line); border-radius:16px; background:var(--ch-faint); color:var(--ch-ink); font-weight:500;
 }
-:root[data-site-theme="charbon"] .glovo-button:hover { background:#ffffff1c; text-decoration:none; }
+@media (hover:hover) { :root[data-site-theme="charbon"] .glovo-button:hover { background:#ffffff1c; text-decoration:none; } }
 
 /* ---------- Hero: headline with one accent line, a floating dish on the right ---------- */
 :root[data-site-theme="charbon"] #hero {
@@ -85,11 +85,18 @@
     grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);
     min-height:min(680px,calc(100svh - var(--app-header)));
 }
+/* A photo stays a framed picture lit by a soft accent glow; a cut-out (data-cutout="true", see dish-images.js) floats. */
+:root[data-site-theme="charbon"] #hero {
+    background:radial-gradient(560px 460px at 74% 50%,color-mix(in srgb,var(--ch-accent) 20%,transparent),transparent 70%);
+}
 :root[data-site-theme="charbon"] #hero>img {
     position:relative; inset:auto; grid-column:2; grid-row:1; align-self:center; justify-self:center;
-    width:min(100%,600px); height:auto; aspect-ratio:1; object-fit:cover; clip-path:none;
-    object-position:50% 70%; border-radius:50%; -webkit-mask-image:var(--ch-dish); mask-image:var(--ch-dish);
-    filter:drop-shadow(0 40px 50px #000c);
+    width:min(calc(100% - 48px),620px); height:auto; aspect-ratio:5/4; object-fit:cover; clip-path:none;
+    object-position:var(--site-photo-x,50%) 55%; border-radius:32px; -webkit-mask-image:none; mask-image:none;
+    filter:none; box-shadow:0 50px 90px -30px #000, 0 0 0 1px #ffffff14;
+}
+:root[data-site-theme="charbon"] #hero[data-cutout="true"]>img {
+    aspect-ratio:1; object-fit:contain; border-radius:0; box-shadow:none; filter:drop-shadow(0 40px 50px #000c);
 }
 :root[data-site-theme="charbon"] #hero .restaurant-intro__copy { padding:48px 0 48px clamp(24px,6vw,96px); }
 :root[data-site-theme="charbon"] #hero h1 {
@@ -108,7 +115,7 @@
     min-height:52px; margin:0; padding:0 26px; gap:12px; border:0; border-radius:16px;
     background:var(--ch-accent); color:var(--ch-on-accent); box-shadow:var(--ch-glow); font-size:15px; font-weight:600;
 }
-:root[data-site-theme="charbon"] #hero .intro-cta:hover { background:color-mix(in srgb,var(--ch-accent) 88%,#fff); box-shadow:var(--ch-glow); }
+@media (hover:hover) { :root[data-site-theme="charbon"] #hero .intro-cta:hover { background:color-mix(in srgb,var(--ch-accent) 88%,#fff); box-shadow:var(--ch-glow); } }
 :root[data-site-theme="charbon"] #hero .intro-cta svg { transform:rotate(-90deg); }
 [dir="rtl"]:root[data-site-theme="charbon"] #hero .intro-cta svg { transform:rotate(90deg); }
 :root[data-site-theme="charbon"] #hero .glovo-button { min-height:52px; padding:0 20px; }
@@ -139,28 +146,47 @@
     width:34px; height:34px; border:1px solid var(--ch-line); border-radius:9px; background:var(--ch-faint);
     color:var(--ch-ink); font-size:15px;
 }
-:root[data-site-theme="charbon"] .browse-arrows button:hover { background:#ffffff1f; }
+@media (hover:hover) { :root[data-site-theme="charbon"] .browse-arrows button:hover { background:#ffffff1f; } }
 
-/* ---------- Product cards: translucent card, dish floating above its top edge, accent "+" on the corner ---------- */
+/* ---------- Product cards: translucent card, accent "+" on the corner ----------
+   Photos sit in a rounded frame at the top of the card, so a photo's own background never reads as a halo.
+   Cut-outs on a transparent background (data-cutout="true", see dish-images.js) float above the card's top edge. */
 :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card {
     position:relative; display:flex; flex-direction:column; gap:0; overflow:visible;
-    margin-top:72px; padding:0 18px 22px; max-width:none;
+    margin-top:0; padding:10px 10px 16px; max-width:none;
     border:1px solid var(--ch-line); border-radius:var(--ch-radius);
     background:var(--ch-glass); color:var(--ch-ink); box-shadow:var(--ch-shadow);
 }
-:root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card:hover { border-color:#ffffff26; }
+@media (hover:hover) { :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card:hover { border-color:#ffffff26; } }
 :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__media {
-    position:relative; width:min(78%,200px); height:auto; min-height:0; max-height:none; aspect-ratio:1;
-    margin:-66px auto 10px; border-radius:50%; overflow:visible; background:none; flex:none;
-    filter:drop-shadow(0 22px 22px #000000b3);
+    position:relative; width:100%; height:auto; min-height:0; max-height:none; aspect-ratio:4/3;
+    margin:0 0 14px; border-radius:calc(var(--ch-radius) - 10px); overflow:hidden; background:#ffffff08; flex:none; filter:none;
+}
+:root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__media::after {
+    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    box-shadow:inset 0 0 0 1px #ffffff12; background:linear-gradient(180deg,transparent 60%,#0000004d);
 }
 :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__media img {
-    position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 65%; border-radius:50%;
-    -webkit-mask-image:var(--ch-dish); mask-image:var(--ch-dish); transform:none;
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; border-radius:inherit;
+    -webkit-mask-image:none; mask-image:none; transform:none; transition:transform .5s cubic-bezier(.2,.7,.2,1);
 }
+@media (hover:hover) and (prefers-reduced-motion:no-preference) {
+    :root[data-site-theme="charbon"] #menuContent .product-card:hover .product-card__media img { transform:scale(1.04); }
+}
+:root[data-site-theme="charbon"] #popularGrid .product-card__media { aspect-ratio:1; }
 :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__body {
-    display:flex; flex-direction:column; flex:1; gap:4px; padding:0; border:0; background:none;
+    display:flex; flex-direction:column; flex:1; gap:4px; padding:0 8px; border:0; background:none;
 }
+/* Cut-outs: the dish floats over the card's top edge with its own shadow. */
+:root[data-site-theme="charbon"] #menuContent .product-card[data-cutout="true"] { margin-top:72px; padding:0 18px 16px; }
+:root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__media[data-cutout="true"] {
+    overflow:visible; background:none; border-radius:0; filter:drop-shadow(0 22px 22px #000000b3);
+}
+:root[data-site-theme="charbon"] #menuContent .product-card__media[data-cutout="true"] { width:min(94%,250px); aspect-ratio:4/3; margin:-70px auto 6px; }
+:root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__media[data-cutout="true"]::after { content:none; }
+:root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__media[data-cutout="true"] img { object-fit:contain; border-radius:0; }
+:root[data-site-theme="charbon"] #promotionsGrid .product-card__media[data-cutout="true"] { background:radial-gradient(closest-side,#ffffff12,transparent); }
+:root[data-site-theme="charbon"] #menuContent .product-card[data-cutout="true"] .product-card__body { padding:0; }
 :root[data-site-theme="charbon"] #promotionsGrid .product-card__body::before,
 :root[data-site-theme="charbon"] #promotionsGrid .product-card__body::after,
 :root[data-site-theme="charbon"] .featured-grid .product-card__choose::after { content:none; }
@@ -178,19 +204,20 @@
     background:var(--ch-accent); color:var(--ch-on-accent); font-size:11px; font-weight:600;
 }
 :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__footer {
-    display:flex; align-items:flex-end; justify-content:space-between; gap:8px;
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
     margin:auto 0 0; padding:12px 0 0; border:0;
 }
 :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__price small { display:none; }
 :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__price strong {
     font-family:var(--ch-font); font-size:15px; font-weight:500; line-height:1.2; color:var(--ch-ink);
 }
+/* The "+" sits inside the card, on the price row, as a round button. */
 :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__choose {
-    position:absolute; bottom:-16px; inset-inline-end:18px; display:grid; place-items:center;
-    width:46px; min-width:0; height:46px; min-height:0; padding:0; border:0; border-radius:13px;
+    position:static; flex:none; display:grid; place-items:center;
+    width:44px; min-width:0; height:44px; min-height:0; padding:0; border:0; border-radius:50%;
     background:var(--ch-accent); color:var(--ch-on-accent); box-shadow:var(--ch-glow);
 }
-:root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__choose:hover { background:color-mix(in srgb,var(--ch-accent) 88%,#fff); }
+@media (hover:hover) { :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__choose:hover { background:color-mix(in srgb,var(--ch-accent) 88%,#fff); } }
 :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__choose span {
     position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;
 }
@@ -200,32 +227,23 @@
 }
 :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__choose:disabled svg { display:block; opacity:.5; }
 
-/* ---------- Offers and best sellers ---------- */
-:root[data-site-theme="charbon"] :is(#promotions,#popular) { background:transparent; color:var(--ch-ink); }
-:root[data-site-theme="charbon"] .discovery-row .menu-feature { width:100%; max-width:1280px; margin-inline:auto; padding:24px var(--app-gutter); }
-:root[data-site-theme="charbon"] #promotions:not(.hidden) { display:block; }
-:root[data-site-theme="charbon"] #promotions .section-heading { display:flex; justify-content:space-between; align-items:center; margin:0 0 4px; }
-:root[data-site-theme="charbon"] #promotions .section-heading h2 { max-width:none; text-align:start; }
-:root[data-site-theme="charbon"] .discovery-row .featured-grid { padding:0 4px 28px; }
-@media (min-width:768px) {
-    :root[data-site-theme="charbon"] .discovery-row .featured-grid { grid-auto-columns:minmax(200px,230px); }
-    /* Best sellers: arrows and cards on the left, the section's words on the right. */
-    :root[data-site-theme="charbon"] #popular:not(.hidden) {
-        display:grid; grid-template-columns:minmax(0,1.5fr) minmax(240px,.8fr); grid-template-rows:auto 1fr;
-        column-gap:clamp(32px,6vw,96px); align-items:start;
-    }
-    :root[data-site-theme="charbon"] #popular .section-heading { display:contents; }
-    :root[data-site-theme="charbon"] #popular .browse-arrows { grid-column:1; grid-row:1; }
-    :root[data-site-theme="charbon"] #popularGrid { grid-column:1; grid-row:2; }
-    :root[data-site-theme="charbon"] #popular-title { grid-column:2; grid-row:1 / 3; align-self:center; margin:0 0 70px; }
-    :root[data-site-theme="charbon"] #popular .feature-lead { grid-column:2; grid-row:2; align-self:center; margin:40px 0 0; max-width:36ch; }
-}
-
 /* ---------- Menu: glass search, text category tabs with an accent dot ---------- */
 :root[data-site-theme="charbon"] #menu-unified { max-width:1280px; margin-inline:auto; }
-:root[data-site-theme="charbon"] .menu-toolbar { background:transparent; border:0; box-shadow:none; }
+/* The sticky search and category bar is a frosted band across the whole page, so cards never show through it.
+   The spread shadow paints the band edge to edge; clip-path keeps it to the bar's height without widening the page. */
+:root[data-site-theme="charbon"] .menu-toolbar {
+    --ch-bar:color-mix(in srgb,var(--ch-bg) 96%,transparent);
+    z-index:30; padding-block:12px 4px; border:0; border-radius:0;
+    background:var(--ch-bar); box-shadow:0 0 0 100vmax var(--ch-bar); clip-path:inset(0 -100vmax);
+    -webkit-backdrop-filter:blur(18px) saturate(140%); backdrop-filter:blur(18px) saturate(140%);
+}
 :root[data-site-theme="charbon"] .store-search { background:var(--ch-faint); border:1px solid var(--ch-line); border-radius:16px; box-shadow:none; }
 :root[data-site-theme="charbon"] .store-search input { color:var(--ch-ink); }
+:root[data-site-theme="charbon"] .store-search:focus-within {
+    outline:none; border-color:color-mix(in srgb,var(--ch-accent) 70%,transparent);
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--ch-accent) 22%,transparent);
+}
+:root[data-site-theme="charbon"] .store-search input:focus-visible { outline:none; }
 :root[data-site-theme="charbon"] .store-search input::placeholder { color:var(--ch-muted); }
 :root[data-site-theme="charbon"] .filter-btn-pill {
     position:relative; min-height:40px; padding:0 4px 0 18px; border:0; border-radius:0; background:none;
@@ -233,11 +251,11 @@
 }
 :root[data-site-theme="charbon"] .filter-btn-pill::before {
     content:""; position:absolute; inset-inline-start:4px; top:50%; width:7px; height:7px; margin-top:-3.5px;
-    border-radius:50%; background:var(--ch-accent); opacity:0; transform:scale(.4); transition:.18s ease;
+    border-radius:50%; background:var(--ch-accent); opacity:0; transition:opacity .15s ease;
 }
-:root[data-site-theme="charbon"] .filter-btn-pill:hover { background:none; color:var(--ch-ink); }
+@media (hover:hover) { :root[data-site-theme="charbon"] .filter-btn-pill:hover { background:none; color:var(--ch-ink); } }
 :root[data-site-theme="charbon"] .filter-btn-pill[aria-pressed="true"] { background:none; color:var(--ch-ink); font-weight:600; }
-:root[data-site-theme="charbon"] .filter-btn-pill[aria-pressed="true"]::before { opacity:1; transform:none; }
+:root[data-site-theme="charbon"] .filter-btn-pill[aria-pressed="true"]::before { opacity:1; }
 :root[data-site-theme="charbon"] #categoryFilters { gap:14px; }
 :root[data-site-theme="charbon"] .store-product-grid { gap:30px 22px; padding-bottom:24px; }
 @media (min-width:768px) {
@@ -249,14 +267,35 @@
 }
 :root[data-site-theme="charbon"] :is(.skeleton-card) { background:var(--ch-faint); border-radius:var(--ch-radius); }
 
-/* ---------- Footer ---------- */
-:root[data-site-theme="charbon"] .restaurant-footer { background:transparent; border-top:1px solid var(--ch-faint); }
-:root[data-site-theme="charbon"] .restaurant-footer h2 { font-family:var(--ch-font); text-transform:none; font-weight:600; }
-:root[data-site-theme="charbon"] .restaurant-footer .footer-directions {
-    border:1px solid var(--ch-line); border-radius:16px; background:var(--ch-faint); color:var(--ch-ink);
+/* ---------- Footer: quiet and compact ---------- */
+:root[data-site-theme="charbon"] .restaurant-footer {
+    --footer-ink:var(--ch-ink); --footer-muted:var(--ch-muted); --footer-orange:var(--ch-accent);
+    margin-block-start:clamp(32px,5vw,64px); background:transparent; border-top:1px solid var(--ch-faint); color:var(--ch-ink);
 }
-:root[data-site-theme="charbon"] .restaurant-footer .footer-directions:hover { background:#ffffff1f; text-decoration:none; }
-:root[data-site-theme="charbon"] .footer-wordmark { font-family:var(--ch-font); font-style:italic; font-weight:700; text-transform:none; }
+:root[data-site-theme="charbon"] .restaurant-footer__inner { max-width:1280px; padding:clamp(28px,4vw,52px) var(--app-gutter) clamp(18px,2.5vw,28px); }
+:root[data-site-theme="charbon"] .restaurant-footer__info {
+    grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr); gap:clamp(16px,3vw,40px); padding-block-end:clamp(20px,3vw,32px);
+}
+:root[data-site-theme="charbon"] .restaurant-footer h2 {
+    max-width:none; margin:0 0 8px; font:600 clamp(20px,2vw,26px)/1.25 var(--ch-font); letter-spacing:-.01em; text-transform:none;
+}
+:root[data-site-theme="charbon"] .restaurant-footer h3 {
+    margin:0 0 6px; color:var(--ch-muted); font:500 12px/1.4 var(--ch-font); letter-spacing:.05em; text-transform:uppercase;
+}
+:root[data-site-theme="charbon"] .restaurant-footer :is(address,.restaurant-footer__hours p,.restaurant-footer__hours dl) { color:color-mix(in srgb,var(--ch-ink) 82%,var(--ch-bg)); font-size:14px; line-height:1.55; }
+:root[data-site-theme="charbon"] .restaurant-footer .footer-directions {
+    margin-block-start:12px; min-height:40px; padding:0 14px; gap:8px; border:1px solid var(--ch-line); border-radius:12px;
+    background:var(--ch-faint); color:var(--ch-ink); font-size:13px; font-weight:500;
+}
+@media (hover:hover) { :root[data-site-theme="charbon"] .restaurant-footer .footer-directions:hover { background:#ffffff1f; text-decoration:none; } }
+:root[data-site-theme="charbon"] .restaurant-footer :is(.footer-contact-links button,.footer-links a) { min-height:40px; font-size:14px; font-weight:500; }
+:root[data-site-theme="charbon"] .footer-contact-links { gap:2px 18px; }
+:root[data-site-theme="charbon"] .restaurant-footer__sign { align-items:center; padding-top:16px; border-top:1px solid var(--ch-faint); }
+:root[data-site-theme="charbon"] .restaurant-footer .footer-wordmark {
+    color:var(--ch-ink); font:italic 700 22px/1 var(--ch-font); letter-spacing:-.02em; text-transform:none;
+}
+:root[data-site-theme="charbon"] .footer-links a { color:var(--ch-muted); font-size:13px; }
+@media (hover:hover) { :root[data-site-theme="charbon"] .footer-links a:hover { color:var(--ch-ink); } }
 
 /* ---------- Sheets: product, cart, checkout ---------- */
 :root[data-site-theme="charbon"] .modal-backdrop { background:#000000a6; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
@@ -265,12 +304,21 @@
     border:1px solid var(--ch-line); border-radius:28px; box-shadow:0 40px 80px -20px #000;
 }
 :root[data-site-theme="charbon"] .modal-panel :is(h2,h3) { font-family:var(--ch-font); text-transform:none; letter-spacing:0; }
-:root[data-site-theme="charbon"] .product-sheet__image {
-    display:grid; place-items:center; height:auto; padding:26px 24px 4px; background:radial-gradient(closest-side,#ffffff12,transparent);
-}
+/* The panel takes focus only so keyboard users land inside it; it is not a control, so no focus ring. */
+:root[data-site-theme="charbon"] .modal-panel:is(:focus,:focus-visible) { outline:none; }
+/* A photo opens the sheet edge to edge and fades into the panel; a cut-out floats on a soft spotlight. */
+:root[data-site-theme="charbon"] .product-sheet__image { position:relative; display:block; height:auto; padding:0; background:none; }
 :root[data-site-theme="charbon"] .product-sheet__image img {
-    width:auto; height:clamp(120px,27vh,260px); aspect-ratio:1; object-fit:cover; border-radius:50%;
-    -webkit-mask-image:var(--ch-dish); mask-image:var(--ch-dish); filter:drop-shadow(0 30px 30px #000c);
+    display:block; width:100%; height:clamp(150px,30vh,280px); aspect-ratio:auto; object-fit:cover; object-position:center;
+    border-radius:27px 27px 0 0; filter:none;
+    -webkit-mask-image:linear-gradient(180deg,#000 62%,transparent); mask-image:linear-gradient(180deg,#000 62%,transparent);
+}
+:root[data-site-theme="charbon"] .product-sheet__image[data-cutout="true"] {
+    display:grid; place-items:center; padding:26px 24px 4px; background:radial-gradient(closest-side,#ffffff12,transparent);
+}
+:root[data-site-theme="charbon"] .product-sheet__image[data-cutout="true"] img {
+    width:auto; height:clamp(120px,27vh,240px); aspect-ratio:1; object-fit:contain; border-radius:0;
+    -webkit-mask-image:none; mask-image:none; filter:drop-shadow(0 30px 30px #000c);
 }
 :root[data-site-theme="charbon"] .modal-close { background:var(--ch-faint); border:1px solid var(--ch-line); color:var(--ch-ink); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
 :root[data-site-theme="charbon"] .product-detail-heading h2 { font-size:24px; font-weight:600; line-height:1.25; }
@@ -289,7 +337,10 @@
     column-gap:12px; row-gap:0; min-height:58px; padding:6px 7px 6px 24px; border-radius:999px; text-align:start;
 }
 [dir="rtl"]:root[data-site-theme="charbon"] .add-to-cart-button { padding:6px 24px 6px 7px; }
-:root[data-site-theme="charbon"] .add-to-cart-button #addToCartLabel { grid-column:1; grid-row:1; align-self:end; font-size:13px; font-weight:500; line-height:1.3; }
+:root[data-site-theme="charbon"] .add-to-cart-button #addToCartLabel {
+    grid-column:1; grid-row:1; align-self:end; min-width:0; overflow:hidden; font-size:13px; font-weight:500; line-height:1.3;
+    white-space:nowrap; text-overflow:ellipsis;
+}
 :root[data-site-theme="charbon"] .add-to-cart-button #modalTotalPriceDisplay { grid-column:1; grid-row:2; align-self:start; font-size:16px; font-weight:700; line-height:1.3; }
 :root[data-site-theme="charbon"] .add-to-cart-button .add-to-cart-icon {
     grid-column:2; grid-row:1 / 3; display:grid; place-items:center; width:44px; height:44px; border-radius:50%;
@@ -297,8 +348,12 @@
 }
 :root[data-site-theme="charbon"] .add-to-cart-button .add-to-cart-icon svg { width:18px; height:18px; }
 :root[data-site-theme="charbon"] :is(.cart-item-card,.service-choice,.summary-item) { border:1px solid var(--ch-line); border-radius:16px; background:var(--ch-faint); box-shadow:none; }
+:root[data-site-theme="charbon"] .summary-item { padding:12px 14px; }
+/* Small accent text on charcoal uses a lighter tint of the accent so it stays readable (about 6.5:1). */
+:root[data-site-theme="charbon"][data-site-mode="dark"] :is(.text-button,.cart-item-card strong) { color:color-mix(in srgb,var(--ch-accent) 55%,#fff); }
+:root[data-site-theme="charbon"] .summary-item + .summary-item { margin-top:8px; }
 :root[data-site-theme="charbon"] :is(.checkout-form,.form-fields) :is(input,textarea,select) {
-    border:1px solid var(--ch-line); border-radius:14px; background:#ffffff0a; color:var(--ch-ink);
+    border:1px solid var(--ch-line); border-radius:14px; background:#ffffff0a; color:var(--ch-ink); font-size:16px;
 }
 
 /* ---------- Toasts ---------- */
@@ -323,32 +378,48 @@
     /* The menu comes first: a two-weight heading instead of the photo poster. */
     :root[data-site-theme="charbon"] #hero { display:block; min-height:0; margin:0 0 4px; }
     :root[data-site-theme="charbon"] #hero>img { display:none; }
+    /* A compact two-weight heading, then one line of status chips: no poster, no repeated paragraph. */
+    :root[data-site-theme="charbon"] #hero { background:none; }
     :root[data-site-theme="charbon"] #hero .restaurant-intro__copy,
-    [dir="rtl"]:root[data-site-theme="charbon"] #hero .restaurant-intro__copy { display:block; padding:22px 4px 6px; }
+    [dir="rtl"]:root[data-site-theme="charbon"] #hero .restaurant-intro__copy { display:block; padding:18px 2px 0; }
     :root[data-site-theme="charbon"] #hero .hero-message { text-align:start; }
-    :root[data-site-theme="charbon"] #hero h1 { margin:0 0 10px; }
+    :root[data-site-theme="charbon"] #hero h1 { margin:0; }
     :root[data-site-theme="charbon"] #hero .hero-lead { font-size:30px; font-weight:700; color:var(--ch-ink); line-height:1.2; }
     :root[data-site-theme="charbon"] #hero :is(.hero-name,.hero-name[data-custom]) { font-size:28px; font-weight:300; line-height:1.25; margin:0; }
-    :root[data-site-theme="charbon"] #hero .hero-message>p { margin:0; font-size:14px; color:var(--ch-muted); }
-    :root[data-site-theme="charbon"] #hero .hero-links { margin-top:14px; justify-content:flex-start; }
+    /* The owner writes this line in the editor, so it stays visible: small and quiet under the heading. */
+    :root[data-site-theme="charbon"] #hero .hero-message>p { display:block; margin:6px 0 0; color:var(--ch-muted); font-size:14px; line-height:1.5; }
+    :root[data-site-theme="charbon"] #hero .hero-links:not(:has(.glovo-button:not([hidden]))) { display:none; }
+    :root[data-site-theme="charbon"] #hero .hero-links { margin-top:12px; justify-content:flex-start; }
     :root[data-site-theme="charbon"] #hero .intro-cta { display:none; }
-    :root[data-site-theme="charbon"] #hero .glovo-button { min-height:40px; padding:0 14px; font-size:13px; }
-    :root[data-site-theme="charbon"] #hero .hero-service-line { padding:10px 4px 0; font-size:12px; }
+    :root[data-site-theme="charbon"] #hero .glovo-button { min-height:36px; padding:0 12px; border-radius:999px; font-size:12px; }
+    :root[data-site-theme="charbon"] #hero .glovo-button svg { width:14px; height:14px; }
+    :root[data-site-theme="charbon"] #hero .hero-service-line,
+    [dir="rtl"]:root[data-site-theme="charbon"] #hero .hero-service-line {
+        flex-wrap:nowrap; gap:12px; padding:12px 2px 0; overflow-x:auto; scrollbar-width:none; font-size:12px; white-space:nowrap;
+    }
+    :root[data-site-theme="charbon"] #hero .hero-service-line .restaurant-services { flex-wrap:nowrap; gap:12px; font-size:12px; }
+    :root[data-site-theme="charbon"] #hero .store-status { flex:none; padding:4px 10px; border:1px solid var(--ch-line); border-radius:999px; background:var(--ch-faint); font-size:12px; }
 
     /* Cards lose their frame: dish, name, short line, price and a small round "+". */
     :root[data-site-theme="charbon"] .store-product-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:26px 14px; }
     :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card {
         margin-top:0; padding:0; border:0; border-radius:0; background:none; box-shadow:none;
     }
-    :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__media {
-        width:100%; margin:0 0 10px; filter:drop-shadow(0 16px 16px #000000a6);
+    :root[data-site-theme="charbon"] #menuContent .product-card__media {
+        width:100%; aspect-ratio:1; margin:0 0 10px; border-radius:18px; box-shadow:0 16px 28px -14px #000000d9;
     }
+    :root[data-site-theme="charbon"] #menuContent .product-card[data-cutout="true"] { margin-top:0; padding:0; }
+    :root[data-site-theme="charbon"] #menuContent .product-card__media[data-cutout="true"] {
+        width:100%; margin:0 0 10px; box-shadow:none; background:radial-gradient(closest-side,#ffffff10,transparent);
+        filter:drop-shadow(0 16px 16px #000000a6);
+    }
+    :root[data-site-theme="charbon"] #menuContent .product-card__body { padding:0 2px; }
     :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card :is(h3,h4) { font-size:15px; }
     :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__description { -webkit-line-clamp:1; }
     :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__footer { padding-top:6px; align-items:center; }
     :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__price strong { font-size:14px; font-weight:600; }
     :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__choose {
-        position:static; width:32px; height:32px; border-radius:50%; border:1px solid #ffffff1f;
+        position:static; width:40px; height:40px; border-radius:50%; border:1px solid #ffffff1f;
         background:#0d0d0e; color:#fff; box-shadow:0 6px 12px #0006;
     }
     :root[data-site-theme="charbon"] :is(#promotionsGrid,#popularGrid,#menuContent) .product-card__choose svg { width:16px; height:16px; }
@@ -384,6 +455,112 @@
     :root[data-site-theme="charbon"] #tabbarCartCount.hidden { display:none; }
     :root[data-site-theme="charbon"] .order-tracker { bottom:calc(84px + env(safe-area-inset-bottom)); }
 
+    /* Footer: the address on top, hours and contact as two small glass tiles, a one-line sign-off. */
+    :root[data-site-theme="charbon"] .restaurant-footer__info { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding-block-end:18px; }
+    :root[data-site-theme="charbon"] .restaurant-footer__visit { grid-column:1 / -1; padding-bottom:4px; }
+    :root[data-site-theme="charbon"] :is(.restaurant-footer__hours,.restaurant-footer__contact) {
+        min-width:0; padding:14px; border:1px solid var(--ch-line); border-radius:18px; background:var(--ch-faint);
+    }
+    :root[data-site-theme="charbon"] .restaurant-footer__contact .footer-contact-links { flex-direction:column; align-items:flex-start; gap:0; }
+    :root[data-site-theme="charbon"] .restaurant-footer__contact :is(button,a) { min-height:36px; padding:0; }
+    :root[data-site-theme="charbon"] .restaurant-footer__contact .glovo-button { margin-top:6px; padding:0 10px; font-size:12px; }
+    :root[data-site-theme="charbon"] .restaurant-footer__sign { flex-direction:row; align-items:center; justify-content:space-between; gap:12px; }
+    :root[data-site-theme="charbon"] .restaurant-footer .footer-wordmark { font-size:18px; }
+    :root[data-site-theme="charbon"] .footer-links { gap:4px 14px; }
+
     /* The product sheet becomes the detail screen. */
     :root[data-site-theme="charbon"] .modal-panel { border-radius:28px 28px 0 0; }
 }
+
+/* The light edition keeps Charbon's floating dishes and uses paper and ink for its surfaces. */
+:root[data-site-theme="charbon"][data-site-mode="light"] {
+    color-scheme:light;
+    --ch-bg:var(--site-background);
+    --ch-ink:var(--site-background-ink);
+    --ch-muted:color-mix(in srgb,var(--ch-ink) 66%,var(--ch-bg));
+    --ch-faint:color-mix(in srgb,var(--ch-ink) 5%,transparent);
+    --ch-line:color-mix(in srgb,var(--ch-ink) 16%,transparent);
+    --ch-glass:var(--site-surface);
+    --ch-shadow:0 12px 35px -20px #2b201a45;
+    --ch-glow:0 6px 16px -9px var(--ch-accent);
+
+    & .store-nav a, & #hero .hero-message>p { color:var(--ch-muted); }
+    & :is(.lang-menu,.modal-panel,.app-toast:not(.is-error),.theme-tabbar) {
+        background:var(--site-surface); color:var(--site-surface-ink); box-shadow:var(--ch-shadow);
+    }
+    & .theme-tabbar>:is(a,button):not(.theme-tabbar__cart) { color:var(--ch-muted); }
+    & .theme-tabbar .theme-tabbar__cart { box-shadow:var(--ch-glow),0 0 0 5px var(--site-surface); }
+    & .theme-tabbar, & #btnThemeSearch { border-color:var(--ch-line); }
+}
+
+/* Promotions explain the bundle. Best sellers keep the menu's dish portrait in a compact row. */
+:root[data-site-theme="charbon"] {
+    & :is(#promotions,#popular):not(.hidden) {
+        display:block; width:100%; max-width:none; margin:0;
+        padding:clamp(18px,2vw,36px) clamp(var(--app-gutter),2.5vw,48px);
+        background:transparent; color:var(--ch-ink);
+    }
+    & :is(#promotions,#popular) .section-heading { display:flex; justify-content:space-between; align-items:center; margin:0 0 16px; }
+    & #popular .feature-lead { display:none; }
+    & .browse-arrows button { width:44px; height:44px; border-radius:50%; }
+    & .discovery-row :focus-visible { outline-color:var(--ch-accent); }
+    & :is(#promotionsGrid,#popularGrid).featured-grid {
+        --card-gap:clamp(12px,1.5vw,24px);
+        gap:var(--card-gap); grid-auto-columns:88%; padding:0 0 5px;
+    }
+    & :is(#promotionsGrid,#popularGrid).featured-grid:has(>.product-card:only-child) { grid-auto-columns:min(100%,660px); }
+    & #popularGrid.featured-grid:has(>.product-card:only-child) { grid-auto-columns:min(100%,430px); }
+    & :is(#promotionsGrid,#popularGrid) .product-card {
+        margin:0; padding:0; gap:0; overflow:hidden; background:var(--ch-glass);
+        border:1px solid var(--ch-line); border-radius:20px; box-shadow:none;
+    }
+    & #promotionsGrid .product-card__media { width:100%; height:auto; aspect-ratio:2.2; margin:0; border-radius:0; filter:none; }
+    & #promotionsGrid .product-card__media img { mask-image:none; border-radius:0; object-position:center; }
+    & #promotionsGrid .product-card__body { padding:clamp(15px,1.6vw,28px); gap:8px; }
+    & #promotionsGrid .product-card h3 { font-size:clamp(22px,2vw,33px); line-height:1.12; }
+    & #promotionsGrid .product-card__description { display:block; font-size:14px; line-height:1.45; }
+    & #promotionsGrid .product-card__footer { flex-wrap:wrap; align-items:center; padding-top:10px; border-top:1px solid var(--ch-line); }
+    & #promotionsGrid .product-card__price small { display:block; color:var(--ch-muted); font-size:12px; }
+    & #promotionsGrid .product-card__price strong { font-size:20px; font-weight:650; }
+    & #promotionsGrid .product-card__choose {
+        position:static; display:inline-flex; width:auto; height:auto; min-height:44px; padding:0 12px;
+        gap:6px; border-radius:11px; background:var(--ch-accent); color:var(--ch-on-accent); box-shadow:none;
+    }
+    & #promotionsGrid .product-card__choose span { position:static; width:auto; height:auto; clip:auto; white-space:normal; }
+    & #promotionsGrid .product-card__choose svg { width:16px; }
+    & #popularGrid .product-card { display:grid; grid-template-columns:30% minmax(0,1fr); align-items:center; padding:14px; gap:14px; }
+    & #popularGrid .product-card__body { min-width:0; }
+    & #popularGrid .product-card__media { width:100%; margin:0; }
+    & #popularGrid .product-card h3 { font-size:clamp(17px,1.4vw,22px); }
+    & #popularGrid .product-card__description { display:none; }
+    & #popularGrid .product-card__price small { display:block; color:var(--ch-muted); }
+    & #popularGrid .product-card__footer { margin:0; padding-top:4px; align-items:center; flex-wrap:wrap; }
+    & #popularGrid .product-card__choose {
+        position:static; width:44px; height:44px; border-radius:50%; background:var(--ch-faint);
+        color:var(--ch-ink); border:1px solid var(--ch-line); box-shadow:none;
+    }
+    & :is(#promotionsGrid,#popularGrid) .product-card__choose:disabled { opacity:.65; }
+    @media (min-width:700px) {
+        & :is(#promotionsGrid,#popularGrid).featured-grid { grid-auto-columns:calc((100% - var(--card-gap)) / 2); }
+    }
+    @media (min-width:1050px) {
+        & #promotionsGrid .product-card { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+        & #promotionsGrid .product-card__media { height:100%; min-height:215px; aspect-ratio:auto; }
+        & #popularGrid.featured-grid { grid-auto-columns:calc((100% - 2 * var(--card-gap)) / 3); }
+    }
+}
+
+/* ---------- One content column ----------
+   Header, hero, offers, best sellers, menu and footer share the same 1280px column and side gutter,
+   so every section starts on the same left edge. Backgrounds and the sticky bar still run edge to edge. */
+:root[data-site-theme="charbon"] .store-header__inner { max-width:1280px; margin-inline:auto; }
+:root[data-site-theme="charbon"] #hero { max-width:calc(1280px - 2 * var(--app-gutter)); }
+:root[data-site-theme="charbon"] #hero .restaurant-intro__copy,
+[dir="rtl"]:root[data-site-theme="charbon"] #hero .restaurant-intro__copy,
+:root[data-site-theme="charbon"] #hero .hero-service-line,
+[dir="rtl"]:root[data-site-theme="charbon"] #hero .hero-service-line { padding-inline:0; }
+:root[data-site-theme="charbon"] :is(#promotions,#popular):not(.hidden) {
+    max-width:1280px; margin-inline:auto; padding-inline:var(--app-gutter);
+}
+:root[data-site-theme="charbon"] #menu-unified { max-width:calc(1280px - 2 * var(--app-gutter)); }
+:root[data-site-theme="charbon"] .restaurant-footer__inner { max-width:1280px; padding-inline:var(--app-gutter); }

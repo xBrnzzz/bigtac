@@ -82,8 +82,8 @@
                             </div>
                         </div>
                         <button type="button" id="btnDarkMode" class="icon-button" onclick="toggleDarkMode()" aria-label="Changer le thème" data-i18n-aria="nav.theme">
-                            <i data-feather="moon" aria-hidden="true">
-                            </i>
+                            <i data-feather="moon" class="mode-moon" aria-hidden="true"></i>
+                            <i data-feather="sun" class="mode-sun" aria-hidden="true"></i>
                         </button>
                         <button type="button" id="btnThemeSearch" class="icon-button theme-only" onclick="document.getElementById('menu-unified').scrollIntoView();document.getElementById('menuSearch').focus({preventScroll:true})" aria-label="Rechercher dans la carte" data-i18n-aria="search.label">
                             <i data-feather="search" aria-hidden="true"></i>
@@ -585,8 +585,10 @@
         import { buildCustomizationSteps, choiceRules, selectionIssue, customizationPrice, cartSelections, cartChoiceSelections, optionSnapshot, moneyCents } from './assets/customization.js';
         import {promotionState,orderingAvailable,safeURL,compareOfferOrder} from './assets/operations-model.js';
         import { setupCarousel } from './assets/carousels.js';
+        import { watchDishImages } from './assets/dish-images.js';
+        watchDishImages(document);
         import { i18n, t, setUiText } from './assets/i18n.js';
-        import { renderStorefrontAppearance, renderStorefrontHours } from './assets/storefront-appearance.js';
+        import { renderStorefrontAppearance, renderStorefrontHours, withoutTransitions } from './assets/storefront-appearance.js';
 
         // --- CONFIG & CONSTANTS ---
         const WHATSAPP_NUMBERS = {
@@ -655,21 +657,25 @@
         const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         let currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
 
-        window.toggleDarkMode = () => {
+        window.toggleDarkMode = () => withoutTransitions(document, () => {
+            if (document.documentElement.dataset.siteTheme === 'charbon') {
+                const next = document.documentElement.dataset.siteMode === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('bigtacStoreMode:' + appConfig.storefront.theme, next);
+                applyRestaurantConfig();
+                return;
+            }
             currentTheme = currentTheme === 'light' ? 'dark' : 'light';
             localStorage.setItem('bigtacTheme', currentTheme);
             applyTheme();
-        };
+        });
 
         function applyTheme() {
-            // A dark restaurant theme is always dark; the customer's toggle only applies to a light theme.
-            const forced = document.documentElement.dataset.siteMode === 'dark';
-            const dark = forced || currentTheme === 'dark';
+            const charbon = document.documentElement.dataset.siteTheme === 'charbon';
+            const dark = charbon ? document.documentElement.dataset.siteMode === 'dark' : currentTheme === 'dark';
             document.documentElement.classList.toggle('dark', dark);
-            const background = forced && getComputedStyle(document.documentElement).getPropertyValue('--site-background').trim();
+            const background = charbon && getComputedStyle(document.documentElement).getPropertyValue('--site-background').trim();
             document.querySelector('meta[name="theme-color"]').content = background || (dark ? '#171b19' : '#ffffff');
             const toggle = document.getElementById('btnDarkMode');
-            toggle.hidden = forced;
             toggle.setAttribute('aria-pressed', String(dark));
         }
         applyTheme();
@@ -826,7 +832,7 @@
         function applyRestaurantConfig(){
             if (!configRead) return;
             const open=storeAvailable(),status=document.getElementById('storeStatus');status.textContent=open?t('hero.status_open'):t('hero.unavailable');status.classList.toggle('is-open',open);status.classList.toggle('is-closed',!open);document.getElementById('closedBanner').classList.toggle('hidden',open);
-            renderStorefrontAppearance(document, appConfig, {language:i18n.getLang(),translate:t,open,table:!!urlTable});
+            renderStorefrontAppearance(document, appConfig, {language:i18n.getLang(),translate:t,open,table:!!urlTable,preferredMode:localStorage.getItem('bigtacStoreMode:' + appConfig.storefront?.theme)});
             applyTheme();
             syncDiscoveryVisibility();
             document.querySelectorAll('.hero-service-line [data-mode]').forEach(label => {
@@ -1097,7 +1103,10 @@
             document.getElementById('modalQtyDisplay').textContent = '1';
             document.getElementById('modalItemName').textContent = currentItem.name;
             const image = document.getElementById('modalItemImage');
-            image.src = currentItem.imageUrl || categoryImages[currentItem.category] || 'assets/snack.png';
+            // Re-arm the fallback for every product: a broken photo falls back to its category, then to the generic image.
+            const fallbacks = [categoryImages[currentItem.category], 'assets/snack.png'].filter(src => src && src !== currentItem.imageUrl);
+            image.onerror = () => { const next = fallbacks.shift(); image.onerror = fallbacks.length ? image.onerror : null; if (next) image.src = next; };
+            image.src = currentItem.imageUrl || fallbacks.shift() || 'assets/snack.png';
             image.alt = currentItem.name;
             renderSimpleView();
             recalcModalDisplayTotal();

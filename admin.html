@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
     <title data-ui-copy="BIGTAC — Studio Admin &amp; Contrôle">BIGTAC — Studio Admin & Contrôle</title>
-    <link rel="icon" href="assets/logo.png" type="image/png">
+    <link id="admin-favicon" rel="icon" href="assets/logo.png">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -309,7 +309,7 @@
             <!-- Driver Header -->
             <div class="driver-topbar flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3">
-                    <img src="assets/logo.png" alt="BIGTAC" class="h-9 w-9 object-contain rounded-xl bg-black p-0.5" onerror="this.src='assets/snack.png'">
+                    <img src="assets/logo.png" alt="" class="h-9 w-9 object-contain rounded-xl bg-black p-0.5" data-restaurant-logo>
                     <div>
                         <h1 class="font-black text-base leading-none text-slate-900" data-i18n="driver.header_title">BIGTAC Livraison</h1>
                         <p class="text-xs text-brand-600 font-bold mt-0.5" id="driver-name-display" data-ui-copy="Livreur">Livreur</p>
@@ -433,6 +433,8 @@
         import { createSettingsEditor } from './assets/admin-settings-editor.js';
         import { createStorefrontEditor } from './assets/admin-storefront-editor.js';
         import { applyAdminPalette } from './assets/storefront-appearance.js';
+        import { watchDishImages } from './assets/dish-images.js';
+        watchDishImages(document);
         import { createPromotions } from './assets/admin-promotions.js';
         import { createMenuWorkspace } from './assets/admin-menu.js';
         import { createOrderWorkspace } from './assets/admin-orders.js';
@@ -664,7 +666,7 @@
             const publish=(config,cached=false)=>{
                 settingsData=config;
                 if (!cached) applyAdminPalette(document, config);
-                settingsEditor.update(config,cached); storefrontEditor.update(config,cached); shell.restaurant(config); orderWorkspace.settingsChanged();
+                settingsEditor.update(config,cached); storefrontEditor.update(config,cached); shell.restaurant(config,cached); orderWorkspace.settingsChanged();
                 if (authorized('overview')) {
                     if (overviewStarted) overview.update(config);
                     else { overview.start(config); overviewStarted=true; }

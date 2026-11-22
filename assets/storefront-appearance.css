@@ -28,6 +28,8 @@
     --app-error-bg:color-mix(in srgb,#ef4b5f 18%,var(--app-surface));
 }
 #btnDarkMode[hidden] { display:none; }
+/* The menu search has its own clear button; hide the browser's built-in one so there is only one. */
+#menuSearch::-webkit-search-cancel-button { -webkit-appearance:none; appearance:none; display:none; }
 /* Elements that exist only for a theme's own layout (assets/theme-*.css). */
 :root:not([data-site-theme="charbon"]) .theme-only { display:none!important; }
 :root {
@@ -101,3 +103,9 @@
     .hero-links { margin-top:8px; }
     .hero-links .glovo-button { min-height:44px; padding-block:8px; }
 }
+
+#btnDarkMode .mode-sun, :root.dark #btnDarkMode .mode-moon { display:none; }
+:root.dark #btnDarkMode .mode-sun { display:block; }
+
+/* Switching light/dark swaps every colour at once; transitions are off for that one frame so nothing smears. */
+.theme-switching *, .theme-switching *::before, .theme-switching *::after { transition:none!important; }

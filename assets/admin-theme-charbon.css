@@ -73,7 +73,7 @@
 :root[data-site-theme="charbon"] :is(.admin-store-status,#admin-connection,.admin-preview,.admin-profile-button,#admin-more-button,#adminLangSelector > button) {
     min-height:40px; border:1px solid #ffffff1a; border-radius:999px; background:var(--ch-faint); color:var(--ch-ink); box-shadow:none;
 }
-:root[data-site-theme="charbon"] :is(.admin-preview,.admin-profile-button,#admin-more-button,#adminLangSelector > button):hover { background:#ffffff1a; }
+@media (hover:hover) { :root[data-site-theme="charbon"] :is(.admin-preview,.admin-profile-button,#admin-more-button,#adminLangSelector > button):hover { background:#ffffff1a; } }
 
 /* ---------- Pages and headings ---------- */
 :root[data-site-theme="charbon"] .admin-page { padding:12px clamp(20px,3vw,44px) 44px; }
@@ -99,11 +99,11 @@
 :root[data-site-theme="charbon"] .admin-body .admin-button {
     min-height:44px; border:1px solid #ffffff1f; border-radius:14px; background:#ffffff0a; color:var(--ch-ink); box-shadow:none;
 }
-:root[data-site-theme="charbon"] .admin-body .admin-button:hover:not(:disabled) { background:#ffffff1a; }
+@media (hover:hover) { :root[data-site-theme="charbon"] .admin-body .admin-button:hover:not(:disabled) { background:#ffffff1a; } }
 :root[data-site-theme="charbon"] .admin-body .admin-button.primary:not(:disabled) {
     border-color:transparent; background:var(--ch-accent); color:var(--ch-on-accent); box-shadow:var(--ch-glow);
 }
-:root[data-site-theme="charbon"] .admin-body .admin-button.primary:hover:not(:disabled) { background:color-mix(in srgb,var(--ch-accent) 88%,#fff); }
+@media (hover:hover) { :root[data-site-theme="charbon"] .admin-body .admin-button.primary:hover:not(:disabled) { background:color-mix(in srgb,var(--ch-accent) 88%,#fff); } }
 :root[data-site-theme="charbon"] .admin-body :is(input:not([type=checkbox],[type=radio],[type=color],[type=range],[type=file]),select,textarea) {
     border:1px solid #ffffff1f; border-radius:14px; background:#ffffff0a; color:var(--ch-ink);
 }
@@ -116,7 +116,7 @@
 :root[data-site-theme="charbon"] #view-overview .service-strip { padding:0; border:0; border-radius:0; background:none; box-shadow:none; }
 :root[data-site-theme="charbon"] .service-strip-heading h3 { color:var(--ch-ink); font-size:17px; }
 :root[data-site-theme="charbon"] .service-strip-heading #overview-freshness { color:var(--ch-muted); }
-:root[data-site-theme="charbon"] #overview-attention {
+:root[data-site-theme="charbon"] #view-overview #overview-attention {
     display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-top:14px; border:0;
 }
 :root[data-site-theme="charbon"] #overview-attention :is(.admin-attention-row,.admin-attention-total) {
@@ -137,7 +137,8 @@
     box-shadow:0 24px 44px -18px color-mix(in srgb,var(--ch-accent) 55%,transparent);
 }
 :root[data-site-theme="charbon"] #overview-attention .admin-attention-row[data-column=pending] > :is(strong,span,svg) { color:var(--ch-ink); }
-:root[data-site-theme="charbon"] #overview-attention .admin-attention-row:hover { border-color:#ffffff2e; transform:translateY(-2px); }
+@media (hover:hover) { :root[data-site-theme="charbon"] #overview-attention .admin-attention-row:hover { border-color:#ffffff2e; } }
+@media (hover:hover) and (prefers-reduced-motion:no-preference) { :root[data-site-theme="charbon"] #overview-attention .admin-attention-row:hover { transform:translateY(-2px); } }
 :root[data-site-theme="charbon"] #overview-attention .admin-empty { color:var(--ch-muted); }
 :root[data-site-theme="charbon"] #view-overview .admin-next-order {
     display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:16px; padding:20px 24px;
@@ -165,7 +166,7 @@
 :root[data-site-theme="charbon"] .admin-quick-actions .admin-button:nth-child(n) {
     border:1px solid #ffffff1a; background:#ffffff0a; color:var(--ch-ink); box-shadow:none;
 }
-:root[data-site-theme="charbon"] .admin-quick-actions .admin-button:hover { background:#ffffff1a; }
+@media (hover:hover) { :root[data-site-theme="charbon"] .admin-quick-actions .admin-button:hover { background:#ffffff1a; } }
 :root[data-site-theme="charbon"] .admin-recent-table :is(th,td) { border-color:#ffffff0f; }
 :root[data-site-theme="charbon"] .admin-recent-status { border-radius:999px; }
 
@@ -188,7 +189,7 @@
 :root[data-site-theme="charbon"] #view-orders .order-card {
     border:1px solid var(--ch-line)!important; box-shadow:0 22px 44px -18px #000000bf, 0 2px 6px #00000040!important;
 }
-:root[data-site-theme="charbon"] #view-orders .order-card:hover { border-color:#ffffff2e!important; }
+@media (hover:hover) { :root[data-site-theme="charbon"] #view-orders .order-card:hover { border-color:#ffffff2e!important; } }
 :root[data-site-theme="charbon"] #view-orders .order-open strong { font-family:var(--font); font-weight:600; }
 :root[data-site-theme="charbon"] #view-orders :is(.order-age,.order-service,.order-status) {
     border-radius:999px; background:#ffffff12; color:var(--ch-soft-ink);
@@ -216,7 +217,7 @@
 }
 :root[data-site-theme="charbon"] #view-menu .menu-category-chips button::before {
     content:""; position:absolute; inset-inline-start:2px; top:50%; width:7px; height:7px; margin-top:-3.5px;
-    border-radius:50%; background:var(--ch-accent); opacity:0; transform:scale(.4); transition:.18s ease;
+    border-radius:50%; background:var(--ch-accent); opacity:0; transition:opacity .15s ease;
 }
 :root[data-site-theme="charbon"] #view-menu .menu-category-chips button[aria-pressed=true] { color:var(--ch-ink); font-weight:600; }
 :root[data-site-theme="charbon"] #view-menu .menu-category-chips button[aria-pressed=true]::before { opacity:1; transform:none; }
@@ -279,3 +280,588 @@
 }
 :root[data-site-theme="charbon"] :is(.admin-more,.storefront-editor,.menu-dialog)::backdrop { background:#000000a6; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
 :root[data-site-theme="charbon"] .admin-body .admin-toast { border:1px solid var(--ch-line); background:#232327eb; color:var(--ch-ink); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); }
+
+#admin-mode-toggle[hidden], #admin-mode-toggle .mode-sun,
+:root[data-site-mode="dark"] #admin-mode-toggle .mode-moon { display:none; }
+:root[data-site-mode="dark"] #admin-mode-toggle .mode-sun { display:grid; }
+:root[data-site-theme="charbon"] #admin-mode-toggle { width:44px; height:44px; flex:none; color:var(--ch-ink); background:var(--ch-faint); border-radius:50%; }
+:root[data-site-theme="charbon"][data-site-mode="light"] {
+    color-scheme:light;
+    --ch-ink:#221f21; --ch-soft-ink:#484449; --ch-muted:#615d61;
+    --ch-line:#24202426; --ch-faint:#2420240a;
+    --ch-glass:var(--site-admin-surface);
+    --ch-shadow:0 10px 30px -20px #30242b45;
+    --ch-glow:0 6px 16px -9px var(--ch-accent);
+    --admin-neutral-control:var(--ch-faint); --admin-neutral-hover:#24202414;
+    --admin-field-surface:var(--site-admin-surface); --admin-field-hover:var(--ch-faint);
+    & :is(.admin-avatar,.admin-more,.storefront-editor,.menu-dialog,dialog.admin-dialog,.admin-bottom-nav),
+    & .admin-body .admin-toast { background:var(--ch-glass); color:var(--ch-ink); box-shadow:var(--ch-shadow); }
+    & .admin-body :is(.admin-button,input,select,textarea), & .orders-mode, & .orders-column,
+    & :is(.admin-store-status,#admin-connection,.admin-preview,.admin-profile-button,#admin-more-button,#adminLangSelector > button) { border-color:var(--ch-line); }
+    & #view-orders .order-card, & #view-menu #items-grid .menu-product { background:var(--ch-glass); }
+    & #view-orders .order-card { box-shadow:var(--ch-shadow)!important; }
+    & #view-orders .order-age:is([data-age-tone=soon],[data-age-tone=late]) { color:#83132a; }
+    & .orders-mode button[aria-pressed=true] { color:#fff; }
+}
+
+/* =====================================================================
+   Declutter pass (owner review, 22 November 2026)
+   ===================================================================== */
+
+/* Classic theme keeps its bottom nav: three views then "Plus" (admin-shell.js moves the button in the DOM, so focus order matches).
+   Charbon centres "Plus" with promotions on the right. */
+
+/* ---------- Top bar: one quiet line of ghost controls ---------- */
+:root[data-site-theme="charbon"] .admin-top-actions { gap:4px; }
+:root[data-site-theme="charbon"] :is(.admin-preview,.admin-profile-button,#adminLangSelector > button,#admin-mode-toggle) {
+    border-color:transparent; background:transparent; box-shadow:none;
+}
+@media (hover:hover) { :root[data-site-theme="charbon"] :is(.admin-preview,.admin-profile-button,#adminLangSelector > button,#admin-mode-toggle):hover { background:var(--ch-faint); } }
+:root[data-site-theme="charbon"] :is(.admin-store-status,#admin-connection) {
+    min-height:32px; padding:0 10px; border:1px solid var(--ch-line); border-radius:999px; background:none; color:var(--ch-soft-ink); font-size:12px; font-weight:500;
+}
+:root[data-site-theme="charbon"] #admin-connection { border-color:transparent; color:var(--ch-muted); }
+:root[data-site-theme="charbon"] .admin-profile-button { gap:10px; padding-inline:6px 10px; }
+
+/* ---------- Overview: smaller tiles, one-line next order ---------- */
+:root[data-site-theme="charbon"] #view-overview #overview-attention { gap:12px; }
+:root[data-site-theme="charbon"] #overview-attention :is(.admin-attention-row,.admin-attention-total) { gap:8px; padding:16px 18px; border-radius:20px; }
+:root[data-site-theme="charbon"] #overview-attention :is(.admin-attention-row,.admin-attention-total) > strong { font-size:34px; }
+:root[data-site-theme="charbon"] #view-overview .admin-next-order { margin-top:12px; padding:14px 14px 14px 20px; border-radius:20px; }
+:root[data-site-theme="charbon"] #view-overview .admin-next-order strong { font-size:18px; }
+:root[data-site-theme="charbon"] #view-overview .admin-next-order > svg { width:44px; height:44px; padding:12px; border-radius:50%; }
+
+/* ---------- Orders: text tabs with each lane's colour dot, one compact tool row ---------- */
+:root[data-site-theme="charbon"] #view-orders .orders-tabs {
+    display:flex; flex-wrap:nowrap; gap:4px 20px; overflow-x:auto; scrollbar-width:none;
+    padding:2px 2px 4px; border:0; background:none; grid-template-columns:none;
+}
+:root[data-site-theme="charbon"] #view-orders .orders-tabs::-webkit-scrollbar { display:none; }
+:root[data-site-theme="charbon"] #view-orders .orders-tabs button {
+    position:relative; flex:none; display:inline-flex; align-items:center; gap:8px; min-height:40px; width:auto;
+    padding:0 0 0 16px; border:0!important; border-radius:0; background:none!important; box-shadow:none!important;
+    color:var(--ch-muted); font-size:14px; font-weight:500; white-space:nowrap;
+}
+:root[data-site-theme="charbon"] #view-orders .orders-tabs button > svg { display:none; }
+:root[data-site-theme="charbon"] #view-orders .orders-tabs button::before {
+    content:""; position:absolute; inset-inline-start:2px; top:50%; width:7px; height:7px; margin-top:-3.5px;
+    border-radius:50%; background:var(--order-tone,var(--ch-accent)); opacity:.45;
+}
+:root[data-site-theme="charbon"] #view-orders .orders-tabs button[aria-pressed=true] { color:var(--ch-ink)!important; font-weight:600; }
+:root[data-site-theme="charbon"] #view-orders .orders-tabs button[aria-pressed=true]::before { opacity:1; box-shadow:0 0 8px var(--order-tone,var(--ch-accent)); }
+:root[data-site-theme="charbon"] #view-orders .orders-tabs button > span:not([id]) { all:unset; }
+:root[data-site-theme="charbon"] #view-orders .orders-tabs button > span[id^="count-"] {
+    display:inline-grid; place-items:center; min-width:22px; height:22px; padding:0 7px; border:0; border-radius:999px;
+    background:var(--ch-faint); color:var(--ch-soft-ink); font-size:12px; font-weight:600;
+}
+:root[data-site-theme="charbon"] #view-orders .orders-tabs button[aria-pressed=true] > span[id^="count-"] { background:var(--ch-accent); color:var(--ch-on-accent); }
+:root[data-site-theme="charbon"] #view-orders :is(.orders-utilities,.orders-search-row) .admin-button,
+:root[data-site-theme="charbon"] #view-orders #orders-filters-toggle {
+    width:42px; min-width:42px; height:42px; min-height:42px; padding:0; justify-content:center; border-radius:50%; font-size:0;
+}
+:root[data-site-theme="charbon"] #view-orders :is(.orders-utilities,.orders-search-row) .admin-button svg { width:18px; height:18px; }
+:root[data-site-theme="charbon"] #view-orders .orders-search input { min-height:42px; font-size:14px; border-radius:999px; }
+/* Phones zoom the page when a field is under 16px, so fields stay at 16px there. */
+@media (max-width:767px) {
+    :root[data-site-theme="charbon"] #view-orders .orders-search input,
+    :root[data-site-theme="charbon"] .admin-body .settings-jump select { font-size:16px; }
+}
+:root[data-site-theme="charbon"] #view-orders .orders-mode { padding:3px; border-radius:999px; }
+:root[data-site-theme="charbon"] #view-orders .orders-mode button { min-height:36px; border-radius:999px; }
+:root[data-site-theme="charbon"] #view-orders .orders-metadata { color:var(--ch-muted); font-size:12px; }
+
+/* ---------- Menu: one header row, one tool row, one scrolling category row ---------- */
+:root[data-site-theme="charbon"] #view-menu .menu-approved-categories { flex-wrap:nowrap; }
+:root[data-site-theme="charbon"] #view-menu .menu-category-chips { flex:1; min-width:0; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; }
+:root[data-site-theme="charbon"] #view-menu .menu-category-chips::-webkit-scrollbar { display:none; }
+:root[data-site-theme="charbon"] #view-menu .menu-category-chips button { flex:none; white-space:nowrap; }
+:root[data-site-theme="charbon"] #view-menu .menu-approved-categories > .admin-button { flex:none; min-height:40px; padding:0 14px; border-radius:999px; font-size:13px; }
+
+/* Menu products: photos framed at the top of the card, cut-outs float above it (see dish-images.js). */
+:root[data-site-theme="charbon"] #view-menu #items-grid.menu-products { gap:22px; padding-top:8px; }
+:root[data-site-theme="charbon"] #view-menu #items-grid.menu-products:has(.menu-product[data-cutout="true"]) { row-gap:84px; padding-top:72px; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product { padding:10px 10px 14px; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product :is(.menu-product-info,.menu-price,.menu-row-actions) { margin-inline:6px; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product-image {
+    justify-self:stretch; width:100%; height:auto; aspect-ratio:4/3; margin:0 0 8px; border-radius:14px;
+    object-fit:cover; object-position:center; -webkit-mask-image:none; mask-image:none; filter:none;
+    box-shadow:inset 0 0 0 1px #ffffff12;
+}
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product[data-cutout="true"] { padding-top:0; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product[data-cutout="true"] .menu-product-image {
+    justify-self:center; width:min(90%,210px); margin:-66px 0 6px; border-radius:0; object-fit:contain; box-shadow:none;
+    filter:drop-shadow(0 22px 22px #000000b3);
+}
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-select { top:18px; inset-inline-start:18px; }
+
+/* ---------- Promotions: image, words, price, then a quiet action row ---------- */
+:root[data-site-theme="charbon"] #view-promotions .promo-entry {
+    display:grid; grid-template-columns:104px minmax(0,1fr) auto; grid-template-areas:"art body price" "actions actions actions";
+    align-items:center; gap:12px 16px; padding:14px; border:1px solid var(--ch-line); border-radius:22px;
+    background:var(--ch-glass); box-shadow:var(--ch-shadow); color:var(--ch-ink);
+}
+:root[data-site-theme="charbon"] #view-promotions .promo-art { grid-area:art; width:104px; aspect-ratio:1; border-radius:16px; overflow:hidden; background:var(--ch-faint); }
+:root[data-site-theme="charbon"] #view-promotions .promo-art img { width:100%; height:100%; object-fit:cover; }
+:root[data-site-theme="charbon"] #view-promotions .promo-art[data-cutout="true"] { overflow:visible; background:none; filter:drop-shadow(0 12px 14px #000000a6); }
+:root[data-site-theme="charbon"] #view-promotions .promo-art[data-cutout="true"] img { object-fit:contain; }
+:root[data-site-theme="charbon"] #view-promotions .promo-entry-body { grid-area:body; min-width:0; display:flex; flex-direction:column; gap:4px; }
+:root[data-site-theme="charbon"] #view-promotions .promo-entry-body h3 {
+    margin:0; font-family:var(--font); font-size:16px; font-weight:600; line-height:1.35;
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+:root[data-site-theme="charbon"] #view-promotions .promo-entry-price { grid-area:price; align-self:start; font-family:var(--font); font-size:20px; font-weight:600; white-space:nowrap; }
+:root[data-site-theme="charbon"] #view-promotions .promo-actions {
+    grid-area:actions; display:flex; align-items:center; gap:8px; padding-top:12px; border-top:1px solid var(--ch-line);
+}
+:root[data-site-theme="charbon"] #view-promotions .promo-actions .admin-button { width:40px; min-width:40px; height:40px; min-height:40px; padding:0; justify-content:center; border-radius:50%; }
+:root[data-site-theme="charbon"] #view-promotions .promo-actions [data-promo-action="edit"] { width:auto; padding:0 16px; border-radius:999px; margin-inline-end:auto; }
+:root[data-site-theme="charbon"] #view-promotions .promo-actions [data-promo-action="edit"] .sr-only {
+    position:static; width:auto; height:auto; margin:0; overflow:visible; clip:auto; white-space:nowrap;
+}
+
+/* ---------- Tablet and phone ---------- */
+@media (max-width:999px) {
+    /* The bottom nav matches the storefront tab bar: icons, an accent dot on the current view, "Plus" raised in the middle. */
+    :root[data-site-theme="charbon"] #admin-bottom-nav {
+        position:relative; display:flex; align-items:center; justify-content:space-around; gap:0; overflow:visible;
+        min-height:calc(72px + env(safe-area-inset-bottom)); padding:0 10px env(safe-area-inset-bottom);
+        border:0; border-top:1px solid var(--ch-faint); border-radius:26px 26px 0 0;
+        background:color-mix(in srgb,var(--admin-ground) 86%,transparent);
+        -webkit-backdrop-filter:blur(18px) saturate(140%); backdrop-filter:blur(18px) saturate(140%);
+        box-shadow:0 -16px 40px #00000059;
+    }
+    :root[data-site-theme="charbon"] #admin-bottom-nav .admin-nav-link {
+        position:relative; flex:none; display:grid; place-items:center; width:48px; height:48px; min-height:0; margin:0; padding:0;
+        border-radius:14px; background:none!important; box-shadow:none!important; color:var(--ch-muted)!important;
+    }
+    :root[data-site-theme="charbon"] #admin-bottom-nav .admin-nav-link span {
+        position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;
+    }
+    :root[data-site-theme="charbon"] #admin-bottom-nav .admin-nav-link svg {
+        width:22px; height:22px; stroke-width:1.6; color:inherit!important; background:none!important;
+    }
+    :root[data-site-theme="charbon"] #admin-bottom-nav .admin-nav-link[aria-current] { color:var(--ch-ink)!important; }
+    :root[data-site-theme="charbon"] #admin-bottom-nav .admin-nav-link[aria-current]::after {
+        content:""; display:block!important; position:absolute; inset:auto auto 3px 50%; width:5px; height:5px; margin-left:-2.5px;
+        border-radius:50%; background:var(--ch-accent);
+    }
+    :root[data-site-theme="charbon"] #admin-bottom-nav [data-more] {
+        width:58px; height:58px; margin-top:-30px; border-radius:50%;
+        background:var(--ch-accent)!important; color:var(--ch-on-accent)!important;
+        box-shadow:var(--ch-glow),0 0 0 6px var(--admin-ground)!important;
+    }
+    :root[data-site-theme="charbon"] #admin-bottom-nav [data-more] svg { width:24px; height:24px; stroke-width:2; }
+    /* "Plus" now lives in the bottom nav, so the top bar drops its own menu button. */
+    :root[data-site-theme="charbon"] #admin-more-button { display:none; }
+}
+@media (max-width:767px) {
+    :root[data-site-theme="charbon"] .admin-topbar .lang-current { display:none; }
+
+    /* Overview: four tiles in a 2 x 2 grid, the next order on one compact row. */
+    :root[data-site-theme="charbon"] #view-overview #overview-attention { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    :root[data-site-theme="charbon"] #overview-attention :is(.admin-attention-row,.admin-attention-total) { padding:14px; gap:6px; }
+    :root[data-site-theme="charbon"] #overview-attention :is(.admin-attention-row,.admin-attention-total) > strong { font-size:28px; }
+    :root[data-site-theme="charbon"] #overview-attention :is(.admin-attention-row,.admin-attention-total) > span { font-size:12px; line-height:1.3; }
+    :root[data-site-theme="charbon"] #view-overview .admin-next-order strong { font-size:16px; }
+
+    /* Orders: title and mode switch, the tabs, then search with icon buttons. */
+    :root[data-site-theme="charbon"] .orders-workspace { gap:10px; }
+    :root[data-site-theme="charbon"] #view-orders .orders-heading h2 { font-size:26px; }
+    :root[data-site-theme="charbon"] #view-orders :is(.orders-search-row,.orders-utilities) { gap:8px; }
+
+    /* Menu: title with the buttons, a single tool row, a single category row. */
+    :root[data-site-theme="charbon"] #view-menu .menu-heading { display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; gap:10px; margin-bottom:12px; text-align:start; }
+    :root[data-site-theme="charbon"] #view-menu .menu-heading > div:first-child { flex:1; min-width:0; }
+    :root[data-site-theme="charbon"] #view-menu .menu-heading h2 { font-size:26px; }
+    :root[data-site-theme="charbon"] #view-menu .menu-heading-actions { display:flex; flex:none; flex-wrap:nowrap; gap:8px; width:auto; }
+    :root[data-site-theme="charbon"] #view-menu .menu-heading-actions > .admin-button { flex:0 0 auto; width:auto; }
+    :root[data-site-theme="charbon"] #view-menu .menu-heading-actions .admin-button { min-height:42px; border-radius:999px; }
+    :root[data-site-theme="charbon"] #view-menu .menu-heading-actions > .admin-button:not(.primary) { width:42px; min-width:42px; padding:0; justify-content:center; border-radius:50%; font-size:0; }
+    :root[data-site-theme="charbon"] #view-menu .menu-heading-actions .admin-button:not(.primary)::after { content:none; }
+    :root[data-site-theme="charbon"] #view-menu .menu-tools .admin-button { width:42px; min-width:42px; height:42px; padding:0; justify-content:center; border-radius:50%; font-size:0; }
+    /* Visually hidden, still named for screen readers. */
+    :root[data-site-theme="charbon"] #view-menu .menu-tools .admin-button span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+    :root[data-site-theme="charbon"] #view-menu #items-grid.menu-products { grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    :root[data-site-theme="charbon"] #view-menu #items-grid.menu-products:has(.menu-product[data-cutout="true"]) { row-gap:64px; padding-top:56px; }
+    :root[data-site-theme="charbon"] #view-menu #items-grid .menu-product-info h4 { font-size:14px; }
+    :root[data-site-theme="charbon"] #view-menu #items-grid .menu-product-info p { font-size:12px; }
+    :root[data-site-theme="charbon"] #view-menu #items-grid .menu-price { font-size:15px; }
+
+    /* Promotions: picture and words side by side, price under the words, actions below. */
+    :root[data-site-theme="charbon"] #view-promotions .promo-entry {
+        grid-template-columns:84px minmax(0,1fr); grid-template-areas:"art body" "art price" "actions actions"; gap:6px 14px; padding:12px;
+    }
+    :root[data-site-theme="charbon"] #view-promotions .promo-art { width:84px; }
+    :root[data-site-theme="charbon"] #view-promotions .promo-entry-body h3 { font-size:15px; -webkit-line-clamp:2; }
+    :root[data-site-theme="charbon"] #view-promotions .promo-entry-price { font-size:17px; }
+    :root[data-site-theme="charbon"] #view-promotions .promo-actions { padding-top:10px; }
+}
+
+/* Small accent-coloured text on dark panels uses a lighter tint of the accent (about 5:1 instead of 2.8:1). */
+:root[data-site-theme="charbon"][data-site-mode="dark"] {
+    --ch-accent-text:color-mix(in srgb,var(--ch-accent) 55%,#fff);
+}
+:root[data-site-theme="charbon"][data-site-mode="dark"] :is(#view-overview .admin-panel-link,#view-overview .admin-recent-table a,#restaurant-profile-form .settings-section-heading h3) {
+    color:var(--ch-accent-text);
+}
+
+/* Switching light/dark swaps every colour at once; transitions are off for that one frame so nothing smears. */
+.theme-switching *, .theme-switching *::before, .theme-switching *::after { transition:none!important; }
+
+/* =====================================================================
+   Classic theme: the same decluttered layout as Charbon (orders, menu, promotions, top bar),
+   in the classic palette. The --ch-* names map to the classic Admin tokens here.
+   ===================================================================== */
+:root:not([data-site-theme="charbon"]) {
+    --ch-ink:var(--admin-text); --ch-soft-ink:var(--admin-text); --ch-muted:var(--admin-muted);
+    --ch-faint:color-mix(in srgb,var(--admin-text) 6%,transparent); --ch-line:var(--admin-border);
+    --ch-accent:var(--admin-primary); --ch-on-accent:var(--admin-on-primary);
+    --ch-glass:var(--admin-surface); --ch-shadow:var(--admin-card-shadow);
+    --ch-glow:0 12px 26px -10px color-mix(in srgb,var(--admin-primary) 60%,transparent);
+}
+:root:not([data-site-theme="charbon"]) #view-orders .orders-search input { font-size:14px; }
+@media (max-width:767px) { :root:not([data-site-theme="charbon"]) #view-orders .orders-search input, :root:not([data-site-theme="charbon"]) .admin-body .settings-jump select { font-size:16px; } }
+/* ---------- Top bar: one quiet line of ghost controls ---------- */
+:root:not([data-site-theme="charbon"]) .admin-top-actions { gap:4px; }
+:root:not([data-site-theme="charbon"]) :is(.admin-preview,.admin-profile-button,#adminLangSelector > button,#admin-mode-toggle) {
+    border-color:transparent; background:transparent; box-shadow:none;
+}
+:root:not([data-site-theme="charbon"]) :is(.admin-preview,.admin-profile-button,#adminLangSelector > button,#admin-mode-toggle):hover { background:var(--ch-faint); }
+:root:not([data-site-theme="charbon"]) :is(.admin-store-status,#admin-connection) {
+    min-height:32px; padding:0 10px; border:1px solid var(--ch-line); border-radius:999px; background:none; color:var(--ch-soft-ink); font-size:12px; font-weight:500;
+}
+:root:not([data-site-theme="charbon"]) #admin-connection { border-color:transparent; color:var(--ch-muted); }
+:root:not([data-site-theme="charbon"]) .admin-profile-button { gap:10px; padding-inline:6px 10px; }
+
+/* ---------- Orders: text tabs with each lane's colour dot, one compact tool row ---------- */
+:root:not([data-site-theme="charbon"]) #view-orders .orders-tabs {
+    display:flex; flex-wrap:nowrap; gap:4px 20px; overflow-x:auto; scrollbar-width:none;
+    padding:2px 2px 4px; border:0; background:none; grid-template-columns:none;
+}
+:root:not([data-site-theme="charbon"]) #view-orders .orders-tabs::-webkit-scrollbar { display:none; }
+:root:not([data-site-theme="charbon"]) #view-orders .orders-tabs button {
+    position:relative; flex:none; display:inline-flex; align-items:center; gap:8px; min-height:40px; width:auto;
+    padding:0 0 0 16px; border:0!important; border-radius:0; background:none!important; box-shadow:none!important;
+    color:var(--ch-muted); font-size:14px; font-weight:500; white-space:nowrap;
+}
+:root:not([data-site-theme="charbon"]) #view-orders .orders-tabs button > svg { display:none; }
+:root:not([data-site-theme="charbon"]) #view-orders .orders-tabs button::before {
+    content:""; position:absolute; inset-inline-start:2px; top:50%; width:7px; height:7px; margin-top:-3.5px;
+    border-radius:50%; background:var(--order-tone,var(--ch-accent)); opacity:.45;
+}
+:root:not([data-site-theme="charbon"]) #view-orders .orders-tabs button[aria-pressed=true] { color:var(--ch-ink)!important; font-weight:600; }
+:root:not([data-site-theme="charbon"]) #view-orders .orders-tabs button[aria-pressed=true]::before { opacity:1; box-shadow:0 0 8px var(--order-tone,var(--ch-accent)); }
+:root:not([data-site-theme="charbon"]) #view-orders .orders-tabs button > span:not([id]) { all:unset; }
+:root:not([data-site-theme="charbon"]) #view-orders .orders-tabs button > span[id^="count-"] {
+    display:inline-grid; place-items:center; min-width:22px; height:22px; padding:0 7px; border:0; border-radius:999px;
+    background:var(--ch-faint); color:var(--ch-soft-ink); font-size:12px; font-weight:600;
+}
+:root:not([data-site-theme="charbon"]) #view-orders .orders-tabs button[aria-pressed=true] > span[id^="count-"] { background:var(--ch-accent); color:var(--ch-on-accent); }
+:root:not([data-site-theme="charbon"]) #view-orders :is(.orders-utilities,.orders-search-row) .admin-button,
+:root:not([data-site-theme="charbon"]) #view-orders #orders-filters-toggle {
+    width:42px; min-width:42px; height:42px; min-height:42px; padding:0; justify-content:center; border-radius:50%; font-size:0;
+}
+:root:not([data-site-theme="charbon"]) #view-orders :is(.orders-utilities,.orders-search-row) .admin-button svg { width:18px; height:18px; }
+:root:not([data-site-theme="charbon"]) #view-orders .orders-search input { min-height:42px; font-size:14px; border-radius:999px; }
+:root:not([data-site-theme="charbon"]) #view-orders .orders-mode { padding:3px; border-radius:999px; }
+:root:not([data-site-theme="charbon"]) #view-orders .orders-mode button { min-height:36px; border-radius:999px; }
+:root:not([data-site-theme="charbon"]) #view-orders .orders-metadata { color:var(--ch-muted); font-size:12px; }
+
+/* ---------- Menu: one header row, one tool row, one scrolling category row ---------- */
+:root:not([data-site-theme="charbon"]) #view-menu .menu-approved-categories { flex-wrap:nowrap; }
+:root:not([data-site-theme="charbon"]) #view-menu .menu-category-chips { flex:1; min-width:0; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; }
+:root:not([data-site-theme="charbon"]) #view-menu .menu-category-chips::-webkit-scrollbar { display:none; }
+:root:not([data-site-theme="charbon"]) #view-menu .menu-category-chips button { flex:none; white-space:nowrap; }
+:root:not([data-site-theme="charbon"]) #view-menu .menu-approved-categories > .admin-button { flex:none; min-height:40px; padding:0 14px; border-radius:999px; font-size:13px; }
+
+/* ---------- Promotions: image, words, price, then a quiet action row ---------- */
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-entry {
+    display:grid; grid-template-columns:104px minmax(0,1fr) auto; grid-template-areas:"art body price" "actions actions actions";
+    align-items:center; gap:12px 16px; padding:14px; border:1px solid var(--ch-line); border-radius:22px;
+    background:var(--ch-glass); box-shadow:var(--ch-shadow); color:var(--ch-ink);
+}
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-art { grid-area:art; width:104px; aspect-ratio:1; border-radius:16px; overflow:hidden; background:var(--ch-faint); }
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-art img { width:100%; height:100%; object-fit:cover; }
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-art[data-cutout="true"] { overflow:visible; background:none; filter:drop-shadow(0 12px 14px #000000a6); }
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-art[data-cutout="true"] img { object-fit:contain; }
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-entry-body { grid-area:body; min-width:0; display:flex; flex-direction:column; gap:4px; }
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-entry-body h3 {
+    margin:0; font-family:var(--font); font-size:16px; font-weight:600; line-height:1.35;
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-entry-price { grid-area:price; align-self:start; font-family:var(--font); font-size:20px; font-weight:600; white-space:nowrap; }
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-actions {
+    grid-area:actions; display:flex; align-items:center; gap:8px; padding-top:12px; border-top:1px solid var(--ch-line);
+}
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-actions .admin-button { width:40px; min-width:40px; height:40px; min-height:40px; padding:0; justify-content:center; border-radius:50%; }
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-actions [data-promo-action="edit"] { width:auto; padding:0 16px; border-radius:999px; margin-inline-end:auto; }
+:root:not([data-site-theme="charbon"]) #view-promotions .promo-actions [data-promo-action="edit"] .sr-only {
+    position:static; width:auto; height:auto; margin:0; overflow:visible; clip:auto; white-space:nowrap;
+}
+
+@media (max-width:767px) {
+    :root:not([data-site-theme="charbon"]) .admin-topbar .lang-current { display:none; }
+
+
+    /* Orders: title and mode switch, the tabs, then search with icon buttons. */
+    :root:not([data-site-theme="charbon"]) .orders-workspace { gap:10px; }
+    :root:not([data-site-theme="charbon"]) #view-orders .orders-heading h2 { font-size:26px; }
+    :root:not([data-site-theme="charbon"]) #view-orders :is(.orders-search-row,.orders-utilities) { gap:8px; }
+
+    /* Menu: title with the buttons, a single tool row, a single category row. */
+    :root:not([data-site-theme="charbon"]) #view-menu .menu-heading { display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; gap:10px; margin-bottom:12px; text-align:start; }
+    :root:not([data-site-theme="charbon"]) #view-menu .menu-heading > div:first-child { flex:1; min-width:0; }
+    :root:not([data-site-theme="charbon"]) #view-menu .menu-heading h2 { font-size:26px; }
+    :root:not([data-site-theme="charbon"]) #view-menu .menu-heading-actions { display:flex; flex:none; flex-wrap:nowrap; gap:8px; width:auto; }
+    :root:not([data-site-theme="charbon"]) #view-menu .menu-heading-actions > .admin-button { flex:0 0 auto; width:auto; }
+    :root:not([data-site-theme="charbon"]) #view-menu .menu-heading-actions .admin-button { min-height:42px; border-radius:999px; }
+    :root:not([data-site-theme="charbon"]) #view-menu .menu-heading-actions > .admin-button:not(.primary) { width:42px; min-width:42px; padding:0; justify-content:center; border-radius:50%; font-size:0; }
+    :root:not([data-site-theme="charbon"]) #view-menu .menu-heading-actions > .admin-button:not(.primary)::after { content:none; }
+    :root:not([data-site-theme="charbon"]) #view-menu .menu-tools .admin-button { width:42px; min-width:42px; height:42px; padding:0; justify-content:center; border-radius:50%; font-size:0; }
+    :root:not([data-site-theme="charbon"]) #view-menu .menu-tools .admin-button span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+    /* Promotions: picture and words side by side, price under the words, actions below. */
+    :root:not([data-site-theme="charbon"]) #view-promotions .promo-entry {
+        grid-template-columns:84px minmax(0,1fr); grid-template-areas:"art body" "art price" "actions actions"; gap:6px 14px; padding:12px;
+    }
+    :root:not([data-site-theme="charbon"]) #view-promotions .promo-art { width:84px; }
+    :root:not([data-site-theme="charbon"]) #view-promotions .promo-entry-body h3 { font-size:15px; -webkit-line-clamp:2; }
+    :root:not([data-site-theme="charbon"]) #view-promotions .promo-entry-price { font-size:17px; }
+    :root:not([data-site-theme="charbon"]) #view-promotions .promo-actions { padding-top:10px; }
+}
+
+/* Light Charbon keeps the same quiet top bar: only the restaurant status keeps an outline. */
+:root[data-site-theme="charbon"][data-site-mode="light"] :is(.admin-preview,.admin-profile-button,#adminLangSelector > button,#admin-mode-toggle,#admin-connection) {
+    border-color:transparent; background:transparent; box-shadow:none;
+}
+@media (hover:hover) { :root[data-site-theme="charbon"][data-site-mode="light"] :is(.admin-preview,.admin-profile-button,#adminLangSelector > button,#admin-mode-toggle):hover { background:var(--ch-faint); } }
+:root[data-site-theme="charbon"] #admin-mode-toggle { background:transparent; }
+
+@media (max-width:999px) {
+    /* Classic uses the same tab bar as Charbon, in its own colours. */
+    :root:not([data-site-theme="charbon"]) #admin-bottom-nav {
+        position:relative; display:flex; align-items:center; justify-content:space-around; gap:0; overflow:visible;
+        min-height:calc(72px + env(safe-area-inset-bottom)); padding:0 10px env(safe-area-inset-bottom);
+        border:0; border-top:1px solid var(--ch-faint); border-radius:26px 26px 0 0;
+        background:color-mix(in srgb,var(--admin-ground) 86%,transparent);
+        -webkit-backdrop-filter:blur(18px) saturate(140%); backdrop-filter:blur(18px) saturate(140%);
+        box-shadow:0 -16px 40px #00000059;
+    }
+    :root:not([data-site-theme="charbon"]) #admin-bottom-nav .admin-nav-link {
+        position:relative; flex:none; display:grid; place-items:center; width:48px; height:48px; min-height:0; margin:0; padding:0;
+        border-radius:14px; background:none!important; box-shadow:none!important; color:var(--ch-muted)!important;
+    }
+    :root:not([data-site-theme="charbon"]) #admin-bottom-nav .admin-nav-link span {
+        position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;
+    }
+    :root:not([data-site-theme="charbon"]) #admin-bottom-nav .admin-nav-link svg {
+        width:22px; height:22px; stroke-width:1.6; color:inherit!important; background:none!important;
+    }
+    :root:not([data-site-theme="charbon"]) #admin-bottom-nav .admin-nav-link[aria-current] { color:var(--ch-ink)!important; }
+    :root:not([data-site-theme="charbon"]) #admin-bottom-nav .admin-nav-link[aria-current]::after {
+        content:""; display:block!important; position:absolute; inset:auto auto 3px 50%; width:5px; height:5px; margin-left:-2.5px;
+        border-radius:50%; background:var(--ch-accent);
+    }
+    :root:not([data-site-theme="charbon"]) #admin-bottom-nav [data-more] {
+        width:58px; height:58px; margin-top:-30px; border-radius:50%;
+        background:var(--ch-accent)!important; color:var(--ch-on-accent)!important;
+        box-shadow:var(--ch-glow),0 0 0 6px var(--admin-ground)!important;
+    }
+    :root:not([data-site-theme="charbon"]) #admin-bottom-nav [data-more] svg { width:24px; height:24px; stroke-width:2; }
+    /* "Plus" now lives in the bottom nav, so the top bar drops its own menu button. */
+    :root:not([data-site-theme="charbon"]) #admin-more-button { display:none; }
+}
+
+/* =====================================================================
+   Commandes and Menu, built to the approved prototype (canvas "BIGTAC Admin · Charbon").
+   ===================================================================== */
+
+/* ---------- Tous: every queue at once, one lane per status (both themes) ---------- */
+#view-orders[data-tab="all"]:not([data-kitchen="true"]) .orders-board {
+    display:grid; grid-template-columns:repeat(4,minmax(250px,1fr)); gap:16px; align-items:start; align-content:start;
+    overflow-x:auto; overflow-y:visible; min-height:0;
+}
+#view-orders[data-tab="all"]:not([data-kitchen="true"]) .orders-board .orders-column {
+    display:flex; flex-direction:column; gap:14px; min-width:0; max-height:none;
+}
+#view-orders[data-tab="all"]:not([data-kitchen="true"]) .orders-column > header { display:flex; }
+#view-orders[data-tab="all"]:not([data-kitchen="true"]) .orders-board .orders-list {
+    display:flex; flex-direction:column; gap:14px; padding:0; overflow:visible; grid-template-columns:none;
+}
+@media (max-width:1199px) {
+    #view-orders[data-tab="all"]:not([data-kitchen="true"]) .orders-board { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:767px) {
+    #view-orders[data-tab="all"]:not([data-kitchen="true"]) .orders-board { grid-template-columns:minmax(0,1fr); overflow-x:visible; }
+}
+/* The product description is part of the Charbon card only. */
+:root:not([data-site-theme="charbon"]) #view-menu .menu-product-description { display:none; }
+
+/* ---------- Charbon Commandes: header like the prototype ---------- */
+@media (min-width:1100px) {
+    :root[data-site-theme="charbon"] #view-orders.orders-workspace {
+        display:grid; grid-template-columns:minmax(0,1fr) auto auto auto;
+        grid-template-areas:"title search utils mode" "meta search utils mode" "tabs tabs tabs tabs" "filters filters filters filters" "note note note note" "error error error error" "board board board board";
+        column-gap:10px; row-gap:0; align-content:start; padding:28px clamp(20px,3vw,44px) 44px;
+    }
+    :root[data-site-theme="charbon"] #view-orders :is(.orders-heading,.orders-toolbar) { display:contents; }
+    :root[data-site-theme="charbon"] #view-orders .orders-heading > div:first-child { grid-area:title; align-self:end; }
+    :root[data-site-theme="charbon"] #view-orders .orders-heading h2 { margin:0; font-size:30px; }
+    :root[data-site-theme="charbon"] #view-orders .orders-metadata { grid-area:meta; align-self:start; margin-top:2px; }
+    :root[data-site-theme="charbon"] #view-orders .orders-search-row { grid-area:search; align-self:center; }
+    :root[data-site-theme="charbon"] #view-orders .orders-search { width:280px; max-width:none; }
+    :root[data-site-theme="charbon"] #view-orders .orders-utilities { grid-area:utils; align-self:center; display:flex; gap:8px; margin:0; }
+    :root[data-site-theme="charbon"] #view-orders .orders-mode { grid-area:mode; align-self:center; position:static; }
+    :root[data-site-theme="charbon"] #view-orders .orders-tabs { grid-area:tabs; margin-top:20px; }
+    :root[data-site-theme="charbon"] #view-orders #orders-filters { grid-area:filters; margin-top:14px; }
+    :root[data-site-theme="charbon"] #view-orders #orders-notification { grid-area:note; margin-top:14px; }
+    :root[data-site-theme="charbon"] #view-orders #orders-error { grid-area:error; margin-top:14px; }
+    :root[data-site-theme="charbon"] #view-orders .orders-board { grid-area:board; margin-top:18px; }
+}
+:root[data-site-theme="charbon"] #view-orders .orders-search label,
+:root[data-site-theme="charbon"] #view-orders .orders-search input { border-radius:16px; }
+:root[data-site-theme="charbon"] #view-orders .orders-mode { padding:4px; border:1px solid var(--ch-line); border-radius:16px; background:#ffffff0a; }
+:root[data-site-theme="charbon"] #view-orders .orders-mode button { min-height:38px; padding:0 16px; border-radius:12px; font-size:13px; }
+:root[data-site-theme="charbon"] #view-orders .orders-mode button[aria-pressed=true] { background:var(--ch-ink); color:var(--admin-ground); }
+
+/* Lanes: a quiet glass panel, the status dot and a round count. */
+:root[data-site-theme="charbon"] #view-orders .orders-column { padding:14px; border:1px solid var(--ch-line); border-radius:28px; background:color-mix(in srgb,var(--ch-ink) 3%,transparent); }
+:root[data-site-theme="charbon"] #view-orders .orders-column > header { align-items:center; justify-content:space-between; padding:6px 8px 2px; }
+:root[data-site-theme="charbon"] #view-orders .orders-column > header p { display:none; }
+:root[data-site-theme="charbon"] #view-orders .orders-column h3 { gap:9px; font-size:15px; font-weight:600; }
+:root[data-site-theme="charbon"] #view-orders .orders-column [data-count] { min-width:28px; height:28px; padding:0 8px; font-size:13px; font-weight:600; border-radius:999px; }
+
+/* ---------- Charbon order card, as in the prototype ---------- */
+:root[data-site-theme="charbon"] #view-orders .order-card {
+    display:flex; flex-direction:column; gap:14px; padding:18px!important; border-radius:22px;
+    background:linear-gradient(155deg,var(--ch-faint),color-mix(in srgb,var(--ch-ink) 3%,transparent));
+}
+:root[data-site-theme="charbon"] #view-orders .order-card > * { margin:0; padding:0; border:0; background:none; }
+:root[data-site-theme="charbon"] #view-orders .order-card-heading { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:0; }
+:root[data-site-theme="charbon"] #view-orders .order-open { padding:0; border:0; background:none; color:var(--ch-ink); }
+:root[data-site-theme="charbon"] #view-orders .order-open strong { font-family:var(--font); font-size:22px; font-weight:600; letter-spacing:-.01em; }
+:root[data-site-theme="charbon"] #view-orders .order-age { padding:4px 10px; border-radius:999px; font-size:12px; font-weight:500; white-space:nowrap; }
+:root[data-site-theme="charbon"] #view-orders .order-ticket-time { display:flex; align-items:center; gap:8px; color:var(--ch-soft-ink); font-size:12px; }
+:root[data-site-theme="charbon"] #view-orders .order-ticket-time .order-status { display:none; }
+:root[data-site-theme="charbon"] #view-orders .order-ticket-time .order-service { display:inline-flex; align-items:center; gap:6px; padding:0; border-radius:0; background:none; color:var(--ch-soft-ink); font-size:12px; font-weight:400; }
+:root[data-site-theme="charbon"] #view-orders .order-products { gap:8px; }
+:root[data-site-theme="charbon"] #view-orders .order-product-title { font-size:14px; font-weight:500; }
+:root[data-site-theme="charbon"] #view-orders :is(.order-options,.order-product-title + *) { color:var(--ch-muted); font-size:12px; }
+:root[data-site-theme="charbon"] #view-orders .order-instructions { margin-top:8px; padding:8px 10px; border-radius:12px; }
+:root[data-site-theme="charbon"] #view-orders .order-ticket-footer {
+    display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"handoff handoff" "actions detail"; gap:12px 8px;
+}
+:root[data-site-theme="charbon"] #view-orders .ticket-handoff {
+    grid-area:handoff; display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:12px; border-top:1px solid var(--ch-line);
+}
+:root[data-site-theme="charbon"] #view-orders .order-card-total { display:flex; flex-direction:column; gap:0; min-width:0; }
+:root[data-site-theme="charbon"] #view-orders .order-card-total span { color:var(--ch-muted); font-size:12px; }
+:root[data-site-theme="charbon"] #view-orders .order-card-total strong { font-family:var(--font); font-size:17px; font-weight:600; color:var(--ch-ink); }
+:root[data-site-theme="charbon"] #view-orders .order-contact-actions { display:flex; gap:6px; }
+:root[data-site-theme="charbon"] #view-orders .order-contact-actions :is(a,button) {
+    display:grid; place-items:center; width:38px; height:38px; min-height:0; padding:0; border:1px solid var(--ch-line); border-radius:12px; background:var(--ch-faint); color:var(--ch-ink);
+}
+:root[data-site-theme="charbon"] #view-orders .order-actions { grid-area:actions; display:flex; gap:8px; min-width:0; margin:0; padding:0; }
+:root[data-site-theme="charbon"] #view-orders .order-actions .admin-button { min-height:46px; border-radius:14px; }
+:root[data-site-theme="charbon"] #view-orders .order-actions .admin-button.primary:not(:disabled) {
+    flex:1; min-width:0; justify-content:center; padding:0 12px; font-size:13px; border-color:transparent;
+    background:var(--ch-accent); color:var(--ch-on-accent); box-shadow:var(--ch-glow);
+}
+:root[data-site-theme="charbon"] #view-orders :is(#col-confirmed,#col-delivery,#col-history) .order-actions .admin-button.primary:not(:disabled) {
+    background:var(--ch-ink); color:var(--admin-ground); box-shadow:none;
+}
+:root[data-site-theme="charbon"] #view-orders .order-actions .admin-button:not(.primary) { width:46px; min-width:46px; flex:none; padding:0; justify-content:center; }
+:root[data-site-theme="charbon"] #view-orders .order-detail-link {
+    grid-area:detail; display:grid; place-items:center; width:46px; height:46px; border:1px solid var(--ch-line)!important; border-radius:14px; background:var(--ch-faint)!important; color:var(--ch-ink);
+}
+:root[data-site-theme="charbon"] #view-orders[data-tab="all"] .order-actions .admin-button.primary svg { display:none; }
+
+/* ---------- Charbon Menu, as in the prototype ---------- */
+@media (min-width:768px) {
+    :root[data-site-theme="charbon"] #view-menu.menu-workspace {
+        display:grid; grid-template-columns:minmax(0,1fr) auto; column-gap:20px; row-gap:0; align-content:start;
+    }
+    :root[data-site-theme="charbon"] #view-menu .menu-heading { grid-column:1 / -1; grid-row:1; margin-bottom:24px; }
+    :root[data-site-theme="charbon"] #view-menu .menu-approved-layout { display:contents; }
+    :root[data-site-theme="charbon"] #view-menu .menu-approved-categories { grid-column:1; grid-row:2; align-self:center; }
+    :root[data-site-theme="charbon"] #view-menu .menu-tools { grid-column:2; grid-row:2; align-self:center; margin:0; }
+    :root[data-site-theme="charbon"] #view-menu .menu-search { width:300px; max-width:none; }
+    :root[data-site-theme="charbon"] #view-menu #menu-filter-panel { grid-column:1 / -1; grid-row:3; margin-top:14px; }
+    :root[data-site-theme="charbon"] #view-menu .menu-approved-products { grid-column:1 / -1; grid-row:4; margin-top:8px; }
+}
+:root[data-site-theme="charbon"] #view-menu .menu-heading h2 { font-size:30px; }
+:root[data-site-theme="charbon"] #view-menu .menu-heading-actions .admin-button { min-height:48px; border-radius:16px; }
+:root[data-site-theme="charbon"] #view-menu .menu-list-heading { display:none; }
+:root[data-site-theme="charbon"] #view-menu .menu-approved-categories > .admin-button {
+    min-height:40px; padding:0; border:0; border-radius:0; background:none!important; box-shadow:none; color:var(--ch-muted); font-size:14px;
+}
+:root[data-site-theme="charbon"] #view-menu .menu-search input,
+:root[data-site-theme="charbon"] #view-menu .menu-search { border-radius:16px; }
+
+/* Card: picture, category and availability, name, description, price with the two actions. */
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product {
+    grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:6px 8px; padding:10px 10px 18px; border-radius:24px;
+}
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product-info { display:contents; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-product-image { grid-row:1; margin-bottom:8px; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-product-info > p:not(.menu-product-description) {
+    grid-column:1; grid-row:2; margin:0 0 0 8px; color:var(--ch-muted); font-size:11px; font-weight:400;
+}
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-stock {
+    grid-column:2; grid-row:2; justify-self:end; display:inline-flex; align-items:center; gap:0; width:auto; min-height:24px;
+    margin:0 8px 0 0; padding:3px 10px; border:0; border-radius:999px; font-size:11px; font-weight:500;
+    background:color-mix(in srgb,#4ade80 14%,transparent); color:#86efac;
+}
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-stock[aria-checked="false"] { background:var(--ch-faint); color:var(--ch-soft-ink); }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-stock svg { display:none; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-product-info h4 { grid-column:1 / -1; grid-row:3; margin:2px 8px 0; font-size:16px; font-weight:600; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-product-description {
+    grid-column:1 / -1; grid-row:4; margin:0 8px; color:var(--ch-muted); font-size:12px; line-height:1.5;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-badges { grid-column:1 / -1; grid-row:5; margin:0 8px; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-badge.green { display:none; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-badges:not(:has(.menu-badge:not(.green))) { display:none; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-price { grid-column:1; grid-row:6; margin:10px 0 0 8px; font-size:17px; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-row-actions { grid-column:2; grid-row:6; margin:10px 8px 0 0; gap:8px; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-row-actions > .admin-button,
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-row-actions summary {
+    display:grid; place-items:center; width:44px; min-width:44px; height:44px; min-height:44px; padding:0; border-radius:13px; font-size:0;
+}
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-row-actions summary {
+    list-style:none; border:1px solid var(--ch-line); background:var(--ch-faint); color:var(--ch-ink); font-size:14px; letter-spacing:.05em; cursor:pointer;
+}
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-row-actions summary::-webkit-details-marker { display:none; }
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-row-actions > .admin-button span {
+    position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;
+}
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-row-actions > .admin-button svg { width:18px; height:18px; }
+:root[data-site-theme="charbon"] #view-menu #items-grid.menu-products { grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }
+@media (max-width:767px) {
+    :root[data-site-theme="charbon"] #view-menu #items-grid.menu-products { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    :root[data-site-theme="charbon"] #view-menu #items-grid .menu-row-actions > .admin-button,
+    :root[data-site-theme="charbon"] #view-menu #items-grid .menu-row-actions summary { width:40px; min-width:40px; height:40px; min-height:40px; }
+}
+
+/* Cards fill their lane; the classic ticket perforation is not part of the prototype card. */
+#view-orders[data-tab="all"]:not([data-kitchen="true"]) .orders-board .orders-list { align-items:stretch; }
+#view-orders[data-tab="all"]:not([data-kitchen="true"]) .orders-board .order-card { align-self:stretch; width:auto; }
+:root[data-site-theme="charbon"] #view-orders .order-card .order-ticket-footer { border:0!important; }
+:root[data-site-theme="charbon"] #view-orders .order-card :is(.order-ticket-footer,.order-ticket-content)::before,
+:root[data-site-theme="charbon"] #view-orders .order-card :is(.order-ticket-footer,.order-ticket-content)::after { content:none; }
+/* The edit action is the card's one accent button (an older neutral-control rule is !important). */
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-row-actions > .admin-button:not(:disabled) {
+    border-color:transparent!important; background:var(--ch-accent)!important; color:var(--ch-on-accent)!important; box-shadow:var(--ch-glow)!important;
+}
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-stock::before,
+:root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-stock::after { content:none; display:none; }
+@media (max-width:767px) {
+    /* Narrow cards: smaller round actions so the price keeps its room. */
+    :root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-price { margin-left:4px; font-size:15px; }
+    :root[data-site-theme="charbon"] #view-menu #items-grid .menu-product .menu-row-actions { gap:6px; margin-right:4px; }
+    :root[data-site-theme="charbon"] #view-menu #items-grid .menu-row-actions > .admin-button,
+    :root[data-site-theme="charbon"] #view-menu #items-grid .menu-row-actions summary { width:36px; min-width:36px; height:36px; min-height:36px; border-radius:11px; }
+    /* The Service / Cuisine switch keeps its icons only, so the title row fits. */
+    :root[data-site-theme="charbon"] #view-orders .orders-mode button { min-width:40px; padding:0 10px; font-size:0; gap:0; }
+    :root[data-site-theme="charbon"] #view-orders .orders-mode button svg { width:17px; height:17px; }
+}

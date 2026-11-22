@@ -1,10 +1,22 @@
 import assert from 'node:assert/strict';
+import {fileURLToPath} from 'node:url';
 import {chromium} from 'playwright';
 import {startAdminFixtureServer} from './fixtures/admin-server.mjs';
 import {startFixtureServer} from './fixtures/server.mjs';
 import {staffAdministration} from '../assets/staff-service.js';
 const admin=await startAdminFixtureServer(),store=await startFixtureServer(),browser=await chromium.launch();let checks=0,production=0;const errors=[];
 const check=(value,label)=>{assert.ok(value,label);checks++;};
+const logoFile=fileURLToPath(new URL('../assets/logo.png',import.meta.url));
+const logoUrl='https://logo.example.test/restaurant.png';
+const uploadedLogo='https://logo.example.test/uploaded.png';
+const bundledLogo='assets/logo.png';
+const serveLogo=route=>route.fulfill({path:logoFile,contentType:'image/png'});
+async function waitForLogo(page, selector, src) {
+    await page.waitForFunction(({selector,src})=>{
+        const logo=document.querySelector(selector);
+        return logo?.getAttribute('src')===src && logo.complete && logo.naturalWidth>0;
+    },{selector,src});
+}
 async function open(url,width=390){const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});await context.route(/firestore\.googleapis\.com|identitytoolkit\.googleapis\.com|gstatic\.com\/firebasejs/,r=>{production++;return r.abort();});const page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));await page.goto(url,{waitUntil:'domcontentloaded'});return {page,context};}
 try{
  for(const operation of Object.values(staffAdministration)){await assert.rejects(operation);checks++;}
@@ -19,8 +31,46 @@ try{
  check(await p.locator('#order-detail-body').innerText().then(t=>t.includes('Livreur 1')),'Assignment updates live detail');await p.waitForFunction(()=>!document.getElementById('delivery-assign').disabled);await p.locator('#delivery-assignee').selectOption('d2');await p.locator('#delivery-assign').click();await p.waitForFunction(()=>__adminFixture.data.orders.find(o=>o.id==='fixture-6').deliveryGuyId==='d2');checks++;
  const conflict=await p.evaluate(async()=>{const {operationsService}=await import('/assets/operations-service.js');const actor={uid:'fixture-staff',role:'admin',epoch:1};try{await operationsService(()=>actor).assign({id:'fixture-6',driverId:'d1',expected:'d1'});return false;}catch{return true;}});check(conflict,'Stale assignment rejected');await p.keyboard.press('Escape');
  await p.evaluate(()=>switchView('drivers'));await p.locator('#drivers-table-body tr').first().waitFor();check(await p.locator('#btn-add-user').isDisabled(),'Browser provisioning disabled');const writes=await p.evaluate(()=>__adminFixture.writes.length);await p.evaluate(()=>deleteDriver('d1'));check(await p.evaluate(()=>__adminFixture.writes.length)===writes,'Legacy removal entry point cannot write');
- await p.evaluate(()=>{__adminFixture.data.settings[0].unknownConfig='keep';__adminFixture.emit();switchView('settings');});await p.locator('#restaurant-restaurantName').fill('Restaurant local');await p.locator('#restaurant-email').fill('bad');await p.locator('#restaurant-profile-form button[type=submit],#restaurant-profile-form button:not([type])').first().click();check(await p.locator('#restaurant-profile-feedback').innerText().then(t=>t.includes('invalide')),'Invalid settings rejected');await p.locator('#restaurant-email').fill('local@example.test');await p.locator('#restaurant-profile-form button:not([type])').click();await p.waitForFunction(()=>__adminFixture.data.settings[0].restaurantName==='Restaurant local');check(await p.evaluate(()=>__adminFixture.data.settings[0].unknownConfig==='keep'),'Unknown settings retained');await context.close();
+ await p.evaluate(()=>{__adminFixture.data.settings[0].unknownConfig='keep';__adminFixture.emit();switchView('settings');});await p.locator('#restaurant-restaurantName').fill('Restaurant local');await p.locator('#restaurant-email').fill('bad');await p.locator('#restaurant-profile-form button[type=submit],#restaurant-profile-form button:not([type])').first().click();check(await p.locator('#restaurant-profile-feedback').innerText().then(t=>t.includes('invalide')),'Invalid settings rejected');await p.locator('#restaurant-email').fill('local@example.test');await p.locator('#restaurant-profile-form button:not([type])').click();await p.waitForFunction(()=>__adminFixture.data.settings[0].restaurantName==='Restaurant local');check(await p.evaluate(()=>__adminFixture.data.settings[0].unknownConfig==='keep'),'Unknown settings retained');
+
+ await p.setViewportSize({width:1440,height:900});
+ await context.route(logoUrl,serveLogo);
+ await context.route(uploadedLogo,serveLogo);
+ await context.route('https://logo.example.test/missing.png',route=>route.fulfill({status:404,body:'Not found'}));
+ await context.route('https://api.cloudinary.com/**',route=>route.fulfill({json:{secure_url:uploadedLogo}}));
+ const logoSelector='.admin-brand img';
+ const logoField=p.locator('#restaurant-logoUrl');
+ const saveProfile=p.locator('#restaurant-profile-form button:not([type])');
+ await waitForLogo(p,logoSelector,bundledLogo);
+ await logoField.fill(logoUrl);
+ await saveProfile.click();
+ await waitForLogo(p,logoSelector,logoUrl);
+ check(await p.locator('#admin-favicon').getAttribute('href')===logoUrl,'Saved Settings URL updates Admin branding without reloading');
+
+ await p.locator('[name=logoFile]').setInputFiles(logoFile);
+ await saveProfile.click();
+ await waitForLogo(p,logoSelector,uploadedLogo);
+ check(await p.locator('#admin-favicon').getAttribute('href')===uploadedLogo,'Uploaded logo updates Admin branding');
+
+ await logoField.fill('https://logo.example.test/missing.png');
+ await saveProfile.click();
+ await p.waitForFunction(()=>__adminFixture.data.settings[0].logoUrl.endsWith('/missing.png'));
+ await waitForLogo(p,logoSelector,bundledLogo);
+ check(await p.locator('#admin-favicon').getAttribute('href')===bundledLogo,'An image load failure falls back to the built-in logo');
+
+ await logoField.fill(logoUrl);
+ await saveProfile.click();
+ await waitForLogo(p,logoSelector,logoUrl);
+ await logoField.fill('');
+ await saveProfile.click();
+ await waitForLogo(p,logoSelector,bundledLogo);
+ check(await p.locator('#admin-favicon').getAttribute('href')===bundledLogo,'Clearing the logo URL restores the built-in logo');
+ await context.close();
  const driver=await open(admin.url+'/admin.html?role=livreur&orders=rich');await driver.page.locator('#view-driver').waitFor({state:'visible'});check(await driver.page.locator('#available-runs-list').innerText().then(t=>t.includes('attribuées')),'Unassigned feed restricted');check(await driver.page.evaluate(()=>!__adminFixture.queries.some(q=>q.name==='orders'&&q.filters?.some(f=>f.field==='status'&&f.value==='en_livraison')&&!q.filters?.some(f=>f.field==='deliveryGuyId'))),'No unassigned customer query');await driver.page.locator('#driver-nav-deliveries').click();
+ await driver.context.route(logoUrl,serveLogo);
+ await driver.page.evaluate(url=>{__adminFixture.data.settings[0].logoUrl=url;__adminFixture.emit();},logoUrl);
+ await waitForLogo(driver.page,'#view-driver .driver-topbar img',logoUrl);
+ check(await driver.page.locator('#admin-favicon').getAttribute('href')===logoUrl,'Driver Admin uses the confirmed restaurant logo');
  check(await driver.page.locator('#my-deliveries-list a[href*="maps"]').count()===0,'Zone label does not fabricate a Maps address');
  await driver.page.evaluate(()=>{__adminFixture.data.orders.find(o=>o.id==='fixture-6').customer.address='12 rue Exemple';__adminFixture.emit();});
  check(await driver.page.locator('#my-deliveries-list a[href*="maps"]').getAttribute('href').then(href=>href.includes('12%20rue%20Exemple')),'Assigned driver gets actual address Maps link');
